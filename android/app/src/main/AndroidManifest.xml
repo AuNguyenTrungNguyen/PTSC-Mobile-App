@@ -11,7 +11,7 @@
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
-      android:icon="@mipmap/ptsc"
+      android:icon="@mipmap/ic_app"
       android:allowBackup="false"
       android:theme="@style/AppTheme">
       <activity
