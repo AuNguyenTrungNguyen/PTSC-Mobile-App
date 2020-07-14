@@ -17,7 +17,7 @@ export default () => {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName='Update'>
+            <Stack.Navigator initialRouteName='Login'>
                 <Stack.Screen
                     name='Login'
                     component={LoginScreen}

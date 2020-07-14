@@ -23,7 +23,7 @@ export default function HomeScreen({ route, navigation }) {
     const [listProject, setListProject] = useState([]);
     const [projectCode, setProjectCode] = useState(null);
     const [barcode, setBarcode] = useState(null);
-    
+
     const getDataFromAPI = async () => {
         try {
             let username = await AsyncStorage.getItem('USERNAME');
@@ -82,7 +82,7 @@ export default function HomeScreen({ route, navigation }) {
         if (route.params?.barCode) {
             setBarcode(route.params?.barCode);
         }
-    }, [listProject, route.params?.barCode]);
+    }, []);
 
     return (
         <View style={styles.safeArea}>
@@ -104,7 +104,7 @@ export default function HomeScreen({ route, navigation }) {
                                 placeholder='Scan a Barcode'
                                 placeholderTextColor={BASE_COLOR}
                                 value={barcode}
-                                />
+                            />
                             <Icon name='camera' style={styles.icon} onPress={_onPressScanBarcode} />
                         </View>
                     </View>
