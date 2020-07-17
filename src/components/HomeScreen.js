@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import LoadDataRoleAPI from '../apis/LoadDataRole';
 import MessageAlert from './CustomViews/MessageAlert';
 
+
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
 
@@ -17,9 +18,8 @@ const storeData = async (key, value) => {
         MessageAlert('CATCH', error.toString());
     }
 };
-export default function HomeScreen({ route, navigation }) {
-
-    const [isLoading, setIsLoading] = useState(false);
+export default ({ route, navigation }) => {
+    const [isLoading, setIsLoading] = useState(true);
     const [listProject, setListProject] = useState([]);
     const [projectCode, setProjectCode] = useState(null);
     const [barcode, setBarcode] = useState(null);
@@ -40,6 +40,7 @@ export default function HomeScreen({ route, navigation }) {
                     }
                     setListProject(res);
                     setIsLoading(false);
+                    setBarcode('LSX18090015');
                 })
                 .catch(error => {
                     setIsLoading(false);
@@ -51,30 +52,39 @@ export default function HomeScreen({ route, navigation }) {
         }
     };
 
-    const _onChangeProjectCoce = (value) => {
+    const _onChangeProjectCode = (value) => {
         setProjectCode(value);
     };
 
-    const _onPressScanBarcode = () => {
+    const _onPressBarcodeScanner = () => {
         navigation.navigate('Camera');
     };
 
-    const _onClickTrackingBarcode = () => {
+    const validateValues = () => {
         if (projectCode == null) {
             MessageAlert('ERROR', 'Please select a project.');
             return;
         }
         if (barcode == null) {
-            MessageAlert('ERROR', 'Please scan a project.');
+            MessageAlert('ERROR', 'Please scan a barcode.');
             return;
         }
         try {
             storeData('PROJECT_CODE', projectCode);
             storeData('BARCODE', barcode);
-            navigation.navigate('Update');
         } catch (error) {
             MessageAlert('CATCH', error.toString());
         }
+    };
+
+    const _onPressTrackingBarcode = () => {
+        validateValues();
+        navigation.navigate('Update');
+    };
+
+    const _onPressUploadImage = () => {
+        validateValues();
+        navigation.navigate('Upload');
     };
 
     useEffect(() => {
@@ -93,7 +103,7 @@ export default function HomeScreen({ route, navigation }) {
                         <Dropdown
                             label='Select Poject'
                             data={listProject}
-                            onChangeText={_onChangeProjectCoce}
+                            onChangeText={_onChangeProjectCode}
                             baseColor={BASE_COLOR}
                             textColor={BASE_COLOR}
                         />
@@ -105,12 +115,16 @@ export default function HomeScreen({ route, navigation }) {
                                 placeholderTextColor={BASE_COLOR}
                                 value={barcode}
                             />
-                            <Icon name='camera' style={styles.icon} onPress={_onPressScanBarcode} />
+                            <Icon name='camera' style={styles.icon} onPress={_onPressBarcodeScanner} />
                         </View>
                     </View>
                     <TouchableOpacity style={styles.buttonContainer}
-                        onPress={_onClickTrackingBarcode}>
+                        onPress={_onPressTrackingBarcode}>
                         <Text style={styles.buttonTitle}>Tracking WO with Barcode</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonContainer}
+                        onPress={_onPressUploadImage}>
+                        <Text style={styles.buttonTitle}>Upload Barcode image </Text>
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
@@ -163,7 +177,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: BASE_COLOR,
         borderRadius: 32,
-        marginTop: 64,
+        marginTop: 24,
     },
     buttonTitle: {
         color: OPP_COLOR,

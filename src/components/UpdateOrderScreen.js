@@ -1,101 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, Modal, ImageBackground, ActivityIndicator } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import ImagePicker from 'react-native-image-picker';
-import RNFetchBlob from 'rn-fetch-blob';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
 import GetListOrderAPI from '../apis/GetListOrder';
-import UpdateOrderDetailAPI from '../apis/UpdateOrderDetail';
-
-import { Port_Server } from '../Core';
+import UpdateActutalsAPI from '../apis/UpdateActutalsAPI';
 import MessageAlert from './CustomViews/MessageAlert';
 
 export default () => {
 
-    /**
-     * State using for update ActutalMHRS
-     */
+    const [isLoading, setIsLoading] = useState(true);
     const [listOrder, setListOrder] = useState([]);
     const [listUpdate, setListUpdate] = useState([]);
     const [drawingNo, setDrawingNo] = useState(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-    /**
-     * State using for update Image Barcode
-     */
-    const [imageLoading, setImageLoading] = useState(false);
-    const [imageSource, setImageSource] = useState(null);
-    const [fileUrl, setFileUrl] = useState(null);
-    const [isShowModal, setIsShowModal] = useState(false);
-
-    /**
-     * State using for Alert Notification
-     */
-    const [isLoading, setIsLoading] = useState(true);
-    const [isImageUpload, setIsImageUpload] = useState(false);
-
-    const _pressChooseImage = () => {
-        setImageLoading(true);
-        ImagePicker.showImagePicker({
-            title: 'Select Image',
-            storageOptions: {
-                mediaType: 'image',
-                skipBackup: true,
-                path: 'bbos',
-            },
-        }, (response) => {
-            setImageLoading(false);
-            if (response.didCancel) {
-                setImageLoading(false);
-            } else if (response.error) {
-                setImageLoading(false);
-                MessageAlert('ERROR: ', response.error);
-            } else {
-                setImageLoading(false);
-                MessageAlert('SUCCESS', 'Choose image successfully.');
-                setImageSource({ uri: response.uri });
-                setFileUrl(response.data);
-            }
-        });
-    }
-
-    const _pressViewImage = () => {
-        setIsShowModal(true);
-    }
-
-    const _pressDeleteImage = () => {
-        MessageAlert('SUCCESS', 'Delete image successfully.');
-        setFileUrl(null);
-        setImageSource(null);
-    }
-
-    const _pressCloseImage = () => {
-        setIsShowModal(false);
-    }
-
     const _onRefresh = () => {
         setIsRefreshing(true);
-        getDataFromAPI()
+        Keyboard.dismiss();
+        getDataFromAPI();
     }
+
+    const _onPressSubmitData = () => {
+        NetInfo.fetch().then(state => {
+            if (!state.isConnected) {
+                MessageAlert('WARNING', 'The internet not connect.');
+            } else {
+                updateActutalsToServer();
+            }
+        });
+    };
 
     const checkNumber = input => {
         const regexNumber = /^[0-9]*$/;
         return input !== '' && regexNumber.test(input);
-    }
+    };
 
     const getDataFromAPI = async () => {
         try {
             let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
             let username = await AsyncStorage.getItem('USERNAME');
             let barcode = await AsyncStorage.getItem('BARCODE');
-            projectCode = 'BD1';
-            username = 'Admin4';
-            barcode = 'LSX18090015';
             GetListOrderAPI(projectCode, username, barcode)
                 .then(res => {
-                    console.log(res);
                     if (Array.isArray(res) && res.length) {
                         setDrawingNo(res[0].DrawingNo);
                         setListOrder(res);
@@ -113,10 +60,10 @@ export default () => {
             setIsLoading(false);
             setIsRefreshing(false);
             MessageAlert('CATCH', error.toString());
-        }
-    }
+        };
+    };
 
-    const updateActutalsToServer = () => {
+    const updateActutalsToServer = async () => {
         let errorIndexs = [];
         let listOrderUpdate = [];
         listUpdate.forEach((item, index) => {
@@ -137,71 +84,30 @@ export default () => {
             MessageAlert('ERROR', message);
             return;
         }
-        listOrderUpdate.forEach((item) => {
-            UpdateOrderDetailAPI(item.RowIndex, item.ActutalMHRS)
-                .then(res => {
-                    if (res.success) {
-                        MessageAlert('SUCCESS', 'Update value in JointNo ' + item.JointNo + ' successfully.');
-                    } else if (res.Message) {
-                        MessageAlert('ERROR', 'Update value in JointNo ' + item.JointNo + ' unsuccessfully.');
-                    }
-                    getDataFromAPI();
-                })
-                .catch(error => {
-                    MessageAlert('CATCH', error.toString());
-                });
-            getDataFromAPI();
-        });
-    };
 
-    const uploadImageToServer = async () => {
-        if (fileUrl == null) {
+        if (!listOrderUpdate.length) {
+            MessageAlert('WARNING', 'No any data changes!');
             return;
         }
-        // TODO Handle resize image after upload to server
-        // ...
+
         try {
-            // let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
-            // let username = await AsyncStorage.getItem('USERNAME');
-            // let barcode = await AsyncStorage.getItem('BARCODE');
-            let date = new Date().getDate();
-            let month = new Date().getMonth() + 1;
-            let year = new Date().getFullYear();
-            let time = new Date().getTime();
-            const imageName = barcode + "_" + username + "_" + date + '_' + month + '_' + year + '_' + time;
-            console.log(imageName);
-            console.log(fileUrl);
-            // RNFetchBlob.fetch('POST', Port_Server + '/api/PIPWorkOrderDetail/UploadFileBarCode', {
-            //     Authorization: "Bearer access-token",
-            //     otherHeader: "foo",
-            //     'Content-Type': 'multipart/form-data',
-            // }, [
-            //     { name: 'file', filename: imageName + '.png', type: 'image/png', data: fileUrl },
-            //     { name: 'BarCode', data: barcode },
-            //     { name: 'ProjectCode', data: projectCode },
-            //     { name: 'Username', data: username },
-            // ]).then((res) => {
-            //     if (res.data) {
-            //         setIsImageUpload(true);
-            //     }
-            // }).catch((error) => {
-            //     MessageAlert('CATCH', error.toString());
-            // });
+            let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
+            let barcode = await AsyncStorage.getItem('BARCODE');
+            UpdateActutalsAPI(projectCode, barcode, listOrderUpdate)
+                .then(res => {
+                    if (res.success) {
+                        MessageAlert('SUCCESS', res.responseText);
+                    } else {
+                        MessageAlert('ERROR', res.responseText);
+                    }
+                    getDataFromAPI();
+                }).catch(error => {
+                    MessageAlert('CATCH', error.toString());
+                });
         } catch (error) {
             MessageAlert('CATCH', error.toString());
-        }
-    }
-
-    const _submitData = () => {
-        NetInfo.fetch().then(state => {
-            if (!state.isConnected) {
-                MessageAlert('WARNING', 'The internet not connect.');
-            } else {
-                // updateActutalsToServer();
-                // uploadImageToServer();
-            }
-        });
-    }
+        };
+    };
 
     useEffect(() => {
         getDataFromAPI();
@@ -213,6 +119,7 @@ export default () => {
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.container}>
                     <FlatList
+                        style={{ flex: 1 }}
                         ListHeaderComponent={
                             <View>
                                 <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
@@ -262,53 +169,10 @@ export default () => {
                         }
                         keyExtractor={item => item.RowIndex.toString()}
                     />
-                    <Text style={styles.action}>Upload Image:</Text>
-                    <View style={styles.actionContainer}>
-                        {imageLoading
-                            ? <TouchableOpacity style={[styles.buttonAction, styles.buttonChoose]} disabled={imageLoading}>
-                                <ActivityIndicator size="large" color="white" />
-                            </TouchableOpacity>
-                            : <TouchableOpacity style={[styles.buttonAction, styles.buttonChoose]} onPress={_pressChooseImage}>
-                                <Text style={styles.buttonTitle}>Choose</Text>
-                            </TouchableOpacity>
-                        }
-                        {fileUrl != null
-                            ? <TouchableOpacity style={[styles.buttonAction, styles.buttonView]} onPress={_pressViewImage}>
-                                <Text style={styles.buttonTitle}>View</Text>
-                            </TouchableOpacity>
-                            : <TouchableOpacity disabled={true}
-                                style={[styles.buttonAction, styles.buttonDisable]}>
-                                <Text style={styles.buttonTitle}>View</Text>
-                            </TouchableOpacity>
-                        }
-                        {fileUrl != null
-                            ? <TouchableOpacity style={[styles.buttonAction, styles.buttonDelete]} onPress={_pressDeleteImage}>
-                                <Text style={styles.buttonTitle}>Delete</Text>
-                            </TouchableOpacity>
-                            : <TouchableOpacity disabled={true}
-                                style={[styles.buttonAction, styles.buttonDisable]}>
-                                <Text style={styles.buttonTitle}>Delete</Text>
-                            </TouchableOpacity>
-                        }
-                    </View>
-                    <TouchableOpacity style={styles.buttonContainer} onPress={_submitData} autoFocus={true} visible={isShowModal}>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitData} autoFocus={true}>
                         <Text style={styles.buttonTitle}>Submit to Server</Text>
                     </TouchableOpacity>
                 </View>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={isShowModal}>
-                    <SafeAreaView style={styles.safeArea}>
-                        <View style={styleModal.modalContainer}>
-                            <ImageBackground
-                                style={styleModal.modalImage}
-                                source={imageSource}>
-                                <Icon name="times-circle" onPress={_pressCloseImage} style={styleModal.modalIcon} />
-                            </ImageBackground>
-                        </View>
-                    </SafeAreaView>
-                </Modal>
             </SafeAreaView>
         </View>
     );
@@ -364,68 +228,15 @@ const styles = StyleSheet.create({
         height: '100%',
         color: BASE_COLOR,
     },
-
-    actionContainer: {
-        height: 48,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    buttonChoose: {
-        backgroundColor: '#007bff',
-    },
-    buttonView: {
-        backgroundColor: '#28a745',
-    },
-    buttonDelete: {
-        backgroundColor: '#dc3545'
-    },
-    buttonAction: {
-        borderRadius: 32,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '30%',
-    },
-    buttonDisable: {
-        backgroundColor: 'gray',
-        opacity: 0.7,
-    },
-
     buttonContainer: {
         height: 48,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: BASE_COLOR,
         borderRadius: 32,
-        marginTop: 16,
     },
     buttonTitle: {
         color: 'white',
         fontSize: 16,
-    },
-    action: {
-        color: BASE_COLOR,
-        fontSize: 18,
-        marginTop: 12,
-        marginBottom: 16,
-    },
-});
-const styleModal = StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        backgroundColor: 'white'
-    },
-    modalImage: {
-        flex: 1,
-        width: null,
-        height: null,
-        resizeMode: 'cover',
-        alignItems: 'flex-end',
-    },
-    modalIcon: {
-        fontSize: 32,
-        color: 'black',
-        margin: 8,
-        backgroundColor: 'white',
-        opacity: 0.5,
     },
 });

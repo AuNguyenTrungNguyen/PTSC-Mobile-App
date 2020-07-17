@@ -18,6 +18,7 @@ export default ({ navigation }) => {
                 style={styles.containerCamera}
                 type={RNCamera.Constants.Type.back}
                 onBarCodeRead={_onBarCodeRead}
+                captureAudio={false}
                 androidCameraPermissionOptions={{
                     title: 'Permission to use camera',
                     message: 'We need your permission to use your camera',

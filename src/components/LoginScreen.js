@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions } from 'react-native';
-import { Container, Content } from 'native-base';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
+
 import LoginAPI from '../apis/Login';
 import MessageAlert from './CustomViews/MessageAlert';
 
@@ -25,6 +25,11 @@ export default ({ navigation }) => {
     const [showPassord, setShowPassord] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const nextInput = useRef(null);
+    const _onSubmitEditingNextInput = () => {
+        nextInput.current.focus();
+    };
+
     const _onChangeUsername = text => {
         setUsername(text);
     };
@@ -43,15 +48,17 @@ export default ({ navigation }) => {
 
     const _login = () => {
         Keyboard.dismiss();
+        setLoading(true);
         NetInfo.fetch().then(state => {
             if (!state.isConnected) {
                 MessageAlert('WARNING', 'The internet not connect.');
+                setLoading(false);
             } else {
                 if (username === '' || password === '') {
                     MessageAlert('ERROR', 'The user name or password is invalid.');
+                    setLoading(false);
                     return;
                 }
-                setLoading(true);
                 LoginAPI(username, password)
                     .then(res => {
                         setLoading(false);
@@ -64,6 +71,10 @@ export default ({ navigation }) => {
                         }
                         storeData('USERNAME', res.userName);
                         navigation.navigate('Home');
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Home' }],
+                        });
                     })
                     .catch(error => {
                         setLoading(false);
@@ -74,54 +85,58 @@ export default ({ navigation }) => {
     };
 
     return (
-        <Container>
-            <Content>
-                <SafeAreaView style={styles.safeArea}>
-                    <Image
-                        resizeMode='contain'
-                        style={styles.image}
-                        source={require('../images/background.jpg')}
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.imageContainer}>
+                <Image
+                    style={styles.image}
+                    resizeMode='stretch'
+                    source={require('../images/background.jpg')}
+                />
+            </View>
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>PTCS M&C</Text>
+            </View>
+            <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
+                <View style={styles.inputContainer}>
+                    <Icon name='user-circle' style={styles.inputIcon} />
+                    <TextInput
+                        style={styles.inputText}
+                        placeholder="Username ..."
+                        value={username}
+                        onChangeText={_onChangeUsername}
+                        blurOnSubmit={false}
+                        onSubmitEditing={_onSubmitEditingNextInput}
                     />
-                    <Text style={styles.title}>PTCS CLOUD</Text>
-                    <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
-                        <View style={styles.inputContainer}>
-                            <Icon name='user-circle' style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Username ..."
-                                value={username}
-                                onChangeText={_onChangeUsername}
-                            />
-                            {username == ''
-                                ? null
-                                : <Icon name="times-circle" onPress={_pressClearUsername} style={styles.inputIcon} />}
-                        </View>
-                        <View style={[styles.inputContainer, styles.inputContainerLast]}>
-                            <Icon name="unlock-alt" style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder="Password ..."
-                                value={password}
-                                secureTextEntry={!showPassord}
-                                onChangeText={_onChangePassword}
-                            />
-                            {password == ''
-                                ? null : (showPassord
-                                    ? <Icon name="eye-slash" onPress={_pressTogglePassword} style={styles.inputIcon} />
-                                    : <Icon name="eye" onPress={_pressTogglePassword} style={styles.inputIcon} />)}
-                        </View>
-                        {loading
-                            ? <TouchableOpacity style={[styles.buttonContainer]}>
-                                <ActivityIndicator size="large" color={OPP_COLOR} />
-                            </TouchableOpacity>
-                            : <TouchableOpacity style={styles.buttonContainer} onPress={_login}>
-                                <Text style={styles.buttonTitle}>LOGIN</Text>
-                            </TouchableOpacity>}
-                        <Text style={styles.forgotPassword}>Forgot password</Text>
-                    </View>
-                </SafeAreaView>
-            </Content>
-        </Container>
+                    {username == ''
+                        ? null
+                        : <Icon name="times-circle" onPress={_pressClearUsername} style={styles.inputIcon} />}
+                </View>
+                <View style={[styles.inputContainer, styles.inputContainerLast]}>
+                    <Icon name="unlock-alt" style={styles.inputIcon} />
+                    <TextInput
+                        blurOnSubmit={true}
+                        ref={nextInput}
+                        style={styles.inputText}
+                        placeholder="Password ..."
+                        value={password}
+                        secureTextEntry={!showPassord}
+                        onChangeText={_onChangePassword}
+                    />
+                    {password == ''
+                        ? null : (showPassord
+                            ? <Icon name="eye-slash" onPress={_pressTogglePassword} style={styles.inputIcon} />
+                            : <Icon name="eye" onPress={_pressTogglePassword} style={styles.inputIcon} />)}
+                </View>
+                {loading
+                    ? <TouchableOpacity style={[styles.buttonContainer]}>
+                        <ActivityIndicator size="large" color={OPP_COLOR} />
+                    </TouchableOpacity>
+                    : <TouchableOpacity style={styles.buttonContainer} onPress={_login}>
+                        <Text style={styles.buttonTitle}>LOGIN</Text>
+                    </TouchableOpacity>}
+                {/* <Text style={styles.forgotPassword}>Forgot password</Text> */}
+            </View>
+        </SafeAreaView>
     );
 };
 
@@ -129,22 +144,27 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
     },
+    imageContainer: {
+        flex: 4,
+    },
     image: {
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').width * 8640 / 12960,
+        width: '100%',
+        height: '100%',
+    },
+    titleContainer: {
+        flex: 1.5,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     title: {
         fontSize: 42,
         color: BASE_COLOR,
         fontWeight: 'bold',
-        marginTop: 16,
-        marginBottom: 16,
-        textAlign: 'center',
         shadowOpacity: 0.5,
         shadowRadius: 1,
     },
     containerCenter: {
-        flex: 1,
+        flex: 4.5,
         padding: 16,
         alignItems: 'center',
         justifyContent: 'center',
@@ -182,9 +202,6 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         marginTop: 48,
         width: '100%',
-    },
-    buttonDisable: {
-        opacity: 0.5,
     },
     buttonTitle: {
         color: OPP_COLOR,
