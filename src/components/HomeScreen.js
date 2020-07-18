@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, View, TextInput, Text, TouchableOpacity, Acti
 import { Dropdown } from 'react-native-material-dropdown';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-community/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 import LoadDataRoleAPI from '../apis/LoadDataRole';
 import MessageAlert from './CustomViews/MessageAlert';
@@ -15,7 +16,7 @@ const storeData = async (key, value) => {
     try {
         await AsyncStorage.setItem(key, value);
     } catch (error) {
-        MessageAlert('CATCH', error.toString());
+        MessageAlert('ERROR', error.toString());
     }
 };
 export default ({ route, navigation }) => {
@@ -24,15 +25,11 @@ export default ({ route, navigation }) => {
     const [projectCode, setProjectCode] = useState(null);
     const [barcode, setBarcode] = useState(null);
 
-    const getDataFromAPI = async () => {
+    const getData = async () => {
         try {
             let username = await AsyncStorage.getItem('USERNAME');
             LoadDataRoleAPI(username)
                 .then(res => {
-                    if (res == null) {
-                        setIsLoading(false);
-                        return;
-                    }
                     if (res.Message != null) {
                         MessageAlert('ERROR', res.Message);
                         setIsLoading(false);
@@ -43,13 +40,23 @@ export default ({ route, navigation }) => {
                 })
                 .catch(error => {
                     setIsLoading(false);
-                    MessageAlert('CATCH', error.toString());
+                    MessageAlert('ERROR', error.toString());
                 });
         } catch (error) {
             setIsLoading(false);
-            MessageAlert('CATCH', error.toString());
+            MessageAlert('ERROR', error.toString());
         }
     };
+
+    const getDataFromAPI = () => {
+        NetInfo.fetch().then(state => {
+            if (!state.isConnected) {
+                MessageAlert('WARNING', 'Network not available!');
+            } else {
+                getData();
+            }
+        });
+    }
 
     const _onChangeProjectCode = (value) => {
         setProjectCode(value);
@@ -61,11 +68,11 @@ export default ({ route, navigation }) => {
 
     const validateValues = () => {
         if (projectCode == null) {
-            MessageAlert('ERROR', 'Please select a project.');
+            MessageAlert('WARNING', 'Please select a project.');
             return false;
         }
         if (barcode == null) {
-            MessageAlert('ERROR', 'Please scan a barcode.');
+            MessageAlert('WARNING', 'Please scan a barcode.');
             return false;
         }
         try {
@@ -73,19 +80,19 @@ export default ({ route, navigation }) => {
             storeData('BARCODE', barcode);
             return true;
         } catch (error) {
-            MessageAlert('CATCH', error.toString());
+            MessageAlert('ERROR', error.toString());
             return false;
         }
     };
 
     const _onPressTrackingBarcode = () => {
-        if(validateValues()){
+        if (validateValues()) {
             navigation.navigate('Update');
         }
     };
 
     const _onPressUploadImage = () => {
-        if(validateValues()){
+        if (validateValues()) {
             navigation.navigate('Upload');
         }
     };
@@ -98,9 +105,9 @@ export default ({ route, navigation }) => {
     }, [route.params?.barCode]);
 
     return (
-        <View style={styles.safeArea}>
+        <SafeAreaView style={styles.safeArea}>
             {isLoading ? <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} /> : null}
-            <SafeAreaView style={styles.safeArea}>
+            <View style={styles.safeArea}>
                 <View style={styles.container}>
                     <View style={styles.containerCenter}>
                         <Dropdown
@@ -130,8 +137,8 @@ export default ({ route, navigation }) => {
                         <Text style={styles.buttonTitle}>Upload Barcode image </Text>
                     </TouchableOpacity>
                 </View>
-            </SafeAreaView>
-        </View>
+            </View>
+        </SafeAreaView>
     );
 };
 const styles = StyleSheet.create({

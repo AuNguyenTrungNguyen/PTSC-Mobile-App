@@ -6,6 +6,7 @@ const MessageAlert = (title, message) => {
         [
             {
                 text: 'Cancel',
+                style: 'cancel'
             },
         ],
         { cancelable: false },

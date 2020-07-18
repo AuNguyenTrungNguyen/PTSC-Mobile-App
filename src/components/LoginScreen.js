@@ -14,7 +14,7 @@ const storeData = async (key, value) => {
     try {
         await AsyncStorage.setItem(key, value);
     } catch (error) {
-        MessageAlert('CATCH', error.toString());
+        MessageAlert('ERROR', error.toString());
     }
 }
 
@@ -51,7 +51,7 @@ export default ({ navigation }) => {
         setLoading(true);
         NetInfo.fetch().then(state => {
             if (!state.isConnected) {
-                MessageAlert('WARNING', 'The internet not connect.');
+                MessageAlert('WARNING', 'Network not available!');
                 setLoading(false);
             } else {
                 if (username === '' || password === '') {
@@ -78,7 +78,7 @@ export default ({ navigation }) => {
                     })
                     .catch(error => {
                         setLoading(false);
-                        MessageAlert('CATCH', error.toString());
+                        MessageAlert('ERROR', error.toString());
                     });
             }
         });
@@ -94,7 +94,7 @@ export default ({ navigation }) => {
                 />
             </View>
             <View style={styles.titleContainer}>
-                <Text style={styles.title}>PTCS M&C</Text>
+                <Text style={styles.title}>PTSC M&C</Text>
             </View>
             <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
                 <View style={styles.inputContainer}>
@@ -128,13 +128,12 @@ export default ({ navigation }) => {
                             : <Icon name="eye" onPress={_pressTogglePassword} style={styles.inputIcon} />)}
                 </View>
                 {loading
-                    ? <TouchableOpacity style={[styles.buttonContainer]}>
+                    ? <TouchableOpacity style={styles.buttonContainer}>
                         <ActivityIndicator size="large" color={OPP_COLOR} />
                     </TouchableOpacity>
                     : <TouchableOpacity style={styles.buttonContainer} onPress={_login}>
                         <Text style={styles.buttonTitle}>LOGIN</Text>
                     </TouchableOpacity>}
-                {/* <Text style={styles.forgotPassword}>Forgot password</Text> */}
             </View>
         </SafeAreaView>
     );
@@ -207,11 +206,5 @@ const styles = StyleSheet.create({
         color: OPP_COLOR,
         fontSize: 18,
         fontWeight: 'bold',
-    },
-    forgotPassword: {
-        textAlign: 'center',
-        fontSize: 16,
-        marginTop: 32,
-        color: BASE_COLOR,
     },
 });

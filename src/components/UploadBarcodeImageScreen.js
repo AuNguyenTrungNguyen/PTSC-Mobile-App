@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, View, Image, Text } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Image, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import ImagePicker from 'react-native-image-picker';
+import ImageResizer from 'react-native-image-resizer';
+import RNFS from 'react-native-fs';
 import NetInfo from '@react-native-community/netinfo';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Port_Server } from '../Core';
@@ -11,8 +13,11 @@ import MessageAlert from './CustomViews/MessageAlert';
 export default () => {
     const [imageSource, setImageSource] = useState(null);
     const [fileUrl, setFileUrl] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const _onPressChooseImage = () => {
+        setIsLoading(true);
         ImagePicker.showImagePicker(
             {
                 title: 'Select Image',
@@ -24,28 +29,35 @@ export default () => {
             },
             response => {
                 if (response.didCancel) {
+                    setIsLoading(false);
                 } else if (response.error) {
-                    Toast.show({
-                        text: response.error,
-                        duration: 3000,
-                    });
+                    setIsLoading(false);
                 } else {
-                    Toast.show({
-                        text: 'Choose image successfully.',
-                        duration: 3000,
-                    });
-                    setImageSource({ uri: response.uri });
-                    setFileUrl(response.data);
+                    ImageResizer.createResizedImage(response.uri, 1000, 1000, 'PNG', 0, response.originalRotation)
+                        .then(res => {
+                            RNFS.readFile(res.uri, 'base64')
+                                .then(data => {
+                                    setIsLoading(false);
+                                    setImageSource({ uri: res.uri });
+                                    setFileUrl(data);
+                                })
+                                .catch(error => {
+                                    setIsLoading(false);
+                                    setImageSource({ uri: res.uri });
+                                    setFileUrl(response.data);
+                                });
+                        })
+                        .catch(error => {
+                            setIsLoading(false);
+                            setImageSource({ uri: response.uri });
+                            setFileUrl(response.data);
+                        });
                 }
             },
         );
     };
 
     const _onPressDeleteImage = () => {
-        Toast.show({
-            text: 'Delete image successfully.',
-            duration: 3000,
-        });
         setFileUrl(null);
         setImageSource(null);
     };
@@ -53,8 +65,9 @@ export default () => {
     const _onPressUploadImage = () => {
         NetInfo.fetch().then(state => {
             if (!state.isConnected) {
-                MessageAlert('WARNING', 'The internet not connect.');
+                MessageAlert('WARNING', 'Network not available!');
             } else {
+                setIsUploading(true);
                 uploadImageToServer();
             }
         });
@@ -62,10 +75,7 @@ export default () => {
 
     const uploadImageToServer = async () => {
         if (fileUrl == null) {
-            Toast.show({
-                text: 'Please choose an image.',
-                duration: 3000,
-            });
+            setIsUploading(false);
             return;
         }
         try {
@@ -81,7 +91,7 @@ export default () => {
                 'POST',
                 Port_Server + '/api/PIPWorkOrderDetail/UploadFileBarCode',
                 {
-                    Authorization: 'Bearer',
+                    // Authorization: 'Bearer',
                     // otherHeader: "foo",
                     'Content-Type': 'multipart/form-data',
                 },
@@ -98,65 +108,72 @@ export default () => {
                 ],
             )
                 .then(res => {
-                    if (res.data) {
-                        var result = JSON.parse(res.data);
-                        MessageAlert('SUCCESS', result.responseText);
-                    }
+                    setIsUploading(false);
+                    MessageAlert('SUCCESS', JSON.parse(res.data).responseText);
                 })
                 .catch(error => {
-                    MessageAlert('CATCH', error.toString());
+                    setIsUploading(false);
+                    MessageAlert('ERROR', error.toString());
                 });
         } catch (error) {
-            MessageAlert('CATCH', error.toString());
+            setIsUploading(false);
+            MessageAlert('ERROR', error.toString());
         };
     };
 
+    const ButtonUploading = () => {
+        if (isUploading) {
+            return (
+                <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
+                    <ActivityIndicator size='large' color='white' />
+                </TouchableOpacity>
+            );
+        }
+        return (
+            <TouchableOpacity style={styles.buttonActionUpload} onPress={_onPressUploadImage}>
+                <Text style={styles.buttonTitle}>Upload</Text>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                {fileUrl == null
-                    ? <View style={styles.imageContainer}>
-                        <Icons name="plus-circle" size={48} onPress={_onPressChooseImage} />
-                        <Text style={styles.text}>Choose image upload</Text>
+            <View style={styles.safeArea}>
+                {isLoading ? <View style={styles.loading}>
+                    <ActivityIndicator size='large' color='#344955' />
+                </View> : null}
+                <View style={styles.container}>
+                    <View style={styles.borderContainer}>
+                        {fileUrl == null
+                            ? <View style={styles.imageContainer}>
+                                <Icons name="plus-circle" size={48} onPress={_onPressChooseImage} />
+                                <Text style={styles.text}>Choose image upload</Text>
+                            </View>
+                            : <View style={styles.imageContainer}>
+                                <Image
+                                    style={styles.image}
+                                    source={imageSource}
+                                    resizeMode='contain' />
+                            </View>
+                        }
                     </View>
-                    : <Image
-                        style={styles.image}
-                        source={imageSource}
-                        resizeMode="contain" />
-                }
-                {/* <View style={styles.actionContainer}>
-                    {fileUrl != null
-                        ? <Button
-                            iconLeft
-                            rounded
-                            danger
-                            style={styles.buttonAction}
-                            onPress={_onPressDeleteImage}>
-                            <Icon name="close" style={styles.buttonIcon} />
-                            <Text>Delete</Text>
-                        </Button>
-                        : <Button iconLeft rounded disabled style={styles.buttonAction}>
-                            <Icon name="close" style={styles.buttonIcon} />
-                            <Text>Delete</Text>
-                        </Button>
-                    }
-                    {fileUrl != null
-                        ? <Button
-                            iconLeft
-                            rounded
-                            success
-                            style={styles.buttonAction}
-                            onPress={_onPressUploadImage}>
-                            <Icon name="push-outline" style={styles.buttonIcon} />
-                            <Text>Upload</Text>
-                        </Button>
-                        : <Button iconLeft rounded disabled style={styles.buttonAction}>
-                            <Icon name="push-outline" style={styles.buttonIcon} />
-                            <Text>Upload</Text>
-                        </Button>
-                    }
-                </View> */}
+                    <View style={styles.actionContainer}>
+                        {fileUrl == null || isUploading
+                            ? <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
+                                <Text style={styles.buttonTitle}>Delete</Text>
+                            </TouchableOpacity>
+                            : <TouchableOpacity style={styles.buttonActionDelete} onPress={_onPressDeleteImage}>
+                                <Text style={styles.buttonTitle}>Delete</Text>
+                            </TouchableOpacity>
+                        }
+                        {fileUrl != null
+                            ? ButtonUploading()
+                            : <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
+                                <Text style={styles.buttonTitle}>Upload</Text>
+                            </TouchableOpacity>
+                        }
+                    </View>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -167,35 +184,71 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
     },
+    loading: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     container: {
         padding: 16,
-        flex: 1,
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+    },
+    borderContainer: {
+        height: '50%',
+        borderWidth: 1,
+        borderColor: BASE_COLOR,
+        padding: 8,
     },
     imageContainer: {
         flex: 1,
-        borderWidth: 1,
-        borderColor: BASE_COLOR,
         justifyContent: 'center',
         alignItems: 'center',
     },
     image: {
-
+        width: '100%',
+        height: '100%'
     },
     text: {
         fontSize: 18,
         marginTop: 8,
     },
     actionContainer: {
-        flex: 1,
+        marginTop: 48,
+        height: 48,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
-    buttonAction: {
+    buttonActionDelete: {
+        borderRadius: 32,
         justifyContent: 'center',
         alignItems: 'center',
         width: '40%',
+        height: '100%',
+        backgroundColor: 'red'
     },
-    buttonIcon: {
+    buttonActionUpload: {
+        borderRadius: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '40%',
+        height: '100%',
+        backgroundColor: 'green'
+    },
+    buttonActionDisable: {
+        borderRadius: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '40%',
+        height: '100%',
+        backgroundColor: 'gray',
+    },
+    buttonTitle: {
         color: 'white',
+        fontSize: 16,
     },
 });

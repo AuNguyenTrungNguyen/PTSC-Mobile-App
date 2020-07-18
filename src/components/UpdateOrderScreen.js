@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -10,10 +10,12 @@ import MessageAlert from './CustomViews/MessageAlert';
 export default () => {
 
     const [isLoading, setIsLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [listOrder, setListOrder] = useState([]);
     const [listUpdate, setListUpdate] = useState([]);
     const [drawingNo, setDrawingNo] = useState(null);
-    const [isRefreshing, setIsRefreshing] = useState(false);
+
 
     const _onRefresh = () => {
         setIsRefreshing(true);
@@ -22,9 +24,11 @@ export default () => {
     }
 
     const _onPressSubmitData = () => {
+        setIsUploading(true);
         NetInfo.fetch().then(state => {
             if (!state.isConnected) {
-                MessageAlert('WARNING', 'The internet not connect.');
+                setIsUploading(false);
+                MessageAlert('WARNING', 'Network not available!');
             } else {
                 updateActutalsToServer();
             }
@@ -34,33 +38,6 @@ export default () => {
     const checkNumber = input => {
         const regexNumber = /^[0-9]*$/;
         return input !== '' && regexNumber.test(input);
-    };
-
-    const getDataFromAPI = async () => {
-        try {
-            let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
-            let username = await AsyncStorage.getItem('USERNAME');
-            let barcode = await AsyncStorage.getItem('BARCODE');
-            GetListOrderAPI(projectCode, username, barcode)
-                .then(res => {
-                    if (Array.isArray(res) && res.length) {
-                        setDrawingNo(res[0].DrawingNo);
-                        setListOrder(res);
-                        setListUpdate(res);
-                    }
-                    setIsLoading(false);
-                    setIsRefreshing(false);
-                })
-                .catch(error => {
-                    setIsLoading(false);
-                    setIsRefreshing(false);
-                    MessageAlert('CATCH', error.toString());
-                });
-        } catch (error) {
-            setIsLoading(false);
-            setIsRefreshing(false);
-            MessageAlert('CATCH', error.toString());
-        };
     };
 
     const updateActutalsToServer = async () => {
@@ -82,11 +59,13 @@ export default () => {
             });
             message += '] is invalid.'
             MessageAlert('ERROR', message);
+            setIsUploading(false);
             return;
         }
 
         if (!listOrderUpdate.length) {
             MessageAlert('WARNING', 'No any data changes!');
+            setIsUploading(false);
             return;
         }
 
@@ -98,28 +77,68 @@ export default () => {
                     if (res.success) {
                         MessageAlert('SUCCESS', res.responseText);
                     } else {
+
                         MessageAlert('ERROR', res.responseText);
                     }
+                    setIsUploading(false);
                     getDataFromAPI();
                 }).catch(error => {
-                    MessageAlert('CATCH', error.toString());
+                    MessageAlert('ERROR', error.toString());
+                    setIsUploading(false);
                 });
         } catch (error) {
-            MessageAlert('CATCH', error.toString());
+            MessageAlert('ERROR', error.toString());
+            setIsUploading(false);
         };
     };
+
+    const getData = async () => {
+        try {
+            let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
+            let username = await AsyncStorage.getItem('USERNAME');
+            let barcode = await AsyncStorage.getItem('BARCODE');
+            GetListOrderAPI(projectCode, username, barcode)
+                .then(res => {
+                    if (Array.isArray(res) && res.length) {
+                        setDrawingNo(res[0].DrawingNo);
+                        setListOrder(res);
+                        setListUpdate(res);
+                    }
+                    setIsLoading(false);
+                    setIsRefreshing(false);
+                })
+                .catch(error => {
+                    setIsLoading(false);
+                    setIsRefreshing(false);
+                    MessageAlert('ERROR', error.toString());
+                });
+        } catch (error) {
+            setIsLoading(false);
+            setIsRefreshing(false);
+            MessageAlert('ERROR', error.toString());
+        };
+    };
+
+    const getDataFromAPI = () => {
+        NetInfo.fetch().then(state => {
+            if (!state.isConnected) {
+                MessageAlert('WARNING', 'Network not available!');
+            } else {
+                getData();
+            }
+        });
+    }
 
     useEffect(() => {
         getDataFromAPI();
     }, []);
 
     return (
-        <View style={styles.safeArea}>
+        <SafeAreaView style={styles.safeArea}>
             {isLoading ? <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} /> : null}
-            <SafeAreaView style={styles.safeArea}>
+            <View style={styles.safeArea}>
                 <View style={styles.container}>
                     <FlatList
-                        style={{ flex: 1 }}
                         ListHeaderComponent={
                             <View>
                                 <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
@@ -131,21 +150,21 @@ export default () => {
                                 </View>
                             </View>
                         }
-                        onRefresh={_onRefresh}
-                        refreshing={isRefreshing}
+                        refreshControl={<RefreshControl colors={['#344955']} refreshing={isRefreshing} onRefresh={_onRefresh} />}
                         style={styles.listOrder}
                         data={listOrder}
                         renderItem={({ item, index }) =>
                             <View style={styles.itemContainer}>
                                 <View style={[styles.itemRow, styles.itemJointNo, styles.itemNumber]}>
                                     <TextInput
+                                        editable={false}
                                         style={styles.input}
                                         value={String(item.JointNo)}
-                                        editable={false}
                                     />
                                 </View>
                                 <View style={[styles.itemRow, styles.itemActutal]}>
                                     <TextInput
+                                        editable={!isUploading}
                                         style={styles.input}
                                         keyboardType='numeric'
                                         value={listUpdate[index]
@@ -169,12 +188,16 @@ export default () => {
                         }
                         keyExtractor={item => item.RowIndex.toString()}
                     />
-                    <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitData} autoFocus={true}>
-                        <Text style={styles.buttonTitle}>Submit to Server</Text>
-                    </TouchableOpacity>
+                    {isUploading
+                        ? <TouchableOpacity style={styles.buttonContainer} disabled={true} autoFocus={true}>
+                            <ActivityIndicator size='large' color='white' />
+                        </TouchableOpacity>
+                        : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitData} autoFocus={true}>
+                            <Text style={styles.buttonTitle}>Submit to Server</Text>
+                        </TouchableOpacity>}
                 </View>
-            </SafeAreaView>
-        </View>
+            </View>
+        </SafeAreaView>
     );
 }
 
