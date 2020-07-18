@@ -40,7 +40,6 @@ export default ({ route, navigation }) => {
                     }
                     setListProject(res);
                     setIsLoading(false);
-                    setBarcode('LSX18090015');
                 })
                 .catch(error => {
                     setIsLoading(false);
@@ -63,28 +62,32 @@ export default ({ route, navigation }) => {
     const validateValues = () => {
         if (projectCode == null) {
             MessageAlert('ERROR', 'Please select a project.');
-            return;
+            return false;
         }
         if (barcode == null) {
             MessageAlert('ERROR', 'Please scan a barcode.');
-            return;
+            return false;
         }
         try {
             storeData('PROJECT_CODE', projectCode);
             storeData('BARCODE', barcode);
+            return true;
         } catch (error) {
             MessageAlert('CATCH', error.toString());
+            return false;
         }
     };
 
     const _onPressTrackingBarcode = () => {
-        validateValues();
-        navigation.navigate('Update');
+        if(validateValues()){
+            navigation.navigate('Update');
+        }
     };
 
     const _onPressUploadImage = () => {
-        validateValues();
-        navigation.navigate('Upload');
+        if(validateValues()){
+            navigation.navigate('Upload');
+        }
     };
 
     useEffect(() => {
@@ -92,7 +95,7 @@ export default ({ route, navigation }) => {
         if (route.params?.barCode) {
             setBarcode(route.params?.barCode);
         }
-    }, []);
+    }, [route.params?.barCode]);
 
     return (
         <View style={styles.safeArea}>

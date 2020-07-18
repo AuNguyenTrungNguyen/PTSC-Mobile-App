@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, View, Image } from 'react-native';
-import { Button, Text, Icon, Toast } from 'native-base';
+import { StyleSheet, SafeAreaView, View, Image, Text } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icons from 'react-native-vector-icons/FontAwesome5';
 import ImagePicker from 'react-native-image-picker';
@@ -116,7 +115,17 @@ export default () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
-                <View style={styles.actionContainer}>
+                {fileUrl == null
+                    ? <View style={styles.imageContainer}>
+                        <Icons name="plus-circle" size={48} onPress={_onPressChooseImage} />
+                        <Text style={styles.text}>Choose image upload</Text>
+                    </View>
+                    : <Image
+                        style={styles.image}
+                        source={imageSource}
+                        resizeMode="contain" />
+                }
+                {/* <View style={styles.actionContainer}>
                     {fileUrl != null
                         ? <Button
                             iconLeft
@@ -147,18 +156,7 @@ export default () => {
                             <Text>Upload</Text>
                         </Button>
                     }
-                </View>
-                {fileUrl == null
-                    ? <View style={styles.imageContainer}>
-                        <Icons name="plus-circle" size={48} onPress={_onPressChooseImage} />
-                        <Text style={styles.text}>Choose image upload</Text>
-                    </View>
-                    : <Image
-                        style={styles.imageContainer}
-                        source={imageSource}
-                        resizeMode="contain"
-                    />
-                }
+                </View> */}
             </View>
         </SafeAreaView>
     );
@@ -173,7 +171,22 @@ const styles = StyleSheet.create({
         padding: 16,
         flex: 1,
     },
+    imageContainer: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: BASE_COLOR,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    image: {
+
+    },
+    text: {
+        fontSize: 18,
+        marginTop: 8,
+    },
     actionContainer: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
@@ -184,20 +197,5 @@ const styles = StyleSheet.create({
     },
     buttonIcon: {
         color: 'white',
-    },
-    imageContainer: {
-        flex: 1,
-        width: null,
-        height: null,
-        margin: 8,
-        padding: 8,
-        borderWidth: 1,
-        borderColor: BASE_COLOR,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    text: {
-        fontSize: 18,
-        marginTop: 4,
     },
 });
