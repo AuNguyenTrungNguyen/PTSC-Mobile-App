@@ -44,7 +44,7 @@
 		00E356EE1AD99517003FC87E /* PTSC_CLOUDTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PTSC_CLOUDTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* PTSC_CLOUDTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTSC_CLOUDTests.m; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* PTSC_CLOUD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PTSC_CLOUD.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* PTSC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PTSC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = PTSC_CLOUD/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = PTSC_CLOUD/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -190,7 +190,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* PTSC_CLOUD.app */,
+				13B07F961A680F5B00A75B9A /* PTSC.app */,
 				00E356EE1AD99517003FC87E /* PTSC_CLOUDTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* PTSC_CLOUD-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* PTSC_CLOUD-tvOSTests.xctest */,
@@ -246,7 +246,7 @@
 			);
 			name = PTSC_CLOUD;
 			productName = PTSC_CLOUD;
-			productReference = 13B07F961A680F5B00A75B9A /* PTSC_CLOUD.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* PTSC.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* PTSC_CLOUD-tvOS */ = {
@@ -301,7 +301,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = ACHY7VXF8B;
+						DevelopmentTeam = 5N6843H255;
 						LastSwiftMigration = 1120;
 						ProvisioningStyle = Automatic;
 					};
@@ -739,7 +739,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = ACHY7VXF8B;
+				DEVELOPMENT_TEAM = 5N6843H255;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -752,8 +752,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.PTSC-CLOUD";
-				PRODUCT_NAME = PTSC_CLOUD;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ptsc-cloud";
+				PRODUCT_NAME = PTSC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -770,7 +770,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = ACHY7VXF8B;
+				DEVELOPMENT_TEAM = 5N6843H255;
 				INFOPLIST_FILE = PTSC_CLOUD/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -778,8 +778,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.PTSC-CLOUD";
-				PRODUCT_NAME = PTSC_CLOUD;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ptsc-cloud";
+				PRODUCT_NAME = PTSC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -790,7 +790,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = ED6CE7FCCBECF514DD15D79B /* Pods-PTSC_CLOUD-tvOS.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -818,7 +817,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5E1A9A00448741A9E66A421B /* Pods-PTSC_CLOUD-tvOS.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
