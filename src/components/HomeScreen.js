@@ -68,11 +68,11 @@ export default ({ route, navigation }) => {
 
     const validateValues = () => {
         if (projectCode == null) {
-            MessageAlert('WARNING', 'Please select a project.');
+            MessageAlert('WARNING', 'Please select a project!');
             return false;
         }
         if (barcode == null) {
-            MessageAlert('WARNING', 'Please scan a barcode.');
+            MessageAlert('WARNING', 'Please scan a barcode!');
             return false;
         }
         try {
@@ -107,36 +107,34 @@ export default ({ route, navigation }) => {
     return (
         <SafeAreaView style={styles.safeArea}>
             {isLoading ? <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} /> : null}
-            <View style={styles.safeArea}>
-                <View style={styles.container}>
-                    <View style={styles.containerCenter}>
-                        <Dropdown
-                            label='Select Poject'
-                            data={listProject}
-                            onChangeText={_onChangeProjectCode}
-                            baseColor={BASE_COLOR}
-                            textColor={BASE_COLOR}
+            <View style={styles.container}>
+                <View style={styles.containerCenter}>
+                    <Dropdown
+                        label='Select Poject'
+                        data={listProject}
+                        onChangeText={_onChangeProjectCode}
+                        baseColor={BASE_COLOR}
+                        textColor={BASE_COLOR}
+                    />
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            editable={false}
+                            placeholder='Scan a Barcode'
+                            placeholderTextColor={BASE_COLOR}
+                            value={barcode}
                         />
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                editable={false}
-                                placeholder='Scan a Barcode'
-                                placeholderTextColor={BASE_COLOR}
-                                value={barcode}
-                            />
-                            <Icon name='camera' style={styles.icon} onPress={_onPressBarcodeScanner} />
-                        </View>
+                        <Icon name='camera' style={styles.icon} onPress={_onPressBarcodeScanner} />
                     </View>
-                    <TouchableOpacity style={styles.buttonContainer}
-                        onPress={_onPressTrackingBarcode}>
-                        <Text style={styles.buttonTitle}>Tracking WO with Barcode</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonContainer}
-                        onPress={_onPressUploadImage}>
-                        <Text style={styles.buttonTitle}>Upload Barcode image </Text>
-                    </TouchableOpacity>
                 </View>
+                <TouchableOpacity style={styles.buttonContainer}
+                    onPress={_onPressTrackingBarcode}>
+                    <Text style={styles.buttonTitle}>Tracking WO with Barcode</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonContainer}
+                    onPress={_onPressUploadImage}>
+                    <Text style={styles.buttonTitle}>Upload Barcode image</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -152,12 +150,13 @@ const styles = StyleSheet.create({
     containerCenter: {
         flex: 1,
         justifyContent: 'center',
-        padding: 16,
     },
 
     loading: {
         width: '100%',
         height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     inputContainer: {
