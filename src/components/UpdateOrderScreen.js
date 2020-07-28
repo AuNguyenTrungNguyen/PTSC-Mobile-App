@@ -7,10 +7,12 @@ import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import GetListOrderAPI from '../apis/GetListOrder';
 import UpdateActutalsAPI from '../apis/UpdateActutalsAPI';
 import MessageAlert from './CustomViews/MessageAlert';
+import LoadingRefresh from './CustomViews/LoadingRefresh';
 
 export default () => {
 
     const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -111,17 +113,20 @@ export default () => {
                         setListUpdate(res);
                     }
                     setIsLoading(false);
+                    setIsError(false);
                     setIsRefreshing(false);
                 })
                 .catch(error => {
                     setIsLoading(false);
+                    setIsError(true);
                     setIsRefreshing(false);
-                    MessageAlert('ERROR', error.toString());
+                    // MessageAlert('ERROR', error.toString());
                 });
         } catch (error) {
             setIsLoading(false);
+            setIsError(true);
             setIsRefreshing(false);
-            MessageAlert('ERROR', error.toString());
+            // MessageAlert('ERROR', error.toString());
         };
     };
 
@@ -141,86 +146,90 @@ export default () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {isLoading
-                ?
-                <View style={styles.container}>
-                    <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} />
-                </View>
-                :
-                <View style={styles.container}>
-                    <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
-                        Project Code: <Text style={styles.textDrawing}>{projectCodeData}</Text>
-                    </Text>
-                    <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
-                        Barcode: <Text style={styles.textDrawing}>{barcodeData}</Text>
-                    </Text>
-                    {listOrder.length == 0
-                        ? <View style={[{ flex: 1, justifyContent: 'center', alignItems: 'center' }, styles.itemRow]}>
+            <LoadingRefresh isLoading={isLoading} isRefresh={isError} _onPressRefresh={getDataFromAPI} />
+            <View style={styles.container}>
+                {listOrder.length == 0
+                    ?
+                    <View style={{ flex: 1}}>
+                        <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                            Project Code: <Text style={styles.textDrawing}>{projectCodeData}</Text>
+                        </Text>
+                        <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                            Barcode: <Text style={styles.textDrawing}>{barcodeData}</Text>
+                        </Text>
+                        <View style={[{ flex: 1, justifyContent: 'center', alignItems: 'center' }, styles.itemRow]}>
                             <Text style={{ fontSize: 16, color: BASE_COLOR }}>No have any data!</Text>
                         </View>
-                        :
-                        <KeyboardAwareFlatList
-                            extraScrollHeight={-80}
-                            ListHeaderComponent={
-                                <View>
-                                    <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
-                                        DrawingNo: <Text style={styles.textDrawing}>{drawingNo}</Text>
-                                    </Text>
-                                    <View style={styles.itemContainer}>
-                                        <Text style={[styles.itemRow, styles.itemHeader]}>JointNo</Text>
-                                        <Text style={[styles.itemRow, styles.itemHeader]}>ActutalMHRS</Text>
-                                    </View>
-                                </View>
-                            }
-                            refreshControl={<RefreshControl colors={['#344955']} refreshing={isRefreshing} onRefresh={_onRefresh} />}
-                            style={styles.listOrder}
-                            data={listOrder}
-                            renderItem={({ item, index }) =>
+                    </View>
+                    : <KeyboardAwareFlatList
+                        extraScrollHeight={-80}
+                        ListHeaderComponent={
+                            <View>
+                                <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                                    Project Code: <Text style={styles.textDrawing}>{projectCodeData}</Text>
+                                </Text>
+                                <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                                    Barcode: <Text style={styles.textDrawing}>{barcodeData}</Text>
+                                </Text>
+                                <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                                    DrawingNo: <Text style={styles.textDrawing}>{drawingNo}</Text>
+                                </Text>
                                 <View style={styles.itemContainer}>
-                                    <View style={[styles.itemRow, styles.itemJointNo, styles.itemNumber]}>
-                                        <TextInput
-                                            editable={false}
-                                            style={styles.input}
-                                            value={String(item.JointNo)}
-                                        />
-                                    </View>
-                                    <View style={[styles.itemRow, styles.itemActutal]}>
-                                        <TextInput
-                                            editable={!isUploading}
-                                            style={styles.input}
-                                            keyboardType='numeric'
-                                            returnKeyType='done'
-                                            value={listUpdate[index]
-                                                ? String(listUpdate[index].ActutalMHRS)
-                                                : String(listOrder[index].ActutalMHRS)
-                                            }
-                                            onChangeText={
-                                                valueUpdate => {
-                                                    let tempTable = [...listUpdate];
-                                                    const newItem = {
-                                                        ...tempTable[index],
-                                                        ActutalMHRS: valueUpdate,
-                                                    };
-                                                    tempTable.splice(index, 1, newItem);
-                                                    setListUpdate(tempTable);
-                                                }
-                                            }
-                                        />
-                                    </View>
+                                    <Text style={[styles.itemRow, styles.itemHeader]}>JointNo</Text>
+                                    <Text style={[styles.itemRow, styles.itemHeader]}>ActutalMHRS</Text>
                                 </View>
-                            }
-                            keyExtractor={item => item.RowIndex.toString()}
-                        />
-                    }
-                    {isUploading
+                            </View>
+                        }
+                        refreshControl={<RefreshControl colors={['#344955']} refreshing={isRefreshing} onRefresh={_onRefresh} />}
+                        style={styles.listOrder}
+                        data={listOrder}
+                        renderItem={({ item, index }) =>
+                            <View style={styles.itemContainer}>
+                                <View style={[styles.itemRow, styles.itemJointNo, styles.itemNumber]}>
+                                    <TextInput
+                                        editable={false}
+                                        style={styles.input}
+                                        value={String(item.JointNo)}
+                                    />
+                                </View>
+                                <View style={[styles.itemRow, styles.itemActutal]}>
+                                    <TextInput
+                                        editable={!isUploading}
+                                        style={styles.input}
+                                        keyboardType='numeric'
+                                        returnKeyType='done'
+                                        value={listUpdate[index]
+                                            ? String(listUpdate[index].ActutalMHRS)
+                                            : String(listOrder[index].ActutalMHRS)
+                                        }
+                                        onChangeText={
+                                            valueUpdate => {
+                                                let tempTable = [...listUpdate];
+                                                const newItem = {
+                                                    ...tempTable[index],
+                                                    ActutalMHRS: valueUpdate,
+                                                };
+                                                tempTable.splice(index, 1, newItem);
+                                                setListUpdate(tempTable);
+                                            }
+                                        }
+                                    />
+                                </View>
+                            </View>
+                        }
+                        keyExtractor={item => item.RowIndex.toString()}
+                    />
+                }
+                {listOrder.length == 0
+                    ? null
+                    : isUploading
                         ? <TouchableOpacity style={styles.buttonContainer} disabled={true} autoFocus={true}>
                             <ActivityIndicator size='large' color='white' />
                         </TouchableOpacity>
                         : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitData} autoFocus={true} disable={listOrder.length == 0}>
                             <Text style={styles.buttonTitle}>Submit to Server</Text>
                         </TouchableOpacity>}
-                </View>
-            }
+            </View>
         </SafeAreaView >
     );
 }
