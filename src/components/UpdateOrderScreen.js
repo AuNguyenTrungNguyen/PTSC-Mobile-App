@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, RefreshControl } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 
 import GetListOrderAPI from '../apis/GetListOrder';
 import UpdateActutalsAPI from '../apis/UpdateActutalsAPI';
@@ -12,16 +13,19 @@ export default () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+
     const [listOrder, setListOrder] = useState([]);
     const [listUpdate, setListUpdate] = useState([]);
-    const [drawingNo, setDrawingNo] = useState(null);
 
+    const [drawingNo, setDrawingNo] = useState(null);
+    const [barcodeData, setBarcodeData] = useState(null);
+    const [projectCodeData, setProjectCodeData] = useState(null);
 
     const _onRefresh = () => {
         setIsRefreshing(true);
         Keyboard.dismiss();
         getDataFromAPI();
-    }
+    };
 
     const _onPressSubmitData = () => {
         setIsUploading(true);
@@ -36,7 +40,7 @@ export default () => {
     };
 
     const checkNumber = input => {
-        const regexNumber = /^[0-9]*$/;
+        const regexNumber = /^\d+(\.\d+)?$/;
         return input !== '' && regexNumber.test(input);
     };
 
@@ -44,7 +48,7 @@ export default () => {
         let errorIndexs = [];
         let listOrderUpdate = [];
         listUpdate.forEach((item, index) => {
-            if (item.RowIndex === listOrder[index].RowIndex && item.ActutalMHRS !== listOrder[index].ActutalMHRS) {
+            if (item.RowIndex === listOrder[index].RowIndex && item.ActutalMHRS != listOrder[index].ActutalMHRS) {
                 if (!checkNumber(item.ActutalMHRS)) {
                     errorIndexs.push(item.JointNo);
                 } else {
@@ -97,6 +101,8 @@ export default () => {
             let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
             let username = await AsyncStorage.getItem('USERNAME');
             let barcode = await AsyncStorage.getItem('BARCODE');
+            setBarcodeData(barcode);
+            setProjectCodeData(projectCode);
             GetListOrderAPI(projectCode, username, barcode)
                 .then(res => {
                     if (Array.isArray(res) && res.length) {
@@ -127,7 +133,7 @@ export default () => {
                 getData();
             }
         });
-    }
+    };
 
     useEffect(() => {
         getDataFromAPI();
@@ -135,69 +141,87 @@ export default () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {isLoading ? <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} /> : null}
-            <View style={styles.safeArea}>
+            {isLoading
+                ?
                 <View style={styles.container}>
-                    <FlatList
-                        ListHeaderComponent={
-                            <View>
-                                <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
-                                    DrawingNo: <Text style={styles.textDrawing}>{drawingNo}</Text>
-                                </Text>
+                    <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} />
+                </View>
+                :
+                <View style={styles.container}>
+                    <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                        Project Code: <Text style={styles.textDrawing}>{projectCodeData}</Text>
+                    </Text>
+                    <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                        Barcode: <Text style={styles.textDrawing}>{barcodeData}</Text>
+                    </Text>
+                    {listOrder.length == 0
+                        ? <View style={[{ flex: 1, justifyContent: 'center', alignItems: 'center' }, styles.itemRow]}>
+                            <Text style={{ fontSize: 16, color: BASE_COLOR }}>No have any data!</Text>
+                        </View>
+                        :
+                        <KeyboardAwareFlatList
+                            extraScrollHeight={-80}
+                            ListHeaderComponent={
+                                <View>
+                                    <Text style={[styles.itemRow, styles.itemHeader, styles.itemDrawing]}>
+                                        DrawingNo: <Text style={styles.textDrawing}>{drawingNo}</Text>
+                                    </Text>
+                                    <View style={styles.itemContainer}>
+                                        <Text style={[styles.itemRow, styles.itemHeader]}>JointNo</Text>
+                                        <Text style={[styles.itemRow, styles.itemHeader]}>ActutalMHRS</Text>
+                                    </View>
+                                </View>
+                            }
+                            refreshControl={<RefreshControl colors={['#344955']} refreshing={isRefreshing} onRefresh={_onRefresh} />}
+                            style={styles.listOrder}
+                            data={listOrder}
+                            renderItem={({ item, index }) =>
                                 <View style={styles.itemContainer}>
-                                    <Text style={[styles.itemRow, styles.itemHeader]}>JointNo</Text>
-                                    <Text style={[styles.itemRow, styles.itemHeader]}>ActutalMHRS</Text>
-                                </View>
-                            </View>
-                        }
-                        refreshControl={<RefreshControl colors={['#344955']} refreshing={isRefreshing} onRefresh={_onRefresh} />}
-                        style={styles.listOrder}
-                        data={listOrder}
-                        renderItem={({ item, index }) =>
-                            <View style={styles.itemContainer}>
-                                <View style={[styles.itemRow, styles.itemJointNo, styles.itemNumber]}>
-                                    <TextInput
-                                        editable={false}
-                                        style={styles.input}
-                                        value={String(item.JointNo)}
-                                    />
-                                </View>
-                                <View style={[styles.itemRow, styles.itemActutal]}>
-                                    <TextInput
-                                        editable={!isUploading}
-                                        style={styles.input}
-                                        keyboardType='numeric'
-                                        value={listUpdate[index]
-                                            ? String(listUpdate[index].ActutalMHRS)
-                                            : String(listOrder[index].ActutalMHRS)
-                                        }
-                                        onChangeText={
-                                            valueUpdate => {
-                                                let tempTable = [...listUpdate];
-                                                const newItem = {
-                                                    ...tempTable[index],
-                                                    ActutalMHRS: valueUpdate,
-                                                };
-                                                tempTable.splice(index, 1, newItem);
-                                                setListUpdate(tempTable);
+                                    <View style={[styles.itemRow, styles.itemJointNo, styles.itemNumber]}>
+                                        <TextInput
+                                            editable={false}
+                                            style={styles.input}
+                                            value={String(item.JointNo)}
+                                        />
+                                    </View>
+                                    <View style={[styles.itemRow, styles.itemActutal]}>
+                                        <TextInput
+                                            editable={!isUploading}
+                                            style={styles.input}
+                                            keyboardType='numeric'
+                                            returnKeyType='done'
+                                            value={listUpdate[index]
+                                                ? String(listUpdate[index].ActutalMHRS)
+                                                : String(listOrder[index].ActutalMHRS)
                                             }
-                                        }
-                                    />
+                                            onChangeText={
+                                                valueUpdate => {
+                                                    let tempTable = [...listUpdate];
+                                                    const newItem = {
+                                                        ...tempTable[index],
+                                                        ActutalMHRS: valueUpdate,
+                                                    };
+                                                    tempTable.splice(index, 1, newItem);
+                                                    setListUpdate(tempTable);
+                                                }
+                                            }
+                                        />
+                                    </View>
                                 </View>
-                            </View>
-                        }
-                        keyExtractor={item => item.RowIndex.toString()}
-                    />
+                            }
+                            keyExtractor={item => item.RowIndex.toString()}
+                        />
+                    }
                     {isUploading
                         ? <TouchableOpacity style={styles.buttonContainer} disabled={true} autoFocus={true}>
                             <ActivityIndicator size='large' color='white' />
                         </TouchableOpacity>
-                        : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitData} autoFocus={true}>
+                        : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitData} autoFocus={true} disable={listOrder.length == 0}>
                             <Text style={styles.buttonTitle}>Submit to Server</Text>
                         </TouchableOpacity>}
                 </View>
-            </View>
-        </SafeAreaView>
+            }
+        </SafeAreaView >
     );
 }
 
@@ -257,6 +281,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: BASE_COLOR,
         borderRadius: 32,
+        marginTop: 32,
     },
     buttonTitle: {
         color: 'white',
