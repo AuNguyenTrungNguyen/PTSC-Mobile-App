@@ -83,7 +83,6 @@ export default () => {
                     if (res.success) {
                         MessageAlert('SUCCESS', res.responseText);
                     } else {
-
                         MessageAlert('ERROR', res.responseText);
                     }
                     setIsUploading(false);
