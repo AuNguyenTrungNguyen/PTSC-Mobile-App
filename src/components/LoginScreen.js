@@ -3,7 +3,7 @@ import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacit
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import LoginAPI from '../apis/Login';
 import MessageAlert from './CustomViews/MessageAlert';

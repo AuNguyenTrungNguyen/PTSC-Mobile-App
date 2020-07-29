@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Image, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icons from 'react-native-vector-icons/FontAwesome5';
@@ -15,6 +15,9 @@ export default () => {
     const [fileUrl, setFileUrl] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+
+    const [barcode, setBarcode] = useState(null);
+    const [projectCode, setProjectCode] = useState(null);
 
     const _onPressChooseImage = () => {
         setIsLoading(true);
@@ -58,11 +61,19 @@ export default () => {
     };
 
     const _onPressDeleteImage = () => {
+        if (fileUrl == null) {
+            MessageAlert('WARNING', 'There are no photos to delete!');
+            return;
+        }
         setFileUrl(null);
         setImageSource(null);
     };
 
     const _onPressUploadImage = () => {
+        if (fileUrl == null) {
+            MessageAlert('WARNING', 'Please select a photo to upload!');
+            return;
+        }
         NetInfo.fetch().then(state => {
             if (!state.isConnected) {
                 MessageAlert('WARNING', 'Network not available!');
@@ -74,14 +85,8 @@ export default () => {
     };
 
     const uploadImageToServer = async () => {
-        if (fileUrl == null) {
-            setIsUploading(false);
-            return;
-        }
         try {
-            let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
             let username = await AsyncStorage.getItem('USERNAME');
-            let barcode = await AsyncStorage.getItem('BARCODE');
             let date = new Date().getDate();
             let month = new Date().getMonth() + 1;
             let year = new Date().getFullYear();
@@ -110,6 +115,8 @@ export default () => {
                 .then(res => {
                     setIsUploading(false);
                     MessageAlert('SUCCESS', JSON.parse(res.data).responseText);
+                    setFileUrl(null);
+                    setImageSource(null);
                 })
                 .catch(error => {
                     setIsUploading(false);
@@ -121,32 +128,40 @@ export default () => {
         };
     };
 
-    const ButtonUploading = () => {
-        if (isUploading) {
-            return (
-                <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
-                    <ActivityIndicator size='large' color='white' />
-                </TouchableOpacity>
-            );
-        }
-        return (
-            <TouchableOpacity style={styles.buttonActionUpload} onPress={_onPressUploadImage}>
-                <Text style={styles.buttonTitle}>Upload</Text>
-            </TouchableOpacity>
-        );
-    };
+    const getData = async () => {
+        try {
+            let projectCode = await AsyncStorage.getItem('PROJECT_CODE');
+            let barcode = await AsyncStorage.getItem('BARCODE');
+            setBarcode(barcode);
+            setProjectCode(projectCode);
+        } catch (error) {
+            MessageAlert('ERROR', error.toString());
+        };
+    }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.safeArea}>
-                {isLoading ? <View style={styles.loading}>
-                    <ActivityIndicator size='large' color='#344955' />
-                </View> : null}
-                <View style={styles.container}>
-                    <View style={styles.borderContainer}>
-                        {fileUrl == null
+            <View style={styles.container}>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.infoTitle}>
+                        Project Code: <Text style={styles.infoValue}>{projectCode}</Text>
+                    </Text>
+                    <Text style={styles.infoTitle}>
+                        Barcode: <Text style={styles.infoValue}>{barcode}</Text>
+                    </Text>
+                </View>
+                <View style={styles.borderContainer}>
+                    {isLoading
+                        ? <View style={styles.imageContainer}>
+                            <ActivityIndicator size='large' color='#344955' />
+                        </View>
+                        : fileUrl == null
                             ? <View style={styles.imageContainer}>
-                                <Icons name="plus-circle" size={48} onPress={_onPressChooseImage} />
+                                <Icons name="plus-circle" size={48} onPress={_onPressChooseImage} color={BASE_COLOR} />
                                 <Text style={styles.text}>Choose image upload</Text>
                             </View>
                             : <View style={styles.imageContainer}>
@@ -155,24 +170,20 @@ export default () => {
                                     source={imageSource}
                                     resizeMode='contain' />
                             </View>
-                        }
-                    </View>
-                    <View style={styles.actionContainer}>
-                        {fileUrl == null || isUploading
-                            ? <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
-                                <Text style={styles.buttonTitle}>Delete</Text>
-                            </TouchableOpacity>
-                            : <TouchableOpacity style={styles.buttonActionDelete} onPress={_onPressDeleteImage}>
-                                <Text style={styles.buttonTitle}>Delete</Text>
-                            </TouchableOpacity>
-                        }
-                        {fileUrl != null
-                            ? ButtonUploading()
-                            : <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
-                                <Text style={styles.buttonTitle}>Upload</Text>
-                            </TouchableOpacity>
-                        }
-                    </View>
+                    }
+                </View>
+                <View style={styles.actionContainer}>
+                    <TouchableOpacity style={styles.buttonActionDelete} onPress={_onPressDeleteImage}>
+                        <Text style={styles.buttonTitle}>Delete</Text>
+                    </TouchableOpacity>
+                    {isUploading
+                        ? <TouchableOpacity style={styles.buttonActionDisable} disabled={true}>
+                            <ActivityIndicator size='large' color='white' />
+                        </TouchableOpacity>
+                        : <TouchableOpacity style={styles.buttonActionUpload} onPress={_onPressUploadImage}>
+                            <Text style={styles.buttonTitle}>Upload</Text>
+                        </TouchableOpacity>
+                    }
                 </View>
             </View>
         </SafeAreaView>
@@ -183,12 +194,7 @@ const BASE_COLOR = '#344955';
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-    },
-    loading: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: 'white',
     },
     container: {
         padding: 16,
@@ -212,8 +218,9 @@ const styles = StyleSheet.create({
         height: '100%'
     },
     text: {
-        fontSize: 18,
-        marginTop: 8,
+        fontSize: 20,
+        marginTop: 24,
+        color: BASE_COLOR,
     },
     actionContainer: {
         marginTop: 48,
@@ -229,7 +236,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '40%',
         height: '100%',
-        backgroundColor: 'red'
+        backgroundColor: '#dc3534'
     },
     buttonActionUpload: {
         borderRadius: 32,
@@ -237,7 +244,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '40%',
         height: '100%',
-        backgroundColor: 'green'
+        backgroundColor: BASE_COLOR,
     },
     buttonActionDisable: {
         borderRadius: 32,
@@ -249,6 +256,18 @@ const styles = StyleSheet.create({
     },
     buttonTitle: {
         color: 'white',
+        fontSize: 16,
+    },
+    infoContainer: {
+        marginBottom: 16,
+    },
+    infoTitle: {
+        color: BASE_COLOR,
+        fontSize: 16,
+        marginBottom: 24,
+    },
+    infoValue: {
+        color: '#b00020',
         fontSize: 16,
     },
 });

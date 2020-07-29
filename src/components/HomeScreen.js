@@ -7,7 +7,7 @@ import NetInfo from '@react-native-community/netinfo';
 
 import LoadDataRoleAPI from '../apis/LoadDataRole';
 import MessageAlert from './CustomViews/MessageAlert';
-
+import LoadingRefresh from './CustomViews/LoadingRefresh';
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
@@ -21,6 +21,8 @@ const storeData = async (key, value) => {
 };
 export default ({ route, navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
+
     const [listProject, setListProject] = useState([]);
     const [projectCode, setProjectCode] = useState(null);
     const [barcode, setBarcode] = useState(null);
@@ -30,27 +32,27 @@ export default ({ route, navigation }) => {
             let username = await AsyncStorage.getItem('USERNAME');
             LoadDataRoleAPI(username)
                 .then(res => {
-                    if (res.Message != null) {
-                        MessageAlert('ERROR', res.Message);
-                        setIsLoading(false);
-                        return;
-                    }
                     setListProject(res);
                     setIsLoading(false);
+                    setIsError(false);
                 })
                 .catch(error => {
                     setIsLoading(false);
-                    MessageAlert('ERROR', error.toString());
+                    setIsError(true);
+                    // MessageAlert('ERROR', error.toString());
                 });
         } catch (error) {
             setIsLoading(false);
-            MessageAlert('ERROR', error.toString());
+            setIsError(true);
+            // MessageAlert('ERROR', error.toString());
         }
     };
 
     const getDataFromAPI = () => {
         NetInfo.fetch().then(state => {
             if (!state.isConnected) {
+                setIsLoading(false);
+                setIsError(true);
                 MessageAlert('WARNING', 'Network not available!');
             } else {
                 getData();
@@ -106,7 +108,7 @@ export default ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {isLoading ? <ActivityIndicator size='large' color={BASE_COLOR} style={styles.loading} /> : null}
+            <LoadingRefresh isLoading={isLoading} isRefresh={isError} _onPressRefresh={getDataFromAPI} />
             <View style={styles.container}>
                 <View style={styles.containerCenter}>
                     <Dropdown
@@ -151,14 +153,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
-
-    loading: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
     inputContainer: {
         marginTop: 48,
         justifyContent: 'center',
