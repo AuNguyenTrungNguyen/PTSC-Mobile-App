@@ -1,2 +1,2 @@
-const Port_Server = 'http://server1.bboscloud.com:8083';
+const Port_Server = 'http://172.16.13.48:60007';
 export { Port_Server };

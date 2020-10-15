@@ -8,6 +8,8 @@ import HomeScreen from './components/HomeScreen';
 import CameraScreen from './components/CameraScreen';
 import UpdateOrderScreen from './components/UpdateOrderScreen';
 import UploadBarcodeImageScreen from './components/UploadBarcodeImageScreen';
+import DrawingListScreen from './components/Drawing/DrawingListScreen';
+import UpdateProgressScreen from './components/Drawing/DetailDrawingScreen';
 
 const Stack = createStackNavigator();
 export default () => {
@@ -29,11 +31,31 @@ export default () => {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name='DrawingList'
+                    component={DrawingListScreen}
+                    options={
+                        {
+                            title: 'Drawing List',
+                            headerBackTitle: 'Back',
+                        }
+                    }
+                />
+                <Stack.Screen
+                    name='UpdateProgress'
+                    component={UpdateProgressScreen}
+                    options={({ route }) => (
+                        {
+                            title: route.params?.titleBar,
+                            headerBackTitle: 'Back',
+                        }
+                    )}
+                />
+                <Stack.Screen
                     name='Camera'
                     component={CameraScreen}
                     options={
                         {
-                            title: 'Barcode Scanner',
+                            title: 'QRCode Scanner',
                             headerBackTitle: 'Back',
                         }
                     } />

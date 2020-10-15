@@ -1,23 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import LoginAPI from '../apis/Login';
+import Helper from '../helper/Helper';
+import LoginAPI from '../apis/LoginAPI';
 import MessageAlert from './CustomViews/MessageAlert';
-
-const BASE_COLOR = '#344955';
-const OPP_COLOR = 'white';
-
-const storeData = async (key, value) => {
-    try {
-        await AsyncStorage.setItem(key, value);
-    } catch (error) {
-        MessageAlert('ERROR', error.toString());
-    }
-}
 
 export default ({ navigation }) => {
 
@@ -47,7 +36,7 @@ export default ({ navigation }) => {
         setShowPassord(!showPassord);
     }
 
-    const _login = () => {
+    const _onPressLogin = () => {
         Keyboard.dismiss();
         setLoading(true);
         NetInfo.fetch().then(state => {
@@ -62,24 +51,24 @@ export default ({ navigation }) => {
                 }
                 LoginAPI(username, password)
                     .then(res => {
-                        setLoading(false);
-                        if (res == null) {
-                            return;
-                        }
-                        if (res.error_description) {
+                        if (res.error) {
                             MessageAlert('ERROR', res.error_description);
+                            setLoading(true);
                             return;
                         }
-                        storeData('USERNAME', res.userName);
-                        navigation.navigate('Home');
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: 'Home' }],
-                        });
+                        if (res.access_token) {
+                            Helper.storeData('TOKEN', res.access_token);
+                            Helper.storeData('USERNAME', res.userName);
+                            navigation.navigate('Home');
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Home' }],
+                            });
+                        }
                     })
                     .catch(error => {
-                        setLoading(false);
                         MessageAlert('ERROR', error.toString());
+                        setLoading(false);
                     });
             }
         });
@@ -133,7 +122,7 @@ export default ({ navigation }) => {
                         ? <TouchableOpacity style={styles.buttonContainer}>
                             <ActivityIndicator size="large" color={OPP_COLOR} />
                         </TouchableOpacity>
-                        : <TouchableOpacity style={styles.buttonContainer} onPress={_login}>
+                        : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
                             <Text style={styles.buttonTitle}>LOGIN</Text>
                         </TouchableOpacity>}
                 </View>
@@ -142,6 +131,8 @@ export default ({ navigation }) => {
     );
 };
 
+const BASE_COLOR = '#344955';
+const OPP_COLOR = 'white';
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,

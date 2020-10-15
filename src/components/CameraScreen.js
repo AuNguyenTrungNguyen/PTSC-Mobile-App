@@ -4,10 +4,10 @@ import { RNCamera } from 'react-native-camera';
 
 export default ({ navigation }) => {
 
-    const _onBarCodeRead = (scanResult) => {
+    const _onQRCodeRead = (scanResult) => {
         if (scanResult.data !== null) {
-            navigation.navigate('Home', {
-                barCode: scanResult.data,
+            navigation.navigate('DrawingList', {
+                qrCode: scanResult.data,
             });
         }
     };
@@ -17,7 +17,7 @@ export default ({ navigation }) => {
             <RNCamera
                 style={styles.containerCamera}
                 type={RNCamera.Constants.Type.back}
-                onBarCodeRead={_onBarCodeRead}
+                onBarCodeRead={_onQRCodeRead}
                 captureAudio={false}
                 androidCameraPermissionOptions={{
                     title: 'Permission to use camera',
@@ -33,7 +33,7 @@ export default ({ navigation }) => {
                     <View style={[styles.bottomRight, styles.edge]} />
                 </View>
                 <View style={styles.backdrop} >
-                    <Text style={styles.note}>Please move your camera over Barcode to scan it</Text>
+                    <Text style={styles.note}>Please move your camera over QR Code to scan it</Text>
                 </View>
             </RNCamera>
         </SafeAreaView>
