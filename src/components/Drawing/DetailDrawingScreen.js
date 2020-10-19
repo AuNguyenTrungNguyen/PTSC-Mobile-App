@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import Moment from 'moment';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Dialog from "react-native-dialog";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import DialogInput from 'react-native-dialog-input';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
@@ -33,6 +33,8 @@ export default ({ route }) => {
   const callAPI = executedAPI => {
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
         executedAPI();
@@ -41,6 +43,7 @@ export default ({ route }) => {
   };
 
   const getDrawingDetail = async () => {
+    setIsLoading(true);
     let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
     GetDrawingDetailAPI(projectCode, drawingNo, token)
@@ -56,7 +59,7 @@ export default ({ route }) => {
         }
       })
       .catch((error) => {
-        MessageAlert('ERROR', error.toString());
+        MessageAlert('ERROR catch', error.toString());
         setIsLoading(false);
         setIsError(true);
       });
@@ -93,6 +96,7 @@ export default ({ route }) => {
    * Handle for action edit data in list
    */
   const [dateDisplay, setDateDisplay] = useState(new Date());
+  const [inputDisplay, setInputDisplay] = useState('');
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
   const [showPicker, setShowPicker] = useState(false);
@@ -109,7 +113,7 @@ export default ({ route }) => {
     setShowPicker(true);
   };
 
-  const _onChangeDate = (event, selectedDate) => {
+  const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
       let array = [...detailDrawingList];
       array[indexUpdate][keyUpdate] = selectedDate;
@@ -128,42 +132,36 @@ export default ({ route }) => {
     setShowPicker(false);
   };
 
-  const _onPressShowDialog = (index, key) => {
+  const _onPressShowDialog = (value, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
+    if (value) {
+      setInputDisplay(value.toString());
+    } else {
+      setInputDisplay('');
+    }
     setShowDialog(true);
   };
 
-  const _onPressSubmitInput = (value) => {
-    if (!checkFormatNumber(value)) {
+  const _onPressSubmitInput = () => {
+    if (!checkFormatNumber(inputDisplay)) {
       Toast.showWithGravity(keyUpdate + ' must be a number.', Toast.SHORT, Toast.TOP);
       return;
     }
     setShowDialog(false);
-    if (detailDrawingList[indexUpdate][keyUpdate] != value) {
+    if (detailDrawingList[indexUpdate][keyUpdate] != inputDisplay) {
       let array = [...detailDrawingList];
-      array[indexUpdate][keyUpdate] = value;
+      array[indexUpdate][keyUpdate] = inputDisplay;
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
       let key = detailDrawingList[indexUpdate].RowIndex;
       let objIndex = array.findIndex((obj => obj.RowIndex == key));
       if (objIndex < 0) {
-        array.push({ RowIndex: key, [keyUpdate]: selectedDate });
+        array.push({ RowIndex: key, [keyUpdate]: inputDisplay });
       } else {
         array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
       }
-      // if (objIndex < 0) {
-      //   if (value) {
-      //     array.push({ RowIndex: key, [keyUpdate]: value });
-      //   }
-      // } else {
-      //   if (value) {
-      //     array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
-      //   } else if (!value && array[objIndex][keyUpdate]) {
-      //     delete array[objIndex][keyUpdate];
-      //   }
-      // }
       setUpdateDrawingList(array);
     }
   };
@@ -188,7 +186,7 @@ export default ({ route }) => {
         ?
         null
         :
-        <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor:'white' }}>
+        <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
           <Text style={{ fontSize: 16, marginTop: 16 }}>DrawingNo: {drawingNo}</Text>
           <Text style={{ fontSize: 16, marginTop: 16 }}>DisciplineCode: {disciplineCode}</Text>
           <Text style={{ fontSize: 16, marginTop: 16 }}>WOType: {wOType}</Text>
@@ -198,7 +196,7 @@ export default ({ route }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={callAPI(getDrawingDetail)} />
+      <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
       <RenderNotLoadData />
       <View style={styles.container}>
         {detailDrawingList.length == 0
@@ -234,7 +232,7 @@ export default ({ route }) => {
                           <AntDesignIcon name='calendar' size={16} />
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.cell, styles.cellCutPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(index, 'CutPercentage')}>
+                        <TouchableOpacity style={[styles.cell, styles.cellCutPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(item.CutPercentage, index, 'CutPercentage')}>
                           <Text style={styles.text}>{formatEmptyData(item.CutPercentage)}</Text>
                           <FontAwesomeIcon name='pencil' size={16} />
                         </TouchableOpacity>
@@ -244,7 +242,7 @@ export default ({ route }) => {
                           <AntDesignIcon name='calendar' size={16} />
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.cell, styles.cellFitPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(index, 'FitPercentage')}>
+                        <TouchableOpacity style={[styles.cell, styles.cellFitPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
                           <Text style={styles.text}>{formatEmptyData(item.FitPercentage)}</Text>
                           <FontAwesomeIcon name='pencil' size={16} />
                         </TouchableOpacity>
@@ -254,7 +252,7 @@ export default ({ route }) => {
                           <AntDesignIcon name='calendar' size={16} />
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.cell, styles.cellWeldPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(index, 'WeldPercentage')}>
+                        <TouchableOpacity style={[styles.cell, styles.cellWeldPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
                           <Text style={styles.text}>{formatEmptyData(item.WeldPercentage)}</Text>
                           <FontAwesomeIcon name='pencil' size={16} />
                         </TouchableOpacity>
@@ -265,26 +263,30 @@ export default ({ route }) => {
               </View>
             </ScrollView>
           </View>}
-        {showPicker && (
-          <DateTimePicker
-            value={dateDisplay}
-            mode={'date'}
-            onChange={_onChangeDate}
-          />
-        )}
-        <DialogInput
-          isDialogVisible={showDialog}
-          title={'Update ' + keyUpdate + ' :'}
-          textInputProps={{ keyboardType: 'numeric' }}
-          initValueTextInput={''}
-          submitInput={(value) => _onPressSubmitInput(value)}
-          closeDialog={() => { setShowDialog(false) }}>
-        </DialogInput>
         {detailDrawingList.length == 0
           ? null
           : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUploadDrawing}>
             <Text style={styles.buttonTitle}>Submit to Server</Text>
           </TouchableOpacity>}
+        <DateTimePickerModal
+          isVisible={showPicker}
+          headerTextIOS={'Update ' + keyUpdate + ' :'}
+          date={dateDisplay}
+          mode={'date'}
+          onConfirm={_onChangeDate}
+          onCancel={() => { setShowPicker(false) }}
+        />
+        <Dialog.Container visible={showDialog}>
+          <Dialog.Title>{'Update ' + keyUpdate + ' :'}</Dialog.Title>
+          <Dialog.Input
+            value={inputDisplay}
+            placeholder={'Enter ' + keyUpdate}
+            onChangeText={(text) => setInputDisplay(text)}
+            underlineColorAndroid={BASE_COLOR}
+          />
+          <Dialog.Button label='Cancle' onPress={() => { setShowDialog(false) }} />
+          <Dialog.Button label='OK' onPress={_onPressSubmitInput} />
+        </Dialog.Container>
         <AwesomeAlert
           show={isUploading}
           showProgress={true}
@@ -310,26 +312,19 @@ const styles = StyleSheet.create({
 
   table: {
     flex: 1,
-    borderColor: BASE_COLOR,
-    borderTopWidth: 1,
   },
   row: {
     flexDirection: 'row',
     height: BASE_CELL_HEIGHT,
-    borderColor: BASE_COLOR,
-    borderLeftWidth: 1,
-    borderBottomWidth: 1,
   },
   cell: {
     borderColor: BASE_COLOR,
-    borderRightWidth: 1,
+    borderWidth: 1,
     lineHeight: BASE_CELL_HEIGHT,
     paddingLeft: 8,
     paddingRight: 8,
   },
   cellHeader: {
-    borderColor: BASE_COLOR,
-    borderBottomWidth: 1,
     fontWeight: 'bold',
     color: BASE_COLOR,
     backgroundColor: 'azure',
@@ -338,7 +333,7 @@ const styles = StyleSheet.create({
     width: 200,
   },
   cellWeldNo: {
-    width: 50,
+    width: 80,
   },
   cellActualType: {
     width: 100,

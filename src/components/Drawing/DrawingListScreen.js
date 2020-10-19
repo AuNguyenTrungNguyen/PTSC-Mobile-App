@@ -29,8 +29,11 @@ export default ({ route, navigation }) => {
   const getDataFromAPI = () => {
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
+        setIsLoading(true);
         getData();
       }
     });
@@ -116,12 +119,12 @@ export default ({ route, navigation }) => {
               <View>
                 <View style={styles.row}>
                   <Text style={[styles.cell, styles.cellHeader, styles.cellNo]}>No</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellDrawingNo]}>Drawing No</Text>
+                  <Text style={[styles.cell, styles.cellHeader, styles.cellDrawingNo]}>DrawingNo</Text>
                   <Text style={[styles.cell, styles.cellHeader, styles.cellSheet]}>Sheet</Text>
                   <Text style={[styles.cell, styles.cellHeader, styles.cellRev]}>Rev</Text>
                   <Text style={[styles.cell, styles.cellHeader, styles.cellWONo]}>WONo</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellDisciplineCode]}>Discipline Code</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellFacilityCode]}>Facility Code</Text>
+                  <Text style={[styles.cell, styles.cellHeader, styles.cellDisciplineCode]}>DisciplineCode</Text>
+                  <Text style={[styles.cell, styles.cellHeader, styles.cellFacilityCode]}>FacilityCode</Text>
                 </View>
                 <ScrollView>
                   {drawingList.map((item, index) => {
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
+    padding: 8,
     color: BASE_COLOR,
   },
   searchIconContainer: {
@@ -195,26 +199,19 @@ const styles = StyleSheet.create({
 
   table: {
     flex: 1,
-    borderColor: BASE_COLOR,
-    borderTopWidth: 1,
   },
   row: {
     flexDirection: 'row',
     height: BASE_CELL_HEIGHT,
-    borderColor: BASE_COLOR,
-    borderLeftWidth: 1,
-    borderBottomWidth: 1,
   },
   cell: {
     borderColor: BASE_COLOR,
-    borderRightWidth: 1,
+    borderWidth: 1,
     lineHeight: BASE_CELL_HEIGHT,
     paddingLeft: 8,
     paddingRight: 8,
   },
   cellHeader: {
-    borderColor: BASE_COLOR,
-    borderBottomWidth: 1,
     fontWeight: 'bold',
     color: BASE_COLOR,
     backgroundColor: 'azure',

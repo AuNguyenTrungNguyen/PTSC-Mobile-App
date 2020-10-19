@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "PTSC_CLOUD-tvOS.app"
-               BlueprintName = "PTSC_CLOUD-tvOS"
+               BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+               BuildableName = "PTSC.app"
+               BlueprintName = "PTSC_CLOUD"
                ReferencedContainer = "container:PTSC_CLOUD.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "PTSC_CLOUD-tvOSTests.xctest"
-               BlueprintName = "PTSC_CLOUD-tvOSTests"
+               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
+               BuildableName = "PTSC_CLOUDTests.xctest"
+               BlueprintName = "PTSC_CLOUDTests"
                ReferencedContainer = "container:PTSC_CLOUD.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -54,15 +54,15 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "PTSC_CLOUD-tvOS.app"
-            BlueprintName = "PTSC_CLOUD-tvOS"
+            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+            BuildableName = "PTSC.app"
+            BlueprintName = "PTSC_CLOUD"
             ReferencedContainer = "container:PTSC_CLOUD.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -71,9 +71,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "PTSC_CLOUD-tvOS.app"
-            BlueprintName = "PTSC_CLOUD-tvOS"
+            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+            BuildableName = "PTSC.app"
+            BlueprintName = "PTSC_CLOUD"
             ReferencedContainer = "container:PTSC_CLOUD.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -82,7 +82,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
