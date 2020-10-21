@@ -43,7 +43,6 @@ export default ({ route }) => {
   };
 
   const getDrawingDetail = async () => {
-    setIsLoading(true);
     let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
     GetDrawingDetailAPI(projectCode, drawingNo, token)
@@ -52,33 +51,36 @@ export default ({ route }) => {
           setDetailDrawingList(res.data);
           setIsLoading(false);
           setIsError(false);
+          setIsUploading(false)
         } else {
           MessageAlert('ERROR', res.Message);
           setIsLoading(false);
           setIsError(true);
+          setIsUploading(false)
         }
       })
       .catch((error) => {
-        MessageAlert('ERROR catch', error.toString());
+        MessageAlert('ERROR', error.toString());
         setIsLoading(false);
         setIsError(true);
+        setIsUploading(false)
       });
   };
 
   const updateDrawingDetail = async () => {
-    let projectCode = await Helper.getItem('PROJECT_CODE');
+    let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
     UpdateDrawingDetailAPI(projectCode, drawingNo, updateDrawingList, token)
       .then(res => {
         if (res.success) {
-          MessageAlert('SUCCESS', res.responseText);
+          Toast.show(res.Message, Toast.SHORT);
+          setUpdateDrawingList([]);
         } else {
           MessageAlert('ERROR', res.Message);
         }
-        setIsUploading(false);
         callAPI(getDrawingDetail);
       }).catch(error => {
-        MessageAlert('ERROR catch', error.toString());
+        MessageAlert('ERROR', error.toString());
         setIsUploading(false);
       });
   };
@@ -88,7 +90,7 @@ export default ({ route }) => {
       setIsUploading(true);
       callAPI(updateDrawingDetail);
     } else {
-      Toast.showWithGravity('No any data changes!', Toast.SHORT, Toast.TOP);
+      Toast.show('No any data changes!', Toast.SHORT);
     }
   };
 
@@ -145,7 +147,7 @@ export default ({ route }) => {
 
   const _onPressSubmitInput = () => {
     if (!checkFormatNumber(inputDisplay)) {
-      Toast.showWithGravity(keyUpdate + ' must be a number.', Toast.SHORT, Toast.TOP);
+      Toast.show(keyUpdate + ' must be a number.', Toast.SHORT);
       return;
     }
     setShowDialog(false);
@@ -262,12 +264,11 @@ export default ({ route }) => {
                 </ScrollView>
               </View>
             </ScrollView>
-          </View>}
-        {detailDrawingList.length == 0
-          ? null
-          : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUploadDrawing}>
-            <Text style={styles.buttonTitle}>Submit to Server</Text>
-          </TouchableOpacity>}
+            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUploadDrawing}>
+              <Text style={styles.buttonTitle}>Submit to Server</Text>
+            </TouchableOpacity>
+          </View>
+        }
         <DateTimePickerModal
           isVisible={showPicker}
           headerTextIOS={'Update ' + keyUpdate + ' :'}
@@ -389,17 +390,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: BASE_COLOR,
     borderWidth: 1,
+    backgroundColor: 'white',
   },
   noDataTitle: {
     fontSize: 16,
-    color: BASE_COLOR
+    color: BASE_COLOR,
   },
   buttonContainer: {
     height: 48,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    borderRadius: 32,
     marginTop: 16,
   },
   buttonTitle: {

@@ -41,8 +41,9 @@ export default ({ route, navigation }) => {
 
   const getData = async () => {
     let username = await Helper.getData('USERNAME');
+    let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
-    GetDrawingListAPI(username, token)
+    GetDrawingListAPI(username, projectCode, token)
       .then(res => {
         if (res.success) {
           setDrawingList(res.data);
@@ -89,31 +90,33 @@ export default ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.searchContainer}>
-            <TextInput
-              onChangeText={_onChangeDrawingNo}
-              value={drawingNo}
-              style={styles.searchInput}
-              placeholder='Enter Drawing No...'
-              placeholderTextColor={BASE_COLOR}
-              underlineColorAndroid='transparent'
-            />
-            <TouchableOpacity style={styles.searchIconContainer} onPress={() => _onPressSearchDrawing(drawingNo)}>
-              <Icon style={styles.searchIcon} name='search' size={24} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.searchIconContainer} onPress={_onPressQRCode}>
-              <Icon style={styles.searchIcon} name='qr-code' size={24} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        {drawingList.length == 0
-          ?
+      {drawingList.length == 0
+        ?
+        <View style={styles.container}>
           <View style={styles.noDataContainer}>
             <Text style={styles.noDataTitle}>No have any data!</Text>
           </View>
-          :
+        </View>
+        :
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <View style={styles.searchContainer}>
+              <TextInput
+                onChangeText={_onChangeDrawingNo}
+                value={drawingNo}
+                style={styles.searchInput}
+                placeholder='Enter Drawing No...'
+                placeholderTextColor={BASE_COLOR}
+                underlineColorAndroid='transparent'
+              />
+              <TouchableOpacity style={styles.searchIconContainer} onPress={() => _onPressSearchDrawing(drawingNo)}>
+                <Icon style={styles.searchIcon} name='search' size={24} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.searchIconContainer} onPress={_onPressQRCode}>
+                <Icon style={styles.searchIcon} name='qr-code' size={24} />
+              </TouchableOpacity>
+            </View>
+          </View>
           <View style={styles.table}>
             <ScrollView horizontal={true}>
               <View>
@@ -149,8 +152,8 @@ export default ({ route, navigation }) => {
               </View>
             </ScrollView>
           </View>
-        }
-      </View>
+        </View>
+      }
     </SafeAreaView >
   );
 };
@@ -252,6 +255,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: BASE_COLOR,
     borderWidth: 1,
+    backgroundColor: 'white',
   },
   noDataTitle: {
     fontSize: 16,

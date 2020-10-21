@@ -1,2 +1,2 @@
-const Port_Server = 'http://172.16.13.48:60007';
+const Port_Server = 'http://procurement.ptscmc.com.vn:8083';
 export { Port_Server };

@@ -92,7 +92,7 @@ export default ({ navigation }) => {
 
   const _onPressUpdateDrawing = () => {
     if (projectCode == null) {
-      Toast.showWithGravity('Please select a project!', Toast.SHORT, Toast.TOP);
+      Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
     try {
