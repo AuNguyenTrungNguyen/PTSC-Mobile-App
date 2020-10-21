@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Helper from '../helper/Helper';
 import GetProjectListAPI from '../apis/GetProjectListAPI';
@@ -18,6 +19,16 @@ export default ({ navigation }) => {
   useEffect(() => {
     getDataFromAPI();
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={_onPressLogout} style={{ paddingRight: 16 }}>
+          <Ionicons name='log-out-outline' size={24} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   const getDataFromAPI = () => {
     NetInfo.fetch().then(state => {
@@ -52,6 +63,27 @@ export default ({ navigation }) => {
         setIsLoading(false);
         setIsError(true);
       });
+  };
+
+  const _onPressLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Logout', onPress: logout }
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const logout = () => {
+    Helper.clearData();
+    navigation.navigate('Login');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   const _onChangeProjectCode = (item) => {

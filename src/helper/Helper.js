@@ -18,5 +18,9 @@ export default class Helper {
       MessageAlert('ERROR', e.toString());
     };
   };
-  
+
+  static clearData = async () => {
+    await AsyncStorage.clear();
+  };
+
 };
