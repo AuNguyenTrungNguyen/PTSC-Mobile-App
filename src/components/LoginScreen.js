@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import Moment from 'moment';
 import Helper from '../helper/Helper';
 import LoginAPI from '../apis/LoginAPI';
 import MessageAlert from './CustomViews/MessageAlert';
@@ -15,20 +14,6 @@ export default ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassord, setShowPassord] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const getRoute = async () => {
-      let expires = await Helper.getData('EXPIRES');
-      if (expires && (Moment.utc(new Date(expires)).valueOf() - Moment.utc(new Date()).valueOf() > 0)) {
-        navigation.navigate('Home');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' }],
-        });
-      }
-    };
-    getRoute();
-  }, []);
 
   const nextInput = useRef(null);
   const _onSubmitEditingNextInput = () => {
@@ -68,7 +53,7 @@ export default ({ navigation }) => {
           .then(res => {
             if (res.error) {
               MessageAlert('ERROR', res.error_description);
-              setLoading(true);
+              setLoading(false);
               return;
             }
             if (res.access_token) {

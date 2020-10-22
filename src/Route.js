@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import SplashScreen from 'react-native-splash-screen';
 
+import AuthScreen from './components/AuthScreen';
 import LoginScreen from './components/LoginScreen';
 import HomeScreen from './components/HomeScreen';
 import CameraScreen from './components/CameraScreen';
@@ -14,17 +14,19 @@ import UpdateProgressScreen from './components/Drawing/DetailDrawingScreen';
 const Stack = createStackNavigator();
 export default () => {
 
-    useEffect(() => {
-        SplashScreen.hide();
-    }, []);
-
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName='Login'>
+            <Stack.Navigator initialRouteName='Auth'>
+                <Stack.Screen
+                    name='Auth'
+                    component={AuthScreen}
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen
                     name='Login'
                     component={LoginScreen}
-                    options={{ headerShown: false }} />
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen
                     name='Home'
                     component={HomeScreen}
@@ -57,7 +59,8 @@ export default () => {
                             title: 'QRCode Scanner',
                             headerBackTitle: 'Back',
                         }
-                    } />
+                    }
+                />
                 <Stack.Screen
                     name='Update'
                     component={UpdateOrderScreen}
@@ -66,7 +69,8 @@ export default () => {
                             title: 'Tracking WO',
                             headerBackTitle: 'Back',
                         }
-                    } />
+                    }
+                />
                 <Stack.Screen
                     name='Upload'
                     component={UploadBarcodeImageScreen}
@@ -75,7 +79,8 @@ export default () => {
                             title: 'Upload Barcode Image',
                             headerBackTitle: 'Back',
                         }
-                    } />
+                    }
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
