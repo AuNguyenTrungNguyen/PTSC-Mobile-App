@@ -90,14 +90,15 @@ export default ({ navigation }) => {
     setProjectCode(item.value);
   };
 
-  const _onPressUpdateDrawing = () => {
+  const _onPressUpdateDrawing = async () => {
     if (projectCode == null) {
       Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
     try {
       Helper.storeData('PROJECT_CODE', projectCode);
-      navigation.navigate('DrawingList', {projectCode: projectCode});
+      let username = await Helper.getData('USERNAME');
+      navigation.navigate('DrawingList', {projectCode: projectCode, username: username});
     } catch (error) {
       MessageAlert('ERROR', error.toString());
     }
