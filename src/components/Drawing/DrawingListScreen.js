@@ -20,10 +20,11 @@ export default ({ route, navigation }) => {
 
   useEffect(
     () => {
-      getDataFromAPI();
       if (route.params?.qrCode) {
         setDrawingNo(route.params?.qrCode);
-        _onPressSearchDrawing(oute.params?.qrCode);
+        _onPressSearchDrawing(route.params?.qrCode);
+      } else {
+        getDataFromAPI();
       }
     }, [route.params?.qrCode]
   );
