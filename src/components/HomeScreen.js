@@ -6,7 +6,7 @@ import Toast from 'react-native-simple-toast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Helper from '../helper/Helper';
-import GetProjectListAPI from '../apis/GetProjectListAPI';
+import GetProjectListAPI from '../apis/app/GetProjectListAPI';
 import MessageAlert from './CustomViews/MessageAlert';
 import LoadingRefresh from './CustomViews/LoadingRefresh';
 
