@@ -15,6 +15,8 @@ export default ({ route, navigation }) => {
   const [drawingList, setDrawingList] = useState([]);
   const [drawingListDefault, setDrawingListDefault] = useState([]);
   const [drawingNo, setDrawingNo] = useState(null);
+  const [isSearch, setIsSearch] = useState(false);
+  const { projectCode } = route.params;
 
   useEffect(
     () => {
@@ -69,6 +71,7 @@ export default ({ route, navigation }) => {
 
   const _onPressSearchDrawing = (searchValue) => {
     Keyboard.dismiss();
+    setIsSearch(true);
     if (searchValue) {
       var searchList = drawingListDefault.filter(item => item.DrawingNo.toLowerCase().includes(searchValue.toLowerCase()));
       setDrawingList(searchList);
@@ -90,13 +93,14 @@ export default ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
-      {drawingList.length == 0
+      {!isSearch && drawingList.length == 0
         ?
-        <View style={styles.container}>
+        (<View style={styles.container}>
           <View style={styles.noDataContainer}>
-            <Text style={styles.noDataTitle}>No have any data!</Text>
+            <Text style={styles.noDataTitle}>No have any data with</Text>
+            <Text style={styles.noDataTitle}>ProjectCode: <Text style={styles.textAction}>{projectCode}</Text></Text>
           </View>
-        </View>
+        </View>)
         :
         <View style={styles.container}>
           <View style={styles.headerContainer}>
@@ -117,41 +121,50 @@ export default ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.table}>
-            <ScrollView horizontal={true}>
-              <View>
-                <View style={styles.row}>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellNo]}>No</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellDrawingNo]}>DrawingNo</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellSheet]}>Sheet</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellRev]}>Rev</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellWONo]}>WONo</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellDisciplineCode]}>DisciplineCode</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellFacilityCode]}>FacilityCode</Text>
+          {drawingList.length == 0
+            ?
+            <View style={styles.noDataContainer}>
+              <Text style={styles.noDataTitle}>No have any data with</Text>
+              <Text style={styles.noDataTitle}>ProjectCode: <Text style={styles.textAction}>{projectCode}</Text></Text>
+              <Text style={styles.noDataTitle}>DrawingNo: <Text style={styles.textAction}>{drawingNo}</Text></Text>
+            </View>
+            :
+            <View style={styles.table}>
+              <ScrollView horizontal={true}>
+                <View>
+                  <View style={styles.row}>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellNo]}>No</Text>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellDrawingNo]}>DrawingNo</Text>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellSheet]}>Sheet</Text>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellRev]}>Rev</Text>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellWONo]}>WONo</Text>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellDisciplineCode]}>DisciplineCode</Text>
+                    <Text style={[styles.cell, styles.cellHeader, styles.cellFacilityCode]}>FacilityCode</Text>
+                  </View>
+                  <ScrollView>
+                    {drawingList.map((item, index) => {
+                      return (
+                        <View style={styles.row}>
+                          <Text style={[styles.cell, styles.cellNo, styles.cellRight]}>{index + 1}</Text>
+                          <TouchableOpacity
+                            style={[styles.cell, styles.cellDrawingNo]}
+                            activeOpacity={1}
+                            onPress={() => _onPressUploadDrawing(item.DrawingNo, item.DisciplineCode, item.WOType)}>
+                            <Text style={styles.textAction}>{item.DrawingNo}</Text>
+                          </TouchableOpacity>
+                          <Text style={[styles.cell, styles.cellSheet]}>{item.Sheet}</Text>
+                          <Text style={[styles.cell, styles.cellRev]}>{item.Rev}</Text>
+                          <Text style={[styles.cell, styles.cellWONo]}>{item.WONo}</Text>
+                          <Text style={[styles.cell, styles.cellDisciplineCode]}>{item.DisciplineCode}</Text>
+                          <Text style={[styles.cell, styles.cellFacilityCode]}>{item.FacilityCode}</Text>
+                        </View>
+                      );
+                    })}
+                  </ScrollView>
                 </View>
-                <ScrollView>
-                  {drawingList.map((item, index) => {
-                    return (
-                      <View style={styles.row}>
-                        <Text style={[styles.cell, styles.cellNo, styles.cellRight]}>{index + 1}</Text>
-                        <TouchableOpacity
-                          style={[styles.cell, styles.cellDrawingNo]}
-                          activeOpacity={1}
-                          onPress={() => _onPressUploadDrawing(item.DrawingNo, item.DisciplineCode, item.WOType)}>
-                          <Text style={styles.textAction}>{item.DrawingNo}</Text>
-                        </TouchableOpacity>
-                        <Text style={[styles.cell, styles.cellSheet]}>{item.Sheet}</Text>
-                        <Text style={[styles.cell, styles.cellRev]}>{item.Rev}</Text>
-                        <Text style={[styles.cell, styles.cellWONo]}>{item.WONo}</Text>
-                        <Text style={[styles.cell, styles.cellDisciplineCode]}>{item.DisciplineCode}</Text>
-                        <Text style={[styles.cell, styles.cellFacilityCode]}>{item.FacilityCode}</Text>
-                      </View>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-            </ScrollView>
-          </View>
+              </ScrollView>
+            </View>
+          }
         </View>
       }
     </SafeAreaView >

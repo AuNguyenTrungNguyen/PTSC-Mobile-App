@@ -97,7 +97,7 @@ export default ({ navigation }) => {
     }
     try {
       Helper.storeData('PROJECT_CODE', projectCode);
-      navigation.navigate('DrawingList');
+      navigation.navigate('DrawingList', {projectCode: projectCode});
     } catch (error) {
       MessageAlert('ERROR', error.toString());
     }
