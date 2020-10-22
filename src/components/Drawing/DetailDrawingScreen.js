@@ -146,21 +146,23 @@ export default ({ route }) => {
   };
 
   const _onPressSubmitInput = () => {
-    if (!checkFormatNumber(inputDisplay)) {
+    let value = inputDisplay.replaceAll(',', '.');
+    setInputDisplay(value);
+    if (!checkFormatNumber(value)) {
       Toast.show(keyUpdate + ' must be a number.', Toast.SHORT);
       return;
     }
     setShowDialog(false);
-    if (detailDrawingList[indexUpdate][keyUpdate] != inputDisplay) {
+    if (detailDrawingList[indexUpdate][keyUpdate] != value) {
       let array = [...detailDrawingList];
-      array[indexUpdate][keyUpdate] = inputDisplay;
+      array[indexUpdate][keyUpdate] = value;
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
       let key = detailDrawingList[indexUpdate].RowIndex;
       let objIndex = array.findIndex((obj => obj.RowIndex == key));
       if (objIndex < 0) {
-        array.push({ RowIndex: key, [keyUpdate]: inputDisplay });
+        array.push({ RowIndex: key, [keyUpdate]: value });
       } else {
         array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
       }
@@ -284,6 +286,7 @@ export default ({ route }) => {
             placeholder={'Enter ' + keyUpdate}
             onChangeText={(text) => setInputDisplay(text)}
             underlineColorAndroid={BASE_COLOR}
+            keyboardType={'numeric'}
           />
           <Dialog.Button label='Cancle' onPress={() => { setShowDialog(false) }} />
           <Dialog.Button label='OK' onPress={_onPressSubmitInput} />

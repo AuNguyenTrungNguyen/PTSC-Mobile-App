@@ -16,7 +16,9 @@ export default () => {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName='Auth'>
+            <Stack.Navigator
+                initialRouteName='Auth'
+                screenOptions={{ headerStyle: { backgroundColor: 'aliceblue' } }}>
                 <Stack.Screen
                     name='Auth'
                     component={AuthScreen}
