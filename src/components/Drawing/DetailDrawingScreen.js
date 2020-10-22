@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'azure',
   },
   cellSpoolsNo: {
-    width: 200,
+    width: 225,
   },
   cellWeldNo: {
     width: 80,

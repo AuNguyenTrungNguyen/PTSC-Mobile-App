@@ -16,7 +16,7 @@ export default ({ route, navigation }) => {
   const [drawingListDefault, setDrawingListDefault] = useState([]);
   const [drawingNo, setDrawingNo] = useState(null);
   const [isSearch, setIsSearch] = useState(false);
-  const { projectCode } = route.params;
+  const { projectCode, username } = route.params;
 
   useEffect(
     () => {
@@ -42,8 +42,6 @@ export default ({ route, navigation }) => {
   };
 
   const getData = async () => {
-    let username = await Helper.getData('USERNAME');
-    let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
     GetDrawingListAPI(username, projectCode, token)
       .then(res => {
@@ -98,6 +96,7 @@ export default ({ route, navigation }) => {
         (<View style={styles.container}>
           <View style={styles.noDataContainer}>
             <Text style={styles.noDataTitle}>No have any data with</Text>
+            <Text style={styles.noDataTitle}>Username: <Text style={styles.textAction}>{username}</Text></Text>
             <Text style={styles.noDataTitle}>ProjectCode: <Text style={styles.textAction}>{projectCode}</Text></Text>
           </View>
         </View>)
@@ -125,6 +124,7 @@ export default ({ route, navigation }) => {
             ?
             <View style={styles.noDataContainer}>
               <Text style={styles.noDataTitle}>No have any data with</Text>
+              <Text style={styles.noDataTitle}>Username: <Text style={styles.textAction}>{username}</Text></Text>
               <Text style={styles.noDataTitle}>ProjectCode: <Text style={styles.textAction}>{projectCode}</Text></Text>
               <Text style={styles.noDataTitle}>DrawingNo: <Text style={styles.textAction}>{drawingNo}</Text></Text>
             </View>
