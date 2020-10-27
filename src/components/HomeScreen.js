@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Alert, Appearance } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
@@ -16,6 +16,8 @@ export default ({ navigation }) => {
   const [listProject, setListProject] = useState([]);
   const [projectCode, setProjectCode] = useState(null);
 
+  let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+
   useEffect(() => {
     getDataFromAPI();
   }, []);
@@ -24,7 +26,7 @@ export default ({ navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={_onPressLogout} style={{ paddingRight: 16 }}>
-          <Ionicons name='log-out-outline' size={24} />
+          <Ionicons name='log-out-outline' size={24} color={colorIcon}/>
         </TouchableOpacity>
       ),
     });

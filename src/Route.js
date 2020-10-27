@@ -1,4 +1,6 @@
 import React from 'react';
+import { Appearance } from 'react-native';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -14,11 +16,18 @@ import UpdateProgressScreen from './components/Drawing/DetailDrawingScreen';
 const Stack = createStackNavigator();
 export default () => {
 
+    let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
+    let optionNoHeader = { headerShown: false };
+    if (Appearance.getColorScheme() === 'dark') {
+        optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
+        optionNoHeader = { headerStyle: { backgroundColor: 'grey', height: getStatusBarHeight() } };
+    };
+
     return (
         <NavigationContainer>
             <Stack.Navigator
                 initialRouteName='Auth'
-                screenOptions={{ headerStyle: { backgroundColor: 'aliceblue' } }}>
+                screenOptions={optionNavigation}>
                 <Stack.Screen
                     name='Auth'
                     component={AuthScreen}
@@ -27,7 +36,7 @@ export default () => {
                 <Stack.Screen
                     name='Login'
                     component={LoginScreen}
-                    options={{ headerShown: false }}
+                    options={optionNoHeader}
                 />
                 <Stack.Screen
                     name='Home'
