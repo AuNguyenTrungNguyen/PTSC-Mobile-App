@@ -146,7 +146,7 @@ export default ({ route }) => {
   };
 
   const _onPressSubmitInput = () => {
-    let value = inputDisplay.replaceAll(',', '.');
+    let value = inputDisplay.replace(/,/g, '.');
     setInputDisplay(value);
     if (!checkFormatNumber(value)) {
       Toast.show(keyUpdate + ' must be a number.', Toast.SHORT);
