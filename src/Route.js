@@ -1,5 +1,5 @@
 import React from 'react';
-import { Appearance } from 'react-native';
+import { Appearance, Platform } from 'react-native';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -20,7 +20,9 @@ export default () => {
     let optionNoHeader = { headerShown: false };
     if (Appearance.getColorScheme() === 'dark') {
         optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
-        optionNoHeader = { headerStyle: { backgroundColor: 'grey', height: getStatusBarHeight() } };
+        if (Platform.OS === 'ios') {
+            optionNoHeader = { headerStyle: { backgroundColor: 'grey', height: getStatusBarHeight() } };
+        }; 
     };
 
     return (
