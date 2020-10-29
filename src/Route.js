@@ -1,6 +1,5 @@
 import React from 'react';
-import { Appearance, Platform } from 'react-native';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { Appearance } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -17,12 +16,8 @@ const Stack = createStackNavigator();
 export default () => {
 
     let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
-    let optionNoHeader = { headerShown: false };
     if (Appearance.getColorScheme() === 'dark') {
         optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
-        if (Platform.OS === 'ios') {
-            optionNoHeader = { headerStyle: { backgroundColor: 'grey', height: getStatusBarHeight() } };
-        }; 
     };
 
     return (
@@ -38,7 +33,7 @@ export default () => {
                 <Stack.Screen
                     name='Login'
                     component={LoginScreen}
-                    options={optionNoHeader}
+                    options={{ headerShown: false }}
                 />
                 <Stack.Screen
                     name='Home'

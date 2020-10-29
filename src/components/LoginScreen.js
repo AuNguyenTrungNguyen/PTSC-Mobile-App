@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions } from 'react-native';
+import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -76,59 +76,63 @@ export default ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAwareScrollView>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.image}
-            resizeMode='stretch'
-            source={require('../images/background.jpg')}
-          />
-        </View>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>PTSC M&C</Text>
-        </View>
-        <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
-          <View style={styles.inputContainer}>
-            <Icon name='user-circle' style={styles.inputIcon} />
-            <TextInput
-              style={styles.inputText}
-              placeholder="Username ..."
-              value={username}
-              onChangeText={_onChangeUsername}
-              blurOnSubmit={false}
-              onSubmitEditing={_onSubmitEditingNextInput}
+    <>
+      <StatusBar barStyle='dark-content' />
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAwareScrollView>
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.image}
+              resizeMode='stretch'
+              source={require('../images/background.jpg')}
             />
-            {username == ''
-              ? null
-              : <Icon name="times-circle" onPress={_onPressClearUsername} style={styles.inputIcon} />}
           </View>
-          <View style={[styles.inputContainer, styles.inputContainerLast]}>
-            <Icon name="unlock-alt" style={styles.inputIcon} />
-            <TextInput
-              blurOnSubmit={true}
-              ref={nextInput}
-              style={styles.inputText}
-              placeholder="Password ..."
-              value={password}
-              secureTextEntry={!showPassord}
-              onChangeText={_onChangePassword}
-            />
-            {password == ''
-              ? null : (showPassord
-                ? <Icon name="eye-slash" onPress={_onPressTogglePassword} style={styles.inputIcon} />
-                : <Icon name="eye" onPress={_onPressTogglePassword} style={styles.inputIcon} />)}
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>PTSC M&C</Text>
           </View>
-          {loading
-            ? <TouchableOpacity style={styles.buttonContainer}>
-              <ActivityIndicator size="large" color={OPP_COLOR} />
-            </TouchableOpacity>
-            : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
-              <Text style={styles.buttonTitle}>LOGIN</Text>
-            </TouchableOpacity>}
-        </View>
-      </KeyboardAwareScrollView>
-    </SafeAreaView>
+          <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
+            <View style={styles.inputContainer}>
+              <Icon name='user-circle' style={styles.inputIcon} />
+              <TextInput
+                style={styles.inputText}
+                placeholder="Username ..."
+                placeholderTextColor={'#5f707a'}
+                value={username}
+                onChangeText={_onChangeUsername}
+                blurOnSubmit={false}
+                onSubmitEditing={_onSubmitEditingNextInput}
+              />
+              {username == ''
+                ? null
+                : <Icon name="times-circle" onPress={_onPressClearUsername} style={styles.inputIcon} />}
+            </View>
+            <View style={[styles.inputContainer, styles.inputContainerLast]}>
+              <Icon name="unlock-alt" style={styles.inputIcon} />
+              <TextInput
+                blurOnSubmit={true}
+                ref={nextInput}
+                style={styles.inputText}
+                placeholder="Password ..."
+                placeholderTextColor={'#5f707a'}
+                value={password}
+                secureTextEntry={!showPassord}
+                onChangeText={_onChangePassword}
+              />
+              {password == ''
+                ? null : (showPassord
+                  ? <Icon name="eye-slash" onPress={_onPressTogglePassword} style={styles.inputIcon} />
+                  : <Icon name="eye" onPress={_onPressTogglePassword} style={styles.inputIcon} />)}
+            </View>
+            {loading
+              ? <TouchableOpacity style={styles.buttonContainer}>
+                <ActivityIndicator size="large" color={OPP_COLOR} />
+              </TouchableOpacity>
+              : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
+                <Text style={styles.buttonTitle}>LOGIN</Text>
+              </TouchableOpacity>}
+          </View>
+        </KeyboardAwareScrollView>
+      </SafeAreaView></>
   );
 };
 
