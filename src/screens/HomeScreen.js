@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Alert, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
@@ -26,7 +26,7 @@ export default ({ navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={_onPressLogout} style={{ paddingRight: 16 }}>
-          <Ionicons name='log-out-outline' size={24} color={colorIcon}/>
+          <Ionicons name='log-out-outline' size={24} color={colorIcon} />
         </TouchableOpacity>
       ),
     });
@@ -81,11 +81,7 @@ export default ({ navigation }) => {
 
   const logout = () => {
     Helper.clearData();
-    navigation.navigate('Login');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    navigation.replace('Login');
   };
 
   const _onChangeProjectCode = (item) => {
@@ -100,7 +96,7 @@ export default ({ navigation }) => {
     try {
       Helper.storeData('PROJECT_CODE', projectCode);
       let username = await Helper.getData('USERNAME');
-      navigation.navigate('DrawingList', {projectCode: projectCode, username: username});
+      navigation.navigate('DrawingList', { projectCode: projectCode, username: username });
     } catch (error) {
       MessageAlert('ERROR', error.toString());
     }
@@ -121,34 +117,11 @@ export default ({ navigation }) => {
             itemStyle={styles.selectItem}
             activeItemStyle={styles.selectActiveItem}
           />
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={styles.action}>
-              <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
-                <Text style={styles.buttonTitle}>Update Progress for Drawing</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update Mhrs for Work Order</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update QC Status for STR DIM</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update QC Status for STR FU</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update QC Status for STR VS</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update QC Status for PIP DIM</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update QC Status for PIP FU</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer} onPress={null}>
-                <Text style={styles.buttonTitle}>Update QC Status for PIP VS</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+          <View style={styles.action}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
+              <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -169,11 +142,11 @@ const styles = StyleSheet.create({
   containerCenter: {
     flex: 1,
     padding: 16,
+    justifyContent: 'center',
   },
 
   selectContainer: {
     height: 50,
-    marginBottom: 32,
   },
   select: {
     borderColor: BASE_COLOR,
@@ -188,8 +161,7 @@ const styles = StyleSheet.create({
   },
 
   action: {
-    flex: 1,
-    justifyContent: 'space-between'
+    marginTop: 32,
   },
   buttonContainer: {
     height: 48,
