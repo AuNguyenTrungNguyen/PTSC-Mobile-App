@@ -7,8 +7,8 @@ import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import NetInfo from '@react-native-community/netinfo';
 import RNFetchBlob from 'rn-fetch-blob';
-import { Port_Server } from '../Core';
-import MessageAlert from './CustomViews/MessageAlert';
+import { Port_Server } from '../../utils/Core';
+import MessageAlert from '../../components/MessageAlert';
 
 export default () => {
     const [imageSource, setImageSource] = useState(null);

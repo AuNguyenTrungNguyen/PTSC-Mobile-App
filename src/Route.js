@@ -3,14 +3,14 @@ import { Appearance } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import AuthScreen from './components/AuthScreen';
-import LoginScreen from './components/LoginScreen';
-import HomeScreen from './components/HomeScreen';
-import CameraScreen from './components/CameraScreen';
-import UpdateOrderScreen from './components/UpdateOrderScreen';
-import UploadBarcodeImageScreen from './components/UploadBarcodeImageScreen';
-import DrawingListScreen from './components/Drawing/DrawingListScreen';
-import UpdateProgressScreen from './components/Drawing/DetailDrawingScreen';
+import AuthScreen from './screens/authentication/AuthScreen';
+import LoginScreen from './screens/authentication/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
+import CameraScreen from './screens/camera/CameraScreen';
+import UpdateOrderScreen from './screens/order/UpdateOrderScreen';
+import UploadBarcodeImageScreen from './screens/order/UploadBarcodeImageScreen';
+import DrawingListScreen from './screens/drawing/DrawingListScreen';
+import UpdateProgressScreen from './screens/drawing/DetailDrawingScreen';
 
 const Stack = createStackNavigator();
 export default () => {

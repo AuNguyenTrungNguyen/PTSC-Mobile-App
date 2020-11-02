@@ -3,10 +3,10 @@ import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Scro
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import Helper from '../../helper/Helper';
+import Helper from '../../utils/Helper';
 import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
-import MessageAlert from '../CustomViews/MessageAlert';
-import LoadingRefresh from '../CustomViews/LoadingRefresh';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default ({ route, navigation }) => {
 

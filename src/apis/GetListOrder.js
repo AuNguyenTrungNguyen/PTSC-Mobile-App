@@ -1,4 +1,4 @@
-import { Port_Server } from '../Core';
+import { Port_Server } from '../utils/Core';
 const GetListWorkOrderDetail = async (ProjectCode, Username, Barcode) => (
     fetch(Port_Server + '/api/PIPWorkOrderDetail/GetListWorkOrderDetail?ProjectCode=' + ProjectCode + "&Username=" + Username + "&Barcode=" + Barcode, {
         method: "GET",

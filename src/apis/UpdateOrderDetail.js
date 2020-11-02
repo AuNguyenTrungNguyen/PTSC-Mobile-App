@@ -1,4 +1,4 @@
-import { Port_Server } from '../Core';
+import { Port_Server } from '../utils/Core';
 const Update = (rowIndex, actutalMHRS) =>
 fetch(
   Port_Server + '/api/PIPWorkOrderDetail/UpdateOrderDetail?rowIndex=' + rowIndex + '&actutalMHRS=' + actutalMHRS,

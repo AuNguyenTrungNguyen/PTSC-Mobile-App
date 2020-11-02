@@ -4,9 +4,9 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import Helper from '../helper/Helper';
-import LoginAPI from '../apis/LoginAPI';
-import MessageAlert from './CustomViews/MessageAlert';
+import Helper from '../../utils/Helper';
+import LoginAPI from '../../apis/LoginAPI';
+import MessageAlert from '../../components/MessageAlert';
 
 export default ({ navigation }) => {
 
@@ -84,7 +84,7 @@ export default ({ navigation }) => {
             <Image
               style={styles.image}
               resizeMode='stretch'
-              source={require('../images/background.jpg')}
+              source={require('../../images/background.jpg')}
             />
           </View>
           <View style={styles.titleContainer}>

@@ -9,11 +9,11 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 
-import Helper from '../../helper/Helper';
+import Helper from '../../utils/Helper';
 import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
-import MessageAlert from '../CustomViews/MessageAlert';
-import LoadingRefresh from '../CustomViews/LoadingRefresh';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default ({ route }) => {
 

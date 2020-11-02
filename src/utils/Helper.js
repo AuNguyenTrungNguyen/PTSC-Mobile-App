@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import MessageAlert from '../components/CustomViews/MessageAlert';
+import MessageAlert from '../components/MessageAlert';
 
 export default class Helper {
 

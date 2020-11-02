@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import Moment from 'moment';
 
-import Helper from '../helper/Helper';
+import Helper from '../../utils/Helper';
 
 export default ({ navigation }) => {
 

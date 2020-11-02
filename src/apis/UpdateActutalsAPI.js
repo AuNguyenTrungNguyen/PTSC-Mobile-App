@@ -1,4 +1,4 @@
-import { Port_Server } from '../Core';
+import { Port_Server } from '../utils/Core';
 const UpdateActutalsAPI = (projectCode, documentNo, details) => {
     return fetch(
         Port_Server + '/api/PIPWorkOrderDetail/UpdateOrderDetail_Array',

@@ -1,4 +1,4 @@
-import {Port_Server} from '../../Core';
+import { Port_Server } from '../../utils/Core';
 const GetDrawingDetailAPI = async (projectCode, drawingNo, token) =>
   fetch(Port_Server + '/api/Drawing/GetDrawingDetail?projectCode=' + projectCode + '&drawingNo=' + drawingNo, {
     headers: {

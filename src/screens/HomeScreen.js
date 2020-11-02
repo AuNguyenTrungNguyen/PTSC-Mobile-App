@@ -5,10 +5,10 @@ import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Helper from '../helper/Helper';
+import Helper from '../utils/Helper';
 import GetProjectListAPI from '../apis/app/GetProjectListAPI';
-import MessageAlert from './CustomViews/MessageAlert';
-import LoadingRefresh from './CustomViews/LoadingRefresh';
+import MessageAlert from '../components/MessageAlert';
+import LoadingRefresh from '../components/LoadingRefresh';
 
 export default ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);

@@ -4,10 +4,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 
-import GetListOrderAPI from '../apis/GetListOrder';
-import UpdateActutalsAPI from '../apis/UpdateActutalsAPI';
-import MessageAlert from './CustomViews/MessageAlert';
-import LoadingRefresh from './CustomViews/LoadingRefresh';
+import GetListOrderAPI from '../../apis/GetListOrder';
+import UpdateActutalsAPI from '../../apis/UpdateActutalsAPI';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default () => {
 
