@@ -17,12 +17,12 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default ({ route }) => {
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [detailDrawingList, setDetailDrawingList] = useState([]);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
-  const { drawingNo, disciplineCode, wOType } = route.params;
+  const { drawingNo, code } = route.params;
 
   useEffect(
     () => {
@@ -183,26 +183,12 @@ export default ({ route }) => {
     return data != null ? Moment(data).format("DD-MMM-YY") : '';
   };
 
-  const WOType = [1, 2, 3, 4, 5];
-  const RenderNotLoadData = () => {
-    return (
-      disciplineCode == 'Piping' && WOType.includes(wOType)
-        ?
-        null
-        :
-        <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-          <Text style={{ fontSize: 16, marginTop: 16 }}>DrawingNo: {drawingNo}</Text>
-          <Text style={{ fontSize: 16, marginTop: 16 }}>DisciplineCode: {disciplineCode}</Text>
-          <Text style={{ fontSize: 16, marginTop: 16 }}>WOType: {wOType}</Text>
-        </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
-      <RenderNotLoadData />
       <View style={styles.container}>
+        <Text>{drawingNo}</Text>
+        <Text>{code}</Text>
         {detailDrawingList.length == 0
           ?
           <View style={[styles.noDataContainer]}>

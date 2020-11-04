@@ -421,14 +421,14 @@ export default ({ route, navigation }) => {
     setIsVisible(false);
   };
 
-  const _onPressViewFitUp = () => {
+  const _onPressViewFitUp = (drawingNo) => {
     Keyboard.dismiss();
-    navigation.navigate('DrawingDetail', { code: 'FitUp' });
+    navigation.navigate('DrawingDetail', { drawingNo: drawingNo, code: 'FitUp' });
   };
 
-  const _onPressViewWeld = () => {
+  const _onPressViewWeld = (drawingNo) => {
     Keyboard.dismiss();
-    navigation.navigate('DrawingDetail', { code: 'Weld' });
+    navigation.navigate('DrawingDetail', { drawingNo: drawingNo, code: 'Weld' });
   };
 
   const _onPressQRCodeFitUp = () => {
@@ -467,10 +467,10 @@ export default ({ route, navigation }) => {
           <Text style={styles.cellData}>{item.Rev}</Text>
         </View>
         <View style={styles.rowAction}>
-          <TouchableOpacity style={styles.cellAction} onPress={_onPressViewFitUp}>
+          <TouchableOpacity style={styles.cellAction} onPress={()=>{_onPressViewFitUp(item.DrawingNo)}}>
             <Text style={styles.textAction}>View Fit-Up</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cellAction} onPress={_onPressViewWeld}>
+          <TouchableOpacity style={styles.cellAction} onPress={()=>{_onPressViewWeld(item.DrawingNo)}}>
             <Text style={styles.textAction}>View Weld</Text>
           </TouchableOpacity>
         </View>

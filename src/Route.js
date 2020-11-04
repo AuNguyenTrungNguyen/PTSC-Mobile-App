@@ -7,10 +7,8 @@ import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import CameraScreen from './screens/camera/CameraScreen';
-import UpdateOrderScreen from './screens/order/UpdateOrderScreen';
-import UploadBarcodeImageScreen from './screens/order/UploadBarcodeImageScreen';
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
-import UpdateProgressScreen from './screens/drawing/DetailDrawingScreen';
+import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 
 const Stack = createStackNavigator();
 export default () => {
@@ -50,16 +48,6 @@ export default () => {
                     }
                 />
                 <Stack.Screen
-                    name='UpdateProgress'
-                    component={UpdateProgressScreen}
-                    options={({ route }) => (
-                        {
-                            title: route.params?.titleBar,
-                            headerBackTitle: 'Back',
-                        }
-                    )}
-                />
-                <Stack.Screen
                     name='Camera'
                     component={CameraScreen}
                     options={
@@ -70,25 +58,16 @@ export default () => {
                     }
                 />
                 <Stack.Screen
-                    name='Update'
-                    component={UpdateOrderScreen}
-                    options={
+                    name='DrawingDetail'
+                    component={DrawingDetailScreen}
+                    options={({ route }) => (
                         {
-                            title: 'Tracking WO',
+                            title: route.params?.titleBar,
                             headerBackTitle: 'Back',
                         }
-                    }
+                    )}
                 />
-                <Stack.Screen
-                    name='Upload'
-                    component={UploadBarcodeImageScreen}
-                    options={
-                        {
-                            title: 'Upload Barcode Image',
-                            headerBackTitle: 'Back',
-                        }
-                    }
-                />
+                
             </Stack.Navigator>
         </NavigationContainer>
     );
