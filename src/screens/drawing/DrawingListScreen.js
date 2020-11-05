@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -45,374 +45,83 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const fakeDataFacility = [
-    {
-      "label": "HST-JACKET",
-      "value": "HST-JACKET"
-    },
-    {
-      "label": "FLARE BOOM",
-      "value": "FLARE BOOM"
-    },
-    {
-      "label": "HT1 WHP",
-      "value": "HT1 WHP"
-    },
-    {
-      "label": "HAI THACH",
-      "value": "HT1"
-    },
-    {
-      "label": "HV ROOM",
-      "value": "HV ROOM"
-    },
-    {
-      "label": "HT1 Topside",
-      "value": "HT1 Topside"
-    },
-    {
-      "label": "PQP JACKET",
-      "value": "PQP JACKET"
-    },
-    {
-      "label": "LV ROOM",
-      "value": "LV ROOM"
-    },
-    {
-      "label": "GO ROOM",
-      "value": "GO ROOM"
-    },
-    {
-      "label": "PQP TOPSIDE",
-      "value": "PQP TOPSIDE"
-    },
-    {
-      "label": "LQ & HELIDECK",
-      "value": "LQ & HELIDECK"
-    }
-  ];
-  const fakeDataDrawing = [
-    {
-      "DrawingNo": "B12-13-DH-0306-SD",
-      "Sheet": "1 of 2",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0306-SD",
-      "Sheet": "2 of 2",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0308-SD",
-      "Sheet": "1 of 2",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0308-SD",
-      "Sheet": "2 of 2",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0310-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0311-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0319-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0322-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "LV ROOM"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0405-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0422-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0429-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0433-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0436-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0505-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0510-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0606-SD",
-      "Sheet": "1 of 3",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0606-SD",
-      "Sheet": "2 of 3",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0606-SD",
-      "Sheet": "3 of 3",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0607-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0609-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0707-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0708-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0714-SD",
-      "Sheet": "1 of 2",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0714-SD",
-      "Sheet": "2 of 2",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0715-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0716-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0718-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0813-SD",
-      "Sheet": "1 of 2",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0813-SD",
-      "Sheet": "2 of 2",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0814-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-0905-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-1201-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-1401-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-1521-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-S101-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-S102-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-    {
-      "DrawingNo": "B12-13-DH-S103-SD",
-      "Sheet": "1 of 1",
-      "Rev": "C1",
-      "FacilityCode": "HT1"
-    },
-  ];
-
   const getData = async () => {
-
-    setDrawingList(fakeDataDrawing);
-    setDrawingListDefault(fakeDataDrawing);
-    setFacilityList(fakeDataFacility);
-    setIsLoading(false);
-    setIsError(false);
-
-    // let token = await Helper.getData('TOKEN');
-    // GetFacilityListAPI(projectCode, token)
-    //   .then(res => {
-    //     if (res.success) {
-    //       setListFacility(res.data);
-    //       setIsLoading(false);
-    //       setIsError(false);
-    //     } else {
-    //       MessageAlert('ERROR', res.Message);
-    //       setIsLoading(false);
-    //       setIsError(true);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     MessageAlert('ERROR', error.toString());
-    //     setIsLoading(false);
-    //     setIsError(true);
-    //   });
-    // GetDrawingListAPI(username, projectCode, token)
-    //   .then(res => {
-    //     if (res.success) {
-    //       setDrawingList(res.data);
-    //       setDrawingListDefault(res.data);
-    //       setIsLoading(false);
-    //       setIsError(false);
-    //     } else {
-    //       MessageAlert('ERROR', res.Message);
-    //       setIsLoading(false);
-    //       setIsError(true);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     MessageAlert('ERROR', error.toString());
-    //     setIsLoading(false);
-    //     setIsError(true);
-    //   });
+    let token = await Helper.getData('TOKEN');
+    try {
+      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, token)
+      ]).then(([facilityResult, drawingResult]) => {
+        if (facilityResult.success && drawingResult.success) {
+          setFacilityList(facilityResult.data);
+          setDrawingList(drawingResult.data);
+          setDrawingListDefault(drawingResult.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      });
+    } catch (error) {
+      MessageAlert('ERROR', error.toString());
+    }
   };
 
   const _onChangeDrawingNo = (no) => {
     setDrawingNo(no);
+    if (no === '') {
+      searchDrawing(facilityCode);
+    }
   };
 
   const _onChangeFacilityCode = (code) => {
     setNewFacilityCode(code);
   };
 
-  const _onPressSearchDrawing = () => {
+  const searchDrawing = (code) => {
+    console.log('searchDrawing');
     if (isSearch === false) {
       setIsSearch(true);
     }
     let array = [...drawingListDefault];
     const newData = drawingListDefault.filter(item => {
-      let condition = true;
-      if (facilityCode !== FACILITY_CODE_DEFAULT) {
-        const itemData = item.FacilityCode.toUpperCase();
-        const codeData = facilityCode.toUpperCase();
-        condition = itemData === codeData;
+      let conditionDrawingNo = true;
+      if (drawingNo) {
+        const itemData = item.DrawingNo.toUpperCase();
+        const drawingData = drawingNo.toUpperCase();
+        conditionDrawingNo = itemData.indexOf(drawingData) > -1;
       }
-      return itemData.indexOf(drawingData) > -1 && condition;
+
+      let conditionFacilityCode = true;
+      if (code !== FACILITY_CODE_DEFAULT) {
+        const itemData = item.FacilityCode.toUpperCase();
+        const codeData = code.toUpperCase();
+        conditionFacilityCode = itemData === codeData;
+      }
+      return (conditionDrawingNo && conditionFacilityCode);
     });
     array = newData;
+    console.log(array.length);
     setDrawingList(array);
+  };
+
+  const _onPressSearchDrawing = () => {
+    searchDrawing(facilityCode);
   };
 
   const _onPressFilterDrawing = () => {
     if (facilityCode !== newFacilityCode) {
       setFacilityCode(newFacilityCode);
-      if (isSearch === false) {
-        setIsSearch(true);
-      }
-      let array = [...drawingListDefault];
-      const newData = drawingListDefault.filter(item => {
-        let condition = true;
-        if (drawingNo) {
-          const itemData = item.DrawingNo.toUpperCase();
-          const drawingData = drawingNo.toUpperCase();
-          condition = itemData.indexOf(drawingData) > -1;
-        }
-        return condition && item.FacilityCode.toUpperCase() === newFacilityCode;
-      });
-      array = newData;
-      setDrawingList(array);
+      searchDrawing(newFacilityCode);
     }
     setIsVisible(false);
   };
 
   const _onPressClearModel = () => {
-    setFacilityCode(FACILITY_CODE_DEFAULT);
-    setNewFacilityCode(FACILITY_CODE_DEFAULT);
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      setFacilityCode(FACILITY_CODE_DEFAULT);
+      setNewFacilityCode(FACILITY_CODE_DEFAULT);
+      searchDrawing(FACILITY_CODE_DEFAULT);
+    }
     setIsVisible(false);
   };
 
@@ -421,14 +130,32 @@ export default ({ route, navigation }) => {
     setIsVisible(false);
   };
 
-  const _onPressViewFitUp = (drawingNo) => {
+  const _onPressViewFitUp = (facilityCode, drawingNo, sheet, rev) => {
     Keyboard.dismiss();
-    navigation.navigate('DrawingDetail', { drawingNo: drawingNo, code: 'FitUp' });
+    navigation.navigate(
+      'DrawingDetail',
+      {
+        facilityCode: facilityCode,
+        drawingNo: drawingNo,
+        sheet: sheet,
+        rev: rev,
+        code: 'FitUp'
+      }
+    );
   };
 
-  const _onPressViewWeld = (drawingNo) => {
+  const _onPressViewWeld = (facilityCode, drawingNo, sheet, rev) => {
     Keyboard.dismiss();
-    navigation.navigate('DrawingDetail', { drawingNo: drawingNo, code: 'Weld' });
+    navigation.navigate(
+      'DrawingDetail',
+      {
+        facilityCode: facilityCode,
+        drawingNo: drawingNo,
+        sheet: sheet,
+        rev: rev,
+        code: 'Weld'
+      }
+    );
   };
 
   const _onPressQRCodeFitUp = () => {
@@ -467,10 +194,10 @@ export default ({ route, navigation }) => {
           <Text style={styles.cellData}>{item.Rev}</Text>
         </View>
         <View style={styles.rowAction}>
-          <TouchableOpacity style={styles.cellAction} onPress={()=>{_onPressViewFitUp(item.DrawingNo)}}>
+          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.FacilityCode, item.DrawingNo, item.Sheet, item.Rev) }}>
             <Text style={styles.textAction}>View Fit-Up</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cellAction} onPress={()=>{_onPressViewWeld(item.DrawingNo)}}>
+          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewWeld(item.FacilityCode, item.DrawingNo, item.Sheet, item.Rev) }}>
             <Text style={styles.textAction}>View Weld</Text>
           </TouchableOpacity>
         </View>
@@ -480,69 +207,69 @@ export default ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
-      {!isSearch && drawingList.length == 0
+      {isLoading || isError
         ?
-        <View style={styles.container}>
-          <ListEmptyData />
-        </View>
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
         :
-        <View style={styles.container}>
-
-          <View style={styles.headerContainer}>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>ProjectCode:</Text>
-              <Text style={styles.infoData}>{projectCode}</Text>
+        (!isSearch && drawingList.length == 0
+          ?
+          <View style={styles.container}>
+            <ListEmptyData />
+          </View>
+          :
+          <View style={styles.container}>
+            <View style={styles.headerContainer}>
+              <View style={styles.rowInfo}>
+                <Text style={styles.infoTitle}>ProjectCode:</Text>
+                <Text style={styles.infoData}>{projectCode}</Text>
+              </View>
+              <View style={styles.rowInfo}>
+                <Text style={styles.infoTitle}>FacilityCode:</Text>
+                <TouchableOpacity style={styles.selectInput} onPress={() => setIsVisible(true)}>
+                  <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.rowInfo}>
+                <Text style={styles.infoTitle}>DrawingNo:</Text>
+                <TextInput
+                  style={styles.searchInput}
+                  value={drawingNo}
+                  onChangeText={_onChangeDrawingNo}
+                  underlineColorAndroid='transparent'
+                />
+              </View>
+              <View style={styles.rowInfo}>
+                <Text style={styles.infoTitle} />
+                <TouchableOpacity style={styles.searchButton} onPress={_onPressSearchDrawing}>
+                  <Text style={styles.buttonTitle}>Search Drawing</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>FacilityCode:</Text>
-              <TouchableOpacity style={styles.selectInput} onPress={() => setIsVisible(true)}>
-                <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>DrawingNo:</Text>
-              <TextInput
-                style={styles.searchInput}
-                value={drawingNo}
-                onChangeText={_onChangeDrawingNo}
-                underlineColorAndroid='transparent'
+            {drawingList.length
+              ?
+              <VirtualizedList
+                style={styles.table}
+                data={drawingList}
+                getItemCount={(data) => data.length}
+                getItem={(data, index) => {
+                  return data[index];
+                }}
+                keyExtractor={(index) => {
+                  return index;
+                }}
+                renderItem={renderItem}
               />
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle} />
-              <TouchableOpacity style={styles.searchButton} onPress={_onPressSearchDrawing}>
-                <Text style={styles.buttonTitle}>Search Drawing</Text>
+              : <ListEmptyData />
+            }
+            <View style={styles.scanContainer}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQRCodeFitUp}>
+                <Text style={styles.buttonTitle}>Scan Fit-Up Drawing</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonRight} onPress={_onPressQRCodeWeld}>
+                <Text style={styles.buttonTitle}>Scan Weld Drawing</Text>
               </TouchableOpacity>
             </View>
-          </View>
-
-          {drawingList.length
-            ?
-            <VirtualizedList
-              style={styles.table}
-              data={drawingList}
-              getItemCount={(data) => data.length}
-              getItem={(data, index) => {
-                return data[index];
-              }}
-              keyExtractor={(index) => {
-                return index;
-              }}
-              renderItem={renderItem}
-            />
-            : <ListEmptyData />
-          }
-
-          <View style={styles.scanContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQRCodeFitUp}>
-              <Text style={styles.buttonTitle}>Scan Fit-Up Drawing</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressQRCodeWeld}>
-              <Text style={styles.buttonTitle}>Scan Weld Drawing</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </View>)
       }
 
       <Modal
@@ -564,10 +291,10 @@ export default ({ route, navigation }) => {
                 <ScrollView>
                   {facilityList.map((item) => {
                     return (
-                      <TouchableOpacity style={modals.row} onPress={() => _onChangeFacilityCode(item.value)}>
-                        <Text style={modals.cell}>{item.value}</Text>
+                      <TouchableOpacity style={modals.row} onPress={() => _onChangeFacilityCode(item.code)}>
+                        <Text style={modals.cell}>{item.code}</Text>
                         <View style={modals.line} />
-                        <Text style={modals.cell}>{item.label}</Text>
+                        <Text style={modals.cell}>{item.name}</Text>
                       </TouchableOpacity>
                     );
                   })}

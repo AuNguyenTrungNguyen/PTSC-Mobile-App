@@ -55,13 +55,11 @@ export default ({ navigation }) => {
           setIsLoading(false);
           setIsError(false);
         } else {
-          MessageAlert('ERROR', res.Message);
           setIsLoading(false);
           setIsError(true);
         }
       })
-      .catch((error) => {
-        MessageAlert('ERROR', error.toString());
+      .catch(() => {
         setIsLoading(false);
         setIsError(true);
       });
@@ -95,8 +93,7 @@ export default ({ navigation }) => {
     }
     try {
       Helper.storeData('PROJECT_CODE', projectCode);
-      let username = await Helper.getData('USERNAME');
-      navigation.navigate('DrawingList', { projectCode: projectCode, username: username });
+      navigation.navigate('DrawingList', { projectCode: projectCode });
     } catch (error) {
       MessageAlert('ERROR', error.toString());
     }
@@ -104,26 +101,30 @@ export default ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
-      <View style={styles.container}>
-        <View style={styles.containerCenter}>
-          <DropDownPicker
-            items={listProject}
-            onChangeItem={_onChangeProjectCode}
-            defaultValue={null}
-            placeholder='Select Project'
-            containerStyle={styles.selectContainer}
-            style={styles.select}
-            itemStyle={styles.selectItem}
-            activeItemStyle={styles.selectActiveItem}
-          />
-          <View style={styles.action}>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
-              <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
-            </TouchableOpacity>
+      {isLoading || isError
+        ?
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
+        :
+        <View style={styles.container}>
+          <View style={styles.containerCenter}>
+            <DropDownPicker
+              items={listProject}
+              onChangeItem={_onChangeProjectCode}
+              defaultValue={null}
+              placeholder='Select Project'
+              containerStyle={styles.selectContainer}
+              style={styles.select}
+              itemStyle={styles.selectItem}
+              activeItemStyle={styles.selectActiveItem}
+            />
+            <View style={styles.action}>
+              <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
+                <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      }
     </SafeAreaView>
   );
 };
@@ -133,6 +134,7 @@ const OPP_COLOR = 'white';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: OPP_COLOR,
   },
   container: {
     flex: 1,
