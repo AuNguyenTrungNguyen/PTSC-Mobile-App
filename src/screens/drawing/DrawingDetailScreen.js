@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, VirtualizedList } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -22,7 +22,8 @@ export default ({ route }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [detailDrawingList, setDetailDrawingList] = useState([]);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
-  const { drawingNo, code } = route.params;
+
+  const { projectCode, facilityCode, drawingNo, sheet, rev, code } = route.params;
 
   useEffect(
     () => {
@@ -43,9 +44,8 @@ export default ({ route }) => {
   };
 
   const getDrawingDetail = async () => {
-    let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
-    GetDrawingDetailAPI(projectCode, drawingNo, token)
+    GetDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
       .then(res => {
         if (res.success) {
           setDetailDrawingList(res.data);
@@ -53,7 +53,6 @@ export default ({ route }) => {
           setIsError(false);
           setIsUploading(false)
         } else {
-          MessageAlert('ERROR', res.Message);
           setIsLoading(false);
           setIsError(true);
           setIsUploading(false)
@@ -68,7 +67,6 @@ export default ({ route }) => {
   };
 
   const updateDrawingDetail = async () => {
-    let projectCode = await Helper.getData('PROJECT_CODE');
     let token = await Helper.getData('TOKEN');
     UpdateDrawingDetailAPI(projectCode, drawingNo, updateDrawingList, token)
       .then(res => {
@@ -85,13 +83,17 @@ export default ({ route }) => {
       });
   };
 
-  const _onPressUploadDrawing = async () => {
+  const _onPressSubmitToServer = async () => {
     if (updateDrawingList.length) {
       setIsUploading(true);
       callAPI(updateDrawingDetail);
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
+  };
+
+  const _onPressManagePicture = () => {
+
   };
 
   /**
@@ -183,194 +185,283 @@ export default ({ route }) => {
     return data != null ? Moment(data).format("DD-MMM-YY") : '';
   };
 
+  const ListEmptyData = () => (
+    <View style={styles.noDataContainer}>
+      <Text style={styles.noDataTitle}>No have any data</Text>
+    </View>
+  );
+
+  const ListLoading = () => (
+    <View style={styles.noDataContainer}>
+      <Text style={styles.noDataTitle}>Loading...</Text>
+    </View>
+  );
+
+  const renderItem = ({ index, item }) => {
+    return (
+      <View style={styles.box}>
+        <View style={styles.row}>
+          <View style={styles.cellTitleLine}>
+            <Text>WeldNo:</Text>
+          </View>
+          <View style={styles.cellDataLine}>
+            <Text style={styles.textData}>{formatEmptyData(item.WeldNo)}</Text>
+          </View>
+          <View style={styles.cellTitleLine}>
+            <Text>WeldType:</Text>
+          </View>
+          <View style={styles.cellDataLine}>
+            <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
+          </View>
+        </View>
+        {code == 'FitUp'
+          ?
+          (<>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>FittingDate:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <TouchableOpacity
+                  style={styles.itemAction}
+                  onPress={() => _onPressShowPicker(item.FittingDate, index, 'FittingDate')}>
+                  <Text style={styles.textData} >{formatDateData(item.FittingDate)}</Text>
+                  <AntDesignIcon style={styles.iconAction} name='calendar' size={20} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>FitPercentage:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <TouchableOpacity
+                  style={styles.itemAction}
+                  onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
+                  <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
+                  <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>)
+          :
+          (<>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>WeldingDate:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <TouchableOpacity
+                  style={styles.itemAction}
+                  onPress={() => _onPressShowPicker(item.WeldingDate, index, 'WeldingDate')}>
+                  <Text style={styles.textData} >{formatDateData(item.WeldingDate)}</Text>
+                  <AntDesignIcon style={styles.iconAction} name='calendar' size={20} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>WeldPercentage:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <TouchableOpacity
+                  style={styles.itemAction}
+                  onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
+                  <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
+                  <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>)}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
-      <View style={styles.container}>
-        <Text>{drawingNo}</Text>
-        <Text>{code}</Text>
-        {detailDrawingList.length == 0
-          ?
-          <View style={[styles.noDataContainer]}>
-            <Text style={styles.noDataTitle}>No have any data!</Text>
-          </View>
-          :
-          <View style={styles.table}>
-            <ScrollView horizontal={true}>
-              <View>
-                <View style={styles.row}>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellSpoolsNo]}>SpoolsNo</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellWeldNo]}>WeldNo</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellActualType]}>ActualType</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellCuttingDate]}>CuttingDate</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellCutPercentage]}>CutPercentage</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellFittingDate]}>FittingDate</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellFitPercentage]}>FitPercentage</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellWeldingDate]}>WeldingDate</Text>
-                  <Text style={[styles.cell, styles.cellHeader, styles.cellWeldPercentage]}>WeldPercentage</Text>
-                </View>
-                <ScrollView>
-                  {detailDrawingList.map((item, index) => {
-                    return (
-                      <View style={styles.row}>
-                        <Text style={[styles.cell, styles.cellSpoolsNo]}>{formatEmptyData(item.SpoolsNo)}</Text>
-                        <Text style={[styles.cell, styles.cellWeldNo]}>{formatEmptyData(item.WeldNo)}</Text>
-                        <Text style={[styles.cell, styles.cellActualType]}>{formatEmptyData(item.ActualType)}</Text>
-
-                        <TouchableOpacity style={[styles.cell, styles.cellCuttingDate, styles.cellRight]} onPress={() => _onPressShowPicker(item.CuttingDate, index, 'CuttingDate')}>
-                          <Text style={styles.text}>{formatDateData(item.CuttingDate)}</Text>
-                          <AntDesignIcon name='calendar' size={16} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.cell, styles.cellCutPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(item.CutPercentage, index, 'CutPercentage')}>
-                          <Text style={styles.text}>{formatEmptyData(item.CutPercentage)}</Text>
-                          <FontAwesomeIcon name='pencil' size={16} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.cell, styles.cellFittingDate, styles.cellRight]} onPress={() => _onPressShowPicker(item.FittingDate, index, 'FittingDate')}>
-                          <Text style={styles.text}>{formatDateData(item.FittingDate)}</Text>
-                          <AntDesignIcon name='calendar' size={16} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.cell, styles.cellFitPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
-                          <Text style={styles.text}>{formatEmptyData(item.FitPercentage)}</Text>
-                          <FontAwesomeIcon name='pencil' size={16} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.cell, styles.cellWeldingDate, styles.cellRight]} onPress={() => _onPressShowPicker(item.WeldingDate, index, 'WeldingDate')}>
-                          <Text style={styles.text}>{formatDateData(item.WeldingDate)}</Text>
-                          <AntDesignIcon name='calendar' size={16} />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.cell, styles.cellWeldPercentage, styles.cellRight]} onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
-                          <Text style={styles.text}>{formatEmptyData(item.WeldPercentage)}</Text>
-                          <FontAwesomeIcon name='pencil' size={16} />
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  })}
-                </ScrollView>
+      {isLoading || isError
+        ?
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
+        :
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>ProjectCode:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{projectCode}</Text>
               </View>
-            </ScrollView>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUploadDrawing}>
-              <Text style={styles.buttonTitle}>Submit to Server</Text>
-            </TouchableOpacity>
+            </View>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>Facility:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{facilityCode}</Text>
+              </View>
+            </View>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>DrawingNo:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{drawingNo}</Text>
+              </View>
+            </View>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>Sheet:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{sheet}</Text>
+              </View>
+            </View>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>Rev:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{rev}</Text>
+              </View>
+            </View>
+            {/* <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>TeamLeader:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{teamLeader}</Text>
+              </View>
+            </View> */}
           </View>
-        }
-        <DateTimePickerModal
-          isVisible={showPicker}
-          headerTextIOS={'Update ' + keyUpdate + ' :'}
-          date={dateDisplay}
-          mode={'date'}
-          onConfirm={_onChangeDate}
-          onCancel={() => { setShowPicker(false) }}
-        />
-        <Dialog.Container visible={showDialog}>
-          <Dialog.Title>{'Update ' + keyUpdate + ' :'}</Dialog.Title>
-          <Dialog.Input
-            value={inputDisplay}
-            placeholder={'Enter ' + keyUpdate}
-            onChangeText={(text) => setInputDisplay(text)}
-            underlineColorAndroid={BASE_COLOR}
-            keyboardType={'numeric'}
+
+          {
+            isLoading
+              ?
+              <ListLoading />
+              :
+              (detailDrawingList.length
+                ?
+                <>
+                  <VirtualizedList
+                    style={styles.table}
+                    data={detailDrawingList}
+                    getItemCount={(data) => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(index) => {
+                      return index;
+                    }}
+                    renderItem={renderItem}
+                  />
+                  <View style={styles.actionContainer}>
+                    <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
+                      <Text style={styles.buttonTitle}>Manage Picture</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                      <Text style={styles.buttonTitle}>Submit to Server</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+                : <ListEmptyData />)
+          }
+          <DateTimePickerModal
+            isVisible={showPicker}
+            headerTextIOS={'Update ' + keyUpdate + ':'}
+            date={dateDisplay}
+            mode={'date'}
+            onConfirm={_onChangeDate}
+            onCancel={() => { setShowPicker(false) }}
           />
-          <Dialog.Button label='Cancle' onPress={() => { setShowDialog(false) }} />
-          <Dialog.Button label='OK' onPress={_onPressSubmitInput} />
-        </Dialog.Container>
-        <AwesomeAlert
-          show={isUploading}
-          showProgress={true}
-          closeOnTouchOutside={false}
-          closeOnHardwareBackPress={false}
-        />
-      </View>
+          <Dialog.Container visible={showDialog}>
+            <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+            <Dialog.Input
+              value={inputDisplay}
+              placeholder={'Enter ' + keyUpdate}
+              onChangeText={(text) => setInputDisplay(text)}
+              underlineColorAndroid={BASE_COLOR}
+              keyboardType={'numeric'}
+            />
+            <Dialog.Button label='Cancle' onPress={() => { setShowDialog(false) }} />
+            <Dialog.Button label='OK' onPress={_onPressSubmitInput} />
+          </Dialog.Container>
+          <AwesomeAlert
+            show={isUploading}
+            showProgress={true}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+          />
+        </View>
+      }
     </SafeAreaView>
   );
 }
 
 const BASE_COLOR = '#344955';
-const BASE_CELL_HEIGHT = 40;
+const OPP_COLOR = 'white';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: OPP_COLOR,
   },
   container: {
     padding: 16,
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: OPP_COLOR,
+  },
+
+  headerContainer: {
+    marginBottom: 4,
+  },
+  rowInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 24,
+    marginBottom: 4,
+  },
+  infoTitle: {
+    flex: 4,
+  },
+  infoDataLine: {
+    flex: 6,
+    borderColor: BASE_COLOR,
+    borderBottomWidth: 1,
+  },
+  infoData: {
+    color: BASE_COLOR,
   },
 
   table: {
-    flex: 1,
+    flexGrow: 1,
+  },
+  box: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 8,
   },
   row: {
     flexDirection: 'row',
-    height: BASE_CELL_HEIGHT,
+    justifyContent: 'center',
+    margin: 4,
+    height: 24,
   },
-  cell: {
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    lineHeight: BASE_CELL_HEIGHT,
-    paddingLeft: 8,
-    paddingRight: 8,
+  cellTitleLine: {
+    flex: 1,
+    justifyContent: 'center',
   },
-  cellHeader: {
+  cellTitle: {
+    flex: 3,
+    justifyContent: 'center',
+  },
+  cellData: {
+    flex: 7,
+    justifyContent: 'center',
+  },
+  textData: {
+    minWidth: 85,
     fontWeight: 'bold',
     color: BASE_COLOR,
-    backgroundColor: 'azure',
   },
-  cellSpoolsNo: {
-    width: 225,
-  },
-  cellWeldNo: {
-    width: 80,
-  },
-  cellActualType: {
-    width: 100,
-  },
-  cellCuttingDate: {
-    width: 120,
+  itemAction: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignSelf: 'flex-start',
   },
-  cellCutPercentage: {
-    width: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cellFittingDate: {
-    width: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cellFitPercentage: {
-    width: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cellWeldingDate: {
-    width: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cellWeldPercentage: {
-    width: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cellLeft: {
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  cellCenter: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cellRight: {
-    justifyContent: 'flex-end',
-  },
-  text: {
-    marginRight: 8,
+  iconAction: {
+    marginLeft: 4,
+    width: 20,
+    height: 20,
   },
 
   noDataContainer: {
@@ -379,21 +470,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: BASE_COLOR,
     borderWidth: 1,
-    backgroundColor: 'white',
+    backgroundColor: OPP_COLOR,
   },
   noDataTitle: {
     fontSize: 16,
-    color: BASE_COLOR,
   },
-  buttonContainer: {
-    height: 48,
+
+  actionContainer: {
+    marginTop: 12,
+    height: 36,
+    flexDirection: 'row',
+  },
+  buttonLeft: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    marginTop: 16,
+    marginRight: 4,
+  },
+  buttonRight: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    marginLeft: 4,
   },
   buttonTitle: {
-    color: 'white',
-    fontSize: 16,
+    color: OPP_COLOR,
+  },
+  buttonTitleDark: {
+    color: BASE_COLOR,
   },
 });

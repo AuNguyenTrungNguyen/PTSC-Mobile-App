@@ -135,6 +135,7 @@ export default ({ route, navigation }) => {
     navigation.navigate(
       'DrawingDetail',
       {
+        projectCode: projectCode,
         facilityCode: facilityCode,
         drawingNo: drawingNo,
         sheet: sheet,
@@ -149,6 +150,7 @@ export default ({ route, navigation }) => {
     navigation.navigate(
       'DrawingDetail',
       {
+        projectCode: projectCode,
         facilityCode: facilityCode,
         drawingNo: drawingNo,
         sheet: sheet,
