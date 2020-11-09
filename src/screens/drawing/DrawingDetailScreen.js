@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, ScrollView, VirtualizedList } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -15,9 +15,9 @@ import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-export default ({ route }) => {
+export default ({ route, navigation }) => {
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [detailDrawingList, setDetailDrawingList] = useState([]);
@@ -93,7 +93,15 @@ export default ({ route }) => {
   };
 
   const _onPressManagePicture = () => {
-
+    navigation.navigate(
+      'DrawingImage',
+      {
+        projectCode: projectCode,
+        facilityCode: facilityCode,
+        drawingNo: drawingNo,
+        code: code
+      }
+    );
   };
 
   /**
@@ -188,12 +196,6 @@ export default ({ route }) => {
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data</Text>
-    </View>
-  );
-
-  const ListLoading = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>Loading...</Text>
     </View>
   );
 
@@ -322,37 +324,32 @@ export default ({ route }) => {
               </View>
             </View> */}
           </View>
-
-          {
-            isLoading
-              ?
-              <ListLoading />
-              :
-              (detailDrawingList.length
-                ?
-                <>
-                  <VirtualizedList
-                    style={styles.table}
-                    data={detailDrawingList}
-                    getItemCount={(data) => data.length}
-                    getItem={(data, index) => {
-                      return data[index];
-                    }}
-                    keyExtractor={(index) => {
-                      return index;
-                    }}
-                    renderItem={renderItem}
-                  />
-                  <View style={styles.actionContainer}>
-                    <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
-                      <Text style={styles.buttonTitle}>Manage Picture</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-                      <Text style={styles.buttonTitle}>Submit to Server</Text>
-                    </TouchableOpacity>
-                  </View>
-                </>
-                : <ListEmptyData />)
+          {detailDrawingList.length
+            ?
+            <>
+              <VirtualizedList
+                style={styles.table}
+                data={detailDrawingList}
+                getItemCount={(data) => data.length}
+                getItem={(data, index) => {
+                  return data[index];
+                }}
+                keyExtractor={(index) => {
+                  return index;
+                }}
+                renderItem={renderItem}
+              />
+              <View style={styles.actionContainer}>
+                <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
+                  <Text style={styles.buttonTitle}>Manage Picture</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                  <Text style={styles.buttonTitle}>Submit to Server</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+            :
+            <ListEmptyData />
           }
           <DateTimePickerModal
             isVisible={showPicker}

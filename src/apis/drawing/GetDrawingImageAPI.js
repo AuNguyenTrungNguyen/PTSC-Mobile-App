@@ -1,12 +1,9 @@
 import { Port_Server } from '../../utils/Core';
-
-const GetDrawingDetailAPI = async (projectCode, facilityCode, drawingNo, sheet, rev, code, token) =>
+const GetDrawingImageAPI = async (projectCode, facilityCode, drawingNo, code, token) =>
   fetch(Port_Server
-    + '/api/Drawing/GetDrawingDetail?projectCode=' + projectCode
+    + '/api/Drawing/GetDrawingImage?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&sheet=' + sheet
-    + '&rev=' + rev
     + '&code=' + code,
     {
       headers: {
@@ -14,4 +11,4 @@ const GetDrawingDetailAPI = async (projectCode, facilityCode, drawingNo, sheet, 
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-module.exports = GetDrawingDetailAPI;
+module.exports = GetDrawingImageAPI;

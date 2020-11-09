@@ -325,6 +325,15 @@ PODS:
     - React
   - RNGestureHandler (1.6.1):
     - React
+  - RNImageCropPicker (0.35.1):
+    - React-Core
+    - React-RCTImage
+    - RNImageCropPicker/QBImagePickerController (= 0.35.1)
+    - TOCropViewController
+  - RNImageCropPicker/QBImagePickerController (0.35.1):
+    - React-Core
+    - React-RCTImage
+    - TOCropViewController
   - RNReanimated (1.9.0):
     - React
   - RNScreens (2.9.0):
@@ -332,6 +341,7 @@ PODS:
   - RNVectorIcons (6.7.0):
     - React
   - Toast (4.0.0)
+  - TOCropViewController (2.5.5)
   - toolbar-android (0.1.0-rc.2):
     - React
   - Yoga (1.14.0)
@@ -398,6 +408,7 @@ DEPENDENCIES:
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -418,6 +429,7 @@ SPEC REPOS:
     - FlipperKit
     - OpenSSL-Universal
     - Toast
+    - TOCropViewController
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -495,6 +507,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNImageCropPicker:
+    :path: "../node_modules/react-native-image-crop-picker"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -555,10 +569,12 @@ SPEC CHECKSUMS:
   RNDateTimePicker: e9fcd5ecdc0c5b018871e0d178d6040dca11973c
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
+  RNImageCropPicker: 16951bc02411f50c4d197488ed6406a23dc3b5f1
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNVectorIcons: 368d6d8b8301224e5ffb6254191f4f8876c2be0d
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
+  TOCropViewController: da59f531f8ac8a94ef6d6c0fc34009350f9e8bfe
   toolbar-android: 404f4450b203597e7b417f714ff417bed562a1be
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

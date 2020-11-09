@@ -9,66 +9,76 @@ import HomeScreen from './screens/HomeScreen';
 import CameraScreen from './screens/camera/CameraScreen';
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
+import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 
 const Stack = createStackNavigator();
 export default () => {
 
-    let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
-    if (Appearance.getColorScheme() === 'dark') {
-        optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
-    };
+  let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
+  if (Appearance.getColorScheme() === 'dark') {
+    optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
+  };
 
-    return (
-        <NavigationContainer>
-            <Stack.Navigator
-                initialRouteName='Auth'
-                screenOptions={optionNavigation}>
-                <Stack.Screen
-                    name='Auth'
-                    component={AuthScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name='Login'
-                    component={LoginScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name='Home'
-                    component={HomeScreen}
-                />
-                <Stack.Screen
-                    name='DrawingList'
-                    component={DrawingListScreen}
-                    options={
-                        {
-                            title: 'Drawing List',
-                            headerBackTitle: 'Back',
-                        }
-                    }
-                />
-                <Stack.Screen
-                    name='Camera'
-                    component={CameraScreen}
-                    options={
-                        {
-                            title: 'QRCode Scanner',
-                            headerBackTitle: 'Back',
-                        }
-                    }
-                />
-                <Stack.Screen
-                    name='DrawingDetail'
-                    component={DrawingDetailScreen}
-                    options={({ route }) => (
-                        {
-                            title: route.params?.titleBar,
-                            headerBackTitle: 'Back',
-                        }
-                    )}
-                />
-                
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName='Auth'
+        screenOptions={optionNavigation}>
+        <Stack.Screen
+          name='Auth'
+          component={AuthScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='Login'
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name='Home'
+          component={HomeScreen}
+        />
+        <Stack.Screen
+          name='DrawingList'
+          component={DrawingListScreen}
+          options={
+            {
+              title: 'Drawing List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='Camera'
+          component={CameraScreen}
+          options={
+            {
+              title: 'QRCode Scanner',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingDetail'
+          component={DrawingDetailScreen}
+          options={
+            {
+              title: 'Drawing Detail',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingImage'
+          component={DrawingImageScreen}
+          options={
+            {
+              title: 'Drawing Pictures',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }

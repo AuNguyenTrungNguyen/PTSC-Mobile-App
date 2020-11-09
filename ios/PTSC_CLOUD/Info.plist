@@ -38,11 +38,9 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is used for scanning barcode</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Library is used for upload barcode image</string>
+	<string>Camera is used for images application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Library is used for upload barcode image</string>
+	<string>Library is used for images application</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
