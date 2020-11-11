@@ -4,7 +4,9 @@ import NetInfo from '@react-native-community/netinfo';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNFetchBlob from 'rn-fetch-blob';
+import Toast from 'react-native-simple-toast';
 
+import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 import GetDrawingImageAPI from '../../apis/drawing/GetDrawingImageAPI';
 import MessageAlert from '../../components/MessageAlert';
@@ -14,7 +16,7 @@ export default ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [isUpload, setIsUpload] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [drawingImageList, setDrawingImageList] = useState([]);
   const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
 
@@ -83,31 +85,34 @@ export default ({ route }) => {
     setIsLoading(true);
     ImagePicker.openPicker({
       multiple: true,
+      maxFiles: 100,
     }).then(images => {
-      imagesUpload = [...drawingImageListUpload];
+      imagesUpload = [];
       images.forEach(image => {
         imagesUpload.push({ uri: image.path });
       });
       setDrawingImageListUpload(imagesUpload);
-      setIsUpload(true);
+      setIsUploading(true);
     }).catch(() => {
       setIsLoading(false);
-      setIsUpload(false);
+      setIsUploading(false);
     });
   };
 
   const _onPressOpenCamera = () => {
-    // ImagePicker.openCamera({
-    // }).then(image => {
-    //   imagesUpload = [];
-    //   imagesUpload.push({ url: image.path });
-    //   navigation.navigate(
-    //     'DrawingImageUpload',
-    //     {
-    //       images: imagesUpload
-    //     }
-    //   );
-    // });
+    setIsLoading(true);
+    ImagePicker.openCamera({
+      cropping: false,
+    })
+      .then(image => {
+        let imagesUpload = [];
+        imagesUpload.push({ uri: image.path });
+        setDrawingImageListUpload(imagesUpload);
+        setIsUploading(true);
+      }).catch(() => {
+        setIsLoading(false);
+        setIsUploading(false);
+      });
   };
 
   const addFilesToBody = () => {
@@ -125,8 +130,9 @@ export default ({ route }) => {
     return Promise.all(promises);
   };
 
-  const _onPressUploadImage = () => {
+  const _onPressUploadImage = async () => {
 
+    let token = await Helper.getData('TOKEN');
     let username = await Helper.getData('USERNAME');
     let dataCode = await Helper.getData('DATACODE');
 
@@ -144,25 +150,34 @@ export default ({ route }) => {
         body = body.concat(res);
         RNFetchBlob.fetch(
           'POST',
-          'http://172.16.13.48:35353/api/Drawing/UploadDrawingImage',
+          Port_Server + '/api/Drawing/UploadDrawingImage',
           {
-            'Authorization': 'Bearer ' + 'P6IWGXih3IzBoFx4b0mUGt7gKLf7a_4LmeI62zvPZ2IoEfS22krdoHP_JKzcwMXL2XPF27c0CCRueV6nOG6VI2K0s2w1PFpu5VBhyRDdetERsn0qeoVBj2siv7yrBOhq36uD_Ed51rVq8TrgILkLvxZnz43OmQ5Yk0_NJwO17JVyPCrkQvyKrpLntg847eMOKJ-r4Y2O5aB-JLCptnE0HCkLbYfpwkFlMiqONryLJQt0G1D0i0jvItR-CTOsa94pR8u8ld3X8OCwE2v6Ejjnufm6DvjpXbfJdeOdVyK4WHdQui-ICMGoe3YwILcD2xL4sAIBa6Xm3mg9FDXX9uJugtOamu_p7K33we6jLp8aFjv1N-1Po4BDO7DihNbmucCpyLLm_vWIRa-F-JHrENCRGCibekA92-4oheMFCUkUtr9WNiYOF-1BwpIkWunxwm_kTvXN_WbACThk59r70cXs-LOL04dyvTL9xsf5l5Un3fA',
+            'Authorization': 'Bearer ' + token,
             'Content-Type': 'multipart/form-data',
           },
           body,
         )
           .then(res => {
-            console.log('res: ' + JSON.stringify(res.data));
+            res = JSON.parse(res.data);
+            if (res.success) {
+              setDrawingImageListUpload([]);
+              setIsLoading(false);
+              setIsUploading(false);
+              Toast.show(res.Message, Toast.SHORT, ['RCTModalHostViewController']);
+              callAPI(getDrawingImage);
+            } else {
+              Toast.show(res.Message, Toast.SHORT);
+            }
           })
-          .catch((err) => {
-            console.log('err: ' + err);
+          .catch((error) => {
+            Toast.show(error.toString(), Toast.SHORT);
           });
       });
   };
 
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any image</Text>
+      <Text style={styles.noDataTitle}>No have any picture</Text>
     </View>
   );
 
@@ -198,22 +213,23 @@ export default ({ route }) => {
               </View>
             </View>
           </View>
-
           {
             drawingImageList.length
               ?
-              <VirtualizedList
-                style={styles.table}
-                data={drawingImageList}
-                getItemCount={(data) => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(index) => {
-                  return index;
-                }}
-                renderItem={renderItem}
-              />
+              <View style={styles.safeArea}>
+                <VirtualizedList
+                  style={styles.table}
+                  data={drawingImageList}
+                  getItemCount={(data) => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(index) => {
+                    return index;
+                  }}
+                  renderItem={renderItem}
+                />
+              </View>
               :
               <ListEmptyData />
           }
@@ -224,27 +240,29 @@ export default ({ route }) => {
           </View>
         </View>
       }
-      <Modal visible={isUpload} animationType='fade'>
+      <Modal visible={isUploading} animationType='slide'>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.container}>
-            <VirtualizedList
-              style={styles.table}
-              data={drawingImageListUpload}
-              getItemCount={(data) => data.length}
-              getItem={(data, index) => {
-                return data[index];
-              }}
-              keyExtractor={(index) => {
-                return index;
-              }}
-              renderItem={renderItem}
-            />
+            <View style={styles.safeArea}>
+              <VirtualizedList
+                style={styles.table}
+                data={drawingImageListUpload}
+                getItemCount={(data) => data.length}
+                getItem={(data, index) => {
+                  return data[index];
+                }}
+                keyExtractor={(index) => {
+                  return index;
+                }}
+                renderItem={renderItem}
+              />
+            </View>
             <View style={styles.actionContainer}>
-              <TouchableOpacity style={styles.buttonLeft} onPress={() => { setIsLoading(false), setIsUpload(false) }}>
-                <Text style={styles.buttonTitle}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressUploadImage}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressUploadImage}>
                 <Text style={styles.buttonTitle}>Upload Pictures</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonRight} onPress={() => { setIsLoading(false), setIsUploading(false) }}>
+                <Text style={styles.buttonTitle}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -290,15 +308,17 @@ const styles = StyleSheet.create({
   },
 
   table: {
-    flexGrow: 1,
+    flexGrow: 0,
     borderColor: BASE_COLOR,
-    borderWidth: 1,
+    borderWidth: 2,
     backgroundColor: OPP_COLOR,
   },
   imageItem: {
-    width: SCREEN_WIDTH - 32,
-    height: (SCREEN_WIDTH - 32) * 0.75,
-    marginBottom: 8,
+    width: SCREEN_WIDTH - 32 - 16,
+    height: (SCREEN_WIDTH - 32 - 16) * 0.75,
+    margin: 4,
+    borderColor: BASE_COLOR,
+    borderWidth: 2,
   },
 
   noDataContainer: {

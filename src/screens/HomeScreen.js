@@ -51,6 +51,7 @@ export default ({ navigation }) => {
     GetProjectListAPI(username, token)
       .then(res => {
         if (res.success) {
+          Helper.storeData('DATACODE', res.DataCode);
           setListProject(res.data);
           setIsLoading(false);
           setIsError(false);
