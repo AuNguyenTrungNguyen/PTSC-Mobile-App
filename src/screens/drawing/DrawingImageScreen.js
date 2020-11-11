@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Image, Dimensions, Alert, Modal } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import ImagePicker from 'react-native-image-crop-picker';
+import ImageResizer from 'react-native-image-resizer';
+import RNFetchBlob from 'rn-fetch-blob';
 
 import Helper from '../../utils/Helper';
 import GetDrawingImageAPI from '../../apis/drawing/GetDrawingImageAPI';
@@ -84,7 +86,7 @@ export default ({ route }) => {
     }).then(images => {
       imagesUpload = [...drawingImageListUpload];
       images.forEach(image => {
-        imagesUpload.push({ url: image.path });
+        imagesUpload.push({ uri: image.path });
       });
       setDrawingImageListUpload(imagesUpload);
       setIsUpload(true);
@@ -108,8 +110,54 @@ export default ({ route }) => {
     // });
   };
 
+  const addFilesToBody = () => {
+    const promises = drawingImageListUpload.map(async (image) => {
+      return await ImageResizer.createResizedImage(image.uri, 800, 600, 'PNG', 0)
+        .then(res => {
+          let file = {
+            name: 'file',
+            filename: res.name,
+            data: RNFetchBlob.wrap(res.path),
+          }
+          return file;
+        });
+    });
+    return Promise.all(promises);
+  };
+
   const _onPressUploadImage = () => {
-    
+
+    let username = await Helper.getData('USERNAME');
+    let dataCode = await Helper.getData('DATACODE');
+
+    let body = [
+      { name: 'projectCode', data: projectCode },
+      { name: 'facilityCode', data: facilityCode },
+      { name: 'drawingNo', data: drawingNo },
+      { name: 'code', data: code },
+      { name: 'username', data: username },
+      { name: 'dataCode', data: dataCode },
+    ];
+
+    addFilesToBody()
+      .then(res => {
+        body = body.concat(res);
+        RNFetchBlob.fetch(
+          'POST',
+          'http://172.16.13.48:35353/api/Drawing/UploadDrawingImage',
+          {
+            'Authorization': 'Bearer ' + 'P6IWGXih3IzBoFx4b0mUGt7gKLf7a_4LmeI62zvPZ2IoEfS22krdoHP_JKzcwMXL2XPF27c0CCRueV6nOG6VI2K0s2w1PFpu5VBhyRDdetERsn0qeoVBj2siv7yrBOhq36uD_Ed51rVq8TrgILkLvxZnz43OmQ5Yk0_NJwO17JVyPCrkQvyKrpLntg847eMOKJ-r4Y2O5aB-JLCptnE0HCkLbYfpwkFlMiqONryLJQt0G1D0i0jvItR-CTOsa94pR8u8ld3X8OCwE2v6Ejjnufm6DvjpXbfJdeOdVyK4WHdQui-ICMGoe3YwILcD2xL4sAIBa6Xm3mg9FDXX9uJugtOamu_p7K33we6jLp8aFjv1N-1Po4BDO7DihNbmucCpyLLm_vWIRa-F-JHrENCRGCibekA92-4oheMFCUkUtr9WNiYOF-1BwpIkWunxwm_kTvXN_WbACThk59r70cXs-LOL04dyvTL9xsf5l5Un3fA',
+            'Content-Type': 'multipart/form-data',
+          },
+          body,
+        )
+          .then(res => {
+            console.log('res: ' + JSON.stringify(res.data));
+          })
+          .catch((err) => {
+            console.log('err: ' + err);
+          });
+      });
   };
 
   const ListEmptyData = () => (
@@ -123,7 +171,7 @@ export default ({ route }) => {
       <Image
         style={styles.imageItem}
         source={{
-          uri: item.url,
+          uri: item.uri,
         }}
       />
     );
