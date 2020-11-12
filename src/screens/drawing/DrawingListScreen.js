@@ -18,9 +18,8 @@ export default ({ route, navigation }) => {
   const [isSearch, setIsSearch] = useState(false);
   const { projectCode } = route.params;
 
-  const [drawingListDefault, setDrawingListDefault] = useState([]);
   const [drawingList, setDrawingList] = useState([]);
-  const [drawingNo, setDrawingNo] = useState(null);
+  const [drawingNo, setDrawingNo] = useState('');
 
   const [isVisible, setIsVisible] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
@@ -49,12 +48,11 @@ export default ({ route, navigation }) => {
   const getData = async () => {
     let token = await Helper.getData('TOKEN');
     try {
-      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, token)
+      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', token)
       ]).then(([facilityResult, drawingResult]) => {
         if (facilityResult.success && drawingResult.success) {
           setFacilityList(facilityResult.data);
           setDrawingList(drawingResult.data);
-          setDrawingListDefault(drawingResult.data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -70,7 +68,7 @@ export default ({ route, navigation }) => {
   const _onChangeDrawingNo = (no) => {
     setDrawingNo(no);
     if (no === '') {
-      searchDrawing(facilityCode);
+      searchDrawing(facilityCode, drawingNo);
     }
   };
 
@@ -78,40 +76,38 @@ export default ({ route, navigation }) => {
     setNewFacilityCode(code);
   };
 
-  const searchDrawing = (code) => {
+  const searchDrawing = async (facilityCode, drawingNo) => {
     if (isSearch === false) {
       setIsSearch(true);
     }
-    let array = [...drawingListDefault];
-    const newData = drawingListDefault.filter(item => {
-      let conditionDrawingNo = true;
-      if (drawingNo) {
-        const itemData = item.DrawingNo.toUpperCase();
-        const drawingData = drawingNo.toUpperCase();
-        conditionDrawingNo = itemData.indexOf(drawingData) > -1;
-      }
-
-      let conditionFacilityCode = true;
-      if (code !== FACILITY_CODE_DEFAULT) {
-        const itemData = item.FacilityCode.toUpperCase();
-        const codeData = code.toUpperCase();
-        conditionFacilityCode = itemData === codeData;
-      }
-      return (conditionDrawingNo && conditionFacilityCode);
-    });
-    array = newData;
-    setDrawingList(array);
+    let token = await Helper.getData('TOKEN');
+    facilityCode = facilityCode != null ? facilityCode : '';
+    drawingNo = drawingNo != null ? drawingNo : '';
+    GetDrawingListAPI(projectCode, facilityCode, drawingNo, token)
+      .then(res => {
+        if (res.success) {
+          let array = []
+          array = res.data;
+          setDrawingList(array);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          MessageAlert('ERROR', error.toString());
+        }
+      }).catch(error => {
+        MessageAlert('ERROR', error.toString());
+      });
   };
 
   const _onPressSearchDrawing = () => {
     Keyboard.dismiss();
-    searchDrawing(facilityCode);
+    searchDrawing(facilityCode, drawingNo);
   };
 
   const _onPressFilterDrawing = () => {
     if (facilityCode !== newFacilityCode) {
       setFacilityCode(newFacilityCode);
-      searchDrawing(newFacilityCode);
+      searchDrawing(newFacilityCode, drawingNo);
     }
     setIsVisible(false);
   };
@@ -120,7 +116,7 @@ export default ({ route, navigation }) => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
       setNewFacilityCode(FACILITY_CODE_DEFAULT);
-      searchDrawing(FACILITY_CODE_DEFAULT);
+      searchDrawing('', drawingNo);
     }
     setIsVisible(false);
   };
@@ -252,10 +248,10 @@ export default ({ route, navigation }) => {
               <View style={styles.rowInfo}>
                 {
                   drawingList.length
-                  ?
-                  <Text style={styles.infoTitle}>{drawingList.length} drawings</Text>
-                  :
-                  <Text style={styles.infoTitle} />
+                    ?
+                    <Text style={styles.infoTitle}>{drawingList.length} drawings</Text>
+                    :
+                    <Text style={styles.infoTitle} />
                 }
                 <TouchableOpacity style={styles.searchButton} onPress={_onPressSearchDrawing}>
                   <Text style={styles.buttonTitle}>Search Drawing</Text>
