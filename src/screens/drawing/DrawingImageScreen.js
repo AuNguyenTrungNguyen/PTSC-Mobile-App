@@ -281,30 +281,34 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   container: {
-    padding: 16,
+    padding: 12,
     flex: 1,
     backgroundColor: OPP_COLOR,
   },
 
   headerContainer: {
-    marginBottom: 4,
+    marginBottom: 8,
+    padding: 4,
+    paddingBottom: 0,
   },
   rowInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 24,
+    minHeight: 24,
     marginBottom: 4,
   },
   infoTitle: {
-    flex: 4,
+    flex: 3,
   },
   infoDataLine: {
-    flex: 6,
+    flex: 7,
     borderColor: BASE_COLOR,
     borderBottomWidth: 1,
+    flexDirection: 'row',
   },
   infoData: {
     color: BASE_COLOR,
+    flexShrink: 1,
   },
 
   table: {
@@ -314,8 +318,8 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   imageItem: {
-    width: SCREEN_WIDTH - 32 - 16,
-    height: (SCREEN_WIDTH - 32 - 16) * 0.75,
+    width: SCREEN_WIDTH - 36,
+    height: (SCREEN_WIDTH - 36) * 0.75,
     margin: 4,
     borderColor: BASE_COLOR,
     borderWidth: 2,
@@ -334,7 +338,7 @@ const styles = StyleSheet.create({
   },
 
   actionContainer: {
-    marginTop: 8,
+    marginTop: 12,
     height: 36,
     flexDirection: 'row',
   },

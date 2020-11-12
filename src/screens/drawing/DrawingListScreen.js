@@ -104,6 +104,7 @@ export default ({ route, navigation }) => {
   };
 
   const _onPressSearchDrawing = () => {
+    Keyboard.dismiss();
     searchDrawing(facilityCode);
   };
 
@@ -244,6 +245,7 @@ export default ({ route, navigation }) => {
                   style={styles.searchInput}
                   value={drawingNo}
                   onChangeText={_onChangeDrawingNo}
+                  onSubmitEditing={_onPressSearchDrawing}
                   underlineColorAndroid='transparent'
                 />
               </View>
@@ -344,7 +346,7 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   container: {
-    padding: 8,
+    padding: 12,
     flex: 1,
     backgroundColor: OPP_COLOR,
   },
@@ -412,6 +414,9 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 16,
+    marginBottom: 4,
   },
   cellTitle: {
     flex: 3,
@@ -454,7 +459,7 @@ const styles = StyleSheet.create({
   },
 
   scanContainer: {
-    marginTop: 8,
+    marginTop: 12,
     height: 36,
     flexDirection: 'row',
   },

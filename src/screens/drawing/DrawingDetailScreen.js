@@ -71,7 +71,7 @@ export default ({ route, navigation }) => {
     UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, updateDrawingList, token)
       .then(res => {
         if (res.success) {
-          Toast.show(res.Message, Toast.SHORT);
+          Toast.show(res.Message, Toast.SHORT, ['RCTModalHostViewController']);
           setUpdateDrawingList([]);
         } else {
           MessageAlert('ERROR', res.Message);
@@ -398,13 +398,15 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   container: {
-    padding: 16,
+    padding: 12,
     flex: 1,
     backgroundColor: OPP_COLOR,
   },
 
   headerContainer: {
-    marginBottom: 4,
+    marginBottom: 8,
+    padding: 4,
+    paddingBottom: 0,
   },
   rowInfo: {
     flexDirection: 'row',
@@ -417,6 +419,7 @@ const styles = StyleSheet.create({
   },
   infoDataLine: {
     flex: 7,
+    borderColor: BASE_COLOR,
     borderBottomWidth: 1,
     flexDirection: 'row',
   },
@@ -440,7 +443,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     margin: 4,
-    height: 24,
+    minHeight: 20,
   },
   cellTitleLine: {
     flex: 1,

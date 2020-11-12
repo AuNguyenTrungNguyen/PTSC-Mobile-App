@@ -8,7 +8,7 @@ const UpdateDrawingDetailAPI = (projectCode, facilityCode, drawingNo, details, t
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ projectCode, facilityCode, drawingNo, weldNo, details }),
+      body: JSON.stringify({ projectCode, facilityCode, drawingNo, details }),
     }
   ).then(res => res.json());
 module.exports = UpdateDrawingDetailAPI;
