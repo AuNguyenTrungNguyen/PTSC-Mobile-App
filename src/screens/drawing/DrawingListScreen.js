@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
+import Toast from 'react-native-simple-toast';
 
 import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
@@ -78,7 +79,6 @@ export default ({ route, navigation }) => {
   };
 
   const searchDrawing = (code) => {
-    console.log('searchDrawing');
     if (isSearch === false) {
       setIsSearch(true);
     }
@@ -100,7 +100,6 @@ export default ({ route, navigation }) => {
       return (conditionDrawingNo && conditionFacilityCode);
     });
     array = newData;
-    console.log(array.length);
     setDrawingList(array);
   };
 
@@ -128,6 +127,14 @@ export default ({ route, navigation }) => {
   const _onPressCancelModel = () => {
     setNewFacilityCode(facilityCode);
     setIsVisible(false);
+  };
+
+  const _onPressShowModel = () => {
+    if (facilityList.length) {
+      setIsVisible(true);
+    } else {
+      Toast.show('No have Facility to filter', Toast.SHORT);
+    }
   };
 
   const _onPressViewFitUp = (facilityCode, drawingNo, sheet, rev) => {
@@ -227,7 +234,7 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.rowInfo}>
                 <Text style={styles.infoTitle}>FacilityCode:</Text>
-                <TouchableOpacity style={styles.selectInput} onPress={() => setIsVisible(true)}>
+                <TouchableOpacity style={styles.selectInput} onPress={_onPressShowModel}>
                   <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
                 </TouchableOpacity>
               </View>
@@ -241,7 +248,13 @@ export default ({ route, navigation }) => {
                 />
               </View>
               <View style={styles.rowInfo}>
-                <Text style={styles.infoTitle} />
+                {
+                  drawingList.length
+                  ?
+                  <Text style={styles.infoTitle}>{drawingList.length} drawings</Text>
+                  :
+                  <Text style={styles.infoTitle} />
+                }
                 <TouchableOpacity style={styles.searchButton} onPress={_onPressSearchDrawing}>
                   <Text style={styles.buttonTitle}>Search Drawing</Text>
                 </TouchableOpacity>
@@ -331,14 +344,15 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   container: {
-    padding: 16,
+    padding: 8,
     flex: 1,
     backgroundColor: OPP_COLOR,
   },
 
   headerContainer: {
-    padding: 8,
-    marginBottom: 4,
+    marginBottom: 8,
+    padding: 4,
+    paddingBottom: 0,
   },
   rowInfo: {
     flexDirection: 'row',
@@ -423,7 +437,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontStyle: 'italic',
   },
-
   noDataContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -441,7 +454,7 @@ const styles = StyleSheet.create({
   },
 
   scanContainer: {
-    marginTop: 12,
+    marginTop: 8,
     height: 36,
     flexDirection: 'row',
   },
@@ -530,7 +543,7 @@ const modals = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    width: 56,
+    width: 60,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: BASE_COLOR,
