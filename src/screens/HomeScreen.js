@@ -107,22 +107,20 @@ export default ({ navigation }) => {
         <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
         :
         <View style={styles.container}>
-          <View style={styles.containerCenter}>
-            <DropDownPicker
-              items={listProject}
-              onChangeItem={_onChangeProjectCode}
-              defaultValue={null}
-              placeholder='Select Project'
-              containerStyle={styles.selectContainer}
-              style={styles.select}
-              itemStyle={styles.selectItem}
-              activeItemStyle={styles.selectActiveItem}
-            />
-            <View style={styles.action}>
-              <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
-                <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
-              </TouchableOpacity>
-            </View>
+          <DropDownPicker
+            items={listProject}
+            onChangeItem={_onChangeProjectCode}
+            defaultValue={null}
+            placeholder='Select Project'
+            containerStyle={styles.selectContainer}
+            style={styles.select}
+            itemStyle={styles.selectItem}
+            activeItemStyle={styles.selectActiveItem}
+          />
+          <View style={styles.action}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
+              <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
+            </TouchableOpacity>
           </View>
         </View>
       }
@@ -141,10 +139,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: OPP_COLOR,
-  },
-  containerCenter: {
-    flex: 1,
-    padding: 16,
     justifyContent: 'center',
   },
 
@@ -156,11 +150,11 @@ const styles = StyleSheet.create({
   },
   selectItem: {
     justifyContent: 'flex-start',
-    borderBottomColor: 'lightgray',
-    borderBottomWidth: 1
+    borderBottomColor: '#adb6bb',
+    borderBottomWidth: 1,
   },
   selectActiveItem: {
-    backgroundColor: 'azure',
+    backgroundColor: '#adb6bb',
   },
 
   action: {
