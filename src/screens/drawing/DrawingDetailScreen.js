@@ -68,7 +68,7 @@ export default ({ route, navigation }) => {
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, drawingNo, updateDrawingList, token)
+    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, updateDrawingList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message, Toast.SHORT);
@@ -132,10 +132,11 @@ export default ({ route, navigation }) => {
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
-      let key = detailDrawingList[indexUpdate].RowIndex;
-      let objIndex = array.findIndex((obj => obj.RowIndex == key));
+      let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+      let weldNo = detailDrawingList[indexUpdate].WeldNo;
+      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: key, [keyUpdate]: selectedDate });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: selectedDate });
       } else {
         array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
       }
@@ -159,20 +160,26 @@ export default ({ route, navigation }) => {
     let value = inputDisplay.replace(/,/g, '.');
     setInputDisplay(value);
     if (!checkFormatNumber(value)) {
-      Toast.show(keyUpdate + ' must be a number.', Toast.SHORT);
+      Toast.show('Please enter '+ keyUpdate + ' must be a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    if (value && (value < 0 || value > 100)) {
+      Toast.show(keyUpdate + ' must be from 0 to 100.', Toast.SHORT);
       return;
     }
     setShowDialog(false);
-    if (detailDrawingList[indexUpdate][keyUpdate] != value) {
+    if (detailDrawingList[indexUpdate][keyUpdate] !== value) {
       let array = [...detailDrawingList];
       array[indexUpdate][keyUpdate] = value;
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
-      let key = detailDrawingList[indexUpdate].RowIndex;
-      let objIndex = array.findIndex((obj => obj.RowIndex == key));
+      let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+      let weldNo = detailDrawingList[indexUpdate].WeldNo;
+      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: key, [keyUpdate]: value });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: value });
       } else {
         array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
       }
@@ -182,7 +189,7 @@ export default ({ route, navigation }) => {
 
   const checkFormatNumber = input => {
     const regexNumber = /^\d+(\.\d+)?$/;
-    return regexNumber.test(input) || input === '';
+    return regexNumber.test(input) && input !== '';
   };
 
   const formatEmptyData = data => {
@@ -402,19 +409,20 @@ const styles = StyleSheet.create({
   rowInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 24,
+    minHeight: 24,
     marginBottom: 4,
   },
   infoTitle: {
-    flex: 4,
+    flex: 3,
   },
   infoDataLine: {
-    flex: 6,
-    borderColor: BASE_COLOR,
+    flex: 7,
     borderBottomWidth: 1,
+    flexDirection: 'row',
   },
   infoData: {
     color: BASE_COLOR,
+    flexShrink: 1,
   },
 
   table: {
