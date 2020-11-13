@@ -32,6 +32,7 @@ export default ({ route, navigation }) => {
   );
 
   const callAPI = executedAPI => {
+    setIsLoading(false);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
@@ -51,18 +52,17 @@ export default ({ route, navigation }) => {
           setDetailDrawingList(res.data);
           setIsLoading(false);
           setIsError(false);
-          setIsUploading(false)
+          setIsUploading(false);
         } else {
           setIsLoading(false);
           setIsError(true);
-          setIsUploading(false)
+          setIsUploading(false);
         }
       })
-      .catch((error) => {
-        MessageAlert('ERROR', error.toString());
+      .catch(() => {
         setIsLoading(false);
         setIsError(true);
-        setIsUploading(false)
+        setIsUploading(false);
       });
   };
 
@@ -74,11 +74,11 @@ export default ({ route, navigation }) => {
           Toast.show(res.Message, Toast.SHORT, ['RCTModalHostViewController']);
           setUpdateDrawingList([]);
         } else {
-          MessageAlert('ERROR', res.Message);
+          MessageAlert('ERROR', 'Please check that you are using the company network!');
         }
         callAPI(getDrawingDetail);
-      }).catch(error => {
-        MessageAlert('ERROR', error.toString());
+      }).catch(() => {
+        MessageAlert('ERROR', 'Please check that you are using the company network!');
         setIsUploading(false);
       });
   };

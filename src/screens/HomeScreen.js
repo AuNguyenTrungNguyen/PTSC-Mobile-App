@@ -33,13 +33,13 @@ export default ({ navigation }) => {
   }, [navigation]);
 
   const getDataFromAPI = () => {
+    setIsLoading(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
-        setIsLoading(true);
         getData();
       }
     });

@@ -29,39 +29,47 @@ export default ({ route, navigation }) => {
 
   useEffect(
     () => {
-      getDataFromAPI();
+      callAPI(getDrawingDetail);
     }, []
   );
 
-  const getDataFromAPI = () => {
+  const callAPI = (executedAPI, loading = true) => {
+    if (loading) {
+      setIsLoading(true);
+    }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
-        setIsLoading(true);
-        getData();
+        executedAPI();
       }
     });
   };
 
-  const getData = async () => {
+  const getDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
     try {
-      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', token)
-      ]).then(([facilityResult, drawingResult]) => {
-        if (facilityResult.success && drawingResult.success) {
-          setFacilityList(facilityResult.data);
-          setDrawingList(drawingResult.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
+      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', token)])
+        .then(([facilityResult, drawingResult]) => {
+          if (facilityResult.success && drawingResult.success) {
+            setFacilityList(facilityResult.data);
+            setDrawingList(drawingResult.data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
           setIsLoading(false);
           setIsError(true);
-        }
-      });
+        });;
     } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
       MessageAlert('ERROR', error.toString());
     }
   };
@@ -69,7 +77,7 @@ export default ({ route, navigation }) => {
   const _onChangeDrawingNo = (no) => {
     setDrawingNo(no);
     if (no === '') {
-      searchDrawing(facilityCode, drawingNo);
+      callAPI(searchDrawing(facilityCode, drawingNo), false);
     }
   };
 
@@ -82,7 +90,7 @@ export default ({ route, navigation }) => {
       setIsSearch(true);
     }
     let token = await Helper.getData('TOKEN');
-    facilityCode = facilityCode != null ? facilityCode : '';
+    facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo != null ? drawingNo : '';
     GetDrawingListAPI(projectCode, facilityCode, drawingNo, token)
       .then(res => {
@@ -93,22 +101,24 @@ export default ({ route, navigation }) => {
           setIsLoading(false);
           setIsError(false);
         } else {
-          MessageAlert('ERROR', error.toString());
+          setIsLoading(false);
+          setIsError(true);
         }
-      }).catch(error => {
-        MessageAlert('ERROR', error.toString());
+      }).catch(() => {
+        setIsLoading(false);
+        setIsError(true);
       });
   };
 
   const _onPressSearchDrawing = () => {
     Keyboard.dismiss();
-    searchDrawing(facilityCode, drawingNo);
+    callAPI(searchDrawing(facilityCode, drawingNo), false);
   };
 
   const _onPressFilterDrawing = () => {
     if (facilityCode !== newFacilityCode) {
       setFacilityCode(newFacilityCode);
-      searchDrawing(newFacilityCode, drawingNo);
+      callAPI(searchDrawing(newFacilityCode, drawingNo), false);
     }
     setIsVisible(false);
   };
@@ -166,9 +176,13 @@ export default ({ route, navigation }) => {
               code: code,
               teamLeader: teamLeader,
             });
+          } else {
+            setIsLoading(false);
+            setIsError(true);
           }
-        }).catch(error => {
-          MessageAlert('ERROR', error);
+        }).catch(() => {
+          setIsLoading(false);
+          setIsError(true);
         });
     }
   };
@@ -204,9 +218,13 @@ export default ({ route, navigation }) => {
               code: code,
               teamLeader: teamLeader,
             });
+          } else {
+            setIsLoading(false);
+            setIsError(true);
           }
-        }).catch(error => {
-          MessageAlert('ERROR', error);
+        }).catch(() => {
+          setIsLoading(false);
+          setIsError(true);
         });
     }
   };
@@ -278,7 +296,7 @@ export default ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
         :
         (!isSearch && drawingList.length == 0
           ?

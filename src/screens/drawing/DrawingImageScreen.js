@@ -29,6 +29,7 @@ export default ({ route }) => {
   );
 
   const callAPI = executedAPI => {
+    setIsLoading(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
@@ -162,15 +163,18 @@ export default ({ route }) => {
             if (res.success) {
               setDrawingImageListUpload([]);
               setIsLoading(false);
+              setIsLoading(false);
               setIsUploading(false);
-              Toast.show(res.Message, Toast.SHORT, ['RCTModalHostViewController']);
+              Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
               callAPI(getDrawingImage);
             } else {
-              Toast.show(res.Message, Toast.SHORT);
+              setIsLoading(false);
+              setIsError(true);
             }
           })
-          .catch((error) => {
-            Toast.show(error.toString(), Toast.SHORT);
+          .catch(() => {
+            setIsLoading(false);
+            setIsError(true);
           });
       });
   };

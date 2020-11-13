@@ -11,17 +11,9 @@ export default ({ navigation }) => {
     const getRoute = async () => {
       let expires = await Helper.getData('EXPIRES');
       if (expires && (Moment.utc(new Date(expires)).valueOf() - Moment.utc(new Date()).valueOf() > 0)) {
-        navigation.navigate('Home');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' }],
-        });
+        navigation.replace('Home');
       } else {
-        navigation.navigate('Login');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
+        navigation.replace('Login');
       }
       SplashScreen.hide();
     };

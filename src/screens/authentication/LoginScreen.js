@@ -60,15 +60,11 @@ export default ({ navigation }) => {
               Helper.storeData('TOKEN', res.access_token);
               Helper.storeData('USERNAME', res.userName);
               Helper.storeData('EXPIRES', res['.expires']);
-              navigation.navigate('Home');
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Home' }],
-              });
+              navigation.replace('Home');
             }
           })
-          .catch(error => {
-            MessageAlert('ERROR', error.toString());
+          .catch(() => {
+            MessageAlert('ERROR', 'Please check that you are using the company network!');
             setLoading(false);
           });
       }

@@ -9,6 +9,8 @@ import MessageAlert from '../../components/MessageAlert';
 
 export default ({ route, navigation }) => {
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [isScanned, setIsScanned] = useState(false);
   const { projectCode, teamLeader, code } = route.params;
 
@@ -22,9 +24,9 @@ export default ({ route, navigation }) => {
   const getFacilityCode = async (drawingNo, sheet, rev) => {
     setIsScanned(true);
     let token = await Helper.getData('TOKEN');
-    NetInfo.fetch().then( state => {
+    NetInfo.fetch().then(state => {
       if (!state.isConnected) {
-        showComfirm('WARNING', 'Network not available!');
+        MessageAlert('WARNING', 'Network not available!');
       } else {
         GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
           .then(res => {
@@ -39,16 +41,18 @@ export default ({ route, navigation }) => {
                 teamLeader: teamLeader,
               });
               setIsScanned(false);
-            } else {
+            } else if (res.data == null) {
               let message = 'Not find FacilityCode with: \n'
                 + 'projectCode: ' + projectCode + '\n'
                 + 'drawingNo: ' + drawingNo + '\n'
                 + 'sheet: ' + sheet + '\n'
                 + 'rev: ' + rev;
-                showComfirm('ERROR', message);
+              showComfirm('ERROR', message);
+            } else {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
             }
-          }).catch(error => {
-            showComfirm('ERROR', error);
+          }).catch(() => {
+            showComfirm('ERROR', 'Please check that you are using the company network!');
           });
       }
     });
