@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
@@ -19,13 +20,14 @@ export default ({ route, navigation }) => {
   const [isSearch, setIsSearch] = useState(false);
   const { projectCode } = route.params;
 
+  const [isSearching, setIsSearching] = useState(false);
   const [drawingList, setDrawingList] = useState([]);
   const [drawingNo, setDrawingNo] = useState('');
+  const [oldDrawingNo, setOldDrawingNo] = useState('');
 
   const [isVisible, setIsVisible] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
   const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
-  const [newFacilityCode, setNewFacilityCode] = useState(FACILITY_CODE_DEFAULT);
 
   useEffect(
     () => {
@@ -77,18 +79,24 @@ export default ({ route, navigation }) => {
   const _onChangeDrawingNo = (no) => {
     setDrawingNo(no);
     if (no === '') {
-      callAPI(searchDrawing(facilityCode, drawingNo), false);
+      callAPI(() => { searchDrawing(facilityCode, '') }, false);
     }
   };
 
   const _onChangeFacilityCode = (code) => {
-    setNewFacilityCode(code);
+    if (code !== facilityCode) {
+      setFacilityCode(code);
+      callAPI(() => { searchDrawing(code, drawingNo) }, false);
+    }
+    setIsVisible(false);
   };
 
   const searchDrawing = async (facilityCode, drawingNo) => {
     if (isSearch === false) {
       setIsSearch(true);
     }
+    setIsSearching(true);
+    setOldDrawingNo(drawingNo);
     let token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo != null ? drawingNo : '';
@@ -100,40 +108,35 @@ export default ({ route, navigation }) => {
           setDrawingList(array);
           setIsLoading(false);
           setIsError(false);
+          setIsSearching(false);
         } else {
           setIsLoading(false);
           setIsError(true);
+          setIsSearching(false);
         }
       }).catch(() => {
         setIsLoading(false);
         setIsError(true);
+        setIsSearching(false);
       });
   };
 
   const _onPressSearchDrawing = () => {
-    Keyboard.dismiss();
-    callAPI(searchDrawing(facilityCode, drawingNo), false);
-  };
-
-  const _onPressFilterDrawing = () => {
-    if (facilityCode !== newFacilityCode) {
-      setFacilityCode(newFacilityCode);
-      callAPI(searchDrawing(newFacilityCode, drawingNo), false);
+    if (oldDrawingNo !== drawingNo) {
+      Keyboard.dismiss();
+      callAPI(() => { searchDrawing(facilityCode, drawingNo) }, false);
     }
-    setIsVisible(false);
   };
 
   const _onPressClearModel = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      setNewFacilityCode(FACILITY_CODE_DEFAULT);
-      searchDrawing('', drawingNo);
+      callAPI(() => { searchDrawing('', drawingNo) }, false);
     }
     setIsVisible(false);
   };
 
   const _onPressCancelModel = () => {
-    setNewFacilityCode(facilityCode);
     setIsVisible(false);
   };
 
@@ -255,13 +258,27 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const ListEmptyData = () => (
+    <View style={styles.noDataContainer}>
+      <Text style={styles.noDataTitle}>No have any data with </Text>
+      <Text style={styles.noDataTitle}>ProjectCode <Text style={styles.noDataText}>{projectCode}</Text></Text>
+    </View>
+  );
+
   /**
    * Drawing List
    **/
-  const ListEmptyData = () => (
+  const ListSearchData = () => (
     <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any data</Text>
-      {!isSearch ? <Text style={styles.noDataTitle}>ProjectCode: <Text style={styles.noDataText}>{projectCode}</Text></Text> : null}
+      <ActivityIndicator size='large' color={BASE_COLOR} />
+    </View>
+  );
+
+  const ListEmptySearchData = () => (
+    <View style={styles.noDataContainer}>
+      <Text style={styles.noDataTitle}>No have result with </Text>
+      {drawingNo ? <Text style={styles.noDataTitle}>DrawingNo: <Text style={styles.noDataText}>{drawingNo}</Text></Text> : null}
+      {facilityCode && facilityCode != FACILITY_CODE_DEFAULT ? <Text style={styles.noDataTitle}>FacilityCode: <Text style={styles.noDataText}>{facilityCode}</Text></Text> : null}
     </View>
   );
 
@@ -318,13 +335,19 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.rowInfo}>
                 <Text style={styles.infoTitle}>DrawingNo:</Text>
-                <TextInput
-                  style={styles.searchInput}
-                  value={drawingNo}
-                  onChangeText={_onChangeDrawingNo}
-                  onSubmitEditing={_onPressSearchDrawing}
-                  underlineColorAndroid='transparent'
-                />
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={styles.inputText}
+                    value={drawingNo}
+                    onChangeText={_onChangeDrawingNo}
+                    onSubmitEditing={_onPressSearchDrawing}
+                    underlineColorAndroid='transparent'
+                  />
+                  {drawingNo == ''
+                    ? null
+                    : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                  }
+                </View>
               </View>
               <View style={styles.rowInfo}>
                 {
@@ -334,26 +357,35 @@ export default ({ route, navigation }) => {
                     :
                     <Text style={styles.infoTitle} />
                 }
-                <TouchableOpacity style={styles.searchButton} onPress={_onPressSearchDrawing}>
+                <TouchableOpacity
+                  style={styles.searchButton}
+                  onPress={_onPressSearchDrawing}
+                  disabled={isSearching}>
                   <Text style={styles.buttonTitle}>Search Drawing</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            {drawingList.length
-              ?
-              <VirtualizedList
-                style={styles.table}
-                data={drawingList}
-                getItemCount={(data) => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(index) => {
-                  return index;
-                }}
-                renderItem={renderItem}
-              />
-              : <ListEmptyData />
+            {
+              isSearching
+                ?
+                <ListSearchData />
+                :
+                (drawingList.length
+                  ?
+                  <VirtualizedList
+                    style={styles.table}
+                    data={drawingList}
+                    getItemCount={(data) => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(index) => {
+                      return index;
+                    }}
+                    renderItem={renderItem}
+                  />
+                  : <ListEmptySearchData />
+                )
             }
             <View style={styles.scanContainer}>
               <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQRCodeFitUp}>
@@ -375,7 +407,7 @@ export default ({ route, navigation }) => {
             <View style={modals.container}>
               <View style={modals.list}>
                 <View style={modals.title}>
-                  <Text style={modals.text}>Choose Facility Code: <Text style={modals.code}>{newFacilityCode}</Text></Text>
+                  <Text style={modals.text}>Current Facility Code: <Text style={modals.code}>{facilityCode}</Text></Text>
                 </View>
                 <View style={modals.row}>
                   <Text style={modals.cellHeader}>CODE</Text>
@@ -395,9 +427,6 @@ export default ({ route, navigation }) => {
                 </ScrollView>
               </View>
               <View style={modals.action}>
-                <TouchableOpacity style={modals.button} onPress={_onPressFilterDrawing}>
-                  <Text style={styles.buttonTitle}>Filter</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={modals.button} onPress={_onPressClearModel}>
                   <Text style={styles.buttonTitle}>Clear</Text>
                 </TouchableOpacity>
@@ -457,13 +486,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 2,
   },
-  searchInput: {
+  inputContainer: {
+    flexDirection: 'row',
     flex: 7,
     borderColor: BASE_COLOR,
     borderWidth: 1,
     height: '100%',
     padding: 4,
     borderRadius: 2,
+    alignItems: 'center',
+  },
+  inputText: {
+    flex: 1,
+    height: '100%',
+    color: BASE_COLOR,
+  },
+  inputIcon: {
+    marginLeft: 4,
+    fontSize: 20,
+    color: BASE_COLOR,
   },
   searchButton: {
     flex: 7,
@@ -528,6 +569,7 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   noDataTitle: {
+    paddingTop: 4,
     fontSize: 16,
   },
   noDataText: {
