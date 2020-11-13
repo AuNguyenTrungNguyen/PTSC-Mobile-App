@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -20,7 +20,7 @@ export default ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [detailDrawingList, setDetailDrawingList] = useState([]);
+  const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
 
   const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
@@ -68,17 +68,17 @@ export default ({ route, navigation }) => {
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, drawingNo, updateDrawingList, token)
+    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, updateDrawingList, token)
       .then(res => {
         if (res.success) {
-          Toast.show(res.Message, Toast.SHORT, ['RCTModalHostViewController']);
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setUpdateDrawingList([]);
         } else {
-          MessageAlert('ERROR', 'Please check that you are using the company network!');
+          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
         callAPI(getDrawingDetail);
       }).catch(() => {
-        MessageAlert('ERROR', 'Please check that you are using the company network!');
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);
       });
   };
@@ -97,6 +97,7 @@ export default ({ route, navigation }) => {
       'DrawingImage',
       {
         projectCode: projectCode,
+        facilityCode: facilityCode,
         drawingNo: drawingNo,
         code: code
       }
@@ -202,6 +203,12 @@ export default ({ route, navigation }) => {
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data</Text>
+    </View>
+  );
+
+  const ListLoadingData = () => (
+    <View style={styles.noDataContainer}>
+      <ActivityIndicator size='large' color={BASE_COLOR} />
     </View>
   );
 
@@ -330,22 +337,27 @@ export default ({ route, navigation }) => {
               </View>
             </View>
           </View>
-          {detailDrawingList.length
-            ?
-            <VirtualizedList
-              style={styles.table}
-              data={detailDrawingList}
-              getItemCount={(data) => data.length}
-              getItem={(data, index) => {
-                return data[index];
-              }}
-              keyExtractor={(index) => {
-                return index;
-              }}
-              renderItem={renderItem}
-            />
-            :
-            <ListEmptyData />
+          {
+            detailDrawingList == null
+              ?
+              <ListLoadingData />
+              :
+              (detailDrawingList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={detailDrawingList}
+                  getItemCount={(data) => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(index) => {
+                    return index;
+                  }}
+                  renderItem={renderItem}
+                />
+                :
+                <ListEmptyData />)
           }
           <View style={styles.actionContainer}>
             <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>

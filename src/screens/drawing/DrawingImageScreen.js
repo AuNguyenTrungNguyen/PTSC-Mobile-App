@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Image, Dimensions, Alert, Modal } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Image, Dimensions, Alert, Modal, ActivityIndicator } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageResizer from 'react-native-image-resizer';
@@ -16,6 +16,7 @@ export default ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [drawingImageList, setDrawingImageList] = useState([]);
   const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
@@ -93,10 +94,10 @@ export default ({ route }) => {
         imagesUpload.push({ uri: image.path });
       });
       setDrawingImageListUpload(imagesUpload);
-      setIsUploading(true);
+      setIsSelecting(true);
     }).catch(() => {
       setIsLoading(false);
-      setIsUploading(false);
+      setIsSelecting(false);
     });
   };
 
@@ -109,10 +110,10 @@ export default ({ route }) => {
         let imagesUpload = [];
         imagesUpload.push({ uri: image.path });
         setDrawingImageListUpload(imagesUpload);
-        setIsUploading(true);
+        setIsSelecting(true);
       }).catch(() => {
         setIsLoading(false);
-        setIsUploading(false);
+        setIsSelecting(false);
       });
   };
 
@@ -132,7 +133,7 @@ export default ({ route }) => {
   };
 
   const _onPressUploadImage = async () => {
-
+    setIsUploading(true);
     let token = await Helper.getData('TOKEN');
     let username = await Helper.getData('USERNAME');
     let dataCode = await Helper.getData('DATACODE');
@@ -164,17 +165,22 @@ export default ({ route }) => {
               setDrawingImageListUpload([]);
               setIsLoading(false);
               setIsLoading(false);
+              setIsSelecting(false);
               setIsUploading(false);
               Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
               callAPI(getDrawingImage);
             } else {
+              Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
               setIsLoading(false);
               setIsError(true);
+              setIsUploading(false);
             }
           })
           .catch(() => {
+            Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
             setIsLoading(false);
             setIsError(true);
+            setIsUploading(false);
           });
       });
   };
@@ -244,7 +250,7 @@ export default ({ route }) => {
           </View>
         </View>
       }
-      <Modal visible={isUploading} animationType='slide'>
+      <Modal visible={isSelecting} animationType='slide'>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.container}>
             <View style={styles.safeArea}>
@@ -262,10 +268,16 @@ export default ({ route }) => {
               />
             </View>
             <View style={styles.actionContainer}>
-              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressUploadImage}>
-                <Text style={styles.buttonTitle}>Upload Pictures</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={() => { setIsLoading(false), setIsUploading(false) }}>
+              {isUploading
+                ?
+                <TouchableOpacity style={styles.buttonLeft}>
+                  <ActivityIndicator size="small" color={OPP_COLOR} />
+                </TouchableOpacity>
+                :
+                <TouchableOpacity style={styles.buttonLeft} onPress={_onPressUploadImage}>
+                  <Text style={styles.buttonTitle}>Upload Pictures</Text>
+                </TouchableOpacity>}
+              <TouchableOpacity style={styles.buttonRight} onPress={() => { setIsLoading(false), setIsSelecting(false) }}>
                 <Text style={styles.buttonTitle}>Cancel</Text>
               </TouchableOpacity>
             </View>

@@ -26,7 +26,7 @@ export default ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
-        MessageAlert('WARNING', 'Network not available!');
+        showComfirm('ERROR', 'Network not available!');
       } else {
         GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
           .then(res => {
