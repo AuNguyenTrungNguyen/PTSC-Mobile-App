@@ -1,18 +1,78 @@
-import React from 'react';
-import { StyleSheet, SafeAreaView, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import NetInfo from '@react-native-community/netinfo';
+
+import Helper from '../../utils/Helper';
+import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetFacilityCodeByDrawingAPI';
+import MessageAlert from '../../components/MessageAlert';
 
 export default ({ route, navigation }) => {
 
-  const { code } = route.params;
+  const [isScanned, setIsScanned] = useState(false);
+  const { projectCode, teamLeader, code } = route.params;
 
-  const _onQRCodeRead = (scanResult) => {
-    if (scanResult.data !== null) {
-      navigation.navigate('DrawingDetail', {
-        drawingNo: scanResult.data,
-        code: code,
-      });
+  const _onQRCodeRead = scanResult => {
+    if (scanResult.data !== null && !isScanned) {
+      var data = scanResult.data.split('_');
+      getFacilityCode(data[0], data[1], data[2]);
     }
+  };
+
+  const getFacilityCode = async (drawingNo, sheet, rev) => {
+    setIsScanned(true);
+    let token = await Helper.getData('TOKEN');
+    NetInfo.fetch().then( state => {
+      if (!state.isConnected) {
+        showComfirm('WARNING', 'Network not available!');
+      } else {
+        GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+          .then(res => {
+            if (res.success && res.data != null) {
+              navigation.navigate('DrawingDetail', {
+                projectCode: projectCode,
+                facilityCode: res.data,
+                drawingNo: drawingNo,
+                sheet: sheet,
+                rev: rev,
+                code: code,
+                teamLeader: teamLeader,
+              });
+              setIsScanned(false);
+            } else {
+              let message = 'Not find FacilityCode with: \n'
+                + 'projectCode: ' + projectCode + '\n'
+                + 'drawingNo: ' + drawingNo + '\n'
+                + 'sheet: ' + sheet + '\n'
+                + 'rev: ' + rev;
+                showComfirm('ERROR', message);
+            }
+          }).catch(error => {
+            showComfirm('ERROR', error);
+          });
+      }
+    });
+  };
+
+  const showComfirm = (type, message) => {
+    Alert.alert(
+      type,
+      message,
+      [
+        {
+          text: 'Back',
+          onPress: () => {
+            navigation.goBack();
+          },
+          style: 'cancel'
+        },
+        {
+          text: 'Rescan',
+          onPress: () => { setIsScanned(false) }
+        }
+      ],
+      { cancelable: false },
+    );
   };
 
   return (

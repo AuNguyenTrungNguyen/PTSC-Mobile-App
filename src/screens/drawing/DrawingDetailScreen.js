@@ -23,7 +23,7 @@ export default ({ route, navigation }) => {
   const [detailDrawingList, setDetailDrawingList] = useState([]);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code } = route.params;
+  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
 
   useEffect(
     () => {
@@ -68,7 +68,7 @@ export default ({ route, navigation }) => {
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, updateDrawingList, token)
+    UpdateDrawingDetailAPI(projectCode, drawingNo, updateDrawingList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message, Toast.SHORT, ['RCTModalHostViewController']);
@@ -97,7 +97,6 @@ export default ({ route, navigation }) => {
       'DrawingImage',
       {
         projectCode: projectCode,
-        facilityCode: facilityCode,
         drawingNo: drawingNo,
         code: code
       }
@@ -160,7 +159,7 @@ export default ({ route, navigation }) => {
     let value = inputDisplay.replace(/,/g, '.');
     setInputDisplay(value);
     if (!checkFormatNumber(value)) {
-      Toast.show('Please enter '+ keyUpdate + ' must be a number.', Toast.SHORT);
+      Toast.show('Please enter ' + keyUpdate + ' must be a number.', Toast.SHORT);
       return;
     }
     value = parseFloat(value);
@@ -297,67 +296,65 @@ export default ({ route, navigation }) => {
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>ProjectCode:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{projectCode}</Text>
+                <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>Facility:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{facilityCode}</Text>
+                <Text style={styles.infoData}>{facilityCode.toUpperCase()}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>DrawingNo:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{drawingNo}</Text>
+                <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>Sheet:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{sheet}</Text>
+                <Text style={styles.infoData}>{sheet.toUpperCase()}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>Rev:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{rev}</Text>
+                <Text style={styles.infoData}>{rev.toUpperCase()}</Text>
               </View>
             </View>
-            {/* <View style={styles.rowInfo}>
+            <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>TeamLeader:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{teamLeader}</Text>
+                <Text style={styles.infoData}>{teamLeader.toUpperCase()}</Text>
               </View>
-            </View> */}
+            </View>
           </View>
           {detailDrawingList.length
             ?
-            <>
-              <VirtualizedList
-                style={styles.table}
-                data={detailDrawingList}
-                getItemCount={(data) => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(index) => {
-                  return index;
-                }}
-                renderItem={renderItem}
-              />
-              <View style={styles.actionContainer}>
-                <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
-                  <Text style={styles.buttonTitle}>Manage Picture</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-                  <Text style={styles.buttonTitle}>Submit to Server</Text>
-                </TouchableOpacity>
-              </View>
-            </>
+            <VirtualizedList
+              style={styles.table}
+              data={detailDrawingList}
+              getItemCount={(data) => data.length}
+              getItem={(data, index) => {
+                return data[index];
+              }}
+              keyExtractor={(index) => {
+                return index;
+              }}
+              renderItem={renderItem}
+            />
             :
             <ListEmptyData />
           }
+          <View style={styles.actionContainer}>
+            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
+              <Text style={styles.buttonTitle}>Manage Picture</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+              <Text style={styles.buttonTitle}>Submit to Server</Text>
+            </TouchableOpacity>
+          </View>
           <DateTimePickerModal
             isVisible={showPicker}
             headerTextIOS={'Update ' + keyUpdate + ':'}

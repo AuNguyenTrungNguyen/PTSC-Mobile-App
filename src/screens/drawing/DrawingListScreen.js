@@ -6,6 +6,7 @@ import Toast from 'react-native-simple-toast';
 import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
 import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
+import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetFacilityCodeByDrawingAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
@@ -134,44 +135,106 @@ export default ({ route, navigation }) => {
     }
   };
 
-  const _onPressViewFitUp = (facilityCode, drawingNo, sheet, rev) => {
+  const _onPressViewFitUp = async (drawingNo, sheet, rev) => {
     Keyboard.dismiss();
+    let teamLeader = await Helper.getData('USERNAME');
+    let code = 'FitUp';
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      navigation.navigate(
+        'DrawingDetail',
+        {
+          projectCode: projectCode,
+          facilityCode: facilityCode,
+          drawingNo: drawingNo,
+          sheet: sheet,
+          rev: rev,
+          code: code,
+          teamLeader: teamLeader,
+        }
+      );
+    } else {
+      let token = await Helper.getData('TOKEN');
+      GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+        .then(res => {
+          if (res.success) {
+            navigation.navigate('DrawingDetail', {
+              projectCode: projectCode,
+              facilityCode: res.data,
+              drawingNo: drawingNo,
+              sheet: sheet,
+              rev: rev,
+              code: code,
+              teamLeader: teamLeader,
+            });
+          }
+        }).catch(error => {
+          MessageAlert('ERROR', error);
+        });
+    }
+  };
+
+  const _onPressViewWeld = async (drawingNo, sheet, rev) => {
+    Keyboard.dismiss();
+    let teamLeader = await Helper.getData('USERNAME');
+    let code = 'Weld';
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      navigation.navigate(
+        'DrawingDetail',
+        {
+          projectCode: projectCode,
+          facilityCode: facilityCode,
+          drawingNo: drawingNo,
+          sheet: sheet,
+          rev: rev,
+          code: code,
+          teamLeader: teamLeader,
+        }
+      );
+    } else {
+      let token = await Helper.getData('TOKEN');
+      GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+        .then(res => {
+          if (res.success) {
+            navigation.navigate('DrawingDetail', {
+              projectCode: projectCode,
+              facilityCode: res.data,
+              drawingNo: drawingNo,
+              sheet: sheet,
+              rev: rev,
+              code: code,
+              teamLeader: teamLeader,
+            });
+          }
+        }).catch(error => {
+          MessageAlert('ERROR', error);
+        });
+    }
+  };
+
+  const _onPressQRCodeFitUp = async () => {
+    Keyboard.dismiss();
+    let teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
-      'DrawingDetail',
+      'Camera',
       {
+        code: 'FitUp',
         projectCode: projectCode,
-        facilityCode: facilityCode,
-        drawingNo: drawingNo,
-        sheet: sheet,
-        rev: rev,
-        code: 'FitUp'
+        teamLeader: teamLeader,
       }
     );
   };
 
-  const _onPressViewWeld = (facilityCode, drawingNo, sheet, rev) => {
+  const _onPressQRCodeWeld = async () => {
     Keyboard.dismiss();
+    let teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
-      'DrawingDetail',
+      'Camera',
       {
+        code: 'Weld',
         projectCode: projectCode,
-        facilityCode: facilityCode,
-        drawingNo: drawingNo,
-        sheet: sheet,
-        rev: rev,
-        code: 'Weld'
+        teamLeader: teamLeader,
       }
     );
-  };
-
-  const _onPressQRCodeFitUp = () => {
-    Keyboard.dismiss();
-    navigation.navigate('Camera', { code: 'FitUp' });
-  };
-
-  const _onPressQRCodeWeld = () => {
-    Keyboard.dismiss();
-    navigation.navigate('Camera', { code: 'Weld' });
   };
 
   /**
@@ -200,10 +263,10 @@ export default ({ route, navigation }) => {
           <Text style={styles.cellData}>{item.Rev}</Text>
         </View>
         <View style={styles.rowAction}>
-          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.FacilityCode, item.DrawingNo, item.Sheet, item.Rev) }}>
+          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.DrawingNo, item.Sheet, item.Rev) }}>
             <Text style={styles.textAction}>View Fit-Up</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewWeld(item.FacilityCode, item.DrawingNo, item.Sheet, item.Rev) }}>
+          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewWeld(item.DrawingNo, item.Sheet, item.Rev) }}>
             <Text style={styles.textAction}>View Weld</Text>
           </TouchableOpacity>
         </View>
