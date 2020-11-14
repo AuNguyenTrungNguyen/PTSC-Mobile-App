@@ -217,7 +217,7 @@ export default ({ route }) => {
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>DrawingNo:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{drawingNo}</Text>
+                <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
