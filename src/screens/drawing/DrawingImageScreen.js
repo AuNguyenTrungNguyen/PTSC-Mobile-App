@@ -5,6 +5,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNFetchBlob from 'rn-fetch-blob';
 import Toast from 'react-native-simple-toast';
+import FastImage from 'react-native-fast-image';
 
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
@@ -119,7 +120,7 @@ export default ({ route }) => {
 
   const addFilesToBody = () => {
     const promises = drawingImageListUpload.map(async (image) => {
-      return await ImageResizer.createResizedImage(image.uri, 800, 600, 'PNG', 0)
+      return await ImageResizer.createResizedImage(image.uri, 900, 450, 'PNG', 0)
         .then(res => {
           let file = {
             name: 'file',
@@ -193,12 +194,15 @@ export default ({ route }) => {
 
   const renderItem = ({ item }) => {
     return (
-      <Image
-        style={styles.imageItem}
-        source={{
-          uri: item.uri,
-        }}
-      />
+      <View style={styles.imageContainer}>
+        <FastImage
+          style={styles.imageItem}
+          source={{
+            uri: item.uri,
+            priority: FastImage.priority.normal,
+          }}
+        />
+      </View>
     );
   };
 
@@ -271,7 +275,7 @@ export default ({ route }) => {
               {isUploading
                 ?
                 <TouchableOpacity style={styles.buttonLeft}>
-                  <ActivityIndicator size="small" color={OPP_COLOR} />
+                  <ActivityIndicator size='small' color={OPP_COLOR} />
                 </TouchableOpacity>
                 :
                 <TouchableOpacity style={styles.buttonLeft} onPress={_onPressUploadImage}>
@@ -329,16 +333,21 @@ const styles = StyleSheet.create({
 
   table: {
     flexGrow: 0,
-    borderColor: BASE_COLOR,
-    borderWidth: 2,
     backgroundColor: OPP_COLOR,
   },
-  imageItem: {
-    width: SCREEN_WIDTH - 36,
-    height: (SCREEN_WIDTH - 36) * 0.75,
-    margin: 4,
+  imageContainer: {
+    width: SCREEN_WIDTH - 28,
+    height: (SCREEN_WIDTH - 28) * 9 / 16,
+    marginBottom: 8,
+    padding: 1,
     borderColor: BASE_COLOR,
-    borderWidth: 2,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageItem: {
+    width: '100%',
+    height: '100%',
   },
 
   noDataContainer: {

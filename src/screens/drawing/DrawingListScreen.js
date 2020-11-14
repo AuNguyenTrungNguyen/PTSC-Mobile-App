@@ -500,6 +500,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     color: BASE_COLOR,
+    paddingVertical: 0,
   },
   inputIcon: {
     marginLeft: 4,
