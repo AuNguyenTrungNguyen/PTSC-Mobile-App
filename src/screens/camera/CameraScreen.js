@@ -40,10 +40,10 @@ export default ({ route, navigation }) => {
               setIsScanned(false);
             } else if (res.data == null) {
               let message = 'Not find FacilityCode with: \n'
-                + 'projectCode: ' + projectCode + '\n'
-                + 'drawingNo: ' + drawingNo + '\n'
-                + 'sheet: ' + sheet + '\n'
-                + 'rev: ' + rev;
+                + 'ProjectCode: ' + projectCode + '\n'
+                + 'DrawingNo: ' + drawingNo + '\n'
+                + 'Sheet: ' + sheet + '\n'
+                + 'Rev: ' + rev;
               showComfirm('ERROR', message);
             } else {
               showComfirm('ERROR', 'Please check that you are using the company network!');
