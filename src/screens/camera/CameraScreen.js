@@ -5,12 +5,9 @@ import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../utils/Helper';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetFacilityCodeByDrawingAPI';
-import MessageAlert from '../../components/MessageAlert';
 
 export default ({ route, navigation }) => {
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [isScanned, setIsScanned] = useState(false);
   const { projectCode, teamLeader, code } = route.params;
 
