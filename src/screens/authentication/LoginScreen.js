@@ -5,9 +5,8 @@ import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import Helper from '../../utils/Helper';
-import LoginAPI from '../../apis/LoginAPI';
 import MessageAlert from '../../components/MessageAlert';
-
+import LoginAPI from '../../apis/LoginAPI';
 export default ({ navigation }) => {
 
   const [username, setUsername] = useState('');
@@ -51,6 +50,7 @@ export default ({ navigation }) => {
         }
         LoginAPI(username, password)
           .then(res => {
+            res = JSON.parse(res.data);
             if (res.error) {
               MessageAlert('ERROR', res.error_description);
               setLoading(false);

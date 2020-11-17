@@ -38,9 +38,9 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is used for images application</string>
+	<string>Camera is used for pictures application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Library is used for images application</string>
+	<string>Library is used for pictures application</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

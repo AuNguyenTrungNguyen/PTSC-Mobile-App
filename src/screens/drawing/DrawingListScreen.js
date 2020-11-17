@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
 import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
-import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetFacilityCodeByDrawingAPI';
+import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 

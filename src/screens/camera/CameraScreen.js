@@ -4,7 +4,7 @@ import { RNCamera } from 'react-native-camera';
 import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../utils/Helper';
-import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetFacilityCodeByDrawingAPI';
+import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
 
 export default ({ route, navigation }) => {
 

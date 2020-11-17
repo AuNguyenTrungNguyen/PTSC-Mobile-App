@@ -13,10 +13,10 @@ const LoadingRefresh = ({ isLoading, isError, _onPressRefresh }) => {
       </View>
       : isError
         ?
-        <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-          <Text style={{ fontSize: 16, color: BASE_COLOR }}>An error occured while executing your request.</Text>
-          <Text style={{ fontSize: 16, marginTop: 16, color: BASE_COLOR }}>Please check that you are using the company network!</Text>
-          <Text style={{ fontSize: 16, marginTop: 16, color: BASE_COLOR }}>Press to refresh!</Text>
+        <View style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', padding: 12 }}>
+          <Text style={{ color: BASE_COLOR }}>An error occured while executing your request.</Text>
+          <Text style={{ marginTop: 16, color: BASE_COLOR }}>Please check that you are using the company network!</Text>
+          <Text style={{ marginTop: 16, color: BASE_COLOR }}>Press to refresh!</Text>
           <TouchableOpacity
             style={{ marginTop: 16 }}
             onPress={_onPressRefresh}>

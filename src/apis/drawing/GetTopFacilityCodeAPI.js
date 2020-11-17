@@ -1,5 +1,5 @@
 import { Port_Server } from '../../utils/Core';
-const GetFacilityCodeByDrawingAPI = async (projectCode, drawingNo, sheet, rev, token) =>
+const GetTopFacilityCodeAPI = async (projectCode, drawingNo, sheet, rev, token) =>
   fetch(
     Port_Server
     + '/api/Drawing/GetFacilityCodeByDrawing?projectCode=' + projectCode
@@ -12,4 +12,4 @@ const GetFacilityCodeByDrawingAPI = async (projectCode, drawingNo, sheet, rev, t
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-module.exports = GetFacilityCodeByDrawingAPI;
+module.exports = GetTopFacilityCodeAPI;

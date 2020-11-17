@@ -64,8 +64,8 @@ export default ({ route }) => {
 
   const _onPressAddImage = () => {
     Alert.alert(
-      'Add Drawig Picture',
-      'Please select a option',
+      'Add Drawing Picture',
+      'Please select an option',
       [
         {
           text: 'Open Gallery',
