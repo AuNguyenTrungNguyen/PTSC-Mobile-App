@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -25,11 +26,34 @@ export default ({ route, navigation }) => {
 
   const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
 
+  const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
+
   useEffect(
     () => {
       callAPI(getDrawingDetail);
     }, []
   );
+
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
+          <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, isShowDescription]);
+
+  const toggle = () => {
+    setIsShowDescription(prevState => {
+      return {
+        show: !prevState.show,
+        name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
+      }
+    });
+  };
 
   const callAPI = executedAPI => {
     setIsLoading(false);
@@ -187,6 +211,49 @@ export default ({ route, navigation }) => {
     }
   };
 
+  const _onPressDoneNow = (index) => {
+    let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
+    let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
+    let valueDate = new Date();
+    let valuePercent = 100;
+
+    let array = [...detailDrawingList];
+    array[index][keyDate] = valueDate;
+    array[index][keyPercent] = valuePercent;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[index].RowIndex;
+    let weldNo = detailDrawingList[index].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyDate]: valueDate, [keyPercent]: valuePercent });
+    } else {
+      array[objIndex][keyDate] = detailDrawingList[index][keyDate];
+      array[objIndex][keyPercent] = detailDrawingList[index][keyPercent];
+    }
+    setUpdateDrawingList(array);
+  };
+
+  const _onPressChangePercent = (value, index, key) => {
+    if (detailDrawingList[index][key] !== value) {
+      let array = [...detailDrawingList];
+      array[index][key] = value;
+      setDetailDrawingList(array);
+
+      array = [...updateDrawingList];
+      let rowIndex = detailDrawingList[index].RowIndex;
+      let weldNo = detailDrawingList[index].WeldNo;
+      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+      if (objIndex < 0) {
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [key]: value });
+      } else {
+        array[objIndex][key] = detailDrawingList[index][key];
+      }
+      setUpdateDrawingList(array);
+    }
+  };
+
   const checkFormatNumber = input => {
     const regexNumber = /^\d+(\.\d+)?$/;
     return regexNumber.test(input) && input !== '';
@@ -217,17 +284,20 @@ export default ({ route, navigation }) => {
       <View style={styles.box}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
-            <Text>WeldNo:</Text>
-          </View>
-          <View style={styles.cellDataLine}>
+            <Text>WeldNo: </Text>
             <Text style={styles.textData}>{formatEmptyData(item.WeldNo)}</Text>
           </View>
           <View style={styles.cellTitleLine}>
-            <Text>WeldType:</Text>
-          </View>
-          <View style={styles.cellDataLine}>
+            <Text>WeldType: </Text>
             <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
           </View>
+          <>
+            <TouchableOpacity
+              style={styles.itemDone}
+              onPress={() => _onPressDoneNow(index)}>
+              <Text style={styles.textDone}>Done</Text>
+            </TouchableOpacity>
+          </>
         </View>
         {code == 'FitUp'
           ?
@@ -244,10 +314,11 @@ export default ({ route, navigation }) => {
                   <AntDesignIcon style={styles.iconAction} name='calendar' size={20} />
                 </TouchableOpacity>
               </View>
+              <View style={styles.cellPercent} />
             </View>
             <View style={styles.row}>
               <View style={styles.cellTitle}>
-                <Text>FitPercentage:</Text>
+                <Text>FitPercent:</Text>
               </View>
               <View style={styles.cellData}>
                 <TouchableOpacity
@@ -255,6 +326,23 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
                   <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
                   <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.cellPercent}>
+                <TouchableOpacity
+                  style={styles.itemPercent}
+                  onPress={() => _onPressChangePercent(25, index, 'FitPercentage')}>
+                  <Text style={styles.textPercent}>25%</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.itemPercent}
+                  onPress={() => _onPressChangePercent(50, index, 'FitPercentage')}>
+                  <Text style={styles.textPercent}>50%</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.itemPercent}
+                  onPress={() => _onPressChangePercent(75, index, 'FitPercentage')}>
+                  <Text style={styles.textPercent}>75%</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -273,10 +361,11 @@ export default ({ route, navigation }) => {
                   <AntDesignIcon style={styles.iconAction} name='calendar' size={20} />
                 </TouchableOpacity>
               </View>
+              <View style={styles.cellPercent} />
             </View>
             <View style={styles.row}>
               <View style={styles.cellTitle}>
-                <Text>WeldPercentage:</Text>
+                <Text>WeldPercent:</Text>
               </View>
               <View style={styles.cellData}>
                 <TouchableOpacity
@@ -284,6 +373,23 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
                   <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
                   <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.cellPercent}>
+                <TouchableOpacity
+                  style={styles.itemPercent}
+                  onPress={() => _onPressChangePercent(25, index, 'WeldPercentage')}>
+                  <Text style={styles.textPercent}>25%</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.itemPercent}
+                  onPress={() => _onPressChangePercent(50, index, 'WeldPercentage')}>
+                  <Text style={styles.textPercent}>50%</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.itemPercent}
+                  onPress={() => _onPressChangePercent(75, index, 'WeldPercentage')}>
+                  <Text style={styles.textPercent}>75%</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -299,44 +405,50 @@ export default ({ route, navigation }) => {
         <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
         :
         <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>ProjectCode:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Facility:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{facilityCode.toUpperCase()}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>DrawingNo:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Sheet:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{sheet.toUpperCase()}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Rev:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{rev.toUpperCase()}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>TeamLeader:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{teamLeader.toUpperCase()}</Text>
-              </View>
-            </View>
-          </View>
+          {
+            isShowDescription.show
+              ?
+              (<View style={styles.headerContainer}>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>ProjectCode:</Text>
+                  <View style={styles.infoDataLine}>
+                    <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>Facility:</Text>
+                  <View style={styles.infoDataLine}>
+                    <Text style={styles.infoData}>{facilityCode.toUpperCase()}</Text>
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>DrawingNo:</Text>
+                  <View style={styles.infoDataLine}>
+                    <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>Sheet:</Text>
+                  <View style={styles.infoDataLine}>
+                    <Text style={styles.infoData}>{sheet.toUpperCase()}</Text>
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>Rev:</Text>
+                  <View style={styles.infoDataLine}>
+                    <Text style={styles.infoData}>{rev.toUpperCase()}</Text>
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>TeamLeader:</Text>
+                  <View style={styles.infoDataLine}>
+                    <Text style={styles.infoData}>{teamLeader.toUpperCase()}</Text>
+                  </View>
+                </View>
+              </View>)
+              :
+              null
+          }
           {
             detailDrawingList == null
               ?
@@ -455,19 +567,38 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   cellTitleLine: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+  },
+  itemDone: {
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textDone: {
+    color: BASE_COLOR,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+  },
+  cellTitle: {
     flex: 1,
     justifyContent: 'center',
   },
-  cellTitle: {
-    flex: 3,
+  cellData: {
+    flex: 1,
     justifyContent: 'center',
   },
-  cellData: {
-    flex: 7,
-    justifyContent: 'center',
+  cellPercent: {
+    flex: 1.2,
+    justifyContent: 'space-around',
+    flexDirection: 'row',
   },
   textData: {
-    minWidth: 85,
+    minWidth: 80,
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
@@ -479,6 +610,16 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     width: 20,
     height: 20,
+  },
+  itemPercent: {
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    marginLeft: 4,
+  },
+  textPercent: {
+    color: BASE_COLOR,
   },
 
   noDataContainer: {

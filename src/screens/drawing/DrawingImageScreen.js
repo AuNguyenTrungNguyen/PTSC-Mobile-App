@@ -171,14 +171,14 @@ export default ({ route }) => {
               Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
               callAPI(getDrawingImage);
             } else {
-              Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+              Toast.show('Please check that you are using the company network!', Toast.SHORT);
               setIsLoading(false);
               setIsError(true);
               setIsUploading(false);
             }
           })
           .catch(() => {
-            Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+            Toast.show('Please check that you are using the company network!', Toast.SHORT);
             setIsLoading(false);
             setIsError(true);
             setIsUploading(false);
