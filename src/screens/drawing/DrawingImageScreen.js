@@ -10,6 +10,7 @@ import FastImage from 'react-native-fast-image';
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 import GetDrawingImageAPI from '../../apis/drawing/GetDrawingImageAPI';
+import DeleteDrawingImageAPI from '../../apis/drawing/DeleteDrawingImageAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
@@ -22,7 +23,7 @@ export default ({ route }) => {
   const [drawingImageList, setDrawingImageList] = useState([]);
   const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, code } = route.params;
+  const { projectCode, facilityCode, drawingNo, code, teamLeader } = route.params;
 
   useEffect(
     () => {
@@ -186,6 +187,19 @@ export default ({ route }) => {
       });
   };
 
+  const _onPressDeleteImage = async id => {
+    let token = await Helper.getData('TOKEN');
+    DeleteDrawingImageAPI(id, token)
+      .then(res => {
+        Toast.show(res.Message.toString(), Toast.SHORT);
+        if (res.success) {
+          callAPI(getDrawingDetail);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT);
+      });
+  };
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any picture</Text>
@@ -202,6 +216,37 @@ export default ({ route }) => {
             priority: FastImage.priority.normal,
           }}
         />
+      </View>
+    );
+  };
+
+  const renderItemWithDelete = ({ item }) => {
+    return (
+      <View style={styles.imageContainer}>
+        <FastImage
+          style={styles.imageItem}
+          source={{
+            uri: item.uri,
+          }}
+        />
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoName}>{item.username}</Text>
+          {
+            item.username.toLowerCase() == teamLeader.toLowerCase()
+              ?
+              (<TouchableOpacity
+                style={styles.infoDelete}
+                onPress={() => _onPressDeleteImage(item.id)}>
+                <Text style={styles.buttonTitleDark}>Delete</Text>
+              </TouchableOpacity>)
+              :
+              (<TouchableOpacity
+                style={styles.itemDisabled}
+                disabled={true}>
+                <Text style={styles.textDisabled}>Delete</Text>
+              </TouchableOpacity>)
+          }
+        </View>
       </View>
     );
   };
@@ -241,7 +286,7 @@ export default ({ route }) => {
                   keyExtractor={(index) => {
                     return index;
                   }}
-                  renderItem={renderItem}
+                  renderItem={renderItemWithDelete}
                 />
               </View>
               :
@@ -337,9 +382,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: SCREEN_WIDTH - 28,
-    height: (SCREEN_WIDTH - 28) * 9 / 16,
+    height: 'auto',
     marginBottom: 8,
-    padding: 1,
     borderColor: BASE_COLOR,
     borderWidth: 1,
     justifyContent: 'center',
@@ -347,7 +391,38 @@ const styles = StyleSheet.create({
   },
   imageItem: {
     width: '100%',
-    height: '100%',
+    height: (SCREEN_WIDTH - 28) * 9 / 16,
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoName: {
+    flex: 1,
+    textAlign: 'center'
+  },
+  infoDelete: {
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    margin: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemDisabled: {
+    backgroundColor: '#cccccc',
+    borderColor: '#999999',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    margin: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textDisabled: {
+    color: '#666666',
   },
 
   noDataContainer: {
