@@ -37,6 +37,11 @@ export default () => {
         <Stack.Screen
           name='Home'
           component={HomeScreen}
+          options={
+            {
+              title: 'Select Project',
+            }
+          }
         />
         <Stack.Screen
           name='DrawingList'

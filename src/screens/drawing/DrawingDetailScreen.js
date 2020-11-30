@@ -211,6 +211,32 @@ export default ({ route, navigation }) => {
     }
   };
 
+  const _onPressClearNow = (index) => {
+    let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
+    let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
+    let keyClear= code == 'FitUp' ? 1 : 2;
+    let valueDate = null;
+    let valuePercent = null;
+
+    let array = [...detailDrawingList];
+    array[index][keyDate] = valueDate;
+    array[index][keyPercent] = valuePercent;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[index].RowIndex;
+    let weldNo = detailDrawingList[index].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyDate]: valueDate, [keyPercent]: valuePercent, ['Clear']: true });
+    } else {
+      array[objIndex][keyDate] = detailDrawingList[index][keyDate];
+      array[objIndex][keyPercent] = detailDrawingList[index][keyPercent];
+      array[objIndex]['Clear'] = keyClear;
+    }
+    setUpdateDrawingList(array);
+  };
+
   const _onPressDoneNow = (index) => {
     let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
     let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
@@ -218,6 +244,8 @@ export default ({ route, navigation }) => {
     let valuePercent = 100;
 
     let array = [...detailDrawingList];
+    array[index]['DonePress'] = true;
+    array[index]['PrevDate'] = detailDrawingList[index][keyDate];
     array[index][keyDate] = valueDate;
     array[index][keyPercent] = valuePercent;
     setDetailDrawingList(array);
@@ -280,18 +308,39 @@ export default ({ route, navigation }) => {
   );
 
   const renderItem = ({ index, item }) => {
+    let conditionClear = true;
+    let itemDate = code == 'FitUp' ? item['FittingDate'] : item['WeldingDate'];
+    if (!itemDate) {
+      conditionClear = false;
+    } else {
+      conditionClear = Moment(itemDate).format("DD-MMM-YY") == Moment(item['PrevDate']).format("DD-MMM-YY") && item['DonePress'];
+    }
     return (
       <View style={styles.box}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.WeldNo)}</Text>
-          </View>
-          <View style={styles.cellTitleLine}>
-            <Text>WeldType: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
+            <Text style={styles.textMeta}>{formatEmptyData(item.WeldNo)}</Text>
+            <Text> - WeldType: </Text>
+            <Text style={styles.textMeta}>{formatEmptyData(item.WeldType)}</Text>
           </View>
           <>
+            {
+              conditionClear
+                ?
+                (<TouchableOpacity
+                  style={styles.itemDone}
+                  onPress={() => _onPressClearNow(index)}>
+                  <Text style={styles.textDone}>Clear</Text>
+                </TouchableOpacity>)
+                :
+                (<TouchableOpacity
+                  style={styles.itemDisabled}
+                  disabled={true}
+                  onPress={() => _onPressClearNow(index)}>
+                  <Text style={styles.textDisabled}>Clear</Text>
+                </TouchableOpacity>)
+            }
             <TouchableOpacity
               style={styles.itemDone}
               onPress={() => _onPressDoneNow(index)}>
@@ -578,10 +627,25 @@ const styles = StyleSheet.create({
     padding: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 8,
   },
   textDone: {
     color: BASE_COLOR,
     fontWeight: 'bold',
+    fontStyle: 'italic',
+  },
+  itemDisabled: {
+    backgroundColor: '#cccccc',
+    borderColor: '#999999',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  textDisabled: {
+    color: '#666666',
     fontStyle: 'italic',
   },
   cellTitle: {
@@ -596,6 +660,10 @@ const styles = StyleSheet.create({
     flex: 1.2,
     justifyContent: 'space-around',
     flexDirection: 'row',
+  },
+  textMeta: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
   },
   textData: {
     minWidth: 80,

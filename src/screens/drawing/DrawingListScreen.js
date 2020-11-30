@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView, ActivityIndicator, Appearance } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -8,6 +9,7 @@ import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
 import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
+import GetDrawingCompletePercentAPI from '../../apis/drawing/GetDrawingCompletePercentAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
@@ -28,6 +30,27 @@ export default ({ route, navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
   const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
+
+  const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
+
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const toggle = () => {
+    setIsShowDescription(prevState => {
+      return {
+        show: !prevState.show,
+        name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
+      }
+    });
+  };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
+          <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, isShowDescription]);
 
   useEffect(
     () => {
@@ -146,6 +169,24 @@ export default ({ route, navigation }) => {
     } else {
       Toast.show('No have Facility to filter', Toast.SHORT);
     }
+  };
+
+  const _onPressCompletePercent = async (drawingNo, sheet, rev) => {
+    Keyboard.dismiss();
+    let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
+    let token = await Helper.getData('TOKEN');
+    GetDrawingCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
+      .then(res => {
+        if (res.success) {
+          let array = [...drawingList];
+          array[index]['progess'] = res.data;
+          setDrawingList(array);
+        } else {
+          Toast.show('Please check that you are using the company network!', Toast.SHORT);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT);
+      });
   };
 
   const _onPressViewFitUp = async (drawingNo, sheet, rev) => {
@@ -295,15 +336,39 @@ export default ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Rev:</Text>
-          <Text style={styles.cellData}>{item.Rev}</Text>
+          <View style={styles.cellData}>
+            <View style={styles.cellValue}>
+              <Text style={styles.textValue}>{item.Rev}</Text>
+            </View>
+            <View style={styles.cellProgress}>
+              {
+                item.progess
+                  ?
+                  <>
+                    <Text style={styles.cellAction}>{item.progess.FitUp}%</Text>
+                    <Text style={styles.cellAction}>{item.progess.Weld}%</Text>
+                  </>
+                  :
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(item.DrawingNo, item.Sheet, item.Rev) }}>
+                    <Text style={styles.textAction}>Complete Percent</Text>
+                  </TouchableOpacity>
+              }
+            </View>
+          </View>
         </View>
         <View style={styles.rowAction}>
-          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.DrawingNo, item.Sheet, item.Rev) }}>
-            <Text style={styles.textAction}>View Fit-Up</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewWeld(item.DrawingNo, item.Sheet, item.Rev) }}>
-            <Text style={styles.textAction}>View Weld</Text>
-          </TouchableOpacity>
+          <View style={styles.cellTitle} />
+          <View style={styles.cellData}>
+            <View style={styles.cellValue} />
+            <View style={styles.cellProgress}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.DrawingNo, item.Sheet, item.Rev) }}>
+                <Text style={styles.textAction}>View Fit-Up</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewWeld(item.DrawingNo, item.Sheet, item.Rev) }}>
+                <Text style={styles.textAction}>View Weld</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
     );
@@ -322,49 +387,49 @@ export default ({ route, navigation }) => {
           </View>
           :
           <View style={styles.container}>
-            <View style={styles.headerContainer}>
-              <View style={styles.rowInfo}>
-                <Text style={styles.infoTitle}>ProjectCode:</Text>
-                <Text style={styles.infoData}>{projectCode}</Text>
-              </View>
-              <View style={styles.rowInfo}>
-                <Text style={styles.infoTitle}>FacilityCode:</Text>
-                <TouchableOpacity style={styles.selectInput} onPress={_onPressShowModel}>
-                  <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.rowInfo}>
-                <Text style={styles.infoTitle}>DrawingNo:</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.inputText}
-                    value={drawingNo}
-                    onChangeText={_onChangeDrawingNo}
-                    onSubmitEditing={_onPressSearchDrawing}
-                    underlineColorAndroid='transparent'
-                  />
-                  {drawingNo == ''
-                    ? null
-                    : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
-                  }
-                </View>
-              </View>
-              <View style={styles.rowInfo}>
-                {
-                  drawingList.length
-                    ?
-                    <Text style={styles.infoTitle}>{drawingList.length} drawings</Text>
-                    :
+            {
+              isShowDescription.show
+                ?
+                (<View style={styles.headerContainer}>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>ProjectCode:</Text>
+                    <Text style={styles.infoData}>{projectCode}</Text>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>FacilityCode:</Text>
+                    <TouchableOpacity style={styles.selectInput} onPress={_onPressShowModel}>
+                      <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>DrawingNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={drawingNo}
+                        onChangeText={_onChangeDrawingNo}
+                        onSubmitEditing={_onPressSearchDrawing}
+                        underlineColorAndroid='transparent'
+                      />
+                      {drawingNo == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle} />
-                }
-                <TouchableOpacity
-                  style={styles.searchButton}
-                  onPress={_onPressSearchDrawing}
-                  disabled={isSearching}>
-                  <Text style={styles.buttonTitle}>Search Drawing</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+                    <TouchableOpacity
+                      style={styles.searchButton}
+                      onPress={_onPressSearchDrawing}
+                      disabled={isSearching}>
+                      <Text style={styles.buttonTitle}>Search Drawing</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>)
+                :
+                null
+            }
             {
               isSearching
                 ?
@@ -537,6 +602,11 @@ const styles = StyleSheet.create({
     minHeight: 16,
     marginBottom: 4,
   },
+  rowAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   cellTitle: {
     flex: 3,
   },
@@ -544,17 +614,33 @@ const styles = StyleSheet.create({
     flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
-  },
-  rowAction: {
     flexDirection: 'row',
-    justifyContent: 'flex-end'
+  },
+  cellValue: {
+    flex: 1,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    justifyContent: 'center',
+  },
+  textValue: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  cellProgress: {
+    flex: 5,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
   cellAction: {
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 4,
     padding: 4,
-    marginRight: 8,
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textAction: {
     color: BASE_COLOR,

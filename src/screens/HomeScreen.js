@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, FlatList } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -83,10 +82,6 @@ export default ({ navigation }) => {
     navigation.replace('Login');
   };
 
-  const _onChangeProjectCode = (item) => {
-    setProjectCode(item.value);
-  };
-
   const _onPressUpdateDrawing = async () => {
     if (projectCode == null) {
       Toast.show('Please select a project!', Toast.SHORT);
@@ -100,6 +95,23 @@ export default ({ navigation }) => {
     }
   };
 
+  const Item = ({ item, onPress, style }) => (
+    <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
+      <Text>{item.value}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderItem = ({ item }) => {
+    const backgroundColor = item.value === projectCode ? SELECT_COLOR : OPP_COLOR;
+    return (
+      <Item
+        item={item}
+        onPress={() => setProjectCode(item.value)}
+        style={{ backgroundColor }}
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
@@ -107,15 +119,10 @@ export default ({ navigation }) => {
         <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
         :
         <View style={styles.container}>
-          <DropDownPicker
-            items={listProject}
-            onChangeItem={_onChangeProjectCode}
-            defaultValue={null}
-            placeholder='Select Project'
-            containerStyle={styles.selectContainer}
-            style={styles.select}
-            itemStyle={styles.selectItem}
-            activeItemStyle={styles.selectActiveItem}
+          <FlatList
+            data={listProject}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.value}
           />
           <View style={styles.action}>
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
@@ -130,6 +137,7 @@ export default ({ navigation }) => {
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
+const SELECT_COLOR = '#adb6bb';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -139,26 +147,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: OPP_COLOR,
-    justifyContent: 'center',
   },
 
-  selectContainer: {
-    height: 50,
-  },
-  select: {
+  item: {
     borderColor: BASE_COLOR,
-  },
-  selectItem: {
-    justifyContent: 'flex-start',
-    borderBottomColor: '#adb6bb',
-    borderBottomWidth: 1,
-  },
-  selectActiveItem: {
-    backgroundColor: '#adb6bb',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 12,
   },
 
   action: {
-    marginTop: 32,
+    marginTop: 24,
   },
   buttonContainer: {
     height: 48,
