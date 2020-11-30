@@ -193,7 +193,7 @@ export default ({ route }) => {
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
-          callAPI(getDrawingDetail);
+          callAPI(getDrawingImage);
         }
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT);
