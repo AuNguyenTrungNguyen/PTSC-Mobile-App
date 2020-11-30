@@ -214,11 +214,12 @@ export default ({ route, navigation }) => {
   const _onPressClearNow = (index) => {
     let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
     let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
-    let keyClear= code == 'FitUp' ? 1 : 2;
+    let keyClear = code == 'FitUp' ? 1 : 2;
     let valueDate = null;
     let valuePercent = null;
 
     let array = [...detailDrawingList];
+    array[index]['DonePress'] = false;
     array[index][keyDate] = valueDate;
     array[index][keyPercent] = valuePercent;
     setDetailDrawingList(array);
@@ -244,8 +245,10 @@ export default ({ route, navigation }) => {
     let valuePercent = 100;
 
     let array = [...detailDrawingList];
-    array[index]['DonePress'] = true;
-    array[index]['PrevDate'] = detailDrawingList[index][keyDate];
+    if(!array[index]['DonePress']) {
+      array[index]['DonePress'] = true;
+      array[index]['PrevDate'] = detailDrawingList[index][keyDate];
+    }
     array[index][keyDate] = valueDate;
     array[index][keyPercent] = valuePercent;
     setDetailDrawingList(array);
@@ -308,13 +311,8 @@ export default ({ route, navigation }) => {
   );
 
   const renderItem = ({ index, item }) => {
-    let conditionClear = true;
     let itemDate = code == 'FitUp' ? item['FittingDate'] : item['WeldingDate'];
-    if (!itemDate) {
-      conditionClear = false;
-    } else {
-      conditionClear = Moment(itemDate).format("DD-MMM-YY") == Moment(item['PrevDate']).format("DD-MMM-YY") && item['DonePress'];
-    }
+    let conditionClear = item['DonePress'] && (!item['PrevDate'] || Moment(itemDate).format("DD-MMM-YY") == Moment(item['PrevDate']).format("DD-MMM-YY"));
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -336,8 +334,7 @@ export default ({ route, navigation }) => {
                 :
                 (<TouchableOpacity
                   style={styles.itemDisabled}
-                  disabled={true}
-                  onPress={() => _onPressClearNow(index)}>
+                  disabled={true}>
                   <Text style={styles.textDisabled}>Clear</Text>
                 </TouchableOpacity>)
             }
