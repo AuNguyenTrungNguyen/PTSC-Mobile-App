@@ -246,7 +246,7 @@ export default ({ route, navigation }) => {
     let valuePercent = 100;
 
     let array = [...detailDrawingList];
-    if(!array[index]['DonePress']) {
+    if (!array[index]['DonePress']) {
       array[index]['DonePress'] = true;
       array[index]['PrevDate'] = detailDrawingList[index][keyDate];
     }
