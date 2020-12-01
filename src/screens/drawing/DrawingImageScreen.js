@@ -188,17 +188,36 @@ export default ({ route }) => {
   };
 
   const _onPressDeleteImage = async id => {
+    Alert.alert(
+      'Delete Drawing Picture',
+      'Are you sure you want to delete this picture',
+      [
+        {
+          text: 'Delete',
+          onPress: () => { deleteDrawingImage(id) },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const deleteDrawingImage = async id => {
     let token = await Helper.getData('TOKEN');
     DeleteDrawingImageAPI(id, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
-          callAPI(getDrawingImage);
+          let array = drawingImageList.filter(image => image.id !== id);
+          setDrawingImageList(array);
         }
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT);
       });
-  };
+  }
 
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
