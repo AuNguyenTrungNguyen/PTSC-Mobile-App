@@ -6,13 +6,16 @@ import ImageResizer from 'react-native-image-resizer';
 import RNFetchBlob from 'rn-fetch-blob';
 import Toast from 'react-native-simple-toast';
 import FastImage from 'react-native-fast-image';
+import Dialog from 'react-native-dialog';
 
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 import GetDrawingImageAPI from '../../apis/drawing/GetDrawingImageAPI';
 import DeleteDrawingImageAPI from '../../apis/drawing/DeleteDrawingImageAPI';
+import EditDrawingImageAPI from '../../apis/drawing/EditDrawingImageAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
+import { TextInput } from 'react-native-gesture-handler';
 
 export default ({ route }) => {
 
@@ -24,6 +27,10 @@ export default ({ route }) => {
   const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
 
   const { projectCode, facilityCode, drawingNo, code, teamLeader } = route.params;
+
+  const [isShowDialog, setIsShowDialog] = useState(false);
+  const [pictureId, setPictureId] = useState(null);
+  const [pictureNote, setPictureNote] = useState(null);
 
   useEffect(
     () => {
@@ -152,6 +159,9 @@ export default ({ route }) => {
     addFilesToBody()
       .then(res => {
         body = body.concat(res);
+        if (pictureNote) {
+          body = body.concat({ name: 'note', data: pictureNote });
+        }
         RNFetchBlob.fetch(
           'POST',
           Port_Server + '/api/Drawing/UploadDrawingImage',
@@ -169,6 +179,7 @@ export default ({ route }) => {
               setIsLoading(false);
               setIsSelecting(false);
               setIsUploading(false);
+              setPictureNote(null);
               Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
               callAPI(getDrawingImage);
             } else {
@@ -219,6 +230,31 @@ export default ({ route }) => {
       });
   }
 
+  const _onPressEditImage = (id, note) => {
+    setIsShowDialog(true);
+    setPictureId(id);
+    setPictureNote(note);
+  };
+
+  const _onPressUpdateImage = async () => {
+    let token = await Helper.getData('TOKEN');
+    EditDrawingImageAPI(pictureId, pictureNote, token)
+      .then(res => {
+        Toast.show(res.Message.toString(), Toast.SHORT);
+        if (res.success) {
+          let index = drawingImageList.findIndex(image => image.id === pictureId);
+          let array = [...drawingImageList]
+          array[index]['note'] = pictureNote;
+          setDrawingImageList(array);
+          setIsShowDialog(false);
+          setPictureId(null);
+          setPictureNote(null);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT);
+      });
+  }
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any picture</Text>
@@ -239,7 +275,7 @@ export default ({ route }) => {
     );
   };
 
-  const renderItemWithDelete = ({ item }) => {
+  const renderItemWithAction = ({ item }) => {
     return (
       <View style={styles.imageContainer}>
         <FastImage
@@ -249,12 +285,12 @@ export default ({ route }) => {
           }}
         />
         <View style={styles.infoContainer}>
-          <Text style={styles.infoName}>{item.username}</Text>
+          <Text style={styles.infoText}>{item.username}</Text>
           {
             item.username.toLowerCase() == teamLeader.toLowerCase()
               ?
               (<TouchableOpacity
-                style={styles.infoDelete}
+                style={styles.infoAction}
                 onPress={() => _onPressDeleteImage(item.id)}>
                 <Text style={styles.buttonTitleDark}>Delete</Text>
               </TouchableOpacity>)
@@ -263,6 +299,24 @@ export default ({ route }) => {
                 style={styles.itemDisabled}
                 disabled={true}>
                 <Text style={styles.textDisabled}>Delete</Text>
+              </TouchableOpacity>)
+          }
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
+          {
+            item.username.toLowerCase() == teamLeader.toLowerCase()
+              ?
+              (<TouchableOpacity
+                style={styles.infoAction}
+                onPress={() => _onPressEditImage(item.id, item.note)}>
+                <Text style={styles.buttonTitleDark}>Edit</Text>
+              </TouchableOpacity>)
+              :
+              (<TouchableOpacity
+                style={styles.itemDisabled}
+                disabled={true}>
+                <Text style={styles.textDisabled}>Edit</Text>
               </TouchableOpacity>)
           }
         </View>
@@ -305,7 +359,7 @@ export default ({ route }) => {
                   keyExtractor={(index) => {
                     return index;
                   }}
-                  renderItem={renderItemWithDelete}
+                  renderItem={renderItemWithAction}
                 />
               </View>
               :
@@ -334,6 +388,13 @@ export default ({ route }) => {
                 }}
                 renderItem={renderItem}
               />
+              <TextInput
+                style={styles.note}
+                multiline={true}
+                value={pictureNote}
+                placeholder={'Enter note'}
+                onChangeText={(text) => setPictureNote(text)}
+                underlineColorAndroid='transparent' />
             </View>
             <View style={styles.actionContainer}>
               {isUploading
@@ -345,13 +406,32 @@ export default ({ route }) => {
                 <TouchableOpacity style={styles.buttonLeft} onPress={_onPressUploadImage}>
                   <Text style={styles.buttonTitle}>Upload Pictures</Text>
                 </TouchableOpacity>}
-              <TouchableOpacity style={styles.buttonRight} onPress={() => { setIsLoading(false), setIsSelecting(false) }}>
+              <TouchableOpacity style={styles.buttonRight} onPress={() => {
+                setIsLoading(false); 
+                setIsSelecting(false);
+                setPictureNote(null);
+              }}>
                 <Text style={styles.buttonTitle}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
         </SafeAreaView>
       </Modal>
+      <Dialog.Container visible={isShowDialog}>
+        <Dialog.Title>{'Edit Picture Note'}</Dialog.Title>
+        <Dialog.Input
+          value={pictureNote}
+          placeholder={'Enter note to update'}
+          onChangeText={(text) => setPictureNote(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => {
+          setIsShowDialog(false);
+          setPictureId(null);
+          setPictureNote(null);
+        }} />
+        <Dialog.Button label='Update' onPress={_onPressUpdateImage} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };
@@ -399,6 +479,15 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     backgroundColor: OPP_COLOR,
   },
+  note: {
+    borderColor: OPP_COLOR,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    padding: 8,
+    marginTop: 8,
+    height: 100,
+    textAlignVertical: 'top'
+  },
   imageContainer: {
     width: SCREEN_WIDTH - 28,
     height: 'auto',
@@ -417,11 +506,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  infoName: {
+  infoText: {
     flex: 1,
     textAlign: 'center'
   },
-  infoDelete: {
+  infoAction: {
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 4,
@@ -429,6 +518,7 @@ const styles = StyleSheet.create({
     margin: 4,
     justifyContent: 'center',
     alignItems: 'center',
+    width: 60,
   },
   itemDisabled: {
     backgroundColor: '#cccccc',
@@ -439,6 +529,7 @@ const styles = StyleSheet.create({
     margin: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 60,
   },
   textDisabled: {
     color: '#666666',
