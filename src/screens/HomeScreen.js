@@ -50,7 +50,6 @@ export default ({ navigation }) => {
     GetProjectListAPI(username, token)
       .then(res => {
         if (res.success) {
-          Helper.storeData('DATACODE', res.DataCode);
           setListProject(res.data);
           setIsLoading(false);
           setIsError(false);
@@ -106,7 +105,10 @@ export default ({ navigation }) => {
     return (
       <Item
         item={item}
-        onPress={() => setProjectCode(item.value)}
+        onPress={() => {
+          setProjectCode(item.value); 
+          Helper.storeData('DATACODE', item.DataCode);
+        }}
         style={{ backgroundColor }}
       />
     );
