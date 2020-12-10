@@ -94,6 +94,14 @@ export default ({ navigation }) => {
     }
   };
 
+  const _onPressViewHistogram = () => {
+    if (projectCode == null) {
+      Toast.show('Please select a project!', Toast.SHORT);
+      return;
+    }
+    navigation.navigate('HistogramList', { projectCode: projectCode });
+  };
+
   const Item = ({ item, onPress, style }) => (
     <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
       <Text>{item.value}</Text>
@@ -129,6 +137,9 @@ export default ({ navigation }) => {
           <View style={styles.action}>
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
               <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewHistogram}>
+              <Text style={styles.buttonTitle}>View Histogram</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -167,6 +178,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
+  },
+  buttonContainerPadding: {
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    marginTop: 8,
   },
   buttonTitle: {
     color: OPP_COLOR,

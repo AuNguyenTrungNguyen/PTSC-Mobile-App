@@ -11,6 +11,9 @@ import DrawingListScreen from './screens/drawing/DrawingListScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 
+import HistogramListScreen from './screens/histogram/HistogramListScreen';
+import HistogramViewScreen from './screens/histogram/HistogramViewScreen';
+
 const Stack = createStackNavigator();
 export default () => {
 
@@ -79,6 +82,27 @@ export default () => {
           options={
             {
               title: 'Drawing Pictures',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='HistogramList'
+          component={HistogramListScreen}
+          options={
+            {
+              title: 'Histogram List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='HistogramView'
+          component={HistogramViewScreen}
+          options={
+            {
+              title: 'Histogram Chart',
               headerBackTitle: 'Back',
             }
           }
