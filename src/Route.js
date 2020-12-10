@@ -5,14 +5,21 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
+
 import HomeScreen from './screens/HomeScreen';
+import ReportsScreen from './screens/ReportsScreen';
+
 import CameraScreen from './screens/camera/CameraScreen';
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 
+import ConstructionListScreen from './screens/construction/ConstructionListScreen';
+
 import HistogramListScreen from './screens/histogram/HistogramListScreen';
 import HistogramViewScreen from './screens/histogram/HistogramViewScreen';
+
+import DailyManpowerScreen from './screens/manpower/DailyManpowerScreen';
 
 const Stack = createStackNavigator();
 export default () => {
@@ -37,6 +44,7 @@ export default () => {
           component={LoginScreen}
           options={{ headerShown: false }}
         />
+
         <Stack.Screen
           name='Home'
           component={HomeScreen}
@@ -46,6 +54,17 @@ export default () => {
             }
           }
         />
+        <Stack.Screen
+          name='Reports'
+          component={ReportsScreen}
+          options={
+            {
+              title: 'Reports',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
         <Stack.Screen
           name='DrawingList'
           component={DrawingListScreen}
@@ -88,6 +107,17 @@ export default () => {
         />
 
         <Stack.Screen
+          name='ConstructionList'
+          component={ConstructionListScreen}
+          options={
+            {
+              title: 'Construction List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
           name='HistogramList'
           component={HistogramListScreen}
           options={
@@ -103,6 +133,17 @@ export default () => {
           options={
             {
               title: 'Histogram Chart',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='DailyManpower'
+          component={DailyManpowerScreen}
+          options={
+            {
+              title: 'Daily Manpower',
               headerBackTitle: 'Back',
             }
           }

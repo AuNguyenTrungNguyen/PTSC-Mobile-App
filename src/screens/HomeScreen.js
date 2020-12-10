@@ -94,12 +94,12 @@ export default ({ navigation }) => {
     }
   };
 
-  const _onPressViewHistogram = () => {
+  const _onPressViewReports = () => {
     if (projectCode == null) {
       Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
-    navigation.navigate('HistogramList', { projectCode: projectCode });
+    navigation.navigate('Reports', { projectCode: projectCode });
   };
 
   const Item = ({ item, onPress, style }) => (
@@ -114,7 +114,7 @@ export default ({ navigation }) => {
       <Item
         item={item}
         onPress={() => {
-          setProjectCode(item.value); 
+          setProjectCode(item.value);
           Helper.storeData('DATACODE', item.DataCode);
         }}
         style={{ backgroundColor }}
@@ -138,8 +138,8 @@ export default ({ navigation }) => {
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
               <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewHistogram}>
-              <Text style={styles.buttonTitle}>View Histogram</Text>
+            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
+              <Text style={styles.buttonTitle}>View Reports</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -174,13 +174,13 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   buttonContainer: {
-    height: 48,
+    height: 42,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
   },
   buttonContainerPadding: {
-    height: 48,
+    height: 42,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
