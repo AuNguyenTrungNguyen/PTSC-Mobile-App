@@ -92,7 +92,8 @@ export default ({ route, navigation }) => {
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, updateDrawingList, token)
+    let keyUpdate = code == 'FitUp' ? 'FittingTeam' : 'WelderTeam';
+    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, keyUpdate, updateDrawingList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -220,7 +221,6 @@ export default ({ route, navigation }) => {
     let valuePercent = null;
 
     let array = [...detailDrawingList];
-    array[index]['DonePress'] = false;
     array[index][keyDate] = valueDate;
     array[index][keyPercent] = valuePercent;
     setDetailDrawingList(array);
@@ -230,7 +230,7 @@ export default ({ route, navigation }) => {
     let weldNo = detailDrawingList[index].WeldNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyDate]: valueDate, [keyPercent]: valuePercent, ['Clear']: true });
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyDate]: valueDate, [keyPercent]: valuePercent, ['Clear']: keyClear });
     } else {
       array[objIndex][keyDate] = detailDrawingList[index][keyDate];
       array[objIndex][keyPercent] = detailDrawingList[index][keyPercent];
@@ -246,10 +246,6 @@ export default ({ route, navigation }) => {
     let valuePercent = 100;
 
     let array = [...detailDrawingList];
-    if (!array[index]['DonePress']) {
-      array[index]['DonePress'] = true;
-      array[index]['PrevDate'] = detailDrawingList[index][keyDate];
-    }
     array[index][keyDate] = valueDate;
     array[index][keyPercent] = valuePercent;
     setDetailDrawingList(array);
@@ -313,9 +309,13 @@ export default ({ route, navigation }) => {
 
   const renderItem = ({ index, item }) => {
     let itemDate = code == 'FitUp' ? item['FittingDate'] : item['WeldingDate'];
-    let conditionClear = item['DonePress'] && (!item['PrevDate'] || Moment(itemDate).format("DD-MMM-YY") == Moment(item['PrevDate']).format("DD-MMM-YY"));
+    let itemPercent = code == 'FitUp' ? item['FitPercentage'] : item['WeldPercentage'];
+    let compareDate = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
+    let comparePercent = itemPercent != null && itemPercent == 100;
+    let indexItem = updateDrawingList.findIndex((obj => obj.RowIndex == item.RowIndex));
+    let condition = compareDate && comparePercent && indexItem < 0;
     return (
-      <View style={styles.box}>
+      <View style={styles.box} pointerEvents={condition ? 'none' : 'auto'}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
@@ -325,25 +325,35 @@ export default ({ route, navigation }) => {
           </View>
           <>
             {
-              conditionClear
+              condition
                 ?
-                (<TouchableOpacity
-                  style={styles.itemDone}
-                  onPress={() => _onPressClearNow(index)}>
-                  <Text style={styles.textDone}>Clear</Text>
-                </TouchableOpacity>)
-                :
                 (<TouchableOpacity
                   style={styles.itemDisabled}
                   disabled={true}>
                   <Text style={styles.textDisabled}>Clear</Text>
                 </TouchableOpacity>)
+                :
+                (<TouchableOpacity
+                  style={styles.itemDone}
+                  onPress={() => _onPressClearNow(index)}>
+                  <Text style={styles.textDone}>Clear</Text>
+                </TouchableOpacity>)
             }
-            <TouchableOpacity
-              style={styles.itemDone}
-              onPress={() => _onPressDoneNow(index)}>
-              <Text style={styles.textDone}>Done</Text>
-            </TouchableOpacity>
+            {
+              condition
+                ?
+                (<TouchableOpacity
+                  style={styles.itemDisabled}
+                  disabled={true}>
+                  <Text style={styles.textDisabled}>Done</Text>
+                </TouchableOpacity>)
+                :
+                (<TouchableOpacity
+                  style={styles.itemDone}
+                  onPress={() => _onPressDoneNow(index)}>
+                  <Text style={styles.textDone}>Done</Text>
+                </TouchableOpacity>)
+            }
           </>
         </View>
         {code == 'FitUp'
@@ -375,23 +385,39 @@ export default ({ route, navigation }) => {
                   <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
                 </TouchableOpacity>
               </View>
-              <View style={styles.cellPercent}>
-                <TouchableOpacity
-                  style={styles.itemPercent}
-                  onPress={() => _onPressChangePercent(25, index, 'FitPercentage')}>
-                  <Text style={styles.textPercent}>25%</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.itemPercent}
-                  onPress={() => _onPressChangePercent(50, index, 'FitPercentage')}>
-                  <Text style={styles.textPercent}>50%</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.itemPercent}
-                  onPress={() => _onPressChangePercent(75, index, 'FitPercentage')}>
-                  <Text style={styles.textPercent}>75%</Text>
-                </TouchableOpacity>
-              </View>
+              {
+                condition
+                  ?
+                  (<View style={styles.cellPercent}>
+                    <TouchableOpacity style={styles.itemPercentDisable}>
+                      <Text style={styles.textPercentDisabled}>25%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.itemPercentDisable}>
+                      <Text style={styles.textPercentDisabled}>50%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.itemPercentDisable}>
+                      <Text style={styles.textPercentDisabled}>75%</Text>
+                    </TouchableOpacity>
+                  </View>)
+                  :
+                  (<View style={styles.cellPercent}>
+                    <TouchableOpacity
+                      style={styles.itemPercent}
+                      onPress={() => _onPressChangePercent(25, index, 'FitPercentage')}>
+                      <Text style={styles.textPercent}>25%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.itemPercent}
+                      onPress={() => _onPressChangePercent(50, index, 'FitPercentage')}>
+                      <Text style={styles.textPercent}>50%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.itemPercent}
+                      onPress={() => _onPressChangePercent(75, index, 'FitPercentage')}>
+                      <Text style={styles.textPercent}>75%</Text>
+                    </TouchableOpacity>
+                  </View>)
+              }
             </View>
           </>)
           :
@@ -422,21 +448,49 @@ export default ({ route, navigation }) => {
                   <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
                 </TouchableOpacity>
               </View>
-              <View style={styles.cellPercent}>
+              {
+                condition
+                  ?
+                  (<View style={styles.cellPercent}>
+                    <TouchableOpacity style={styles.itemPercentDisable}>
+                      <Text style={styles.textPercentDisabled}>25%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.itemPercentDisable}>
+                      <Text style={styles.textPercentDisabled}>50%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.itemPercentDisable}>
+                      <Text style={styles.textPercentDisabled}>75%</Text>
+                    </TouchableOpacity>
+                  </View>)
+                  :
+                  (<View style={styles.cellPercent}>
+                    <TouchableOpacity
+                      style={styles.itemPercent}
+                      onPress={() => _onPressChangePercent(25, index, 'WeldPercentage')}>
+                      <Text style={styles.textPercent}>25%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.itemPercent}
+                      onPress={() => _onPressChangePercent(50, index, 'WeldPercentage')}>
+                      <Text style={styles.textPercent}>50%</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.itemPercent}
+                      onPress={() => _onPressChangePercent(75, index, 'WeldPercentage')}>
+                      <Text style={styles.textPercent}>75%</Text>
+                    </TouchableOpacity>
+                  </View>)
+              }
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>WelderIDs:</Text>
+              </View>
+              <View style={styles.cellDataWelder}>
                 <TouchableOpacity
-                  style={styles.itemPercent}
-                  onPress={() => _onPressChangePercent(25, index, 'WeldPercentage')}>
-                  <Text style={styles.textPercent}>25%</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.itemPercent}
-                  onPress={() => _onPressChangePercent(50, index, 'WeldPercentage')}>
-                  <Text style={styles.textPercent}>50%</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.itemPercent}
-                  onPress={() => _onPressChangePercent(75, index, 'WeldPercentage')}>
-                  <Text style={styles.textPercent}>75%</Text>
+                  style={styles.itemActionWelder}>
+                  <Text style={styles.textDataWelder} >{formatEmptyData(item.WelderID)}</Text>
+                  <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -654,6 +708,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  cellDataWelder: {
+    flex: 2.2,
+    justifyContent: 'center',
+  },
+  itemActionWelder: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  textDataWelder: {
+    minWidth: 80,
+    flexShrink: 1,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  iconActionWelder: {
+    marginHorizontal: 4,
+    width: 20,
+    height: 20,
+  },
   cellPercent: {
     flex: 1.2,
     justifyContent: 'space-around',
@@ -686,6 +759,17 @@ const styles = StyleSheet.create({
   },
   textPercent: {
     color: BASE_COLOR,
+  },
+  itemPercentDisable: {
+    backgroundColor: '#cccccc',
+    borderColor: '#999999',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    marginLeft: 4,
+  },
+  textPercentDisabled: {
+    color: '#666666',
   },
 
   noDataContainer: {

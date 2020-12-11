@@ -1,5 +1,5 @@
 import { Port_Server } from '../..//utils/Core';
-const UpdateDrawingDetailAPI = (projectCode, facilityCode, drawingNo, details, token) =>
+const UpdateDrawingDetailAPI = (projectCode, facilityCode, drawingNo, userUpdate, keyUpdate, details, token) =>
   fetch(
     Port_Server + '/api/Drawing/UpdateDrawingDetail',
     {
@@ -8,7 +8,7 @@ const UpdateDrawingDetailAPI = (projectCode, facilityCode, drawingNo, details, t
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ projectCode, facilityCode, drawingNo, details }),
+      body: JSON.stringify({ projectCode, facilityCode, drawingNo, userUpdate, keyUpdate, details }),
     }
   ).then(res => res.json());
 module.exports = UpdateDrawingDetailAPI;
