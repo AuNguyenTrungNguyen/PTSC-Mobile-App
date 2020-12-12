@@ -13,6 +13,7 @@ import CameraScreen from './screens/camera/CameraScreen';
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
+import DrawingAddWelderScreen from './screens/drawing/DrawingAddWelderScreen';
 
 import ConstructionListScreen from './screens/construction/ConstructionListScreen';
 
@@ -101,6 +102,16 @@ export default () => {
           options={
             {
               title: 'Drawing Pictures',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingWelder'
+          component={DrawingAddWelderScreen}
+          options={
+            {
+              title: 'Select Welders',
               headerBackTitle: 'Back',
             }
           }

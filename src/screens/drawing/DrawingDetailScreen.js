@@ -30,8 +30,12 @@ export default ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(getDrawingDetail);
-    }, []
+      if (route.params?.welderSelected) {
+        _onChangeWelders(route.params?.welderSelected);
+      } else {
+        callAPI(getDrawingDetail);
+      }
+    }, [route.params?.welderSelected]
   );
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
@@ -211,6 +215,35 @@ export default ({ route, navigation }) => {
       }
       setUpdateDrawingList(array);
     }
+  };
+
+  const _onPressSelectWelder = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    navigation.navigate(
+      'DrawingWelder',
+      {
+        projectCode: projectCode,
+        welders: value,
+      }
+    );
+  };
+
+  const _onChangeWelders = (welderSelected) => {
+    let array = [...detailDrawingList];
+    array[indexUpdate][keyUpdate] = welderSelected;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+    let weldNo = detailDrawingList[indexUpdate].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: welderSelected });
+    } else {
+      array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+    }
+    setUpdateDrawingList(array);
   };
 
   const _onPressClearNow = (index) => {
@@ -488,7 +521,8 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.cellDataWelder}>
                 <TouchableOpacity
-                  style={styles.itemActionWelder}>
+                  style={styles.itemActionWelder}
+                  onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
                   <Text style={styles.textDataWelder} >{formatEmptyData(item.WelderID)}</Text>
                   <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} />
                 </TouchableOpacity>
