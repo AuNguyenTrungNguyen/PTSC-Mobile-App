@@ -328,6 +328,12 @@ export default ({ route, navigation }) => {
     return data != null ? Moment(data).format("DD-MMM-YY") : '';
   };
 
+  const formatEmptyWelder = data => {
+    return (!data || data != 'WELDER_ID_NULL') ? data : '';
+  };
+
+
+  
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data</Text>
@@ -523,7 +529,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemActionWelder}
                   onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
-                  <Text style={styles.textDataWelder} >{formatEmptyData(item.WelderID)}</Text>
+                  <Text style={styles.textDataWelder} >{formatEmptyWelder(item.WelderID)}</Text>
                   <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} />
                 </TouchableOpacity>
               </View>

@@ -70,7 +70,7 @@ export default ({ route, navigation }) => {
 
   const searchWelder = async (welderId, welderName) => {
     let token = await Helper.getData('TOKEN');
-    GetWelderListAPI('DNWHP', welderId, welderName, token) //TEST
+    GetWelderListAPI(projectCode, welderId, welderName, token)
       .then(res => {
         if (res.success) {
           setWelderList(res.data);
@@ -108,7 +108,19 @@ export default ({ route, navigation }) => {
   };
 
   const _onPressAddWelder = () => {
-    navigation.navigate('DrawingDetail', { welderSelected: welderSelected });
+    if (!welderSelected) {
+      navigation.navigate('DrawingDetail', { welderSelected: 'WELDER_ID_NULL' });
+    } else {
+      navigation.navigate('DrawingDetail', { welderSelected: welderSelected });
+    }
+  };
+
+  const formatEmptyData = data => {
+    return data != null ? data : '';
+  };
+
+  const formatEmptyWelder = data => {
+    return (!data || data != 'WELDER_ID_NULL') ? data : '';
   };
 
 
@@ -192,10 +204,6 @@ export default ({ route, navigation }) => {
     );
   };
 
-  const formatEmptyData = data => {
-    return data != null ? data : '';
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       {
@@ -229,7 +237,7 @@ export default ({ route, navigation }) => {
                   <TextInput
                     style={styles.inputText}
                     value={welderName}
-                    placeholder={'Enter WelderID'}
+                    placeholder={'Enter WelderName'}
                     onChangeText={_onChangeWelderName}
                     underlineColorAndroid='transparent'
                   />
@@ -252,7 +260,7 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.rowInfoWelders}>
                 <Text style={styles.infoTitle}>Welders:</Text>
-                <Text style={styles.infoData}>{welderSelected}</Text>
+                <Text style={styles.infoData}>{formatEmptyWelder(welderSelected)}</Text>
               </View>
             </View>
             <RenderWelderList />

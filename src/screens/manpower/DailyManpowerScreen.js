@@ -97,7 +97,7 @@ export default ({ route }) => {
       <Text style={styles.noDataTitle}>An error occured while executing your request</Text>
       <TouchableOpacity
         style={{ marginTop: 16 }}
-        onPress={() => { callAPI(() => getManPowerList(selectedDate))}}>
+        onPress={() => { callAPI(() => getManPowerList(selectedDate)) }}>
         <Icon name='sync-circle-outline' size={36} color={BASE_COLOR} />
       </TouchableOpacity>
     </View>
@@ -166,7 +166,7 @@ export default ({ route }) => {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.rowInfo}>
-            <Text style={styles.infoData}>{projectCode}</Text>
+            <Text style={styles.infoTitle}>Login User:</Text>
             <Text style={styles.infoData}>{username}</Text>
           </View>
           <TouchableOpacity
@@ -205,14 +205,20 @@ const styles = StyleSheet.create({
   headerContainer: {
     padding: 4,
     paddingBottom: 0,
-    borderColor: BASE_COLOR,
-    borderBottomWidth: 1,
   },
   rowInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     height: 24,
     marginBottom: 4,
+  },
+  infoTitle: {
+    flex: 3,
+  },
+  infoData: {
+    flex: 7,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
   },
   rowAction: {
     height: 36,
@@ -222,12 +228,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 2,
     marginBottom: 4,
-  },
-  infoData: {
-    flex: 1,
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-    textAlign: 'center',
   },
   buttonTitle: {
     color: OPP_COLOR,

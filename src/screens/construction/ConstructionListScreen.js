@@ -295,10 +295,6 @@ export default ({ route, navigation }) => {
                 ?
                 (<View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
-                    <Text style={styles.infoTitle}>ProjectCode:</Text>
-                    <Text style={styles.infoData}>{projectCode}</Text>
-                  </View>
-                  <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>FacilityCode:</Text>
                     <TouchableOpacity style={styles.buttonSelect} onPress={() => _onPressShowModel(CODE_FACILITY)} >
                       <Text style={styles.buttonTitleDark}>{facilityCode}</Text>

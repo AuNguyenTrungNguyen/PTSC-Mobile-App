@@ -136,7 +136,7 @@ export default ({ navigation }) => {
           />
           <View style={styles.action}>
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
-              <Text style={styles.buttonTitle}>Update Piping Fab Status</Text>
+              <Text style={styles.buttonTitle}>Realtime Update</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
               <Text style={styles.buttonTitle}>View Reports</Text>
