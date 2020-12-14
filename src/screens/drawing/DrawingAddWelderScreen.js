@@ -143,31 +143,6 @@ export default ({ route, navigation }) => {
     </View>
   );
 
-  const RenderWelderList = () => {
-    {
-      if (isSearching) {
-        return <ListSearchData />
-      } else if (welderList == null) {
-        return <ListSelectData />
-      } else if (!welderList.length) {
-        return <ListEmptyData />
-      } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={welderList}
-          getItemCount={(data) => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(index) => {
-            return index
-          }}
-          renderItem={renderItem}
-        />
-      }
-    }
-  };
-
   const renderItem = ({ item }) => {
     return (
       welderSelected && welderSelected.includes(item.WelderID)
@@ -263,7 +238,34 @@ export default ({ route, navigation }) => {
                 <Text style={styles.infoData}>{formatEmptyWelder(welderSelected)}</Text>
               </View>
             </View>
-            <RenderWelderList />
+            {
+              isSearching
+                ?
+                <ListSearchData />
+                :
+                (welderList == null
+                  ?
+                  <ListSelectData />
+                  :
+                  (!welderList.length
+                    ?
+                    <ListEmptyData />
+                    :
+                    <VirtualizedList
+                      style={styles.table}
+                      data={welderList}
+                      getItemCount={(data) => data.length}
+                      getItem={(data, index) => {
+                        return data[index];
+                      }}
+                      keyExtractor={(index) => {
+                        return index
+                      }}
+                      renderItem={renderItem}
+                    />
+                  )
+                )
+            }
             <View style={styles.actionContainer}>
               <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddWelder}>
                 <Text style={styles.buttonTitle}>Add Welders</Text>
