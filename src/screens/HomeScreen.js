@@ -94,12 +94,30 @@ export default ({ navigation }) => {
     }
   };
 
+  const _onPressQCUpdate = () => {
+    if (projectCode == null) {
+      Toast.show('Please select a project!', Toast.SHORT);
+      return;
+    }
+    try {
+      Helper.storeData('PROJECT_CODE', projectCode);
+      navigation.navigate('QCDrawingList', { projectCode: projectCode });
+    } catch (error) {
+      MessageAlert('ERROR', error.toString());
+    }
+  };
+
   const _onPressViewReports = () => {
     if (projectCode == null) {
       Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
-    navigation.navigate('Reports', { projectCode: projectCode });
+    try {
+      Helper.storeData('PROJECT_CODE', projectCode);
+      navigation.navigate('Reports', { projectCode: projectCode });
+    } catch (error) {
+      MessageAlert('ERROR', error.toString());
+    }
   };
 
   const Item = ({ item, onPress, style }) => (
@@ -136,7 +154,10 @@ export default ({ navigation }) => {
           />
           <View style={styles.action}>
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
-              <Text style={styles.buttonTitle}>Realtime Update</Text>
+              <Text style={styles.buttonTitle}>Construction Update</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>
+              <Text style={styles.buttonTitle}>QC Update</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
               <Text style={styles.buttonTitle}>View Reports</Text>

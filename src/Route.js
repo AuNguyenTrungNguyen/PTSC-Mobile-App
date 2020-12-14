@@ -15,6 +15,9 @@ import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/drawing/DrawingAddWelderScreen';
 
+import QCDrawingListScreen from './screens/qc/QCDrawingListScreen';
+import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
+
 import ConstructionListScreen from './screens/construction/ConstructionListScreen';
 
 import HistogramListScreen from './screens/histogram/HistogramListScreen';
@@ -112,6 +115,28 @@ export default () => {
           options={
             {
               title: 'Select Welders',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='QCDrawingList'
+          component={QCDrawingListScreen}
+          options={
+            {
+              title: 'QC Drawing List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='QCDrawingDetail'
+          component={QCDrawingDetailScreen}
+          options={
+            {
+              title: 'QC Drawing Detail',
               headerBackTitle: 'Back',
             }
           }

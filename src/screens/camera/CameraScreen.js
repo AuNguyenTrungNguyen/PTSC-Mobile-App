@@ -9,7 +9,7 @@ import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAP
 export default ({ route, navigation }) => {
 
   const [isScanned, setIsScanned] = useState(false);
-  const { projectCode, teamLeader, code } = route.params;
+  const { projectCode, teamLeader, code, source } = route.params;
 
   const _onQRCodeRead = scanResult => {
     if (scanResult.data !== null && !isScanned) {
@@ -28,16 +28,29 @@ export default ({ route, navigation }) => {
         GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
           .then(res => {
             if (res.success && res.data != null) {
-              navigation.navigate('DrawingDetail', {
-                projectCode: projectCode,
-                facilityCode: res.data,
-                drawingNo: drawingNo,
-                sheet: sheet,
-                rev: rev,
-                code: code,
-                teamLeader: teamLeader,
-              });
-              setIsScanned(false);
+              if (source == 'Drawing') {
+                navigation.navigate('DrawingDetail', {
+                  projectCode: projectCode,
+                  facilityCode: res.data,
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
+                  code: code,
+                  teamLeader: teamLeader,
+                });
+                setIsScanned(false);
+              } else {
+                navigation.navigate('QCDrawingDetail', {
+                  projectCode: projectCode,
+                  facilityCode: res.data,
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
+                  code: code,
+                  teamLeader: teamLeader,
+                });
+                setIsScanned(false);
+              }
             } else if (res.data == null) {
               let message = 'Not find FacilityCode with: \n'
                 + 'ProjectCode: ' + projectCode + '\n'

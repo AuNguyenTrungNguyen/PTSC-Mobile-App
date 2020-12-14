@@ -54,7 +54,7 @@ export default ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(getDrawingDetail);
+      callAPI(getDrawingList);
     }, []
   );
 
@@ -73,7 +73,7 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const getDrawingDetail = async () => {
+  const getDrawingList = async () => {
     let token = await Helper.getData('TOKEN');
     try {
       await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', token)])
@@ -195,7 +195,7 @@ export default ({ route, navigation }) => {
     let code = 'FitUp';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
-        'DrawingDetail',
+        'QCDrawingDetail',
         {
           projectCode: projectCode,
           facilityCode: facilityCode,
@@ -211,7 +211,7 @@ export default ({ route, navigation }) => {
       GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
         .then(res => {
           if (res.success) {
-            navigation.navigate('DrawingDetail', {
+            navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
               facilityCode: res.data,
               drawingNo: drawingNo,
@@ -231,13 +231,13 @@ export default ({ route, navigation }) => {
     }
   };
 
-  const _onPressViewWeld = async (drawingNo, sheet, rev) => {
+  const _onPressViewVisual = async (drawingNo, sheet, rev) => {
     Keyboard.dismiss();
     let teamLeader = await Helper.getData('USERNAME');
-    let code = 'Weld';
+    let code = 'Visual';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
-        'DrawingDetail',
+        'QCDrawingDetail',
         {
           projectCode: projectCode,
           facilityCode: facilityCode,
@@ -253,7 +253,7 @@ export default ({ route, navigation }) => {
       GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
         .then(res => {
           if (res.success) {
-            navigation.navigate('DrawingDetail', {
+            navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
               facilityCode: res.data,
               drawingNo: drawingNo,
@@ -280,21 +280,21 @@ export default ({ route, navigation }) => {
       'Camera',
       {
         code: 'FitUp',
-        source: 'Drawing',
+        source: 'QCDrawing',
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
     );
   };
 
-  const _onPressQRCodeWeld = async () => {
+  const _onPressQRCodeVisual = async () => {
     Keyboard.dismiss();
     let teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
       'Camera',
       {
-        code: 'Weld',
-        source: 'Drawing',
+        code: 'Visual',
+        source: 'QCDrawing',
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
@@ -366,8 +366,8 @@ export default ({ route, navigation }) => {
               <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.DrawingNo, item.Sheet, item.Rev) }}>
                 <Text style={styles.textAction}>View FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewWeld(item.DrawingNo, item.Sheet, item.Rev) }}>
-                <Text style={styles.textAction}>View Weld</Text>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewVisual(item.DrawingNo, item.Sheet, item.Rev) }}>
+                <Text style={styles.textAction}>View Visual</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -380,7 +380,7 @@ export default ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingList)} />
         :
         (!isSearch && drawingList.length == 0
           ?
@@ -458,7 +458,7 @@ export default ({ route, navigation }) => {
               <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQRCodeFitUp}>
                 <Text style={styles.buttonTitle}>Scan FitUp Drawing</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressQRCodeWeld}>
+              <TouchableOpacity style={styles.buttonRight} onPress={_onPressQRCodeVisual}>
                 <Text style={styles.buttonTitle}>Scan Weld Drawing</Text>
               </TouchableOpacity>
             </View>
