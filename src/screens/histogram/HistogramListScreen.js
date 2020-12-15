@@ -210,6 +210,10 @@ const styles = StyleSheet.create({
   noDataTitle: {
     fontSize: 16,
   },
+  noDataText: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
 
   actionContainer: {
     marginTop: 12,

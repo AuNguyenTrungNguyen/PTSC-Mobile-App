@@ -158,7 +158,7 @@ export default ({ route, navigation }) => {
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
       let array = [...detailDrawingList];
-      array[indexUpdate][keyUpdate] = selectedDate;
+      array[indexUpdate][keyUpdate] = Moment(selectedDate).format();
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
@@ -166,7 +166,7 @@ export default ({ route, navigation }) => {
       let weldNo = detailDrawingList[indexUpdate].WeldNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: selectedDate });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: Moment(selectedDate).format() });
       } else {
         array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
       }
@@ -333,7 +333,7 @@ export default ({ route, navigation }) => {
   };
 
 
-  
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data</Text>
@@ -407,7 +407,13 @@ export default ({ route, navigation }) => {
                   style={styles.itemAction}
                   onPress={() => _onPressShowPicker(item.FittingDate, index, 'FittingDate')}>
                   <Text style={styles.textData} >{formatDateData(item.FittingDate)}</Text>
-                  <AntDesignIcon style={styles.iconAction} name='calendar' size={20} />
+                  {
+                    condition
+                      ?
+                      <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
+                      :
+                      <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR} />
+                  }
                 </TouchableOpacity>
               </View>
               <View style={styles.cellPercent} />
@@ -421,7 +427,13 @@ export default ({ route, navigation }) => {
                   style={styles.itemAction}
                   onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
                   <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
-                  <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
+                  {
+                    condition
+                      ?
+                      <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                      :
+                      <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                  }
                 </TouchableOpacity>
               </View>
               {
@@ -470,7 +482,13 @@ export default ({ route, navigation }) => {
                   style={styles.itemAction}
                   onPress={() => _onPressShowPicker(item.WeldingDate, index, 'WeldingDate')}>
                   <Text style={styles.textData} >{formatDateData(item.WeldingDate)}</Text>
-                  <AntDesignIcon style={styles.iconAction} name='calendar' size={20} />
+                  {
+                    condition
+                      ?
+                      <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
+                      :
+                      <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR}/>
+                  }
                 </TouchableOpacity>
               </View>
               <View style={styles.cellPercent} />
@@ -484,7 +502,13 @@ export default ({ route, navigation }) => {
                   style={styles.itemAction}
                   onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
                   <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
-                  <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} />
+                  {
+                    condition
+                      ?
+                      <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                      :
+                      <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                  }
                 </TouchableOpacity>
               </View>
               {
@@ -530,7 +554,13 @@ export default ({ route, navigation }) => {
                   style={styles.itemActionWelder}
                   onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
                   <Text style={styles.textDataWelder} >{formatEmptyWelder(item.WelderID)}</Text>
-                  <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} />
+                  {
+                    condition
+                      ?
+                      <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={'#a3a3a3'} />
+                      :
+                      <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={BASE_COLOR}/>
+                  }
                 </TouchableOpacity>
               </View>
             </View>

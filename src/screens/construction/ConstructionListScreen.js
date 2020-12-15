@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Modal, Dimensions, ScrollView, ActivityIndicator, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
+import Toast from 'react-native-simple-toast';
 
 import Helper from '../../utils/Helper';
 import GetConstructionFacilityListAPI from '../../apis/construction/GetConstructionFacilityListAPI';
@@ -107,9 +108,17 @@ export default ({ route, navigation }) => {
 
   const _onPressShowModel = (code) => {
     if (code == CODE_FACILITY) {
-      setVisibleFacility(true);
+      if (facilityList.length) {
+        setVisibleFacility(true);
+      } else {
+        Toast.show('No have FacilityCode to filter', Toast.SHORT);
+      }
     } else if (code == CODE_DISCIPLINE) {
-      setIsVisibleDiscipline(true);
+      if (discicplineList.length) {
+        setIsVisibleDiscipline(true);
+      } else {
+        Toast.show('No have DisciplineCode to filter', Toast.SHORT);
+      }
     }
   };
 
@@ -268,9 +277,9 @@ export default ({ route, navigation }) => {
             {
               item.RemainMHRS < 0
                 ?
-                <Text style={[styles.textData, {color: 'red'}]}>{formatEmptyData(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'red' }]}>{formatEmptyData(item.RemainMHRS)}</Text>
                 :
-                <Text style={[styles.textData, {color: 'green'}]}>{formatEmptyData(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'green' }]}>{formatEmptyData(item.RemainMHRS)}</Text>
             }
           </View>
         </View>
