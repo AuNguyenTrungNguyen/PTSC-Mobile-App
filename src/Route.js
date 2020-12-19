@@ -20,6 +20,8 @@ import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
 
 import ConstructionListScreen from './screens/construction/ConstructionListScreen';
 
+import DisciplineListScreen from './screens/discipline/DisciplineListScreen';
+
 import HistogramListScreen from './screens/histogram/HistogramListScreen';
 import HistogramViewScreen from './screens/histogram/HistogramViewScreen';
 
@@ -148,6 +150,17 @@ export default () => {
           options={
             {
               title: 'Construction List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='DisciplineList'
+          component={DisciplineListScreen}
+          options={
+            {
+              title: 'Discipline List',
               headerBackTitle: 'Back',
             }
           }

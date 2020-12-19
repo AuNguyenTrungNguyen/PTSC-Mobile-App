@@ -16,6 +16,14 @@ export default ({ route, navigation }) => {
     navigation.navigate('ConstructionList', { projectCode: projectCode });
   };
 
+  const _onPressViewDiscipline = () => {
+    if (projectCode == null) {
+      Toast.show('Please select a project!', Toast.SHORT);
+      return;
+    }
+    navigation.navigate('DisciplineList', { projectCode: projectCode });
+  };
+
   const _onPressViewHistogram = () => {
     if (projectCode == null) {
       Toast.show('Please select a project!', Toast.SHORT);
@@ -49,8 +57,11 @@ export default ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.actionContainer}>
-          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewConstruction}>
-            <Text style={styles.buttonTitle}>View Construction</Text>
+          <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewConstruction}>
+            <Text style={styles.buttonTitle}>View Construction ID</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewDiscipline}>
+            <Text style={styles.buttonTitle}>View Disclipline</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewHistogram}>
             <Text style={styles.buttonTitle}>View Histogram</Text>
