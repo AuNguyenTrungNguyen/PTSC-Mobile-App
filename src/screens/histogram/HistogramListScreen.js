@@ -99,7 +99,7 @@ export default ({ route, navigation }) => {
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>Compare: </Text>
-            <Text style={styles.textData}>{item.CompareType == 0 ? 'Plan/Actual' : 'Forecast/Actual'}</Text>
+            <Text style={styles.textData}>{formatCompareType(item.CompareType)}</Text>
           </View>
           <View style={styles.cellSmall}>
             <Text style={styles.textTitle}>Phase: </Text>
@@ -108,6 +108,21 @@ export default ({ route, navigation }) => {
         </View>
       </TouchableOpacity>
     );
+  };
+
+  const formatCompareType = type => {
+    switch (type) {
+      case 0:
+        return 'Plan/Actual';
+      case 1:
+        return 'Forecast/Actual';
+      case 2:
+        return 'Plan/Remain';
+      case 3:
+        return 'Forecast/Remain';
+      default:
+        return '';
+    }
   };
 
   return (

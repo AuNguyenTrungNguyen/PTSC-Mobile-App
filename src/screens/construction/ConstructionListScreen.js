@@ -17,7 +17,6 @@ export default ({ route, navigation }) => {
   const CODE_DISCIPLINE = 2;
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
   const DISCIPLINE_CODE_DEFAULT = 'All Discipline Code';
-  const CONSTRUCTION_SEARCH = 1;
   const CONSTRUCTION_SPACE = 'SPACE';
 
   const { projectCode } = route.params;
@@ -172,10 +171,9 @@ export default ({ route, navigation }) => {
 
   const searchConstruction = async (facilityCode, discicplineCode) => {
     let token = await Helper.getData('TOKEN');
-    let mode = facilityCode !== FACILITY_CODE_DEFAULT || discicplineCode !== DISCIPLINE_CODE_DEFAULT ? CONSTRUCTION_SEARCH : 0;
-    let facilityCodeSearch = (mode !== CONSTRUCTION_SEARCH || facilityCode == FACILITY_CODE_DEFAULT) ? '' : facilityCode;
-    let discicplineCodeSearch = (mode !== CONSTRUCTION_SEARCH || discicplineCode == DISCIPLINE_CODE_DEFAULT) ? '' : discicplineCode;
-    GetConstructionListAPI(projectCode, facilityCodeSearch, discicplineCodeSearch, mode, token)
+    let facilityCodeSearch = facilityCode == FACILITY_CODE_DEFAULT ? '' : facilityCode;
+    let discicplineCodeSearch = discicplineCode == DISCIPLINE_CODE_DEFAULT ? '' : discicplineCode;
+    GetConstructionListAPI(projectCode, facilityCodeSearch, discicplineCodeSearch, token)
       .then(res => {
         if (res.success) {
           setConstructionList(res.data);
@@ -315,12 +313,6 @@ export default ({ route, navigation }) => {
                       <Text style={styles.buttonTitleDark}>{discicplineCode == CONSTRUCTION_SPACE ? '' : discicplineCode}</Text>
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.rowInfo}>
-                    <Text style={styles.infoTitle} />
-                    <TouchableOpacity style={styles.searchButton} onPress={_onPressSearchConstruction} disabled={isSearching}>
-                      <Text style={styles.buttonTitle}>Search Construction</Text>
-                    </TouchableOpacity>
-                  </View>
                 </View>)
                 :
                 null
@@ -433,17 +425,6 @@ const styles = StyleSheet.create({
     padding: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 2,
-  },
-  searchButton: {
-    flex: 7,
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    height: '100%',
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
     borderRadius: 2,
   },
   buttonTitle: {

@@ -1,11 +1,10 @@
 import { Port_Server } from '../../utils/Core';
-const GetConstructionListAPI = async (projectCode, facilityCode, disciplineCode, mode, token) =>
+const GetConstructionListAPI = async (projectCode, facilityCode, disciplineCode, token) =>
   fetch(
     Port_Server
     + '/api/Reports/GetConstructionList?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&disciplineCode=' + disciplineCode
-    + '&mode=' + mode,
+    + '&disciplineCode=' + disciplineCode,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

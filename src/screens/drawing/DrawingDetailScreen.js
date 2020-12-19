@@ -96,8 +96,7 @@ export default ({ route, navigation }) => {
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    let keyUpdate = code == 'FitUp' ? 'FittingTeam' : 'WelderTeam';
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, keyUpdate, updateDrawingList, token)
+    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, updateDrawingList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -158,7 +157,7 @@ export default ({ route, navigation }) => {
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
       let array = [...detailDrawingList];
-      array[indexUpdate][keyUpdate] = Moment(selectedDate).format();
+      array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD");
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
@@ -166,9 +165,9 @@ export default ({ route, navigation }) => {
       let weldNo = detailDrawingList[indexUpdate].WeldNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: Moment(selectedDate).format() });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemDate']: Moment(selectedDate).format("YYYY-MM-DD") });
       } else {
-        array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+        array[objIndex]['ItemDate'] = detailDrawingList[indexUpdate][keyUpdate];
       }
       setUpdateDrawingList(array);
     }
@@ -209,9 +208,9 @@ export default ({ route, navigation }) => {
       let weldNo = detailDrawingList[indexUpdate].WeldNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: value });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemPercent']: value });
       } else {
-        array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+        array[objIndex]['ItemPercent'] = detailDrawingList[indexUpdate][keyUpdate];
       }
       setUpdateDrawingList(array);
     }
@@ -249,7 +248,6 @@ export default ({ route, navigation }) => {
   const _onPressClearNow = (index) => {
     let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
     let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
-    let keyClear = code == 'FitUp' ? 1 : 2;
     let valueDate = null;
     let valuePercent = null;
 
@@ -263,11 +261,10 @@ export default ({ route, navigation }) => {
     let weldNo = detailDrawingList[index].WeldNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyDate]: valueDate, [keyPercent]: valuePercent, ['Clear']: keyClear });
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemDate']: valueDate, ['ItemPercent']: valuePercent });
     } else {
-      array[objIndex][keyDate] = detailDrawingList[index][keyDate];
-      array[objIndex][keyPercent] = detailDrawingList[index][keyPercent];
-      array[objIndex]['Clear'] = keyClear;
+      array[objIndex]['ItemDate'] = detailDrawingList[index][keyDate];
+      array[objIndex]['ItemPercent'] = detailDrawingList[index][keyPercent];
     }
     setUpdateDrawingList(array);
   };
@@ -275,7 +272,7 @@ export default ({ route, navigation }) => {
   const _onPressDoneNow = (index) => {
     let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
     let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
-    let valueDate = new Date();
+    let valueDate = Moment(new Date()).format("YYYY-MM-DD");
     let valuePercent = 100;
 
     let array = [...detailDrawingList];
@@ -288,10 +285,10 @@ export default ({ route, navigation }) => {
     let weldNo = detailDrawingList[index].WeldNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyDate]: valueDate, [keyPercent]: valuePercent });
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemDate']: valueDate, ['ItemPercent']: valuePercent });
     } else {
-      array[objIndex][keyDate] = detailDrawingList[index][keyDate];
-      array[objIndex][keyPercent] = detailDrawingList[index][keyPercent];
+      array[objIndex]['ItemDate'] = detailDrawingList[index][keyDate];
+      array[objIndex]['ItemPercent'] = detailDrawingList[index][keyPercent];
     }
     setUpdateDrawingList(array);
   };
@@ -307,9 +304,9 @@ export default ({ route, navigation }) => {
       let weldNo = detailDrawingList[index].WeldNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [key]: value });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemPercent']: value });
       } else {
-        array[objIndex][key] = detailDrawingList[index][key];
+        array[objIndex]['ItemPercent'] = detailDrawingList[index][key];
       }
       setUpdateDrawingList(array);
     }
@@ -487,7 +484,7 @@ export default ({ route, navigation }) => {
                       ?
                       <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
                       :
-                      <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR}/>
+                      <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR} />
                   }
                 </TouchableOpacity>
               </View>
@@ -559,7 +556,7 @@ export default ({ route, navigation }) => {
                       ?
                       <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={'#a3a3a3'} />
                       :
-                      <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={BASE_COLOR}/>
+                      <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={BASE_COLOR} />
                   }
                 </TouchableOpacity>
               </View>
