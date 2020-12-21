@@ -1,26 +1,14 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, FlatList } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-simple-toast';
+import React, { useLayoutEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Helper from '../utils/Helper';
-import GetProjectListAPI from '../apis/app/GetProjectListAPI';
-import MessageAlert from '../components/MessageAlert';
-import LoadingRefresh from '../components/LoadingRefresh';
 
-export default ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [listProject, setListProject] = useState([]);
-  const [projectCode, setProjectCode] = useState(null);
+export default ({ route, navigation }) => {
 
-  let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const { projectCode, disciplineCode } = route.params;
 
-  useEffect(() => {
-    getDataFromAPI();
-  }, []);
-
+  let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -30,39 +18,6 @@ export default ({ navigation }) => {
       ),
     });
   }, [navigation]);
-
-  const getDataFromAPI = () => {
-    setIsLoading(true);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        getData();
-      }
-    });
-  };
-
-  const getData = async () => {
-    let username = await Helper.getData('USERNAME');
-    let token = await Helper.getData('TOKEN');
-    GetProjectListAPI(username, token)
-      .then(res => {
-        if (res.success) {
-          setListProject(res.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
-  };
 
   const _onPressLogout = () => {
     Alert.alert(
@@ -81,97 +36,135 @@ export default ({ navigation }) => {
     navigation.replace('Login');
   };
 
-  const _onPressUpdateDrawing = async () => {
-    if (projectCode == null) {
-      Toast.show('Please select a project!', Toast.SHORT);
-      return;
-    }
-    try {
-      Helper.storeData('PROJECT_CODE', projectCode);
-      navigation.navigate('DrawingList', { projectCode: projectCode });
-    } catch (error) {
-      MessageAlert('ERROR', error.toString());
-    }
+  const _onPressUpdateDrawing = () => {
+    navigation.navigate('DrawingList', { projectCode: projectCode });
   };
 
   const _onPressQCUpdate = () => {
-    if (projectCode == null) {
-      Toast.show('Please select a project!', Toast.SHORT);
-      return;
-    }
-    try {
-      Helper.storeData('PROJECT_CODE', projectCode);
-      navigation.navigate('QCDrawingList', { projectCode: projectCode });
-    } catch (error) {
-      MessageAlert('ERROR', error.toString());
-    }
+    navigation.navigate('QCDrawingList', { projectCode: projectCode });
   };
 
   const _onPressViewReports = () => {
-    if (projectCode == null) {
-      Toast.show('Please select a project!', Toast.SHORT);
-      return;
-    }
-    try {
-      Helper.storeData('PROJECT_CODE', projectCode);
-      navigation.navigate('Reports', { projectCode: projectCode });
-    } catch (error) {
-      MessageAlert('ERROR', error.toString());
-    }
+    navigation.navigate('Reports', { projectCode: projectCode });
   };
 
-  const Item = ({ item, onPress, style }) => (
-    <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
-      <Text>{item.value}</Text>
-    </TouchableOpacity>
-  );
+  const _onPressQRCodeFitUp = async () => {
+    let teamLeader = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        code: 'FitUp',
+        source: 'Drawing',
+        projectCode: projectCode,
+        teamLeader: teamLeader,
+      }
+    );
+  };
 
-  const renderItem = ({ item }) => {
-    const backgroundColor = item.value === projectCode ? SELECT_COLOR : OPP_COLOR;
-    return (
-      <Item
-        item={item}
-        onPress={() => {
-          setProjectCode(item.value);
-          Helper.storeData('DATACODE', item.DataCode);
-        }}
-        style={{ backgroundColor }}
-      />
+  const _onPressQRCodeWeld = async () => {
+    let teamLeader = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        code: 'Weld',
+        source: 'Drawing',
+        projectCode: projectCode,
+        teamLeader: teamLeader,
+      }
+    );
+  };
+
+  const _onPressQRCodeFitUpQC = async () => {
+    let teamLeader = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        code: 'FitUp',
+        source: 'QCDrawing',
+        projectCode: projectCode,
+        teamLeader: teamLeader,
+      }
+    );
+  };
+
+  const _onPressQRCodeVisualQC = async () => {
+    let teamLeader = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        code: 'Visual',
+        source: 'QCDrawing',
+        projectCode: projectCode,
+        teamLeader: teamLeader,
+      }
     );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={getDataFromAPI} />
-        :
-        <View style={styles.container}>
-          <FlatList
-            data={listProject}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.value}
-          />
-          <View style={styles.action}>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
-              <Text style={styles.buttonTitle}>Construction Update</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>
-              <Text style={styles.buttonTitle}>QC Update</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
-              <Text style={styles.buttonTitle}>View Reports</Text>
-            </TouchableOpacity>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>Project:</Text>
+            <View style={styles.headerDataContainer}>
+              <Text style={styles.headerData}>{projectCode.toUpperCase()}</Text>
+            </View>
+          </View>
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>Module:</Text>
+            <View style={styles.headerDataContainer}>
+              <Text style={styles.headerData}>{disciplineCode.toUpperCase()}</Text>
+            </View>
           </View>
         </View>
-      }
+        <View style={styles.table}>
+          <View style={styles.row}>
+            <View style={styles.cell}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp}>
+                <Text style={styles.itemTitle}>Cons Scan FitUp</Text>
+                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cell}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld}>
+                <Text style={styles.itemTitle}>Cons Scan Weld</Text>
+                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.cell}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUpQC}>
+                <Text style={styles.itemTitle}>QC Scan FitUp</Text>
+                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cell}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeVisualQC}>
+                <Text style={styles.itemTitle}>QC Scan Weld</Text>
+                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        <View style={styles.action}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
+            <Text style={styles.buttonTitle}>Construction Update</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>
+            <Text style={styles.buttonTitle}>QC Update</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
+            <Text style={styles.buttonTitle}>View Reports</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
-const SELECT_COLOR = '#adb6bb';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -183,16 +176,67 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
 
-  item: {
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 8,
+  headerContainer: {
     marginBottom: 12,
+    padding: 4,
+    paddingBottom: 0,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 28,
+    marginBottom: 4,
+  },
+  headerTitle: {
+    flex: 3,
+  },
+  headerDataContainer: {
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderBottomWidth: 1,
+  },
+  headerData: {
+    color: BASE_COLOR,
+    fontWeight: 'bold',
   },
 
+
+  table: {
+    flex: 1,
+  },
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  cell: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemContainer: {
+    height: '80%',
+    width: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+  itemTitle: {
+    color: BASE_COLOR,
+    fontSize: 16,
+  },
+  itemIcon: {
+    color: BASE_COLOR,
+    height: 48,
+    width: 48,
+    margin: 4,
+    marginTop: 16,
+  },
+
+
   action: {
-    marginTop: 24,
+    marginTop: 12,
   },
   buttonContainer: {
     height: 42,
@@ -205,7 +249,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    marginTop: 8,
+    marginTop: 12,
   },
   buttonTitle: {
     color: OPP_COLOR,

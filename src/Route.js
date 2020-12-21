@@ -56,7 +56,7 @@ export default () => {
           component={HomeScreen}
           options={
             {
-              title: 'Select Project',
+              title: 'PTSC M&C',
             }
           }
         />

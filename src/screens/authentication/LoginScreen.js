@@ -26,7 +26,7 @@ export default ({ navigation }) => {
   const [projectCode, setProjectCode] = useState(PROJECT_CODE_DEFAULT);
   const [isVisibleProject, setIsVisibleProject] = useState(false);
 
-  const [discicplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
+  const [disciplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
   const [isVisibleDiscipline, setIsVisibleDiscipline] = useState(false);
 
   const nextInput = useRef(null);
@@ -110,7 +110,7 @@ export default ({ navigation }) => {
           setLoading(false);
           return;
         }
-        if (discicplineCode === DISCIPLINE_CODE_DEFAULT) {
+        if (disciplineCode === DISCIPLINE_CODE_DEFAULT) {
           MessageAlert('ERROR', 'Please select a module.');
           setLoading(false);
           return;
@@ -128,9 +128,9 @@ export default ({ navigation }) => {
               Helper.storeData('USERNAME', res.userName);
               Helper.storeData('EXPIRES', res['.expires']);
               Helper.storeData('PROJECT_CODE', projectCode);
-              Helper.storeData('DISCIPLINE_CODE', discicplineCode);
+              Helper.storeData('DISCIPLINE_CODE', disciplineCode);
               Helper.storeData('DATACODE', 'PTSCMC');
-              navigation.replace('Home');
+              navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
             }
           })
           .catch(() => {
@@ -215,7 +215,7 @@ export default ({ navigation }) => {
             <TouchableOpacity
               style={[styles.selectContainer, styles.inputContainerLast]}
               onPress={_onPressSelectDiscipline}>
-              <Text style={styles.selectText}>{discicplineCode}</Text>
+              <Text style={styles.selectText}>{disciplineCode}</Text>
             </TouchableOpacity>
             {loading
               ? <TouchableOpacity style={styles.buttonContainer}>
