@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>PTSC M&amp;C</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -38,11 +38,9 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is used for scanning barcode</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Library is used for upload barcode image</string>
+	<string>Camera is used for pictures application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Library is used for upload barcode image</string>
+	<string>Library is used for pictures application</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
