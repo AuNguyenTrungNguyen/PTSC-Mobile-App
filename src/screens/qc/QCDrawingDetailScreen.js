@@ -38,13 +38,6 @@ export default ({ route, navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { }}>
-            <Ionicons
-              size={24}
-              name={'help-circle-outline'} color={iconColor} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
