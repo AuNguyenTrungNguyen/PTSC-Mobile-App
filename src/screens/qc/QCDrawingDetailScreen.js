@@ -20,7 +20,7 @@ export default ({ route, navigation }) => {
   const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader, source } = route.params;
+  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
@@ -30,14 +30,27 @@ export default ({ route, navigation }) => {
     }, [route.params?.welderSelected]
   );
 
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
-          <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { }}>
+            <Ionicons
+              size={24}
+              name={'help-circle-outline'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={toggle}>
+            <Ionicons
+              size={24}
+              name={isShowDescription.name} color={iconColor} />
+          </TouchableOpacity>
+        </View>
       ),
     });
   }, [navigation, isShowDescription]);

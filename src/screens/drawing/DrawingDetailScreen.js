@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
@@ -38,14 +38,27 @@ export default ({ route, navigation }) => {
     }, [route.params?.welderSelected]
   );
 
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
-          <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { }}>
+            <Ionicons
+              size={24}
+              name={'help-circle-outline'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={toggle}>
+            <Ionicons
+              size={24}
+              name={isShowDescription.name} color={iconColor} />
+          </TouchableOpacity>
+        </View>
       ),
     });
   }, [navigation, isShowDescription]);

@@ -33,7 +33,7 @@ export default ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -45,7 +45,9 @@ export default ({ route, navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
+        <TouchableOpacity
+          style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+          onPress={toggle}>
           <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
         </TouchableOpacity>
       ),
