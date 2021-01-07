@@ -398,10 +398,23 @@ export default ({ route, navigation }) => {
       <View style={styles.box} pointerEvents={condition ? 'none' : 'auto'}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
-            <Text>WeldNo: </Text>
-            <Text style={styles.textMeta}>{formatEmptyData(item.WeldNo)}</Text>
-            <Text> - WeldType: </Text>
-            <Text style={styles.textMeta}>{formatEmptyData(item.WeldType)}</Text>
+            {
+              condition
+                ?
+                <Text style={styles.greenText}>
+                  <Text>WeldNo: </Text>
+                  <Text style={[styles.textMeta, styles.greenText]}>{formatEmptyData(item.WeldNo)}</Text>
+                  <Text> - ConType: </Text>
+                  <Text style={[styles.textMeta, styles.greenText]}>{formatEmptyData(item.ConType)}</Text>
+                </Text>
+                :
+                <>
+                  <Text>WeldNo: </Text>
+                  <Text style={styles.textMeta}>{formatEmptyData(item.WeldNo)}</Text>
+                  <Text> - ConType: </Text>
+                  <Text style={styles.textMeta}>{formatEmptyData(item.ConType)}</Text>
+                </>
+            }
           </View>
           <>
             {
@@ -881,6 +894,9 @@ const styles = StyleSheet.create({
   textMeta: {
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  greenText: {
+    color: 'green',
   },
   textData: {
     minWidth: 80,
