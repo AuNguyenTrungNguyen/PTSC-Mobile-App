@@ -6,7 +6,6 @@ import Dialog from "react-native-dialog";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -20,9 +19,9 @@ export default ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
+  const [errorList, setErrorList] = useState([]);
 
   const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
 
@@ -93,41 +92,84 @@ export default ({ route, navigation }) => {
           setDetailDrawingList(res.data);
           setIsLoading(false);
           setIsError(false);
-          setIsUploading(false);
         } else {
           setIsLoading(false);
           setIsError(true);
-          setIsUploading(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
-        setIsUploading(false);
       });
   };
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, updateDrawingList, token)
-      .then(res => {
-        if (res.success) {
-          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-          setUpdateDrawingList([]);
-        } else {
+    let errorListData = [];
+    let doneListData = [];
+    if (code == 'FitUp') {
+      doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent) || i.IsClear);
+      const doneIds = doneListData.map(i => i.RowIndex);
+      errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
+    } else {
+      doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.WelderID) || i.IsClear);
+      const doneIds = doneListData.map(i => i.RowIndex);
+      errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
+    }
+    if (errorListData.length) {
+      const errorIds = errorListData.map(i => i.RowIndex);
+      setErrorList(errorIds);
+      Toast.show('Have error data!', Toast.SHORT, ['RCTModalHostViewController']);
+    } else {
+      setErrorList([]);
+    }
+    if (doneListData.length) {
+      UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, doneListData, token)
+        .then(res => {
+          if (res.success) {
+            Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          } else {
+            Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+          }
+          if (errorListData.length) {
+            setUpdateDrawingList(errorListData);
+          } else {
+            setUpdateDrawingList([]);
+          }
+        }).catch(() => {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        });
+    }
+  };
+
+  const handleDataUpdate = () => {
+    updateDrawingList.forEach(element => {
+      let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
+      let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
+      const data = detailDrawingList.find(i => i.RowIndex === element['RowIndex'] && i.WeldNo === element['WeldNo']);
+      if (element.hasOwnProperty('ItemDate') && element['ItemDate'] == null
+        && element.hasOwnProperty('ItemPercent') && element['ItemPercent'] == null
+        && ((element.hasOwnProperty('WelderID') && element['WelderID'] == null)
+          || (!element.hasOwnProperty('WelderID') && !data['WelderID']))) {
+        element['IsClear'] = true;
+      } else {
+        if (!element.hasOwnProperty('ItemDate')) {
+          element['ItemDate'] = data[keyDate];
         }
-        callAPI(getDrawingDetail);
-      }).catch(() => {
-        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        setIsUploading(false);
-      });
+        if (!element.hasOwnProperty('ItemPercent')) {
+          element['ItemPercent'] = data[keyPercent];
+        }
+        if (code == 'Weld' && !element.hasOwnProperty('WelderID')) {
+          element['WelderID'] = data['WelderID'];
+        }
+      }
+    });
+    callAPI(updateDrawingDetail);
   };
 
   const _onPressSubmitToServer = async () => {
     if (updateDrawingList.length) {
-      setIsUploading(true);
-      callAPI(updateDrawingDetail);
+      handleDataUpdate();
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
@@ -273,6 +315,7 @@ export default ({ route, navigation }) => {
 
   const _onChangeWelders = (welderSelected) => {
     let array = [...detailDrawingList];
+    welderSelected = formatEmptyWelder(welderSelected);
     array[indexUpdate][keyUpdate] = welderSelected;
     setDetailDrawingList(array);
 
@@ -369,7 +412,7 @@ export default ({ route, navigation }) => {
   };
 
   const formatEmptyWelder = data => {
-    return (!data || data != 'WELDER_ID_NULL') ? data : '';
+    return data == 'WELDER_ID_NULL' ? null : data;
   };
 
 
@@ -394,8 +437,9 @@ export default ({ route, navigation }) => {
     let indexItem = updateDrawingList.findIndex((obj => obj.RowIndex == item.RowIndex));
     let condition = compareDate && comparePercent && indexItem < 0;
     let checkHasData = code == 'FitUp' ? (itemDate || itemPercent) : (itemDate || itemPercent || item['WelderID']);
+    let isUserError = errorList.indexOf(item.RowIndex) > -1;
     return (
-      <View style={styles.box} pointerEvents={condition ? 'none' : 'auto'}>
+      <View style={isUserError ? styles.boxError : styles.box} pointerEvents={condition ? 'none' : 'auto'}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             {
@@ -591,7 +635,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemActionWelder}
                   onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
-                  <Text style={styles.textDataWelder} >{formatEmptyWelder(item.WelderID)}</Text>
+                  <Text style={styles.textDataWelder} >{item.WelderID}</Text>
                   {
                     condition
                       ?
@@ -708,12 +752,6 @@ export default ({ route, navigation }) => {
             <Dialog.Button label='Cancle' onPress={() => { setShowDialog(false) }} />
             <Dialog.Button label='OK' onPress={_onPressSubmitInput} />
           </Dialog.Container>
-          <AwesomeAlert
-            show={isUploading}
-            showProgress={true}
-            closeOnTouchOutside={false}
-            closeOnHardwareBackPress={false}
-          />
         </View>
       }
       <Modal
@@ -811,6 +849,14 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  boxError: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: 'red',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 8,
