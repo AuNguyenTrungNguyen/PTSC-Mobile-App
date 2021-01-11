@@ -1,2 +1,2 @@
-const Port_Server = 'http://demo-procurement.ptscmc.com.vn:8082';
+const Port_Server = 'http://webapi.local';
 export { Port_Server };
