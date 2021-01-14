@@ -9,18 +9,21 @@ import Helper from '../../utils/Helper';
 import MessageAlert from '../../components/MessageAlert';
 import LoginAPI from '../../apis/LoginAPI';
 import GetDataLoginAPI from '../../apis/app/GetDataLoginAPI';
+import GetProjectListAPI from '../../apis/app/GetProjectListAPI';
 export default ({ navigation }) => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassord, setShowPassord] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoadingLogin, setIsLoadingLogin] = useState(false);
 
   const PROJECT_CODE_DEFAULT = 'Select Project';
   const DISCIPLINE_CODE_DEFAULT = 'Select Module';
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
   const [projectList, setProjectList] = useState([]);
+
+  const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(true);
   const [disciplineList, setDisciplineList] = useState([]);
 
   const [projectCode, setProjectCode] = useState(PROJECT_CODE_DEFAULT);
@@ -35,45 +38,56 @@ export default ({ navigation }) => {
   };
 
   useEffect(() => {
-    getDataFromAPI();
+    callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
   }, []);
 
-  const getDataFromAPI = () => {
-    setIsLoading(true);
+  const callAPI = (executedAPI, key) => {
+    if (key === PROJECT_CODE_DEFAULT) {
+      setIsLoadingProject(true);
+    } else if (key === DISCIPLINE_CODE_DEFAULT) {
+      setIsLoadingDiscipline(true);
+    }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
-        ConfirmAlert();
+        setIsLoadingProject(false);
+        confirmAlert(key);
       } else {
-        getData();
+        executedAPI();
       }
     });
   };
 
-  const getData = () => {
+  const getModuleList = () => {
     GetDataLoginAPI()
       .then(res => {
         if (res.success) {
-          setProjectList(res.projectList);
           setDisciplineList(res.disciplineList);
-          setIsLoading(false);
+          setIsLoadingDiscipline(false);
         } else {
-          ConfirmAlert();
+          confirmAlert(DISCIPLINE_CODE_DEFAULT);
         }
       })
       .catch(() => {
-        ConfirmAlert();
+        confirmAlert(DISCIPLINE_CODE_DEFAULT);
       });
   };
 
-  const ConfirmAlert = () => {
-    Alert.alert(
-      'ERROR',
-      'Check that you are using the company network and reload',
-      [
-        { text: 'Reload', onPress: () => { getDataFromAPI() } }
-      ],
-      { cancelable: false },
-    );
+  const confirmAlert = key => {
+    if (key === DISCIPLINE_CODE_DEFAULT) {
+      Alert.alert(
+        'ERROR',
+        'Check that you are using the company network and reload!',
+        [{ text: 'Reload', onPress: () => { callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT); } }],
+        { cancelable: false },
+      );
+    } else if (key === PROJECT_CODE_DEFAULT) {
+      Alert.alert(
+        'ERROR',
+        'Check that you are using the company network and reload!',
+        [{ text: 'Reload', onPress: () => { callAPI(getProjectList, PROJECT_CODE_DEFAULT); } }],
+        { cancelable: false },
+      );
+    }
   };
 
   const _onChangeUsername = text => {
@@ -94,25 +108,25 @@ export default ({ navigation }) => {
 
   const _onPressLogin = () => {
     Keyboard.dismiss();
-    setLoading(true);
+    setIsLoadingLogin(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         MessageAlert('WARNING', 'Network not available!');
-        setLoading(false);
+        setIsLoadingLogin(false);
       } else {
         if (username === '' || password === '') {
           MessageAlert('ERROR', 'The user name or password is invalid.');
-          setLoading(false);
+          setIsLoadingLogin(false);
           return;
         }
         if (projectCode === PROJECT_CODE_DEFAULT) {
           MessageAlert('ERROR', 'Please select a project.');
-          setLoading(false);
+          setIsLoadingLogin(false);
           return;
         }
         if (disciplineCode === DISCIPLINE_CODE_DEFAULT) {
           MessageAlert('ERROR', 'Please select a module.');
-          setLoading(false);
+          setIsLoadingLogin(false);
           return;
         }
         LoginAPI(username, password)
@@ -120,7 +134,7 @@ export default ({ navigation }) => {
             res = JSON.parse(res.data);
             if (res.error) {
               MessageAlert('ERROR', res.error_description);
-              setLoading(false);
+              setIsLoadingLogin(false);
               return;
             }
             if (res.access_token) {
@@ -135,14 +149,39 @@ export default ({ navigation }) => {
           })
           .catch(() => {
             MessageAlert('ERROR', 'Please check that you are using the company network!');
-            setLoading(false);
+            setIsLoadingLogin(false);
           });
       }
     });
   };
 
   const _onPressSelectProject = () => {
-    setIsVisibleProject(true);
+    if (username === '' || password === '') {
+      MessageAlert('ERROR', 'The user name or password is invalid.');
+    } else {
+      callAPI(getProjectList, PROJECT_CODE_DEFAULT);
+    }
+  };
+
+  const getProjectList = async () => {
+    let token = await Helper.getData('TOKEN');
+    GetProjectListAPI(username, token)
+      .then(res => {
+        if (res.success) {
+          setIsLoadingProject(false);
+          if (!res.data.length) {
+            MessageAlert('ERROR', 'Don\'t have any projects with this account.\nTry entering another account.');
+          } else {
+            setProjectList(res.data);
+            setIsVisibleProject(true);
+          }
+        } else {
+          confirmAlert(PROJECT_CODE_DEFAULT);
+        }
+      })
+      .catch(() => {
+        confirmAlert(PROJECT_CODE_DEFAULT);
+      });
   };
 
   const _onChangeProjectCode = (item) => {
@@ -151,7 +190,11 @@ export default ({ navigation }) => {
   };
 
   const _onPressSelectDiscipline = () => {
-    setIsVisibleDiscipline(true);
+    if (!disciplineList.length) {
+      MessageAlert('ERROR', 'No have any module code with this account.');
+    } else {
+      setIsVisibleDiscipline(true);
+    }
   };
 
   const _onChangeDisciplineCode = (item) => {
@@ -174,7 +217,7 @@ export default ({ navigation }) => {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>PTSC M&C</Text>
           </View>
-          <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
+          <View style={styles.containerCenter} pointerEvents={isLoadingLogin ? 'none' : 'auto'}>
             <View style={styles.inputContainer}>
               <Icon name='user-circle' style={styles.inputIcon} />
               <TextInput
@@ -207,23 +250,29 @@ export default ({ navigation }) => {
                   ? <Icon name="eye-slash" onPress={_onPressTogglePassword} style={styles.inputIcon} />
                   : <Icon name="eye" onPress={_onPressTogglePassword} style={styles.inputIcon} />)}
             </View>
-            <TouchableOpacity
-              style={[styles.selectContainer, styles.inputContainerLast]}
-              onPress={_onPressSelectProject}>
-              <Text style={styles.selectText}>{projectCode}</Text>
-            </TouchableOpacity>
+            {
+              isLoadingProject
+                ? <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]}>
+                  <ActivityIndicator size="large" color={OPP_COLOR} />
+                </TouchableOpacity>
+                : <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]} onPress={_onPressSelectProject}>
+                  <Text style={styles.selectText}>{projectCode}</Text>
+                </TouchableOpacity>
+            }
             <TouchableOpacity
               style={[styles.selectContainer, styles.inputContainerLast]}
               onPress={_onPressSelectDiscipline}>
               <Text style={styles.selectText}>{disciplineCode}</Text>
             </TouchableOpacity>
-            {loading
-              ? <TouchableOpacity style={styles.buttonContainer}>
-                <ActivityIndicator size="large" color={OPP_COLOR} />
-              </TouchableOpacity>
-              : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
-                <Text style={styles.buttonTitle}>LOGIN</Text>
-              </TouchableOpacity>}
+            {
+              isLoadingLogin
+                ? <TouchableOpacity style={styles.buttonContainer}>
+                  <ActivityIndicator size="large" color={OPP_COLOR} />
+                </TouchableOpacity>
+                : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
+                  <Text style={styles.buttonTitle}>LOGIN</Text>
+                </TouchableOpacity>
+            }
           </View>
         </KeyboardAwareScrollView>
         <Modal
@@ -281,7 +330,7 @@ export default ({ navigation }) => {
           </View>
         </Modal>
         <AwesomeAlert
-          show={isLoading}
+          show={isLoadingDiscipline}
           showProgress={true}
           closeOnTouchOutside={false}
           closeOnHardwareBackPress={false}
