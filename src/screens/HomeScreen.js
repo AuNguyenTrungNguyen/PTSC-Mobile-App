@@ -36,8 +36,8 @@ export default ({ route, navigation }) => {
     navigation.replace('Login');
   };
 
-  const _onPressUpdateDrawing = () => {
-    navigation.navigate('DrawingList', { projectCode: projectCode });
+  const _onPressConstructionUpdate = () => {
+    navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
   };
 
   const _onPressQCUpdate = () => {
@@ -148,7 +148,7 @@ export default ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.action}>
-          <TouchableOpacity style={styles.buttonContainer} onPress={_onPressUpdateDrawing}>
+          <TouchableOpacity style={styles.buttonContainer} onPress={_onPressConstructionUpdate}>
             <Text style={styles.buttonTitle}>Construction Update</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>

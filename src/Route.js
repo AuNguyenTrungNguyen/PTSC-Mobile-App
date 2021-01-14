@@ -8,12 +8,16 @@ import LoginScreen from './screens/authentication/LoginScreen';
 
 import HomeScreen from './screens/HomeScreen';
 import ReportsScreen from './screens/ReportsScreen';
+import ConstructionUpdateManageScreen from './screens/ConstructionUpdateManageScreen';
 
 import CameraScreen from './screens/camera/CameraScreen';
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/drawing/DrawingAddWelderScreen';
+
+import SpoolMatrixScreen from './screens/spool/SpoolMatrixScreen';
+import SpoolCameraScreen from './screens/spool/SpoolCameraScreen';
 
 import QCDrawingListScreen from './screens/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
@@ -60,6 +64,18 @@ export default () => {
             }
           }
         />
+
+        <Stack.Screen
+          name='ConstructionUpdateManage'
+          component={ConstructionUpdateManageScreen}
+          options={
+            {
+              title: 'Construction Update',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
         <Stack.Screen
           name='Reports'
           component={ReportsScreen}
@@ -117,6 +133,28 @@ export default () => {
           options={
             {
               title: 'Select Welders',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='SpoolMatrix'
+          component={SpoolMatrixScreen}
+          options={
+            {
+              title: 'Spool Matrix',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='SpoolCamera'
+          component={SpoolCameraScreen}
+          options={
+            {
+              title: 'QRCode Scanner',
               headerBackTitle: 'Back',
             }
           }

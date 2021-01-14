@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import NetInfo from '@react-native-community/netinfo';
+import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../utils/Helper';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
@@ -9,10 +10,11 @@ import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAP
 export default ({ route, navigation }) => {
 
   const [isScanned, setIsScanned] = useState(false);
+  const isFocused = useIsFocused();
   const { projectCode, teamLeader, code, source } = route.params;
 
   const _onQRCodeRead = scanResult => {
-    if (scanResult.data !== null && !isScanned) {
+    if (scanResult.data !== null && !isScanned && isFocused) {
       var data = scanResult.data.split('_');
       getFacilityCode(data[0], data[1], data[2]);
     }
@@ -110,7 +112,7 @@ export default ({ route, navigation }) => {
           <View style={[styles.bottomRight, styles.edge]} />
         </View>
         <View style={styles.backdrop} >
-          <Text style={styles.note}>Please move your camera over QR Code to scan it</Text>
+          <Text style={styles.note}>Please move your camera over QR Code to scan it {isFocused ? 'true' : 'false'}</Text>
         </View>
       </RNCamera>
     </SafeAreaView>
