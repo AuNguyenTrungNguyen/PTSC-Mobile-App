@@ -253,7 +253,7 @@ export default ({ navigation }) => {
             {
               isLoadingProject
                 ? <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]}>
-                  <ActivityIndicator size="large" color={OPP_COLOR} />
+                  <ActivityIndicator size="large" color={BASE_COLOR} />
                 </TouchableOpacity>
                 : <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]} onPress={_onPressSelectProject}>
                   <Text style={styles.selectText}>{projectCode}</Text>

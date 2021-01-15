@@ -311,19 +311,19 @@ const SpoolMatrix = ({ route, navigation }) => {
           <Text style={styles.cellData}>{item.SpoolNo}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellLongTitle}>WS_WeldedStatus</Text>
+          <Text style={styles.cellTitle}>WS_WeldedStatus</Text>
           <Text style={styles.cellData}>{formatEmptyData(item.WS_WeldedStatus)}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellLongTitle}>Field_FitUpStatus</Text>
+          <Text style={styles.cellTitle}>Field_FitUpStatus</Text>
           <Text style={styles.cellData}>{formatEmptyData(item.Field_FitUpStatus)}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellLongTitle}>Field_WeldedStatus</Text>
+          <Text style={styles.cellTitle}>Field_WeldedStatus</Text>
           <Text style={styles.cellData}>{formatEmptyData(item.Field_WeldedStatus)}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellLongTitle}>SpoolRigUpToSite</Text>
+          <Text style={styles.cellTitle}>SpoolRigUpToSite</Text>
           <View style={styles.cellAction}>
             <TouchableOpacity style={styles.itemAction} onPress={() => _onPressShowPicker(item.SpoolRigUpToSite, index)}>
               <Text style={styles.textAction} >{formatDateData(item.SpoolRigUpToSite)}</Text>
@@ -409,9 +409,12 @@ const SpoolMatrix = ({ route, navigation }) => {
                     updateSpoolList && updateSpoolList.length
                       ?
                       <TouchableOpacity style={styles.inputContainer} onPress={confirmUpdate} activeOpacity={1}>
-                        <View style={styles.inputText}>
-                          <Text>{drawingNo}</Text>
-                        </View>
+                        <TextInput
+                          editable={false}
+                          style={styles.inputText}
+                          value={drawingNo}
+                          underlineColorAndroid='transparent'
+                        />
                         {drawingNo == ''
                           ? null
                           : <FontAwesome5Icon name='times-circle' style={styles.inputIcon} />
@@ -500,21 +503,11 @@ const SpoolMatrix = ({ route, navigation }) => {
           <SafeAreaView>
             <View style={modals.container}>
               <View style={modals.list}>
-                <View style={modals.title}>
-                  <Text style={modals.text}>Current Facility Code: <Text style={modals.code}>{facilityCode}</Text></Text>
-                </View>
-                <View style={modals.row}>
-                  <Text style={modals.cellHeader}>CODE</Text>
-                  <View style={modals.line} />
-                  <Text style={modals.cellHeader}>NAME</Text>
-                </View>
                 <ScrollView>
                   {facilityList.map((item) => {
                     return (
                       <TouchableOpacity style={modals.row} onPress={() => _onChangeFacilityCode(item.code)}>
                         <Text style={modals.cell}>{item.code}</Text>
-                        <View style={modals.line} />
-                        <Text style={modals.cell}>{item.name}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -657,11 +650,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cellTitle: {
-    flex: 4,
-    justifyContent: 'center',
-  },
-  cellLongTitle: {
-    flex: 6,
+    flex: 5,
     justifyContent: 'center',
   },
   cellData: {
@@ -764,39 +753,18 @@ const modals = StyleSheet.create({
     width: windowWidth * 0.85,
     height: undefined,
   },
-  title: {
-    marginBottom: 16,
-  },
-  text: {
-    color: BASE_COLOR,
-  },
-  code: {
-    color: BASE_COLOR,
-    fontWeight: 'bold'
-  },
   row: {
     flexDirection: 'row',
-    height: 36,
+    minHeight: 36,
     borderColor: BASE_COLOR,
     borderWidth: 1,
     alignItems: 'center',
-  },
-  cellHeader: {
-    flex: 5,
-    color: BASE_COLOR,
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
   cell: {
     flex: 5,
     color: BASE_COLOR,
     paddingLeft: 4,
     paddingRight: 4,
-  },
-  line: {
-    height: 36,
-    width: 1,
-    backgroundColor: BASE_COLOR,
   },
   action: {
     width: windowWidth * 0.85,
