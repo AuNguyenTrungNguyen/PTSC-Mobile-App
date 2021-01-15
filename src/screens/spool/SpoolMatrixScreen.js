@@ -164,7 +164,7 @@ const SpoolMatrix = ({ route, navigation }) => {
       setErrorList(errorIds);
       Alert.alert(
         'WARNING',
-        'There is data that has not been updated!',
+        'There is data that has not been updated.\nPlease Submit to Server before implementing this action!',
         [
           {
             text: 'Cancel',
@@ -188,7 +188,7 @@ const SpoolMatrix = ({ route, navigation }) => {
       setErrorList(errorIds);
       Alert.alert(
         'WARNING',
-        'There is data that has not been updated!',
+        'There is data that has not been updated.\nPlease Submit to Server before implementing this action!',
         [
           {
             text: 'Cancel',
@@ -243,7 +243,7 @@ const SpoolMatrix = ({ route, navigation }) => {
     setErrorList(errorIds);
     Alert.alert(
       'WARNING',
-      'There is data that has not been updated!',
+      'There is data that has not been updated.\nPlease Submit to Server before implementing this action!',
       [
         {
           text: 'Cancel',
@@ -409,12 +409,9 @@ const SpoolMatrix = ({ route, navigation }) => {
                     updateSpoolList && updateSpoolList.length
                       ?
                       <TouchableOpacity style={styles.inputContainer} onPress={confirmUpdate} activeOpacity={1}>
-                        <TextInput
-                          editable={false}
-                          style={styles.inputText}
-                          value={drawingNo}
-                          underlineColorAndroid='transparent'
-                        />
+                        <View style={styles.inputText}>
+                          <Text style={styles.buttonTitleDark}>{drawingNo}</Text>
+                        </View>
                         {drawingNo == ''
                           ? null
                           : <FontAwesome5Icon name='times-circle' style={styles.inputIcon} />
