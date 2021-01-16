@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, Dimensions, Modal, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Dimensions, Modal, ScrollView } from 'react-native';
 
-const HeatNoModal = props => {
+const PickupDataModal = props => {
   return (
     <Modal
       animationType='fade'
@@ -15,14 +15,20 @@ const HeatNoModal = props => {
                 {props.children}
               </ScrollView>
             </View>
-            <View style={modals.action}>
-              <TouchableOpacity style={modals.button} onPress={props.onClear}>
-                <Text style={modals.buttonTitle}>Clear</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={modals.button} onPress={props.onCancel}>
-                <Text style={modals.buttonTitle}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+            {
+              props.loaded
+                ?
+                <View style={modals.action}>
+                  <TouchableOpacity style={modals.button} onPress={props.onClear}>
+                    <Text style={modals.buttonTitle}>Clear</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={modals.button} onPress={props.onCancel}>
+                    <Text style={modals.buttonTitle}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+                :
+                null
+            }
           </View>
         </SafeAreaView>
       </View>
@@ -51,6 +57,7 @@ const modals = StyleSheet.create({
     borderRadius: 8,
   },
   list: {
+    flexShrink: 1,
     padding: 16,
     width: windowWidth * 0.85,
     height: undefined,
@@ -76,4 +83,4 @@ const modals = StyleSheet.create({
   },
 });
 
-export default HeatNoModal;
+export default PickupDataModal;

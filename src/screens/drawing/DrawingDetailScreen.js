@@ -14,10 +14,11 @@ import Helper from '../../utils/Helper';
 import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
 import GetHeatNoListAPI from '../../apis/drawing/GetHeatNoListAPI';
+import GetWPSListAPI from '../../apis/drawing/GetWPSListAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import HelpModal from '../../components/drawing/HelpModal';
-import HeatNoModal from '../../components/drawing/HeatNoModal';
+import PickupDataModal from '../../components/drawing/PickupDataModal';
 
 export default ({ route, navigation }) => {
 
@@ -180,8 +181,11 @@ export default ({ route, navigation }) => {
       if (!element.hasOwnProperty('WelderID')) {
         element['WelderID'] = data['WelderID'];
       }
+      if (!element.hasOwnProperty('WPSNo')) {
+        element['WPSNo'] = data['WPSNo'];
+      }
       // Check CLEAR
-      if (!element['ItemDate'] && !element['ItemPercent'] && !element['WelderID']) {
+      if (!element['ItemDate'] && !element['ItemPercent'] && !element['WelderID'] && !element['WPSNo']) {
         element['IsClear'] = true;
       }
     });
@@ -255,7 +259,7 @@ export default ({ route, navigation }) => {
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
 
   const [isVisibleHeatNo, setIsVisibleHeatNo] = useState(false);
-  const [heatNoList, setHeatNoList] = useState(['Loading']);
+  const [heatNoList, setHeatNoList] = useState(null);
 
   const _onPressShowHeatNoPopup = (value, index, key) => {
     setIndexUpdate(index);
@@ -313,6 +317,68 @@ export default ({ route, navigation }) => {
     setUpdateDrawingList(array);
     setIsVisibleHeatNo(false);
   };
+
+  const [isVisibleWPS, setIsVisibleWPS] = useState(false);
+  const [wpsList, setWPSList] = useState(null);
+
+  const _onPressShowWPSPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleWPS(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getWPSList();
+      }
+    });
+  };
+
+  const _onPressClearWPSPopup = () => {
+    _onChangeWPSCode(null);
+    setIsVisibleWPS(false);
+  };
+
+  const getWPSList = async () => {
+    let token = await Helper.getData('TOKEN');
+    GetWPSListAPI(projectCode, token)
+      .then(res => {
+        if (res.success) {
+          setWPSList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+
+  const _onChangeWPSCode = (data) => {
+    let array = [...detailDrawingList];
+    array[indexUpdate][keyUpdate] = data;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+    let weldNo = detailDrawingList[indexUpdate].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: data });
+    } else {
+      array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+    }
+    setUpdateDrawingList(array);
+    setIsVisibleWPS(false);
+  };
+
+
 
   /**
    * Handle for action edit data in list
@@ -804,6 +870,25 @@ export default ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>WPS:</Text>
+              </View>
+              <View style={styles.cellDataLine}>
+                <TouchableOpacity
+                  style={styles.itemActionWelder}
+                  onPress={() => _onPressShowWPSPopup(index, 'WPSNo')}>
+                  <Text style={styles.textDataWelder} >{item.WPSNo}</Text>
+                  {
+                    condition
+                      ?
+                      <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
+                      :
+                      <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={BASE_COLOR} />
+                  }
+                </TouchableOpacity>
+              </View>
+            </View>
           </>)}
       </View>
     );
@@ -922,26 +1007,60 @@ export default ({ route, navigation }) => {
         visible={isVisibleHelp}
         code={code}
         onClose={() => setIsVisibleHelp(false)} />
-      <HeatNoModal
+      <PickupDataModal
         visible={isVisibleHeatNo}
         onClear={_onPressClearHeatNoPopup}
-        onCancel={() => setIsVisibleHeatNo(false)}  >
+        onCancel={() => setIsVisibleHeatNo(false)}
+        loaded={heatNoList != null}>
         {
-          heatNoList.length
+          heatNoList != null
             ?
-            heatNoList.map((item) => {
-              return (
-                <TouchableOpacity style={modals.row} onPress={() => _onChangeHeatNoCode(item)}>
-                  <Text style={modals.cell}>{item}</Text>
-                </TouchableOpacity>
-              );
-            })
+            heatNoList.length
+              ?
+              heatNoList.map((item) => {
+                return (
+                  <TouchableOpacity style={modals.row} onPress={() => _onChangeHeatNoCode(item)}>
+                    <Text style={modals.cell}>{item}</Text>
+                  </TouchableOpacity>
+                );
+              })
+              :
+              <View>
+                <Text style={modals.emptyText}>No have any data!</Text>
+              </View>
             :
             <View>
-              <Text style={modals.emptyText}>No have any data!</Text>
+              <ActivityIndicator size='large' color={BASE_COLOR} />
             </View>
         }
-      </HeatNoModal>
+      </PickupDataModal>
+      <PickupDataModal
+        visible={isVisibleWPS}
+        onClear={_onPressClearWPSPopup}
+        onCancel={() => setIsVisibleWPS(false)}
+        loaded={wpsList != null}>
+        {
+          wpsList != null
+            ?
+            wpsList.length
+              ?
+              wpsList.map((item) => {
+                return (
+                  <TouchableOpacity style={modals.row} onPress={() => _onChangeWPSCode(item)}>
+                    <Text style={modals.cell}>{item}</Text>
+                  </TouchableOpacity>
+                );
+              })
+              :
+              <View>
+                <Text style={modals.emptyText}>No have any data!</Text>
+              </View>
+            :
+            <View>
+              <ActivityIndicator size='large' color={BASE_COLOR} />
+            </View>
+        }
+      </PickupDataModal>
     </SafeAreaView>
   );
 }
