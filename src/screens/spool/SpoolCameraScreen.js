@@ -1,47 +1,24 @@
 import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import { useIsFocused } from '@react-navigation/native';
 
 const SpoolCameraScreen = ({ navigation }) => {
 
-  const [isScanned, setIsScanned] = useState(false);
+  const isFocused = useIsFocused();
 
   const _onQRCodeRead = scanResult => {
-    if (scanResult.data !== null && !isScanned) {
+    if (scanResult.data !== null && isFocused) {
       goBackSpoolScreen(scanResult.data);
     }
   };
 
   const goBackSpoolScreen = (scanResult) => {
-    setIsScanned(true);
     var data = scanResult.split('_');
     if (data != null && data[0]) {
-      Alert.alert(
-        'SUCCESS',
-        'DrawingNo: ' + data[0],
-        [
-          {
-            text: 'Back',
-            onPress: () => {
-              navigation.goBack();
-            },
-            style: 'cancel'
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('SpoolMatrix', {
-                drawingNo: data[0],
-              });
-            }
-          },
-          {
-            text: 'Rescan',
-            onPress: () => { setIsScanned(false) }
-          }
-        ],
-        { cancelable: false },
-      );
+      navigation.navigate('SpoolMatrix', {
+        drawingNo: data[0],
+      });
     } else {
       Alert.alert(
         'ERROR',

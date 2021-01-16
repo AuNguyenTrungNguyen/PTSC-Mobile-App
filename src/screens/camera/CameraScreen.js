@@ -112,7 +112,7 @@ export default ({ route, navigation }) => {
           <View style={[styles.bottomRight, styles.edge]} />
         </View>
         <View style={styles.backdrop} >
-          <Text style={styles.note}>Please move your camera over QR Code to scan it {isFocused ? 'true' : 'false'}</Text>
+          <Text style={styles.note}>Please move your camera over QR Code to scan it</Text>
         </View>
       </RNCamera>
     </SafeAreaView>

@@ -409,9 +409,20 @@ const SpoolMatrix = ({ route, navigation }) => {
                     updateSpoolList && updateSpoolList.length
                       ?
                       <TouchableOpacity style={styles.inputContainer} onPress={confirmUpdate} activeOpacity={1}>
-                        <View style={styles.inputText}>
-                          <Text style={styles.buttonTitleDark}>{drawingNo}</Text>
-                        </View>
+                        {
+                          Platform.OS === 'android'
+                            ?
+                            <TextInput
+                              editable={false}
+                              style={styles.inputText}
+                              value={drawingNo}
+                              underlineColorAndroid='transparent'
+                            />
+                            :
+                            <View style={styles.inputText}>
+                              <Text style={styles.buttonTitleDark} numberOfLines={1}>{drawingNo}</Text>
+                            </View>
+                        }
                         {drawingNo == ''
                           ? null
                           : <FontAwesome5Icon name='times-circle' style={styles.inputIcon} />
