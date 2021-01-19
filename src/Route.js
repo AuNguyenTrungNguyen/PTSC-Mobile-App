@@ -11,7 +11,11 @@ import ReportsScreen from './screens/ReportsScreen';
 import ConstructionUpdateManageScreen from './screens/ConstructionUpdateManageScreen';
 
 import CameraScreen from './screens/camera/CameraScreen';
+import AllStatusCameraScreen from './screens/camera/AllStatusCameraScreen';
+
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
+import DrawingSearchScreen from './screens/drawing/DrawingSearchScreen';
+import DrawingAllStatusScreen from './screens/drawing/DrawingAllStatusScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/drawing/DrawingAddWelderScreen';
@@ -103,6 +107,36 @@ export default () => {
           options={
             {
               title: 'QRCode Scanner',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='AllStatusCamera'
+          component={AllStatusCameraScreen}
+          options={
+            {
+              title: 'QRCode Scanner',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingSearch'
+          component={DrawingSearchScreen}
+          options={
+            {
+              title: 'Search Drawing',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingAllStatus'
+          component={DrawingAllStatusScreen}
+          options={
+            {
+              title: 'Drawing Detail Status',
               headerBackTitle: 'Back',
             }
           }

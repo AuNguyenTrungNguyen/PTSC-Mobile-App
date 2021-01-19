@@ -100,6 +100,24 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const _onPressQRCodeAllStatus = () => {
+    navigation.navigate(
+      'AllStatusCamera',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  const _onPressSearchAllStatus = () => {
+    navigation.navigate(
+      'DrawingSearch',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -120,13 +138,13 @@ export default ({ route, navigation }) => {
         <View style={styles.table}>
           <View style={styles.row}>
             <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp} activeOpacity={1}>
                 <Text style={styles.itemTitle}>Cons Scan FitUp</Text>
                 <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
               </TouchableOpacity>
             </View>
             <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld} activeOpacity={1}>
                 <Text style={styles.itemTitle}>Cons Scan Weld</Text>
                 <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
               </TouchableOpacity>
@@ -134,15 +152,29 @@ export default ({ route, navigation }) => {
           </View>
           <View style={styles.row}>
             <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUpQC}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUpQC} activeOpacity={1}>
                 <Text style={styles.itemTitle}>QC Scan FitUp</Text>
                 <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
               </TouchableOpacity>
             </View>
             <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeVisualQC}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeVisualQC} activeOpacity={1}>
                 <Text style={styles.itemTitle}>QC Scan Weld</Text>
                 <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.cell}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeAllStatus} activeOpacity={1}>
+                <Text style={styles.itemTitle}>Scan All Status</Text>
+                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cell}>
+              <TouchableOpacity style={styles.itemContainer} onPress={_onPressSearchAllStatus} activeOpacity={1}>
+                <Text style={styles.itemTitle}>Search All Status</Text>
+                <Ionicons name='md-search' size={48} color={BASE_COLOR} style={styles.itemIcon} />
               </TouchableOpacity>
             </View>
           </View>
@@ -214,15 +246,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemContainer: {
-    height: '80%',
-    width: '80%',
+    height: '90%',
+    width: '90%',
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 12,
+    padding: 4,
   },
   itemTitle: {
+    textAlign: 'center',
     color: BASE_COLOR,
     fontSize: 16,
   },
@@ -231,7 +265,7 @@ const styles = StyleSheet.create({
     height: 48,
     width: 48,
     margin: 4,
-    marginTop: 16,
+    marginVertical: 16,
   },
 
 
