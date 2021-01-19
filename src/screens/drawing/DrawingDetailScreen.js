@@ -625,18 +625,32 @@ export default ({ route, navigation }) => {
   const renderItem = ({ index, item }) => {
     let itemDate = code == 'FitUp' ? item['FittingDate'] : item['WeldingDate'];
     let itemPercent = code == 'FitUp' ? item['FitPercentage'] : item['WeldPercentage'];
-    let compareDate = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
-    let comparePercent = itemPercent != null && itemPercent == 100;
-    let indexItem = updateDrawingList.findIndex((obj => obj.RowIndex == item.RowIndex));
-    let condition = compareDate && comparePercent && indexItem < 0;
+
+    let isDateValid = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
+    let isPercentValid = itemPercent != null && itemPercent == 100;
+    let isUpdateValid = updateDrawingList.findIndex((obj => obj.RowIndex == item.RowIndex)) < 0;
+
+    let isDisableItem = isDateValid && isPercentValid && isUpdateValid;
     let checkHasData = code == 'FitUp' ? (itemDate || itemPercent) : (itemDate || itemPercent || item['WelderID']);
     let isUserError = errorList.indexOf(item.RowIndex) > -1;
+
+    let isDisableByProject = false;
+    if (itemDate) {
+      let nowString = Moment(new Date()).format("YYYY-MM-DD");
+      let now = Moment(nowString, "YYYY-MM-DD");
+      let dateString = Moment(itemDate, "YYYY-MM-DD");
+      let date = Moment(dateString, "YYYY-MM-DD");
+      isDisableByProject = Moment.duration(now.diff(date)).asDays() > 1 ? true : false;
+    }
+    isDisableByProject = isUpdateValid && isDisableByProject;
+    isDisableItem = projectCode === 'DNWHP' ? isDisableByProject : isDisableItem;
+
     return (
-      <View style={isUserError ? styles.boxError : styles.box} pointerEvents={condition ? 'none' : 'auto'}>
+      <View style={isUserError ? styles.boxError : styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             {
-              condition
+              isDisableItem
                 ?
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>
@@ -655,7 +669,7 @@ export default ({ route, navigation }) => {
           </View>
           <>
             {
-              !condition && checkHasData
+              !isDisableItem && checkHasData
                 ?
                 (<TouchableOpacity
                   style={styles.itemDone}
@@ -670,7 +684,7 @@ export default ({ route, navigation }) => {
                 </TouchableOpacity>)
             }
             {
-              condition
+              isDisableItem
                 ?
                 (<TouchableOpacity
                   style={styles.itemDisabled}
@@ -699,7 +713,7 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowPicker(item.FittingDate, index, 'FittingDate')}>
                   <Text style={styles.textData} >{formatDateData(item.FittingDate)}</Text>
                   {
-                    condition
+                    isDisableItem
                       ?
                       <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
                       :
@@ -719,7 +733,7 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
                   <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
                   {
-                    condition
+                    isDisableItem
                       ?
                       <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
                       :
@@ -728,7 +742,7 @@ export default ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               {
-                condition
+                isDisableItem
                   ?
                   (<View style={styles.cellPercentRight}>
                     <TouchableOpacity style={styles.itemPercentDisable}>
@@ -765,7 +779,7 @@ export default ({ route, navigation }) => {
                     onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
                     <Text style={styles.textDataWelder}>{formatEmptyData(item.Heat01)}</Text>
                     {
-                      condition || !item.ItemCode01
+                      isDisableItem || !item.ItemCode01
                         ?
                         <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
                         :
@@ -796,7 +810,7 @@ export default ({ route, navigation }) => {
                     onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
                     <Text style={styles.textDataWelder}>{formatEmptyData(item.Heat02)}</Text>
                     {
-                      condition || !item.ItemCode02
+                      isDisableItem || !item.ItemCode02
                         ?
                         <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
                         :
@@ -820,7 +834,7 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowPicker(item.WeldingDate, index, 'WeldingDate')}>
                   <Text style={styles.textData} >{formatDateData(item.WeldingDate)}</Text>
                   {
-                    condition
+                    isDisableItem
                       ?
                       <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
                       :
@@ -840,7 +854,7 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
                   <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
                   {
-                    condition
+                    isDisableItem
                       ?
                       <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
                       :
@@ -849,7 +863,7 @@ export default ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               {
-                condition
+                isDisableItem
                   ?
                   (<View style={styles.cellPercent}>
                     <TouchableOpacity style={styles.itemPercentDisable}>
@@ -892,7 +906,7 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
                   <Text style={styles.textDataWelder} >{item.WelderID}</Text>
                   {
-                    condition
+                    isDisableItem
                       ?
                       <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={'#a3a3a3'} />
                       :
@@ -911,7 +925,7 @@ export default ({ route, navigation }) => {
                   onPress={() => _onPressShowWPSPopup(index, 'WPSNo')}>
                   <Text style={styles.textDataWelder} >{item.WPSNo}</Text>
                   {
-                    condition
+                    isDisableItem
                       ?
                       <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
                       :
