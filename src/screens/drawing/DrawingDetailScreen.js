@@ -496,12 +496,18 @@ export default ({ route, navigation }) => {
   const _onPressClearNow = (index) => {
     let keyDate = code == 'FitUp' ? 'FittingDate' : 'WeldingDate';
     let keyPercent = code == 'FitUp' ? 'FitPercentage' : 'WeldPercentage';
-    let valueDate = null;
-    let valuePercent = null;
+    let valueClear = null;
 
     let array = [...detailDrawingList];
-    array[index][keyDate] = valueDate;
-    array[index][keyPercent] = valuePercent;
+    array[index][keyDate] = valueClear;
+    array[index][keyPercent] = valueClear;
+    if (code == 'FitUp') {
+      array[index]['Heat01'] = valueClear;
+      array[index]['Heat02'] = valueClear;
+    } else {
+      array[index]['WelderID'] = valueClear;
+      array[index]['WPSNo'] = valueClear;
+    }
     setDetailDrawingList(array);
 
     array = [...updateDrawingList];
@@ -509,10 +515,35 @@ export default ({ route, navigation }) => {
     let weldNo = detailDrawingList[index].WeldNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemDate']: valueDate, ['ItemPercent']: valuePercent });
+      if (code == 'FitUp') {
+        array.push({
+          RowIndex: rowIndex,
+          WeldNo: weldNo,
+          ['ItemDate']: valueClear,
+          ['ItemPercent']: valueClear,
+          ['Heat01']: valueClear,
+          ['Heat02']: valueClear
+        });
+      } else {
+        array.push({
+          RowIndex: rowIndex,
+          WeldNo: weldNo,
+          ['ItemDate']: valueClear,
+          ['ItemPercent']: valueClear,
+          ['WelderID']: valueClear,
+          ['WPSNo']: valueClear
+        });
+      }
     } else {
       array[objIndex]['ItemDate'] = detailDrawingList[index][keyDate];
       array[objIndex]['ItemPercent'] = detailDrawingList[index][keyPercent];
+      if (code == 'FitUp') {
+        array[objIndex]['Heat01'] = detailDrawingList[index]['Heat01'];
+        array[objIndex]['Heat02'] = detailDrawingList[index]['Heat02'];
+      } else {
+        array[objIndex]['WelderID'] = detailDrawingList[index]['WelderID'];
+        array[objIndex]['WPSNo'] = detailDrawingList[index]['WPSNo'];
+      }
     }
     setUpdateDrawingList(array);
   };
