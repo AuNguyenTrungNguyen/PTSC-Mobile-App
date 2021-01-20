@@ -9,7 +9,7 @@ import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
 import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
-import GetDrawingCompletePercentAPI from '../../apis/drawing/GetDrawingCompletePercentAPI';
+import GetQCCompletePercentAPI from '../../apis/qc/GetQCCompletePercentAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
@@ -177,7 +177,7 @@ export default ({ route, navigation }) => {
     Keyboard.dismiss();
     let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
     let token = await Helper.getData('TOKEN');
-    GetDrawingCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
+    GetQCCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
       .then(res => {
         if (res.success) {
           let array = [...drawingList];
