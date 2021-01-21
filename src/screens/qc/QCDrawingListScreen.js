@@ -711,6 +711,7 @@ const modals = StyleSheet.create({
     borderRadius: 8,
   },
   list: {
+    flexShrink: 1,
     padding: 16,
     width: windowWidth * 0.85,
     height: undefined,
@@ -727,7 +728,7 @@ const modals = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    height: 36,
+    minHeight: 36,
     borderColor: BASE_COLOR,
     borderWidth: 1,
     alignItems: 'center',
@@ -741,11 +742,10 @@ const modals = StyleSheet.create({
   cell: {
     flex: 5,
     color: BASE_COLOR,
-    paddingLeft: 4,
-    paddingRight: 4,
+    padding: 4,
   },
   line: {
-    height: 36,
+    height: '100%',
     width: 1,
     backgroundColor: BASE_COLOR,
   },

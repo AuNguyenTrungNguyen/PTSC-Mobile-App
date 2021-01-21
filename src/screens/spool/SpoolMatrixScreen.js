@@ -340,7 +340,7 @@ const SpoolMatrix = ({ route, navigation }) => {
   };
 
   const formatDateData = data => {
-    return data != null ? Moment(data).format("DD-MMM-YY") : '';
+    return data ? Moment(data).format("DD-MMM-YY") : '';
   };
 
   /**
@@ -511,11 +511,21 @@ const SpoolMatrix = ({ route, navigation }) => {
           <SafeAreaView>
             <View style={modals.container}>
               <View style={modals.list}>
+                <View style={modals.title}>
+                  <Text style={modals.text}>Current Facility Code: <Text style={modals.code}>{facilityCode}</Text></Text>
+                </View>
+                <View style={modals.row}>
+                  <Text style={modals.cellHeader}>CODE</Text>
+                  <View style={modals.line} />
+                  <Text style={modals.cellHeader}>NAME</Text>
+                </View>
                 <ScrollView>
                   {facilityList.map((item) => {
                     return (
                       <TouchableOpacity style={modals.row} onPress={() => _onChangeFacilityCode(item.code)}>
                         <Text style={modals.cell}>{item.code}</Text>
+                        <View style={modals.line} />
+                        <Text style={modals.cell}>{item.name}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -757,9 +767,20 @@ const modals = StyleSheet.create({
     borderRadius: 8,
   },
   list: {
+    flexShrink: 1,
     padding: 16,
     width: windowWidth * 0.85,
     height: undefined,
+  },
+  title: {
+    marginBottom: 16,
+  },
+  text: {
+    color: BASE_COLOR,
+  },
+  code: {
+    color: BASE_COLOR,
+    fontWeight: 'bold'
   },
   row: {
     flexDirection: 'row',
@@ -768,11 +789,21 @@ const modals = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
   },
+  cellHeader: {
+    flex: 5,
+    color: BASE_COLOR,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   cell: {
     flex: 5,
     color: BASE_COLOR,
-    paddingLeft: 4,
-    paddingRight: 4,
+    padding: 4,
+  },
+  line: {
+    height: '100%',
+    width: 1,
+    backgroundColor: BASE_COLOR,
   },
   action: {
     width: windowWidth * 0.85,
