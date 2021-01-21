@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Dimensions, Alert, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Dimensions, Alert, Modal, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageResizer from 'react-native-image-resizer';
@@ -7,6 +7,8 @@ import RNFetchBlob from 'rn-fetch-blob';
 import Toast from 'react-native-simple-toast';
 import FastImage from 'react-native-fast-image';
 import Dialog from 'react-native-dialog';
+import ImageView from 'react-native-image-viewing';
+import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
@@ -31,6 +33,9 @@ export default ({ route }) => {
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [pictureId, setPictureId] = useState(null);
   const [pictureNote, setPictureNote] = useState(null);
+
+  const [isOpenImage, setIsOpenImage] = useState(false);
+  const [openImage, setOpenImage] = useState([]);
 
   useEffect(
     () => {
@@ -253,7 +258,97 @@ export default ({ route }) => {
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT);
       });
-  }
+  };
+
+  const _onPressOpenImage = uri => {
+    setOpenImage([{ uri: uri }]);
+    setIsOpenImage(true);
+  };
+
+  const _onPressSaveImage = async () => {
+    if (Platform.OS === 'android' && !(await hasAndroidPermissionSaveStorage())) {
+      Alert.alert(
+        'WARNING',
+        'Please accept picture permissions to continue',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      savePicture();
+    }
+  };
+
+  const savePicture = async () => {
+    try {
+      let indexFileName = openImage[0].uri.lastIndexOf('/');
+      let imageName = openImage[0].uri.substring(indexFileName);
+      let indexExtension = imageName.lastIndexOf('.');
+      let imageExtension = imageName.substring(indexExtension + 1);
+      let path = RNFetchBlob.fs.dirs.MainBundleDir + imageName;
+      RNFetchBlob
+        .config({
+          fileCache: true,
+          appendExt: imageExtension,
+          path: path,
+        })
+        .fetch('GET', openImage[0].uri)
+        .then((res) => {
+          CameraRoll.save(res.path())
+            .then(() => {
+              Alert.alert(
+                'SUCCESS',
+                'Picture saved successfully.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                ],
+              )
+            })
+            .catch(() => {
+              Alert.alert(
+                'ERROR',
+                'An error occured while executing your request.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                ],
+              )
+            });
+        });
+    } catch (error) {
+      Alert.alert(
+        'ERROR',
+        'An error occured while executing your request.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+      )
+    }
+  };
+
+  const hasAndroidPermissionSaveStorage = async () => {
+    const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+    const hasPermission = await PermissionsAndroid.check(permission);
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(permission);
+    return status === 'granted';
+  };
 
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
@@ -278,12 +373,14 @@ export default ({ route }) => {
   const renderItemWithAction = ({ item }) => {
     return (
       <View style={styles.imageContainer}>
-        <FastImage
-          style={styles.imageItem}
-          source={{
-            uri: item.uri,
-          }}
-        />
+        <TouchableOpacity style={styles.imageItem} activeOpacity={1} onPress={() => { _onPressOpenImage(item.uri) }}>
+          <FastImage
+            style={styles.imageItem}
+            source={{
+              uri: item.uri,
+            }}
+          />
+        </TouchableOpacity>
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.username}</Text>
           {
@@ -407,7 +504,7 @@ export default ({ route }) => {
                   <Text style={styles.buttonTitle}>Upload Pictures</Text>
                 </TouchableOpacity>}
               <TouchableOpacity style={styles.buttonRight} onPress={() => {
-                setIsLoading(false); 
+                setIsLoading(false);
                 setIsSelecting(false);
                 setPictureNote(null);
               }}>
@@ -432,6 +529,27 @@ export default ({ route }) => {
         }} />
         <Dialog.Button label='Update' onPress={_onPressUpdateImage} />
       </Dialog.Container>
+      <ImageView
+        visible={isOpenImage}
+        images={openImage}
+        imageIndex={0}
+        onRequestClose={() => setIsOpenImage(false)}
+        FooterComponent={
+          ({ imageIndex }) => {
+            return (
+              <SafeAreaView style={styles.bottomImageRoot}>
+                <View style={styles.bottomImageContanier}>
+                  <TouchableOpacity
+                    style={styles.bottomSaveButton}
+                    onPress={_onPressSaveImage} >
+                     <Text style={styles.buttonTitleDark}>Save Picture</Text>
+                  </TouchableOpacity>
+                </View>
+              </SafeAreaView>
+            );
+          }
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -577,5 +695,22 @@ const styles = StyleSheet.create({
   },
   buttonTitleDark: {
     color: BASE_COLOR,
+  },
+
+  bottomImageRoot: {
+    flex: 1,
+  },
+  bottomImageContanier: {
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  bottomSaveButton: {
+    backgroundColor: OPP_COLOR,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 8,
   },
 });
