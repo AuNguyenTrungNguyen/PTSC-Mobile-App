@@ -10,7 +10,7 @@ import Helper from '../../utils/Helper';
 const ANDROID_STORE = 'https://play.google.com/store/apps/details?id=com.ptsc_cloud';
 const IOS_STORE = 'https://testflight.apple.com/join/4EoDbXUS';
 const LATEST_VERSION = '2.0';
-const LATEST_BUILD_NUMBER = '18';
+const LATEST_BUILD_NUMBER = '19';
 
 export default ({ navigation }) => {
 

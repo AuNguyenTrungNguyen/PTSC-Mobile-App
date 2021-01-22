@@ -81,7 +81,6 @@ target 'PTSC_CLOUD' do
 
 
 
-  pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
 
   target 'PTSC_CLOUDTests' do
     inherit! :complete
