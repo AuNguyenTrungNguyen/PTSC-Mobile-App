@@ -1,41 +1,50 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Moment from 'moment';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../utils/Helper';
-import GetDrawingDetailAPI from '../../apis/qc/GetDrawingDetailAPI';
-import UpdateDrawingDetailAPI from '../../apis/qc/UpdateDrawingDetailAPI';
+import GetSpendListAPI from '../../apis/qc/GetSpendListAPI';
+import UpdateSpendListAPI from '../../apis/qc/UpdateSpendListAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
+import TotalLocationModal from '../../components/drawing/TotalLocationModal';
 
 export default ({ route, navigation }) => {
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [detailDrawingList, setDetailDrawingList] = useState(null);
-  const [updateDrawingList, setUpdateDrawingList] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
+  const [spendList, setSpendList] = useState([]);
+  const [updateSpendList, setUpdateSpendList] = useState([]);
+
+  const [isVisibleTotal, setIsVisibleTotal] = useState(false);
+  const [totalList, setTotalList] = useState([]);
+
+  const { projectCode, userLogin, code } = route.params;
+
+  const [weldNo, setWeldNo] = useState('');
+  const [drawingNo, setDrawingNo] = useState('');
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
-
-  useEffect(
-    () => {
-      callAPI(getDrawingDetail);
-    }, [route.params?.welderSelected]
-  );
-
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleTotal(true) }}>
+            <Ionicons
+              size={24}
+              name={'md-list-circle-outline'} color={iconColor} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -47,7 +56,6 @@ export default ({ route, navigation }) => {
       ),
     });
   }, [navigation, isShowDescription]);
-
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -57,12 +65,19 @@ export default ({ route, navigation }) => {
     });
   };
 
+  useEffect(
+    () => {
+      callAPI(getSpendListData);
+    }, []
+  );
+
   const callAPI = executedAPI => {
-    setIsLoading(false);
+    setIsSearching(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
+        setIsSearching(false);
         MessageAlert('WARNING', 'Network not available!');
       } else {
         executedAPI();
@@ -70,82 +85,92 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const getDrawingDetail = async () => {
+  const getSpendListData = async (weld = weldNo, drawing = drawingNo) => {
     let token = await Helper.getData('TOKEN');
-    GetDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+    GetSpendListAPI(projectCode, weld, drawing, code, token)
       .then(res => {
         if (res.success) {
-          setDetailDrawingList(res.data);
+          setSpendList(res.data);
+          setTotalList(res.total);
           setIsLoading(false);
           setIsError(false);
           setIsUploading(false);
+          setIsSearching(false);
         } else {
           setIsLoading(false);
           setIsError(true);
           setIsUploading(false);
+          setIsSearching(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
         setIsUploading(false);
+        setIsSearching(false);
       });
   };
 
-  const updateDrawingDetail = async () => {
+  const updateSpendData = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, code, updateDrawingList, token)
+    UpdateSpendListAPI(projectCode, code, updateSpendList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-          setUpdateDrawingList([]);
+          setUpdateSpendList([]);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
-        callAPI(getDrawingDetail);
+        callAPI(getSpendListData);
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);
       });
   };
 
+  const _onChangeWeldNo = no => {
+    setWeldNo(no);
+    if (!no) {
+      callAPI(() => { getSpendListData(no, drawingNo) });
+    }
+  };
+
+  const _onChangeDrawingNo = (no) => {
+    setDrawingNo(no);
+    if (!no) {
+      callAPI(() => { getSpendListData(weldNo, no) });
+    }
+  };
+
+  const _onPressSearchDrawing = () => {
+    Keyboard.dismiss();
+    callAPI(getSpendListData);
+  };
+
   const _onPressSubmitToServer = async () => {
-    if (updateDrawingList.length) {
+    if (updateSpendList.length) {
       setIsUploading(true);
-      callAPI(updateDrawingDetail);
+      callAPI(updateSpendData);
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
   };
 
-  const _onPressManagePicture = () => {
-    navigation.navigate(
-      'DrawingImage',
-      {
-        projectCode: projectCode,
-        facilityCode: facilityCode,
-        drawingNo: drawingNo,
-        code: code == 'Visual' ? 'Weld' : code,
-        teamLeader: teamLeader
-      }
-    );
-  };
-
   const _onPressChangeStatus = (value, index, key) => {
-    let array = [...detailDrawingList];
+    let array = [...spendList];
     array[index][key] = value;
-    setDetailDrawingList(array);
+    setSpendList(array);
 
-    array = [...updateDrawingList];
-    let rowIndex = detailDrawingList[index].RowIndex;
-    let weldNo = detailDrawingList[index].WeldNo;
+    array = [...updateSpendList];
+    let rowIndex = spendList[index].RowIndex;
+    let weldNo = spendList[index].WeldNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
       array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemResult']: value });
     } else {
-      array[objIndex]['ItemResult'] = detailDrawingList[index][key];
+      array[objIndex]['ItemResult'] = spendList[index][key];
     }
-    setUpdateDrawingList(array);
+    setUpdateSpendList(array);
   };
 
   const formatEmptyData = data => {
@@ -158,16 +183,36 @@ export default ({ route, navigation }) => {
 
 
 
-
-  const ListEmptyData = () => (
+  const ListSearchData = () => (
     <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any data</Text>
+      <ActivityIndicator size='large' color={BASE_COLOR} />
     </View>
   );
 
-  const ListLoadingData = () => (
+  const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
-      <ActivityIndicator size='large' color={BASE_COLOR} />
+      {
+        weldNo || drawingNo
+          ?
+          <Text style={styles.noDataTitle}>No have any data with</Text>
+          :
+          <Text style={styles.noDataTitle}>No have any data</Text>
+      }
+      {
+        weldNo
+          ?
+          <Text style={styles.noDataTitle}>WeldNo: <Text style={styles.noDataText}>{weldNo}</Text></Text>
+          :
+          null
+      }
+      {
+        drawingNo
+          ?
+          <Text style={styles.noDataTitle}>DrawingNo: <Text style={styles.noDataText}>{drawingNo}</Text></Text>
+          :
+          null
+      }
+
     </View>
   );
 
@@ -175,11 +220,39 @@ export default ({ route, navigation }) => {
     return (
       <View style={styles.box}>
         <View style={styles.row}>
-          <View style={styles.cellTitleLine}>
-            <Text>WeldNo: </Text>
+          <View style={styles.cellTitle}>
+            <Text>WeldNo:</Text>
+          </View>
+          <View style={styles.cellData}>
             <Text style={styles.textData}>{formatEmptyData(item.WeldNo)}</Text>
-            <Text> - WeldType: </Text>
+          </View>
+          <View style={styles.cellTitle}>
+            <Text>WeldType:</Text>
+          </View>
+          <View style={styles.cellData}>
             <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text>DrawingNo: </Text>
+          </View>
+          <View style={styles.cellDataNoAction}>
+            <Text style={styles.textData}>{formatEmptyData(item.DrawingNo)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text>Sheet:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{formatEmptyData(item.Sheet)}</Text>
+          </View>
+          <View style={styles.cellTitle}>
+            <Text>Rev:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{formatEmptyData(item.Rev)}</Text>
           </View>
         </View>
         {code == 'FitUp'
@@ -187,10 +260,24 @@ export default ({ route, navigation }) => {
           (<>
             <View style={styles.row}>
               <View style={styles.cellTitle}>
+                <Text>HeatNo01:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <Text style={styles.textData}>{formatEmptyData(item.Heat01)}</Text>
+              </View>
+              <View style={styles.cellTitle}>
+                <Text>HeatNo02:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <Text style={styles.textData}>{formatEmptyData(item.Heat02)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
                 <Text>FittingDate:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatDateData(item.FittingDate)}</Text>
+                <Text style={styles.textData}>{formatDateData(item.FittingDate)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -202,10 +289,10 @@ export default ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <View style={styles.cellTitle}>
-                <Text>FitPercent:</Text>
+                <Text>Location:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
+                <Text style={styles.textData}>{formatEmptyData(item.Location)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -225,11 +312,11 @@ export default ({ route, navigation }) => {
                     ?
                     item.FitUpResult == 'ACC'
                       ?
-                      <Text style={styles.textAccept} >{item.FitUpResult}</Text>
+                      <Text style={styles.textAccept}>{item.FitUpResult}</Text>
                       :
-                      <Text style={styles.textReject} >{item.FitUpResult}</Text>
+                      <Text style={styles.textReject}>{item.FitUpResult}</Text>
                     :
-                    <Text style={styles.textData} >{formatEmptyData(item.FitUpResult)}</Text>
+                    <Text style={styles.textData}>{formatEmptyData(item.FitUpResult)}</Text>
                 }
               </View>
               <View style={styles.cellAction}>
@@ -248,7 +335,15 @@ export default ({ route, navigation }) => {
                 <Text>WelderIDs:</Text>
               </View>
               <View style={styles.cellWelder}>
-                <Text style={styles.textData} >{formatEmptyData(item.WelderID)}</Text>
+                <Text style={styles.textData}>{formatEmptyData(item.WelderID)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>WPSNo:</Text>
+              </View>
+              <View style={styles.cellWelder}>
+                <Text style={styles.textData}>{formatEmptyData(item.WPSNo)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -256,7 +351,7 @@ export default ({ route, navigation }) => {
                 <Text>WeldingDate:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatDateData(item.WeldingDate)}</Text>
+                <Text style={styles.textData}>{formatDateData(item.WeldingDate)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -268,10 +363,10 @@ export default ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <View style={styles.cellTitle}>
-                <Text>WeldPercent:</Text>
+                <Text>Location:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
+                <Text style={styles.textData}>{formatEmptyData(item.Location)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -291,11 +386,11 @@ export default ({ route, navigation }) => {
                     ?
                     item.VisualResult == 'ACC'
                       ?
-                      <Text style={styles.textAccept} >{item.VisualResult}</Text>
+                      <Text style={styles.textAccept}>{item.VisualResult}</Text>
                       :
-                      <Text style={styles.textReject} >{item.VisualResult}</Text>
+                      <Text style={styles.textReject}>{item.VisualResult}</Text>
                     :
-                    <Text style={styles.textData} >{formatEmptyData(item.VisualResult)}</Text>
+                    <Text style={styles.textData}>{formatEmptyData(item.VisualResult)}</Text>
                 }
               </View>
               <View style={styles.cellAction}>
@@ -315,7 +410,7 @@ export default ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
         :
         <View style={styles.container}>
           {
@@ -323,72 +418,79 @@ export default ({ route, navigation }) => {
               ?
               (<View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
+                  <Text>Project: </Text>
+                  <Text style={[styles.infoData]}>{projectCode.toUpperCase()}</Text>
+                  <Text>   User: </Text>
+                  <Text style={[styles.infoData]}>{userLogin.toUpperCase()}</Text>
+                </View>
+                <View style={styles.rowInfoAction}>
+                  <Text style={styles.infoTitleAction}>DrawingNo:</Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.inputText}
+                      value={drawingNo}
+                      onChangeText={_onChangeDrawingNo}
+                      onSubmitEditing={_onPressSearchDrawing}
+                      underlineColorAndroid='transparent'
+                    />
+                    {drawingNo == ''
+                      ? null
+                      : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                    }
                   </View>
                 </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>Facility:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{facilityCode.toUpperCase()}</Text>
+                <View style={styles.rowInfoAction}>
+                  <Text style={styles.infoTitleAction}>WeldNo:</Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.inputText}
+                      value={weldNo}
+                      onChangeText={_onChangeWeldNo}
+                      onSubmitEditing={_onPressSearchDrawing}
+                      underlineColorAndroid='transparent'
+                    />
+                    {weldNo == ''
+                      ? null
+                      : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                    }
                   </View>
                 </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>DrawingNo:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
-                  </View>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>Sheet:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{sheet.toUpperCase()}</Text>
-                  </View>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>Rev:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{rev.toUpperCase()}</Text>
-                  </View>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>LoginUser:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{teamLeader.toUpperCase()}</Text>
-                  </View>
+                <View style={styles.rowInfoAction}>
+                  <Text style={styles.infoTitleAction} />
+                  <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={_onPressSearchDrawing}
+                    disabled={isSearching}>
+                    <Text style={styles.buttonTitle}>Search Drawing</Text>
+                  </TouchableOpacity>
                 </View>
               </View>)
               :
               null
           }
-          {
-            detailDrawingList == null
+          {isSearching
+            ?
+            <ListSearchData />
+            :
+            spendList.length
               ?
-              <ListLoadingData />
+              <VirtualizedList
+                style={styles.table}
+                data={spendList}
+                getItemCount={(data) => data.length}
+                getItem={(data, index) => {
+                  return data[index];
+                }}
+                keyExtractor={(index) => {
+                  return index;
+                }}
+                renderItem={renderItem}
+              />
               :
-              (detailDrawingList.length
-                ?
-                <VirtualizedList
-                  style={styles.table}
-                  data={detailDrawingList}
-                  getItemCount={(data) => data.length}
-                  getItem={(data, index) => {
-                    return data[index];
-                  }}
-                  keyExtractor={(index) => {
-                    return index;
-                  }}
-                  renderItem={renderItem}
-                />
-                :
-                <ListEmptyData />)
+              <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
-              <Text style={styles.buttonTitle}>Manage Picture</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
             </TouchableOpacity>
           </View>
@@ -400,6 +502,10 @@ export default ({ route, navigation }) => {
           />
         </View>
       }
+      <TotalLocationModal
+        visible={isVisibleTotal}
+        data={totalList}
+        onClose={() => setIsVisibleTotal(false)} />
     </SafeAreaView>
   );
 }
@@ -428,18 +534,53 @@ const styles = StyleSheet.create({
     minHeight: 24,
     marginBottom: 4,
   },
-  infoTitle: {
+  infoData: {
+    flex: 2,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    textAlign: 'center',
+  },
+  rowInfoAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 32,
+    marginBottom: 4,
+  },
+  infoTitleAction: {
     flex: 3,
   },
-  infoDataLine: {
+  inputContainer: {
+    flexDirection: 'row',
     flex: 7,
     borderColor: BASE_COLOR,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    borderRadius: 2,
+    alignItems: 'center',
   },
-  infoData: {
+  inputText: {
+    flex: 1,
+    height: '100%',
     color: BASE_COLOR,
-    flexShrink: 1,
+    paddingVertical: 0,
+    justifyContent: 'center'
+  },
+  inputIcon: {
+    marginLeft: 4,
+    fontSize: 20,
+    color: BASE_COLOR,
+  },
+  searchButton: {
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    borderRadius: 2,
   },
 
   table: {
@@ -459,11 +600,6 @@ const styles = StyleSheet.create({
     margin: 4,
     minHeight: 20,
   },
-  cellTitleLine: {
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'center',
-  },
   textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
@@ -478,6 +614,10 @@ const styles = StyleSheet.create({
   },
   cellData: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  cellDataNoAction: {
+    flex: 3,
     justifyContent: 'center',
   },
   textAccept: {
@@ -540,7 +680,13 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   noDataTitle: {
+    paddingTop: 8,
     fontSize: 16,
+    textAlign: 'center',
+  },
+  noDataText: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
   },
 
   actionContainer: {
@@ -548,19 +694,11 @@ const styles = StyleSheet.create({
     height: 36,
     flexDirection: 'row',
   },
-  buttonLeft: {
+  buttonAction: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    marginRight: 4,
-  },
-  buttonRight: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginLeft: 4,
   },
   buttonTitle: {
     color: OPP_COLOR,

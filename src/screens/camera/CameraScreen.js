@@ -39,9 +39,12 @@ export default ({ route, navigation }) => {
                   rev: rev,
                   code: code,
                   teamLeader: teamLeader,
+                  title: code + ' Detail',
                 });
                 setIsScanned(false);
               } else {
+                let codeTitle = code == 'Visual' ? 'Weld' : code;
+                let title = 'QC ' + codeTitle + ' Detail';
                 navigation.navigate('QCDrawingDetail', {
                   projectCode: projectCode,
                   facilityCode: res.data,
@@ -50,6 +53,7 @@ export default ({ route, navigation }) => {
                   rev: rev,
                   code: code,
                   teamLeader: teamLeader,
+                  title: title,
                 });
                 setIsScanned(false);
               }

@@ -1,12 +1,23 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../utils/Helper';
+import GetSpendNumbersAPI from '../apis/qc/GetSpendNumbersAPI';
+import MessageAlert from '../components/MessageAlert';
+import LoadingRefresh from '../components/LoadingRefresh';
 
-export default ({ route, navigation }) => {
+const HomeScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Weld: 0 });
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const isFocused = useIsFocused();
 
   let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -18,6 +29,46 @@ export default ({ route, navigation }) => {
       ),
     });
   }, [navigation]);
+
+  useEffect(
+    () => {
+      callAPI(getSpendNumbers);
+    }, [isFocused]
+  );
+
+  const callAPI = executedAPI => {
+    if (isFocused) {
+      setIsLoading(true);
+      NetInfo.fetch().then(state => {
+        if (!state.isConnected) {
+          setIsLoading(false);
+          setIsError(true);
+          MessageAlert('WARNING', 'Network not available!');
+        } else {
+          executedAPI();
+        }
+      });
+    }
+  };
+
+  const getSpendNumbers = async () => {
+    let token = await Helper.getData('TOKEN');
+    GetSpendNumbersAPI(projectCode, token)
+      .then(res => {
+        if (res.success) {
+          setSpendNumbers(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
 
   const _onPressLogout = () => {
     Alert.alert(
@@ -100,6 +151,32 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const _onPressQCSpendFitUpList = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'QCSpendList',
+      {
+        code: 'FitUp',
+        projectCode: projectCode,
+        userLogin: userLogin,
+        title: 'QC Spend FitUp'
+      }
+    );
+  };
+
+  const _onPressQCSpendVisualList = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'QCSpendList',
+      {
+        code: 'Visual',
+        projectCode: projectCode,
+        userLogin: userLogin,
+        title: 'QC Spend Weld'
+      }
+    );
+  };
+
   const _onPressQRCodeAllStatus = () => {
     navigation.navigate(
       'AllStatusCamera',
@@ -118,79 +195,126 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const _onPressMamageQCFitUp = () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code FitUp Drawing\n\nSpend List: Spend FitUp Request List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeFitUpQC },
+        { text: 'Spend List', onPress: _onPressQCSpendFitUpList },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+
+  const _onPressMamageQCWeld = () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code Weld Drawing\n\nSpend List: Spend Weld Request List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeVisualQC },
+        { text: 'Spend List', onPress: _onPressQCSpendVisualList },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>Project:</Text>
-            <View style={styles.headerDataContainer}>
-              <Text style={styles.headerData}>{projectCode.toUpperCase()}</Text>
+      {isLoading || isError
+        ?
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendNumbers)} />
+        :
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <View style={styles.headerRow}>
+              <Text style={styles.headerTitle}>Project:</Text>
+              <View style={styles.headerDataContainer}>
+                <Text style={styles.headerData}>{projectCode.toUpperCase()}</Text>
+              </View>
+            </View>
+            <View style={styles.headerRow}>
+              <Text style={styles.headerTitle}>Module:</Text>
+              <View style={styles.headerDataContainer}>
+                <Text style={styles.headerData}>{disciplineCode.toUpperCase()}</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>Module:</Text>
-            <View style={styles.headerDataContainer}>
-              <Text style={styles.headerData}>{disciplineCode.toUpperCase()}</Text>
+          <View style={styles.table}>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp} activeOpacity={1}>
+                  <Text style={styles.itemTitle}>Cons Scan FitUp</Text>
+                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.cell}>
+                <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld} activeOpacity={1}>
+                  <Text style={styles.itemTitle}>Cons Scan Weld</Text>
+                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                </TouchableOpacity>
+              </View>
             </View>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <TouchableOpacity style={styles.itemContainer} onPress={_onPressMamageQCFitUp} activeOpacity={1}>
+                  <Text style={styles.itemTitle}>QC Scan FitUp</Text>
+                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                </TouchableOpacity>
+                {
+                  spendNumbers.FitUp
+                    ?
+                    <View style={styles.badgeContainer}>
+                      <Text style={styles.badgeText}>{spendNumbers.FitUp < 100 ? spendNumbers.FitUp : '99+'}</Text>
+                    </View>
+                    :
+                    null
+                }
+              </View>
+              <View style={styles.cell}>
+                <TouchableOpacity style={styles.itemContainer} onPress={_onPressMamageQCWeld} activeOpacity={1}>
+                  <Text style={styles.itemTitle}>QC Scan Weld</Text>
+                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                </TouchableOpacity>
+                {
+                  spendNumbers.Weld
+                    ?
+                    <View style={styles.badgeContainer}>
+                      <Text style={styles.badgeText}>{spendNumbers.Weld < 100 ? spendNumbers.Weld : '99+'}</Text>
+                    </View>
+                    :
+                    null
+                }
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeAllStatus} activeOpacity={1}>
+                  <Text style={styles.itemTitle}>Scan All Status</Text>
+                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.cell}>
+                <TouchableOpacity style={styles.itemContainer} onPress={_onPressSearchAllStatus} activeOpacity={1}>
+                  <Text style={styles.itemTitle}>Search All Status</Text>
+                  <Ionicons name='md-search' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <View style={styles.action}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressConstructionUpdate}>
+              <Text style={styles.buttonTitle}>Construction Update</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>
+              <Text style={styles.buttonTitle}>QC Update</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
+              <Text style={styles.buttonTitle}>View Reports</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.table}>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp} activeOpacity={1}>
-                <Text style={styles.itemTitle}>Cons Scan FitUp</Text>
-                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld} activeOpacity={1}>
-                <Text style={styles.itemTitle}>Cons Scan Weld</Text>
-                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUpQC} activeOpacity={1}>
-                <Text style={styles.itemTitle}>QC Scan FitUp</Text>
-                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeVisualQC} activeOpacity={1}>
-                <Text style={styles.itemTitle}>QC Scan Weld</Text>
-                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeAllStatus} activeOpacity={1}>
-                <Text style={styles.itemTitle}>Scan All Status</Text>
-                <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.cell}>
-              <TouchableOpacity style={styles.itemContainer} onPress={_onPressSearchAllStatus} activeOpacity={1}>
-                <Text style={styles.itemTitle}>Search All Status</Text>
-                <Ionicons name='md-search' size={48} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View style={styles.action}>
-          <TouchableOpacity style={styles.buttonContainer} onPress={_onPressConstructionUpdate}>
-            <Text style={styles.buttonTitle}>Construction Update</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>
-            <Text style={styles.buttonTitle}>QC Update</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
-            <Text style={styles.buttonTitle}>View Reports</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      }
     </SafeAreaView>
   );
 };
@@ -267,7 +391,22 @@ const styles = StyleSheet.create({
     margin: 4,
     marginVertical: 16,
   },
-
+  badgeContainer: {
+    width: 36,
+    height: 36,
+    padding: 2,
+    borderRadius: 36 / 2,
+    backgroundColor: '#FF8C00',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: OPP_COLOR,
+    fontWeight: 'bold'
+  },
 
   action: {
     marginTop: 12,
@@ -290,3 +429,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export default HomeScreen;

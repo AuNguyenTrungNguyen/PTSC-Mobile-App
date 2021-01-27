@@ -25,6 +25,7 @@ import SpoolCameraScreen from './screens/spool/SpoolCameraScreen';
 
 import QCDrawingListScreen from './screens/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
+import QCSpendListScreen from './screens/qc/QCSpendListScreen';
 
 import ConstructionListScreen from './screens/construction/ConstructionListScreen';
 
@@ -144,12 +145,10 @@ export default () => {
         <Stack.Screen
           name='DrawingDetail'
           component={DrawingDetailScreen}
-          options={
-            {
-              title: 'Drawing Detail',
-              headerBackTitle: 'Back',
-            }
-          }
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
         />
         <Stack.Screen
           name='DrawingImage'
@@ -204,16 +203,21 @@ export default () => {
             }
           }
         />
-
         <Stack.Screen
           name='QCDrawingDetail'
           component={QCDrawingDetailScreen}
-          options={
-            {
-              title: 'QC Drawing Detail',
-              headerBackTitle: 'Back',
-            }
-          }
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
+        />
+        <Stack.Screen
+          name='QCSpendList'
+          component={QCSpendListScreen}
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
         />
 
         <Stack.Screen

@@ -102,6 +102,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: code == 'Visual' ? 'Weld' : code + ' Detail',
         }
       );
     } else {
@@ -117,6 +118,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: code == 'Visual' ? 'Weld' : code + ' Detail',
             });
           } else {
             setIsLoading(false);
@@ -132,6 +134,8 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
   const _onPressViewQC = async code => {
     let teamLeader = await Helper.getData('USERNAME');
     if (facilityCode) {
+      let codeTitle = code == 'Visual' ? 'Weld' : code;
+      let title = 'QC ' + codeTitle + ' Detail';
       navigation.navigate(
         'QCDrawingDetail',
         {
@@ -142,6 +146,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: title,
         }
       );
     } else {
@@ -157,6 +162,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: title,
             });
           } else {
             setIsLoading(false);

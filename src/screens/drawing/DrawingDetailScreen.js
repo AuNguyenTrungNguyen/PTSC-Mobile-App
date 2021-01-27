@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, Dimensions, Modal, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -15,6 +15,7 @@ import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
 import GetHeatNoListAPI from '../../apis/drawing/GetHeatNoListAPI';
 import GetWPSListAPI from '../../apis/drawing/GetWPSListAPI';
+import GetLocationListAPI from '../../apis/drawing/GetLocationListAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import HelpModal from '../../components/drawing/HelpModal';
@@ -124,8 +125,11 @@ export default ({ route, navigation }) => {
       if (!element.hasOwnProperty('Heat02')) {
         element['Heat02'] = data['Heat02'];
       }
+      if (!element.hasOwnProperty('Location')) {
+        element['Location'] = data['Location'];
+      }
       // Check CLEAR
-      if (!element['ItemDate'] && !element['ItemPercent'] && !element['Heat01'] && !element['Heat02']) {
+      if (!element['ItemDate'] && !element['ItemPercent'] && !element['Heat01'] && !element['Heat02'] && !element['Location']) {
         element['IsClear'] = true;
       }
     });
@@ -137,7 +141,7 @@ export default ({ route, navigation }) => {
     let errorListData = [];
     let doneListData = [];
 
-    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent) || i.IsClear);
+    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Location) || i.IsClear);
     const doneIds = doneListData.map(i => i.RowIndex);
     errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
 
@@ -378,6 +382,67 @@ export default ({ route, navigation }) => {
     setIsVisibleWPS(false);
   };
 
+  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
+  const [locationList, setLocationList] = useState(null);
+
+  const _onPressShowLocationPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleLocation(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getLocationList();
+      }
+    });
+  };
+
+  const _onPressClearLocationPopup = () => {
+    _onChangeLocation(null);
+    setIsVisibleLocation(false);
+  };
+
+  const getLocationList = async () => {
+    if (locationList == null) {
+      let token = await Helper.getData('TOKEN');
+      GetLocationListAPI(projectCode, token)
+        .then(res => {
+          if (res.success) {
+            setLocationList(res.data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+          setIsError(true);
+        });
+    }
+  };
+
+  const _onChangeLocation = (data) => {
+    let array = [...detailDrawingList];
+    array[indexUpdate][keyUpdate] = data;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+    let weldNo = detailDrawingList[indexUpdate].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: data });
+    } else {
+      array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+    }
+    setUpdateDrawingList(array);
+    setIsVisibleLocation(false);
+  };
 
 
   /**
@@ -504,6 +569,7 @@ export default ({ route, navigation }) => {
     if (code == 'FitUp') {
       array[index]['Heat01'] = valueClear;
       array[index]['Heat02'] = valueClear;
+      array[index]['Location'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
@@ -643,14 +709,16 @@ export default ({ route, navigation }) => {
       isDisableByProject = Moment.duration(now.diff(date)).asDays() > 1 ? true : false;
     }
     isDisableByProject = isUpdateValid && isDisableByProject;
-    isDisableItem = projectCode === 'DNWHP' ? isDisableByProject : isDisableItem;
+
+    const isCompleteText = projectCode === 'DNWHP' ? isDisableByProject : isDisableItem;
+    isDisableItem = false;
 
     return (
       <View style={isUserError ? styles.boxError : styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             {
-              isDisableItem
+              isCompleteText
                 ?
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>
@@ -820,6 +888,26 @@ export default ({ route, navigation }) => {
                   :
                   null}
               </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>Location:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <TouchableOpacity
+                  style={styles.itemAction}
+                  onPress={() => _onPressShowLocationPopup(index, 'Location')}>
+                  <Text style={styles.textData} >{formatEmptyData(item.Location)}</Text>
+                  {
+                    isDisableItem
+                      ?
+                      <Ionicons style={styles.iconAction} name='md-location' size={20} color={'#a3a3a3'} />
+                      :
+                      <Ionicons style={styles.iconAction} name='md-location' size={20} color={BASE_COLOR} />
+                  }
+                </TouchableOpacity>
+              </View>
+              <View style={styles.cellPercent} />
             </View>
           </>)
           :
@@ -1092,6 +1180,33 @@ export default ({ route, navigation }) => {
               wpsList.map((item) => {
                 return (
                   <TouchableOpacity style={modals.row} onPress={() => _onChangeWPSCode(item)}>
+                    <Text style={modals.cell}>{item}</Text>
+                  </TouchableOpacity>
+                );
+              })
+              :
+              <View>
+                <Text style={modals.emptyText}>No have any data!</Text>
+              </View>
+            :
+            <View>
+              <ActivityIndicator size='large' color={BASE_COLOR} />
+            </View>
+        }
+      </PickupDataModal>
+      <PickupDataModal
+        visible={isVisibleLocation}
+        onClear={_onPressClearLocationPopup}
+        onCancel={() => setIsVisibleLocation(false)}
+        loaded={locationList != null}>
+        {
+          locationList != null
+            ?
+            locationList.length
+              ?
+              locationList.map((item) => {
+                return (
+                  <TouchableOpacity style={modals.row} onPress={() => _onChangeLocation(item)}>
                     <Text style={modals.cell}>{item}</Text>
                   </TouchableOpacity>
                 );

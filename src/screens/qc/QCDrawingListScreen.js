@@ -206,6 +206,7 @@ export default ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: 'QC FitUp Detail',
         }
       );
     } else {
@@ -221,6 +222,7 @@ export default ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: 'QC FitUp Detail',
             });
           } else {
             setIsLoading(false);
@@ -248,6 +250,7 @@ export default ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: 'QC Weld Detail',
         }
       );
     } else {
@@ -263,6 +266,7 @@ export default ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: 'QC Weld Detail',
             });
           } else {
             setIsLoading(false);
