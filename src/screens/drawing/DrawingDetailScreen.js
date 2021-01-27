@@ -296,11 +296,13 @@ export default ({ route, navigation }) => {
         } else {
           setIsLoading(false);
           setIsError(true);
+          setIsVisibleHeatNo(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
+        setIsVisibleHeatNo(false);
       });
   };
 
@@ -356,11 +358,13 @@ export default ({ route, navigation }) => {
         } else {
           setIsLoading(false);
           setIsError(true);
+          setIsVisibleWPS(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
+        setIsVisibleWPS(false);
       });
   };
 
@@ -417,11 +421,13 @@ export default ({ route, navigation }) => {
           } else {
             setIsLoading(false);
             setIsError(true);
+            setIsVisibleLocation(false);
           }
         })
         .catch(() => {
           setIsLoading(false);
           setIsError(true);
+          setIsVisibleLocation(false);
         });
     }
   };
