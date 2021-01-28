@@ -53,7 +53,7 @@ export default ({ navigation }) => {
     SplashScreen.hide();
     if (res.version === version && res.buildNumber === buildNumber) {
       let expires = await Helper.getData('EXPIRES');
-      let isUpdated = await Helper.getData('IS_UPDATED'); // Next version remove it
+      let isUpdated = await Helper.getData('IS_UPDATED_21');
       if (isUpdated && expires && (Moment.utc(new Date(expires)).valueOf() - Moment.utc(new Date()).valueOf() > 0)) {
         let projectCode = await Helper.getData('PROJECT_CODE');
         let disciplineCode = await Helper.getData('DISCIPLINE_CODE');

@@ -144,7 +144,7 @@ export default ({ navigation }) => {
               Helper.storeData('PROJECT_CODE', projectCode);
               Helper.storeData('DISCIPLINE_CODE', disciplineCode);
               Helper.storeData('DATACODE', 'PTSCMC');
-              Helper.storeData('IS_UPDATED', 'DONE'); // Next version remove it
+              Helper.storeData('IS_UPDATED_21', 'DONE');
               navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
             }
           })
