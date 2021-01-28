@@ -1,5 +1,5 @@
 import { Port_Server } from '../../utils/Core';
-const UpdateSpendListAPI = (projectCode, code, itemQCSpendUpdate, token) =>
+const UpdateSpendListAPI = (projectCode, code, userUpdate, itemQCSpendUpdate, token) =>
   fetch(
     Port_Server + '/api/QCUpdate/UpdateSpendList',
     {
@@ -8,7 +8,7 @@ const UpdateSpendListAPI = (projectCode, code, itemQCSpendUpdate, token) =>
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ projectCode, code, itemQCSpendUpdate }),
+      body: JSON.stringify({ projectCode, code, userUpdate, itemQCSpendUpdate }),
     }
   ).then(res => res.json());
 module.exports = UpdateSpendListAPI;

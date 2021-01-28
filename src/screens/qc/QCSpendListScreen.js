@@ -2,7 +2,6 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Moment from 'moment';
-import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -18,7 +17,6 @@ export default ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
   const [spendList, setSpendList] = useState([]);
@@ -94,26 +92,23 @@ export default ({ route, navigation }) => {
           setTotalList(res.total);
           setIsLoading(false);
           setIsError(false);
-          setIsUploading(false);
           setIsSearching(false);
         } else {
           setIsLoading(false);
           setIsError(true);
-          setIsUploading(false);
           setIsSearching(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
-        setIsUploading(false);
         setIsSearching(false);
       });
   };
 
   const updateSpendData = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateSpendListAPI(projectCode, code, updateSpendList, token)
+    UpdateSpendListAPI(projectCode, code, userLogin, updateSpendList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -124,7 +119,6 @@ export default ({ route, navigation }) => {
         callAPI(getSpendListData);
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        setIsUploading(false);
       });
   };
 
@@ -149,7 +143,6 @@ export default ({ route, navigation }) => {
 
   const _onPressSubmitToServer = async () => {
     if (updateSpendList.length) {
-      setIsUploading(true);
       callAPI(updateSpendData);
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
@@ -164,9 +157,11 @@ export default ({ route, navigation }) => {
     array = [...updateSpendList];
     let rowIndex = spendList[index].RowIndex;
     let weldNo = spendList[index].WeldNo;
+    let facilityCode = spendList[index].FacilityCode;
+    let drawingNo = spendList[index].DrawingNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemResult']: value });
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, ['ItemResult']: value });
     } else {
       array[objIndex]['ItemResult'] = spendList[index][key];
     }
@@ -494,12 +489,6 @@ export default ({ route, navigation }) => {
               <Text style={styles.buttonTitle}>Submit to Server</Text>
             </TouchableOpacity>
           </View>
-          <AwesomeAlert
-            show={isUploading}
-            showProgress={true}
-            closeOnTouchOutside={false}
-            closeOnHardwareBackPress={false}
-          />
         </View>
       }
       <TotalLocationModal

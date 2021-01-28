@@ -94,7 +94,7 @@ export default ({ route, navigation }) => {
 
   const updateDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, code, updateDrawingList, token)
+    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, code, teamLeader, updateDrawingList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
