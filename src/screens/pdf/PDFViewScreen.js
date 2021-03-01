@@ -19,7 +19,7 @@ export default ({ route, navigation }) => {
           source={prepareSource()}
           backgroundColor={OPP_COLOR}
           fitPolicy={1}
-          maxScale={2}
+          maxScale={3}
           activityIndicatorProps={{ color: BASE_COLOR, progressTintColor: BASE_COLOR }}
           onError={() => {
             Alert.alert(

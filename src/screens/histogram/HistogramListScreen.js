@@ -52,8 +52,14 @@ export default ({ route, navigation }) => {
       });
   };
 
-  const _onPressHistogramView = (link) => {
-    navigation.navigate('HistogramView', { link: link });
+  const _onPressHistogramView = link => {
+    navigation.navigate(
+      'PDFView',
+      {
+        link: link,
+        title: 'View Histogram Chart',
+      }
+    );
   };
 
   const ListEmptyData = () => (

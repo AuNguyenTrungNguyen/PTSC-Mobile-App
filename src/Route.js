@@ -32,9 +32,10 @@ import ConstructionListScreen from './screens/construction/ConstructionListScree
 import DisciplineListScreen from './screens/discipline/DisciplineListScreen';
 
 import HistogramListScreen from './screens/histogram/HistogramListScreen';
-import HistogramViewScreen from './screens/histogram/HistogramViewScreen';
 
 import DailyManpowerScreen from './screens/manpower/DailyManpowerScreen';
+
+import PDFViewScreen from './screens/pdf/PDFViewScreen';
 
 const Stack = createStackNavigator();
 export default () => {
@@ -252,16 +253,6 @@ export default () => {
             }
           }
         />
-        <Stack.Screen
-          name='HistogramView'
-          component={HistogramViewScreen}
-          options={
-            {
-              title: 'Histogram Chart',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
 
         <Stack.Screen
           name='DailyManpower'
@@ -272,6 +263,15 @@ export default () => {
               headerBackTitle: 'Back',
             }
           }
+        />
+
+        <Stack.Screen
+          name='PDFView'
+          component={PDFViewScreen}
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

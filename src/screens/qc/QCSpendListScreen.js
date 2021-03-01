@@ -13,7 +13,7 @@ import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import TotalLocationModal from '../../components/drawing/TotalLocationModal';
 
-export default ({ route, navigation }) => {
+const QCSpendListScreen = ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -168,6 +168,16 @@ export default ({ route, navigation }) => {
     setUpdateSpendList(array);
   };
 
+  const _onPressOpenDrawing = link => {
+    navigation.navigate(
+      'PDFView',
+      {
+        link: link,
+        title: 'View Drawing Spend List',
+      }
+    );
+  };
+
   const formatEmptyData = data => {
     return data ? data : '';
   };
@@ -233,7 +243,15 @@ export default ({ route, navigation }) => {
             <Text>DrawingNo: </Text>
           </View>
           <View style={styles.cellDataNoAction}>
-            <Text style={styles.textData}>{formatEmptyData(item.DrawingNo)}</Text>
+            {
+              item.WebLink
+                ?
+                <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }}>
+                  <Text style={styles.textDataOpen}>{formatEmptyData(item.DrawingNo)}</Text>
+                </TouchableOpacity>
+                :
+                <Text style={styles.textData}>{formatEmptyData(item.DrawingNo)}</Text>
+            }
           </View>
         </View>
         <View style={styles.row}>
@@ -593,6 +611,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
+  textDataOpen: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    textDecorationLine: 'underline',
+    color: BASE_COLOR,
+  },
   cellTitle: {
     flex: 1,
     justifyContent: 'center',
@@ -696,3 +720,5 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
 });
+
+export default QCSpendListScreen;
