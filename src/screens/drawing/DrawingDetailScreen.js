@@ -20,6 +20,7 @@ import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import HelpModal from '../../components/drawing/HelpModal';
 import PickupDataModal from '../../components/drawing/PickupDataModal';
+import PickupDataModalHeader from '../../components/drawing/PickupDataModalHeader';
 
 export default ({ route, navigation }) => {
 
@@ -308,7 +309,7 @@ export default ({ route, navigation }) => {
 
   const _onChangeHeatNoCode = (data) => {
     let array = [...detailDrawingList];
-    array[indexUpdate][keyUpdate] = data;
+    array[indexUpdate][keyUpdate] = !data ? null : data.HeatNo_TagNo;
     setDetailDrawingList(array);
 
     array = [...updateDrawingList];
@@ -316,9 +317,20 @@ export default ({ route, navigation }) => {
     let weldNo = detailDrawingList[indexUpdate].WeldNo;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: data });
+      if (keyUpdate == 'Heat01') {
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo01']: !data ? null : data.SeriNo, ['ItemDescription01']: !data ? null : data.ItemDescription });
+      } else {
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo02']: !data ? null : data.SeriNo, ['ItemDescription02']: !data ? null : data.ItemDescription });
+      }
     } else {
       array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+      if (keyUpdate == 'Heat01') {
+        array[objIndex]['SeriNo01'] = !data ? null : data.SeriNo;
+        array[objIndex]['ItemDescription01'] = !data ? null : data.ItemDescription;
+      } else {
+        array[objIndex]['SeriNo02'] = !data ? null : data.SeriNo;
+        array[objIndex]['ItemDescription02'] = !data ? null : data.ItemDescription;
+      }
     }
     setUpdateDrawingList(array);
     setIsVisibleHeatNo(false);
@@ -575,6 +587,10 @@ export default ({ route, navigation }) => {
     if (code == 'FitUp') {
       array[index]['Heat01'] = valueClear;
       array[index]['Heat02'] = valueClear;
+      array[index]['SeriNo01'] = valueClear;
+      array[index]['SeriNo02'] = valueClear;
+      array[index]['ItemDescription01'] = valueClear;
+      array[index]['ItemDescription02'] = valueClear;
       array[index]['Location'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
@@ -594,7 +610,11 @@ export default ({ route, navigation }) => {
           ['ItemDate']: valueClear,
           ['ItemPercent']: valueClear,
           ['Heat01']: valueClear,
-          ['Heat02']: valueClear
+          ['Heat02']: valueClear,
+          ['SeriNo01']: valueClear,
+          ['SeriNo02']: valueClear,
+          ['ItemDescription01']: valueClear,
+          ['ItemDescription02']: valueClear,
         });
       } else {
         array.push({
@@ -612,6 +632,10 @@ export default ({ route, navigation }) => {
       if (code == 'FitUp') {
         array[objIndex]['Heat01'] = detailDrawingList[index]['Heat01'];
         array[objIndex]['Heat02'] = detailDrawingList[index]['Heat02'];
+        array[objIndex]['SeriNo01'] = detailDrawingList[index]['SeriNo01'];
+        array[objIndex]['SeriNo02'] = detailDrawingList[index]['SeriNo02'];
+        array[objIndex]['ItemDescription01'] = detailDrawingList[index]['ItemDescription01'];
+        array[objIndex]['ItemDescription02'] = detailDrawingList[index]['ItemDescription02'];
       } else {
         array[objIndex]['WelderID'] = detailDrawingList[index]['WelderID'];
         array[objIndex]['WPSNo'] = detailDrawingList[index]['WPSNo'];
@@ -1146,11 +1170,14 @@ export default ({ route, navigation }) => {
         visible={isVisibleHelp}
         code={code}
         onClose={() => setIsVisibleHelp(false)} />
-      <PickupDataModal
+      <PickupDataModalHeader
         visible={isVisibleHeatNo}
         onClear={_onPressClearHeatNoPopup}
         onCancel={() => setIsVisibleHeatNo(false)}
-        loaded={heatNoList != null}>
+        loaded={heatNoList != null}
+        text01='HeatNo'
+        text02='SeriNo'
+      >
         {
           heatNoList != null
             ?
@@ -1159,7 +1186,9 @@ export default ({ route, navigation }) => {
               heatNoList.map((item) => {
                 return (
                   <TouchableOpacity style={modals.row} onPress={() => _onChangeHeatNoCode(item)}>
-                    <Text style={modals.cell}>{item}</Text>
+                    <Text style={modals.cell}>{item.HeatNo_TagNo}</Text>
+                    <View style={modals.line} />
+                    <Text style={modals.cell}>{item.SeriNo}</Text>
                   </TouchableOpacity>
                 );
               })
@@ -1172,7 +1201,7 @@ export default ({ route, navigation }) => {
               <ActivityIndicator size='large' color={BASE_COLOR} />
             </View>
         }
-      </PickupDataModal>
+      </PickupDataModalHeader>
       <PickupDataModal
         visible={isVisibleWPS}
         onClear={_onPressClearWPSPopup}
@@ -1464,5 +1493,10 @@ const modals = StyleSheet.create({
     color: BASE_COLOR,
     textAlign: 'center',
     fontSize: 15,
+  },
+  line: {
+    height: '100%',
+    width: 1,
+    backgroundColor: BASE_COLOR,
   },
 });
