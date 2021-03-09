@@ -178,6 +178,19 @@ const QCSpendListScreen = ({ route, navigation }) => {
     );
   };
 
+  const _onPressManagePicture = async (facilityCode, drawingNo) => {
+    navigation.navigate(
+      'DrawingImage',
+      {
+        projectCode: projectCode,
+        facilityCode: facilityCode,
+        drawingNo: drawingNo,
+        code: code == 'Visual' ? 'Weld' : code,
+        teamLeader: userLogin
+      }
+    );
+  };
+
   const formatEmptyData = data => {
     return data ? data : '';
   };
@@ -237,12 +250,19 @@ const QCSpendListScreen = ({ route, navigation }) => {
           <View style={styles.cellData}>
             <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
           </View>
+          <View style={styles.cellImageAction}>
+            {
+              <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
+                <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
+              </TouchableOpacity>
+            }
+          </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
             <Text>DrawingNo: </Text>
           </View>
-          <View style={styles.cellDataNoAction}>
+          <View style={styles.cellDrawingAction}>
             {
               item.WebLink
                 ?
@@ -629,9 +649,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  cellDataNoAction: {
+  cellDrawingAction: {
     flex: 3,
     justifyContent: 'center',
+  },
+  cellImageAction: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textAccept: {
     fontWeight: 'bold',
