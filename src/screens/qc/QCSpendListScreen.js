@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
 
 import Helper from '../../utils/Helper';
+import Constant from '../../utils/Constant';
 import GetSpendListAPI from '../../apis/qc/GetSpendListAPI';
 import UpdateSpendListAPI from '../../apis/qc/UpdateSpendListAPI';
 import MessageAlert from '../../components/MessageAlert';
@@ -193,7 +194,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   const _onChangeCheckbox = (index, key, value) => {
-    value = value ? 'x' : 'EMPTY_VALUE';
+    value = value ? 'x' : Constant.EMPTY_VALUE_STRING;
 
     let array = [...spendList];
     array[index][key] = value;
@@ -471,13 +472,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.cellData}>
                 <CheckBox
-                  value={!!item.UT}
+                  value={item.UT && item.UT !== Constant.EMPTY_VALUE_STRING}
                   onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
                   style={styles.checkBox}
                   boxType='square'
                   disabled={false}
-                  onCheckColor={BASE_COLOR}
+                  onCheckColor={OPP_COLOR}
+                  onFillColor={BASE_COLOR}
                   onTintColor={BASE_COLOR}
+                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
                   animationDuration={0.2}
                   onAnimationType='flat'
                 />
@@ -487,13 +490,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.cellData}>
                 <CheckBox
-                  value={!!item.RT}
+                  value={item.RT && item.RT !== Constant.EMPTY_VALUE_STRING}
                   onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
                   style={styles.checkBox}
                   boxType='square'
                   disabled={false}
-                  onCheckColor={BASE_COLOR}
+                  onCheckColor={OPP_COLOR}
+                  onFillColor={BASE_COLOR}
                   onTintColor={BASE_COLOR}
+                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
                   animationDuration={0.2}
                   onAnimationType='flat'
                 />
@@ -503,13 +508,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.cellData}>
                 <CheckBox
-                  value={!!item.MT}
+                  value={item.MT && item.MT !== Constant.EMPTY_VALUE_STRING}
                   onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
                   style={styles.checkBox}
                   boxType='square'
                   disabled={false}
-                  onCheckColor={BASE_COLOR}
+                  onCheckColor={OPP_COLOR}
+                  onFillColor={BASE_COLOR}
                   onTintColor={BASE_COLOR}
+                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
                   animationDuration={0.2}
                   onAnimationType='flat'
                 />
@@ -521,13 +528,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.cellData}>
                 <CheckBox
-                  value={!!item.PT}
+                  value={item.PT && item.PT !== Constant.EMPTY_VALUE_STRING}
                   onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
                   style={styles.checkBox}
                   boxType='square'
                   disabled={false}
-                  onCheckColor={BASE_COLOR}
+                  onCheckColor={OPP_COLOR}
+                  onFillColor={BASE_COLOR}
                   onTintColor={BASE_COLOR}
+                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
                   animationDuration={0.2}
                   onAnimationType='flat'
                 />
@@ -537,13 +546,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.cellData}>
                 <CheckBox
-                  value={!!item.PMI}
+                  value={item.PMI && item.PMI !== Constant.EMPTY_VALUE_STRING}
                   onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
                   style={styles.checkBox}
                   boxType='square'
                   disabled={false}
-                  onCheckColor={BASE_COLOR}
+                  onCheckColor={OPP_COLOR}
+                  onFillColor={BASE_COLOR}
                   onTintColor={BASE_COLOR}
+                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
                   animationDuration={0.2}
                   onAnimationType='flat'
                 />
@@ -553,13 +564,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.cellData}>
                 <CheckBox
-                  value={!!item.PAUT}
+                  value={item.PAUT && item.PAUT !== Constant.EMPTY_VALUE_STRING}
                   onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
                   style={styles.checkBox}
                   boxType='square'
                   disabled={false}
-                  onCheckColor={BASE_COLOR}
+                  onCheckColor={OPP_COLOR}
+                  onFillColor={BASE_COLOR}
                   onTintColor={BASE_COLOR}
+                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
                   animationDuration={0.2}
                   onAnimationType='flat'
                 />
