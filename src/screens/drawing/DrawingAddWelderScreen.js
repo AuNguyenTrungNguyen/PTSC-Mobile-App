@@ -10,7 +10,7 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default ({ route, navigation }) => {
 
-  const { projectCode, welders } = route.params;
+  const { projectCode, welders, index } = route.params;
 
   const [welderId, setWelderId] = useState('');
   const [welderName, setWelderName] = useState('');
@@ -109,9 +109,9 @@ export default ({ route, navigation }) => {
 
   const _onPressAddWelder = () => {
     if (!welderSelected) {
-      navigation.navigate('DrawingDetail', { welderSelected: 'WELDER_ID_NULL' });
+      navigation.navigate('DrawingDetail', { welderSelected: 'WELDER_ID_NULL', index: index });
     } else {
-      navigation.navigate('DrawingDetail', { welderSelected: welderSelected });
+      navigation.navigate('DrawingDetail', { welderSelected: welderSelected, index: index });
     }
   };
 

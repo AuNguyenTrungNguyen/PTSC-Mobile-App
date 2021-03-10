@@ -42,7 +42,7 @@ export default ({ route, navigation }) => {
       } else {
         callAPI(getDrawingDetail);
       }
-    }, [route.params?.welderSelected]
+    }, [route.params?.welderSelected, route.params?.index]
   );
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -554,6 +554,7 @@ export default ({ route, navigation }) => {
       {
         projectCode: projectCode,
         welders: value,
+        index: index,
       }
     );
   };
