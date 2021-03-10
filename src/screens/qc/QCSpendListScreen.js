@@ -5,6 +5,7 @@ import Moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import CheckBox from '@react-native-community/checkbox';
 
 import Helper from '../../utils/Helper';
 import GetSpendListAPI from '../../apis/qc/GetSpendListAPI';
@@ -189,6 +190,28 @@ const QCSpendListScreen = ({ route, navigation }) => {
         teamLeader: userLogin
       }
     );
+  };
+
+  const _onChangeCheckbox = (index, key, value) => {
+    value = value ? 'x' : 'EMPTY_VALUE';
+
+    let array = [...spendList];
+    array[index][key] = value;
+    setSpendList(array);
+
+    array = [...updateSpendList];
+    let rowIndex = spendList[index].RowIndex;
+    let weldNo = spendList[index].WeldNo;
+    let facilityCode = spendList[index].FacilityCode;
+    let drawingNo = spendList[index].DrawingNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push(
+        { RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, [key]: value });
+    } else {
+      array[objIndex][key] = value;
+    }
+    setUpdateSpendList(array);
   };
 
   const formatEmptyData = data => {
@@ -434,6 +457,114 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>NDTPercent:</Text>
+              </View>
+              <View style={styles.cellWelder}>
+                <Text style={styles.textData}>{formatEmptyData(item.NDTPercent)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>UT:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <CheckBox
+                  value={!!item.UT}
+                  onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
+                  style={styles.checkBox}
+                  boxType='square'
+                  disabled={false}
+                  onCheckColor={BASE_COLOR}
+                  onTintColor={BASE_COLOR}
+                  animationDuration={0.2}
+                  onAnimationType='flat'
+                />
+              </View>
+              <View style={styles.cellTitle}>
+                <Text>RT:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <CheckBox
+                  value={!!item.RT}
+                  onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
+                  style={styles.checkBox}
+                  boxType='square'
+                  disabled={false}
+                  onCheckColor={BASE_COLOR}
+                  onTintColor={BASE_COLOR}
+                  animationDuration={0.2}
+                  onAnimationType='flat'
+                />
+              </View>
+              <View style={styles.cellTitle}>
+                <Text>MT:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <CheckBox
+                  value={!!item.MT}
+                  onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
+                  style={styles.checkBox}
+                  boxType='square'
+                  disabled={false}
+                  onCheckColor={BASE_COLOR}
+                  onTintColor={BASE_COLOR}
+                  animationDuration={0.2}
+                  onAnimationType='flat'
+                />
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>PT:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <CheckBox
+                  value={!!item.PT}
+                  onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
+                  style={styles.checkBox}
+                  boxType='square'
+                  disabled={false}
+                  onCheckColor={BASE_COLOR}
+                  onTintColor={BASE_COLOR}
+                  animationDuration={0.2}
+                  onAnimationType='flat'
+                />
+              </View>
+              <View style={styles.cellTitle}>
+                <Text>PMI:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <CheckBox
+                  value={!!item.PMI}
+                  onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
+                  style={styles.checkBox}
+                  boxType='square'
+                  disabled={false}
+                  onCheckColor={BASE_COLOR}
+                  onTintColor={BASE_COLOR}
+                  animationDuration={0.2}
+                  onAnimationType='flat'
+                />
+              </View>
+              <View style={styles.cellTitle}>
+                <Text>PAUT:</Text>
+              </View>
+              <View style={styles.cellData}>
+                <CheckBox
+                  value={!!item.PAUT}
+                  onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
+                  style={styles.checkBox}
+                  boxType='square'
+                  disabled={false}
+                  onCheckColor={BASE_COLOR}
+                  onTintColor={BASE_COLOR}
+                  animationDuration={0.2}
+                  onAnimationType='flat'
+                />
+              </View>
+            </View>
           </>)}
       </View>
     );
@@ -630,6 +761,12 @@ const styles = StyleSheet.create({
   textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  checkBox: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    width: 24,
+    height: 24,
   },
   textDataOpen: {
     fontWeight: 'bold',

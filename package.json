@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/cameraroll": "^4.0.1",
+    "@react-native-community/checkbox": "^0.5.7",
     "@react-native-community/cli": "^4.13.0",
     "@react-native-community/cli-platform-ios": "^4.13.0",
     "@react-native-community/datetimepicker": "^3.0.3",
