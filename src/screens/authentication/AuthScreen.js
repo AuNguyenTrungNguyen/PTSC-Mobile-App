@@ -22,7 +22,8 @@ export default ({ navigation }) => {
   const buildNumber = DeviceInfo.getBuildNumber();
 
   useEffect(() => {
-    callAPI(getVersionApp);
+    // callAPI(getVersionApp);
+    getRoute();
   }, []);
 
   const callAPI = executedAPI => {
@@ -52,36 +53,39 @@ export default ({ navigation }) => {
       });
   };
 
-  const getRoute = async res => {
-    if (res.version === version && res.buildNumber === buildNumber) {
-      let expires = await Helper.getData('EXPIRES');
-      if (expires && (Moment.utc(new Date(expires)).valueOf() - Moment.utc(new Date()).valueOf() > 0)) {
-        let projectCode = await Helper.getData('PROJECT_CODE');
-        let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-        navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
-      } else {
-        Helper.clearData();
-        navigation.replace('Login');
-      }
+  const getRoute = async () => {
+    // const getRoute = async res => {
+    // if (res.version == version && res.buildNumber == buildNumber) {
+    let expires = await Helper.getData('EXPIRES');
+    if (expires && (Moment.utc(new Date(expires)).valueOf() - Moment.utc(new Date()).valueOf() > 0)) {
+      let projectCode = await Helper.getData('PROJECT_CODE');
+      let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+      SplashScreen.hide();
+      navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
     } else {
-      Alert.alert(
-        'WARNING',
-        'The application has a new version.',
-        [
-          {
-            text: 'Use Old',
-            style: 'default',
-            onPress: continueOldVersion,
-          },
-          {
-            text: 'Get New',
-            style: 'default',
-            onPress: updateNewVersion,
-          },
-        ],
-        { cancelable: false },
-      );
+      Helper.clearData();
+      SplashScreen.hide();
+      navigation.replace('Login');
     }
+    // } else {
+    //   Alert.alert(
+    //     'WARNING',
+    //     'The application has a new version.',
+    //     [
+    //       {
+    //         text: 'Use Old',
+    //         style: 'default',
+    //         onPress: continueOldVersion,
+    //       },
+    //       {
+    //         text: 'Get New',
+    //         style: 'default',
+    //         onPress: updateNewVersion,
+    //       },
+    //     ],
+    //     { cancelable: false },
+    //   );
+    // }
   };
 
   const continueOldVersion = async () => {
@@ -100,7 +104,7 @@ export default ({ navigation }) => {
   const OPP_COLOR = 'white';
   return (
     <SafeAreaView style={{ flex: 1 }} >
-      {
+      {/* {
         isLoading
           ?
           <View style={{ width: '100%', height: '100%', justifyContent: 'center', backgroundColor: OPP_COLOR }}>
@@ -124,7 +128,7 @@ export default ({ navigation }) => {
               resizeMode='contain'
               source={require('../../images/waiting.png')}
             />
-      }
+      } */}
     </SafeAreaView>
   );
 };

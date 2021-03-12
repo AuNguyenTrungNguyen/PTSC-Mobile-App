@@ -202,7 +202,7 @@ export default ({ route, navigation }) => {
     let errorListData = [];
     let doneListData = [];
 
-    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.WelderID) || i.IsClear);
+    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.WelderID && i.WPSNo) || i.IsClear);
     const doneIds = doneListData.map(i => i.RowIndex);
     errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
 
@@ -616,6 +616,7 @@ export default ({ route, navigation }) => {
           ['SeriNo02']: valueClear,
           ['ItemDescription01']: valueClear,
           ['ItemDescription02']: valueClear,
+          ['Location']: valueClear,
         });
       } else {
         array.push({
@@ -637,6 +638,7 @@ export default ({ route, navigation }) => {
         array[objIndex]['SeriNo02'] = detailDrawingList[index]['SeriNo02'];
         array[objIndex]['ItemDescription01'] = detailDrawingList[index]['ItemDescription01'];
         array[objIndex]['ItemDescription02'] = detailDrawingList[index]['ItemDescription02'];
+        array[objIndex]['Location'] = detailDrawingList[index]['Location'];
       } else {
         array[objIndex]['WelderID'] = detailDrawingList[index]['WelderID'];
         array[objIndex]['WPSNo'] = detailDrawingList[index]['WPSNo'];

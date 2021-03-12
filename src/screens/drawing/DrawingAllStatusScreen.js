@@ -133,9 +133,9 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
 
   const _onPressViewQC = async code => {
     let teamLeader = await Helper.getData('USERNAME');
+    let codeTitle = code == 'Visual' ? 'Weld' : code;
+    let title = 'QC ' + codeTitle + ' Detail';
     if (facilityCode) {
-      let codeTitle = code == 'Visual' ? 'Weld' : code;
-      let title = 'QC ' + codeTitle + ' Detail';
       navigation.navigate(
         'QCDrawingDetail',
         {
