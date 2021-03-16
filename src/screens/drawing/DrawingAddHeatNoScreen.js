@@ -4,22 +4,20 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../utils/Helper';
-import { GetWelderListAPI } from '../../apis/drawing/ConstructionDrawingAPI';
+import { GetHeatNoListAPI } from '../../apis/drawing/ConstructionDrawingAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default ({ route, navigation }) => {
 
-  const { projectCode, welders, index } = route.params;
+  const { projectCode, index } = route.params;
 
-  const [welderId, setWelderId] = useState('');
-  const [welderName, setWelderName] = useState('');
+  const [heatNo, setHeatNo] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [welderSelected, setWelderSelected] = useState(welders);
-  const [welderList, setWelderList] = useState(null);
+  const [heatNoList, setHeatNoList] = useState(null);
 
   const callAPI = (executedAPI, loading = true) => {
     if (loading) {
@@ -36,44 +34,26 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const getWelderList = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetWelderListAPI(projectCode, welderId, welderName, token)
-      .then(res => {
-        if (res.success) {
-          setWelderList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
+  const _onChangeHeatNo = (no) => {
+    setHeatNo(no);
   };
 
-  const _onChangeWelderID = (id) => {
-    setWelderId(id);
-  };
-
-  const _onChangeWelderName = (name) => {
-    setWelderName(name);
-  };
-
-  const _onPressSearchWelder = () => {
+  const _onPressSearchHeatNo = () => {
     Keyboard.dismiss();
-    callAPI(() => { searchWelder(welderId, welderName) }, false);
+    callAPI(() => { searchHeatNo(heatNo) }, false);
   };
 
-  const searchWelder = async (welderId, welderName) => {
+  const getHeatNoList = async () => {
+    Keyboard.dismiss();
+    callAPI(() => { searchHeatNo('') }, false);
+  };
+
+  const searchHeatNo = async (heatNo) => {
     let token = await Helper.getData('TOKEN');
-    GetWelderListAPI(projectCode, welderId, welderName, token)
+    GetHeatNoListAPI(projectCode, heatNo, token)
       .then(res => {
         if (res.success) {
-          setWelderList(res.data);
+          setHeatNoList(res.data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -89,38 +69,12 @@ export default ({ route, navigation }) => {
       });
   };
 
-  const _onPressSelectWelder = (id) => {
-    if (welderSelected) {
-      if (!welderSelected.includes(id)) {
-        let welders = welderSelected + '/' + id;
-        setWelderSelected(welders);
-      }
-    } else {
-      setWelderSelected(id);
-    }
-  };
-
-  const _onPressUnselectWelder = (id) => {
-    if (welderSelected) {
-      const removed = welderSelected.split('/').filter(item => item !== id).join('/');
-      setWelderSelected(removed);
-    }
-  };
-
-  const _onPressAddWelder = () => {
-    if (!welderSelected) {
-      navigation.navigate('DrawingDetail', { welderSelected: 'CLEAR_WELDER_ID', index: index });
-    } else {
-      navigation.navigate('DrawingDetail', { welderSelected: welderSelected, index: index });
-    }
+  const _onPressAddHeatNo = itemHeatNo => {
+    navigation.navigate('DrawingDetail', { heatNoSelected: itemHeatNo, index: index });
   };
 
   const formatEmptyData = data => {
     return data != null ? data : '';
-  };
-
-  const formatEmptyWelder = data => {
-    return (!data || data != 'CLEAR_WELDER_ID') ? data : '';
   };
 
 
@@ -133,7 +87,7 @@ export default ({ route, navigation }) => {
 
   const ListSelectData = () => (
     <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>Enter WelderID and WelderName</Text>
+      <Text style={styles.noDataTitle}>Enter HeatNo to search</Text>
     </View>
   );
 
@@ -145,37 +99,22 @@ export default ({ route, navigation }) => {
 
   const renderItem = ({ item }) => {
     return (
-      welderSelected && welderSelected.includes(item.WelderID)
-        ?
-        <TouchableOpacity style={styles.boxSelected} onPress={() => { _onPressUnselectWelder(item.WelderID) }}>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>WelderID: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderID)}</Text>
-            </View>
+      <TouchableOpacity style={styles.box} onPress={() => { _onPressAddHeatNo(item) }}>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>HeatNo: </Text>
+            <Text style={styles.textData}>{formatEmptyData(item.HeatNo_TagNo)}</Text>
+            <Text style={styles.textTitle}>SeriNo: </Text>
+            <Text style={styles.textData}>{formatEmptyData(item.SeriNo)}</Text>
           </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>WelderName: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderName)}</Text>
-            </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>Description: </Text>
+            <Text numberOfLines={2} ellipsizeMode='tail' style={styles.textData}>{formatEmptyData(item.ItemDescription)}</Text>
           </View>
-        </TouchableOpacity>
-        :
-        <TouchableOpacity style={styles.box} onPress={() => { _onPressSelectWelder(item.WelderID) }}>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>WelderID: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderID)}</Text>
-            </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>WelderName: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderName)}</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -184,58 +123,40 @@ export default ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getWelderList)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getHeatNoList)} />
           :
           <View style={styles.container}>
             <View style={styles.headerContainer}>
               <View style={styles.rowInfo}>
-                <Text style={styles.infoTitle}>WelderID:</Text>
+                <Text style={styles.infoTitle}>HeatNo:</Text>
                 <View style={styles.inputContainer}>
                   <TextInput
                     style={styles.inputText}
-                    value={welderId}
-                    placeholder={'Enter WelderID'}
-                    onChangeText={_onChangeWelderID}
+                    value={heatNo}
+                    placeholder={'Enter HeatNo'}
+                    onChangeText={_onChangeHeatNo}
                     underlineColorAndroid='transparent'
                   />
-                  {welderId == ''
+                  {heatNo == ''
                     ? null
                     : <Icon name='times-circle'
-                      onPress={() => _onChangeWelderID('')}
+                      onPress={() => _onChangeHeatNo('')}
                       style={styles.inputIcon} />
                   }
                 </View>
               </View>
-              <View style={styles.rowInfo}>
-                <Text style={styles.infoTitle}>WelderName:</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.inputText}
-                    value={welderName}
-                    placeholder={'Enter WelderName'}
-                    onChangeText={_onChangeWelderName}
-                    underlineColorAndroid='transparent'
-                  />
-                  {welderName == ''
-                    ? null
-                    : <Icon name='times-circle'
-                      onPress={() => _onChangeWelderName('')}
-                      style={styles.inputIcon} />
-                  }
-                </View>
-              </View>
+              {/* <View style={styles.textHeaderData}>
+                <Text style={styles.infoTitle}>ItemCode:</Text>
+                <Text style={styles.infoData}>{formatEmptyData(itemCode)}</Text>
+              </View> */}
               <View style={styles.rowInfo}>
                 <Text style={styles.infoTitle} />
                 <TouchableOpacity
                   style={styles.searchButton}
-                  onPress={_onPressSearchWelder}
+                  onPress={_onPressSearchHeatNo}
                   disabled={isSearching}>
-                  <Text style={styles.buttonTitle}>Search Welder</Text>
+                  <Text style={styles.buttonTitle}>Search Heatno</Text>
                 </TouchableOpacity>
-              </View>
-              <View style={styles.rowInfoWelders}>
-                <Text style={styles.infoTitle}>Welders:</Text>
-                <Text style={styles.infoData}>{formatEmptyWelder(welderSelected)}</Text>
               </View>
             </View>
             {
@@ -243,17 +164,17 @@ export default ({ route, navigation }) => {
                 ?
                 <ListSearchData />
                 :
-                (welderList == null
+                (heatNoList == null
                   ?
                   <ListSelectData />
                   :
-                  (!welderList.length
+                  (!heatNoList.length
                     ?
                     <ListEmptyData />
                     :
                     <VirtualizedList
                       style={styles.table}
-                      data={welderList}
+                      data={heatNoList}
                       getItemCount={(data) => data.length}
                       getItem={(data, index) => {
                         return data[index];
@@ -267,8 +188,8 @@ export default ({ route, navigation }) => {
                 )
             }
             <View style={styles.actionContainer}>
-              <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddWelder}>
-                <Text style={styles.buttonTitle}>Add Welders</Text>
+              <TouchableOpacity style={styles.buttonUpload} onPress={() => _onPressAddHeatNo('CLEAR_HEAT_NO')}>
+                <Text style={styles.buttonTitle}>Clear HeatNo</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -279,7 +200,6 @@ export default ({ route, navigation }) => {
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
-const SELECT_COLOR = '#adb6bb';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -308,12 +228,6 @@ const styles = StyleSheet.create({
     flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
-  },
-  rowInfoWelders: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 36,
-    marginBottom: 4,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -378,14 +292,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
-  boxSelected: {
-    flexDirection: 'column',
-    width: '100%',
-    borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 8,
-    backgroundColor: SELECT_COLOR,
-  },
   row: {
     flex: 1,
     flexDirection: 'row',
@@ -406,7 +312,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
-
   actionContainer: {
     marginTop: 8,
     height: 36,

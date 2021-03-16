@@ -13,9 +13,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import Helper from '../../utils/Helper';
 import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
-import GetHeatNoListAPI from '../../apis/drawing/GetHeatNoListAPI';
-import GetWPSListAPI from '../../apis/drawing/GetWPSListAPI';
-import GetLocationListAPI from '../../apis/drawing/GetLocationListAPI';
+import { GetLocationListAPI, GetWPSListAPI, GetHeatNoListPopupAPI, GetFittingTeamAPI } from '../../apis/drawing/ConstructionDrawingAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import HelpModal from '../../components/drawing/HelpModal';
@@ -39,10 +37,13 @@ export default ({ route, navigation }) => {
     () => {
       if (route.params?.welderSelected) {
         _onChangeWelders(route.params?.welderSelected);
-      } else {
-        callAPI(getDrawingDetail);
+      } else if (route.params?.heatNoSelected) {
+        _onChangeHeatNo(route.params?.heatNoSelected);
       }
-    }, [route.params?.welderSelected, route.params?.index]
+      else {
+        callAPI(getData);
+      }
+    }, [route.params?.welderSelected, route.params?.heatNoSelected, route.params?.index]
   );
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -92,6 +93,35 @@ export default ({ route, navigation }) => {
     });
   };
 
+  const getData = async () => {
+    let token = await Helper.getData('TOKEN');
+    try {
+      await Promise.all([
+        GetDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token),
+        GetFittingTeamAPI(projectCode, teamLeader, token)
+      ])
+        .then(([drawingResult, fittingTeamResult]) => {
+          if (drawingResult.success && fittingTeamResult.success) {
+            setDetailDrawingList(drawingResult.data);
+            setFittingTeamList(fittingTeamResult.data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+          setIsError(true);
+        });;
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      MessageAlert('ERROR', error.toString());
+    }
+  };
+
   const getDrawingDetail = async () => {
     let token = await Helper.getData('TOKEN');
     GetDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
@@ -129,8 +159,11 @@ export default ({ route, navigation }) => {
       if (!element.hasOwnProperty('Location')) {
         element['Location'] = data['Location'];
       }
+      if (!element.hasOwnProperty('FittingTeam')) {
+        element['FittingTeam'] = data['FittingTeam'];
+      }
       // Check CLEAR
-      if (!element['ItemDate'] && !element['ItemPercent'] && !element['Heat01'] && !element['Heat02'] && !element['Location']) {
+      if (!element['ItemDate'] && !element['ItemPercent'] && !element['Heat01'] && !element['Heat02'] && !element['Location'] && !element['FittingTeam']) {
         element['IsClear'] = true;
       }
     });
@@ -142,7 +175,7 @@ export default ({ route, navigation }) => {
     let errorListData = [];
     let doneListData = [];
 
-    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Location) || i.IsClear);
+    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Heat01 && i.Heat02 && i.Location && i.FittingTeam ) || i.IsClear);
     const doneIds = doneListData.map(i => i.RowIndex);
     errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
 
@@ -209,7 +242,6 @@ export default ({ route, navigation }) => {
     if (errorListData.length) {
       const errorIds = errorListData.map(i => i.RowIndex);
       setErrorList(errorIds);
-      Toast.show('Have error data!', Toast.SHORT, ['RCTModalHostViewController']);
     } else {
       setErrorList([]);
     }
@@ -263,51 +295,51 @@ export default ({ route, navigation }) => {
 
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
 
-  const [isVisibleHeatNo, setIsVisibleHeatNo] = useState(false);
-  const [heatNoList, setHeatNoList] = useState(null);
+  const [isVisibleHeatNoPopup, setIsVisibleHeatNoPopup] = useState(false);
+  const [heatNoListPopup, setHeatNoListPopup] = useState(null);
 
   const _onPressShowHeatNoPopup = (value, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
-    setIsVisibleHeatNo(true);
+    setIsVisibleHeatNoPopup(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
-        getHeatNoList(value);
+        getHeatNoListPopup(value);
       }
     });
   };
 
   const _onPressClearHeatNoPopup = () => {
-    _onChangeHeatNoCode(null);
-    setIsVisibleHeatNo(false);
+    _onChangeHeatNoPopup(null);
+    setIsVisibleHeatNoPopup(false);
   };
 
-  const getHeatNoList = async value => {
+  const getHeatNoListPopup = async value => {
     let token = await Helper.getData('TOKEN');
-    GetHeatNoListAPI(projectCode, value, token)
+    GetHeatNoListPopupAPI(projectCode, value, token)
       .then(res => {
         if (res.success) {
-          setHeatNoList(res.data);
+          setHeatNoListPopup(res.data);
           setIsLoading(false);
           setIsError(false);
         } else {
           setIsLoading(false);
           setIsError(true);
-          setIsVisibleHeatNo(false);
+          setIsVisibleHeatNoPopup(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
-        setIsVisibleHeatNo(false);
+        setIsVisibleHeatNoPopup(false);
       });
   };
 
-  const _onChangeHeatNoCode = (data) => {
+  const _onChangeHeatNoPopup = (data) => {
     let array = [...detailDrawingList];
     array[indexUpdate][keyUpdate] = !data ? null : data.HeatNo_TagNo;
     setDetailDrawingList(array);
@@ -333,7 +365,7 @@ export default ({ route, navigation }) => {
       }
     }
     setUpdateDrawingList(array);
-    setIsVisibleHeatNo(false);
+    setIsVisibleHeatNoPopup(false);
   };
 
   const [isVisibleWPS, setIsVisibleWPS] = useState(false);
@@ -462,6 +494,33 @@ export default ({ route, navigation }) => {
     setIsVisibleLocation(false);
   };
 
+  const [isVisibleFittingTeam, setIsVisibleFittingTeam] = useState(false);
+  const [fittingTeamList, setFittingTeamList] = useState([]);
+
+  const _onPressShowFittingTeamPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleFittingTeam(true);
+  };
+
+  const _onChangeFittingTeam = data => {
+    let array = [...detailDrawingList];
+    array[indexUpdate][keyUpdate] = data;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+    let weldNo = detailDrawingList[indexUpdate].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: data });
+    } else {
+      array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+    }
+    setUpdateDrawingList(array);
+    setIsVisibleFittingTeam(false);
+  };
+
 
   /**
    * Handle for action edit data in list
@@ -550,7 +609,7 @@ export default ({ route, navigation }) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
     navigation.navigate(
-      'DrawingWelder',
+      'DrawingAddWelder',
       {
         projectCode: projectCode,
         welders: value,
@@ -559,7 +618,7 @@ export default ({ route, navigation }) => {
     );
   };
 
-  const _onChangeWelders = (welderSelected) => {
+  const _onChangeWelders = welderSelected => {
     let array = [...detailDrawingList];
     welderSelected = formatEmptyWelder(welderSelected);
     array[indexUpdate][keyUpdate] = welderSelected;
@@ -573,6 +632,48 @@ export default ({ route, navigation }) => {
       array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: welderSelected });
     } else {
       array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+    }
+    setUpdateDrawingList(array);
+  };
+
+  const _onPressSelectHeatNo = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    navigation.navigate(
+      'DrawingAddHeatNo',
+      {
+        projectCode: projectCode,
+        itemCode: value,
+        index: index,
+      }
+    );
+  };
+
+  const _onChangeHeatNo = data => {
+    let array = [...detailDrawingList];
+    data = formatEmptyHeatNo(data);
+    array[indexUpdate][keyUpdate] = !data ? null : data.HeatNo_TagNo;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+    let weldNo = detailDrawingList[indexUpdate].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      if (keyUpdate == 'Heat01') {
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo01']: !data ? null : data.SeriNo, ['ItemDescription01']: !data ? null : data.ItemDescription });
+      } else {
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo02']: !data ? null : data.SeriNo, ['ItemDescription02']: !data ? null : data.ItemDescription });
+      }
+    } else {
+      array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+      if (keyUpdate == 'Heat01') {
+        array[objIndex]['SeriNo01'] = !data ? null : data.SeriNo;
+        array[objIndex]['ItemDescription01'] = !data ? null : data.ItemDescription;
+      } else {
+        array[objIndex]['SeriNo02'] = !data ? null : data.SeriNo;
+        array[objIndex]['ItemDescription02'] = !data ? null : data.ItemDescription;
+      }
     }
     setUpdateDrawingList(array);
   };
@@ -593,6 +694,7 @@ export default ({ route, navigation }) => {
       array[index]['ItemDescription01'] = valueClear;
       array[index]['ItemDescription02'] = valueClear;
       array[index]['Location'] = valueClear;
+      array[index]['FittingTeam'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
@@ -617,6 +719,7 @@ export default ({ route, navigation }) => {
           ['ItemDescription01']: valueClear,
           ['ItemDescription02']: valueClear,
           ['Location']: valueClear,
+          ['FittingTeam']: valueClear,
         });
       } else {
         array.push({
@@ -639,6 +742,7 @@ export default ({ route, navigation }) => {
         array[objIndex]['ItemDescription01'] = detailDrawingList[index]['ItemDescription01'];
         array[objIndex]['ItemDescription02'] = detailDrawingList[index]['ItemDescription02'];
         array[objIndex]['Location'] = detailDrawingList[index]['Location'];
+        array[objIndex]['FittingTeam'] = detailDrawingList[index]['FittingTeam'];
       } else {
         array[objIndex]['WelderID'] = detailDrawingList[index]['WelderID'];
         array[objIndex]['WPSNo'] = detailDrawingList[index]['WPSNo'];
@@ -704,7 +808,11 @@ export default ({ route, navigation }) => {
   };
 
   const formatEmptyWelder = data => {
-    return data == 'WELDER_ID_NULL' ? null : data;
+    return data == 'CLEAR_WELDER_ID' ? null : data;
+  };
+
+  const formatEmptyHeatNo = data => {
+    return data == 'CLEAR_HEAT_NO' ? null : data;
   };
 
 
@@ -876,19 +984,30 @@ export default ({ route, navigation }) => {
                 {item.ItemCode01
                   ?
                   <TouchableOpacity
-                    style={styles.itemActionWelder}
+                    style={styles.itemActionIcon}
                     onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
-                    <Text style={styles.textDataWelder}>{formatEmptyData(item.Heat01)}</Text>
+                    <Text style={styles.textData}>{formatEmptyData(item.Heat01)}</Text>
                     {
-                      isDisableItem || !item.ItemCode01
+                      isDisableItem
                         ?
-                        <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
                         :
-                        <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={BASE_COLOR} />
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                     }
                   </TouchableOpacity>
                   :
-                  null}
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressSelectHeatNo(item.ItemCode01, index, 'Heat01')}>
+                    <Text style={styles.textData}>{formatEmptyData(item.Heat01)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>}
               </View>
             </View>
             <View style={styles.row}>
@@ -907,19 +1026,30 @@ export default ({ route, navigation }) => {
                 {item.ItemCode02
                   ?
                   <TouchableOpacity
-                    style={styles.itemActionWelder}
+                    style={styles.itemActionIcon}
                     onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
-                    <Text style={styles.textDataWelder}>{formatEmptyData(item.Heat02)}</Text>
+                    <Text style={styles.textData}>{formatEmptyData(item.Heat02)}</Text>
                     {
-                      isDisableItem || !item.ItemCode02
+                      isDisableItem
                         ?
-                        <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
                         :
-                        <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={BASE_COLOR} />
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                     }
                   </TouchableOpacity>
                   :
-                  null}
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressSelectHeatNo(item.ItemCode02, index, 'Heat02')}>
+                    <Text style={styles.textData}>{formatEmptyData(item.Heat02)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>}
               </View>
             </View>
             <View style={styles.row}>
@@ -941,6 +1071,26 @@ export default ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               <View style={styles.cellPercent} />
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>FittingTeam:</Text>
+              </View>
+              <View style={styles.cellDataLine}>
+                <TouchableOpacity
+                  style={styles.itemActionIcon}
+                  onPress={() => _onPressShowFittingTeamPopup(index, 'FittingTeam')}
+                >
+                  <Text style={styles.textData} >{item.FittingTeam}</Text>
+                  {
+                    isDisableItem
+                      ?
+                      <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                      :
+                      <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                  }
+                </TouchableOpacity>
+              </View>
             </View>
           </>)
           :
@@ -1023,15 +1173,15 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.cellDataLine}>
                 <TouchableOpacity
-                  style={styles.itemActionWelder}
+                  style={styles.itemActionIcon}
                   onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
-                  <Text style={styles.textDataWelder} >{item.WelderID}</Text>
+                  <Text style={styles.textData} >{item.WelderID}</Text>
                   {
                     isDisableItem
                       ?
-                      <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={'#a3a3a3'} />
+                      <AntDesignIcon style={styles.iconAction} name='addusergroup' size={20} color={'#a3a3a3'} />
                       :
-                      <AntDesignIcon style={styles.iconActionWelder} name='addusergroup' size={20} color={BASE_COLOR} />
+                      <AntDesignIcon style={styles.iconAction} name='addusergroup' size={20} color={BASE_COLOR} />
                   }
                 </TouchableOpacity>
               </View>
@@ -1042,15 +1192,15 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.cellDataLine}>
                 <TouchableOpacity
-                  style={styles.itemActionWelder}
+                  style={styles.itemActionIcon}
                   onPress={() => _onPressShowWPSPopup(index, 'WPSNo')}>
-                  <Text style={styles.textDataWelder} >{item.WPSNo}</Text>
+                  <Text style={styles.textData} >{item.WPSNo}</Text>
                   {
                     isDisableItem
                       ?
-                      <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={'#a3a3a3'} />
+                      <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
                       :
-                      <Ionicons style={styles.iconActionWelder} name='md-list' size={20} color={BASE_COLOR} />
+                      <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                   }
                 </TouchableOpacity>
               </View>
@@ -1174,21 +1324,21 @@ export default ({ route, navigation }) => {
         code={code}
         onClose={() => setIsVisibleHelp(false)} />
       <PickupDataModalHeader
-        visible={isVisibleHeatNo}
+        visible={isVisibleHeatNoPopup}
         onClear={_onPressClearHeatNoPopup}
-        onCancel={() => setIsVisibleHeatNo(false)}
-        loaded={heatNoList != null}
+        onCancel={() => setIsVisibleHeatNoPopup(false)}
+        loaded={heatNoListPopup != null}
         text01='HeatNo'
         text02='SeriNo'
       >
         {
-          heatNoList != null
+          heatNoListPopup != null
             ?
-            heatNoList.length
+            heatNoListPopup.length
               ?
-              heatNoList.map((item) => {
+              heatNoListPopup.map((item) => {
                 return (
-                  <TouchableOpacity style={modals.row} onPress={() => _onChangeHeatNoCode(item)}>
+                  <TouchableOpacity style={modals.row} onPress={() => _onChangeHeatNoPopup(item)}>
                     <Text style={modals.cell}>{item.HeatNo_TagNo}</Text>
                     <View style={modals.line} />
                     <Text style={modals.cell}>{item.SeriNo}</Text>
@@ -1257,6 +1407,20 @@ export default ({ route, navigation }) => {
             <View>
               <ActivityIndicator size='large' color={BASE_COLOR} />
             </View>
+        }
+      </PickupDataModal>
+      <PickupDataModal
+        visible={isVisibleFittingTeam}
+        onCancel={() => setIsVisibleFittingTeam(false)}
+        loaded={true}>
+        {
+          fittingTeamList.map((item) => {
+            return (
+              <TouchableOpacity style={modals.row} onPress={() => _onChangeFittingTeam(item)}>
+                <Text style={modals.cell}>{item}</Text>
+              </TouchableOpacity>
+            );
+          })
         }
       </PickupDataModal>
     </SafeAreaView>
@@ -1371,20 +1535,9 @@ const styles = StyleSheet.create({
     flex: 2.2,
     justifyContent: 'center',
   },
-  itemActionWelder: {
+  itemActionIcon: {
     flexDirection: 'row',
     alignItems: 'center'
-  },
-  textDataWelder: {
-    minWidth: 80,
-    flexShrink: 1,
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-  },
-  iconActionWelder: {
-    marginHorizontal: 4,
-    width: 20,
-    height: 20,
   },
   cellPercent: {
     flex: 1.2,

@@ -19,9 +19,15 @@ const PickupDataModal = props => {
               props.loaded
                 ?
                 <View style={modals.action}>
-                  <TouchableOpacity style={modals.button} onPress={props.onClear}>
-                    <Text style={modals.buttonTitle}>Clear</Text>
-                  </TouchableOpacity>
+                  {
+                    props.onClear
+                      ?
+                      <TouchableOpacity style={modals.button} onPress={props.onClear}>
+                        <Text style={modals.buttonTitle}>Clear</Text>
+                      </TouchableOpacity>
+                      :
+                      null
+                  }
                   <TouchableOpacity style={modals.button} onPress={props.onCancel}>
                     <Text style={modals.buttonTitle}>Cancel</Text>
                   </TouchableOpacity>

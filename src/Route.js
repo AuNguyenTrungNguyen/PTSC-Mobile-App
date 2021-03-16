@@ -19,6 +19,7 @@ import DrawingAllStatusScreen from './screens/drawing/DrawingAllStatusScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/drawing/DrawingAddWelderScreen';
+import DrawingAddHeatNoScreen from './screens/drawing/DrawingAddHeatNoScreen';
 
 import SpoolMatrixScreen from './screens/spool/SpoolMatrixScreen';
 import SpoolCameraScreen from './screens/spool/SpoolCameraScreen';
@@ -162,11 +163,21 @@ export default () => {
           }
         />
         <Stack.Screen
-          name='DrawingWelder'
+          name='DrawingAddWelder'
           component={DrawingAddWelderScreen}
           options={
             {
               title: 'Select Welders',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingAddHeatNo'
+          component={DrawingAddHeatNoScreen}
+          options={
+            {
+              title: 'Select HeatNo',
               headerBackTitle: 'Back',
             }
           }
