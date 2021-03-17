@@ -3,7 +3,7 @@ import { Port_Server } from '../../utils/Core';
 export const GetWelderListAPI = (projectCode, id, name, token) =>
   fetch(
     Port_Server
-    + '/api/Drawing/GetWelderList?projectCode=' + 'DNWHP'
+    + '/api/Drawing/GetWelderList?projectCode=' + projectCode
     + '&id=' + id
     + '&name=' + name,
     {
@@ -16,7 +16,7 @@ export const GetWelderListAPI = (projectCode, id, name, token) =>
 export const GetHeatNoListPopupAPI = (projectCode, itemCode, token) =>
   fetch(
     Port_Server
-    + '/api/Drawing/GetHeatNoListPopup?projectCode=' + 'DNWHP'
+    + '/api/Drawing/GetHeatNoListPopup?projectCode=' + projectCode
     + '&itemCode=' + itemCode,
     {
       headers: {
@@ -28,7 +28,7 @@ export const GetHeatNoListPopupAPI = (projectCode, itemCode, token) =>
 export const GetHeatNoListAPI = (projectCode, heatNo, token) =>
   fetch(
     Port_Server
-    + '/api/Drawing/GetHeatNoList?projectCode=' + 'DNWHP'
+    + '/api/Drawing/GetHeatNoList?projectCode=' + projectCode
     + '&heatNo=' + heatNo,
     {
       headers: {
@@ -38,7 +38,7 @@ export const GetHeatNoListAPI = (projectCode, heatNo, token) =>
     }).then(res => res.json());
 
 export const GetWPSListAPI = (projectCode, token) =>
-  fetch(Port_Server + '/api/Drawing/GetWPSList?projectCode=' + 'DNWHP', {
+  fetch(Port_Server + '/api/Drawing/GetWPSList?projectCode=' + projectCode, {
     headers: {
       'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export const GetWPSListAPI = (projectCode, token) =>
   }).then(res => res.json());
 
 export const GetLocationListAPI = (projectCode, token) =>
-  fetch(Port_Server + '/api/Drawing/GetLocationList?projectCode=' + 'DNWHP', {
+  fetch(Port_Server + '/api/Drawing/GetLocationList?projectCode=' + projectCode, {
     headers: {
       'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ export const GetLocationListAPI = (projectCode, token) =>
 export const GetFittingTeamAPI = (projectCode, userLogin, token) =>
   fetch(
     Port_Server
-    + '/api/Drawing/GetFittingTeam?projectCode=' + 'DNWHP'
+    + '/api/Drawing/GetFittingTeam?projectCode=' + projectCode
     + '&PMSUserLogin=' + userLogin,
     {
       headers: {

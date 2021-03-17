@@ -11,6 +11,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import Helper from '../../utils/Helper';
+import Formater from '../../utils/Formater';
 import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
 import { GetLocationListAPI, GetWPSListAPI, GetHeatNoListPopupAPI, GetFittingTeamAPI } from '../../apis/drawing/ConstructionDrawingAPI';
@@ -41,7 +42,7 @@ export default ({ route, navigation }) => {
         _onChangeHeatNo(route.params?.heatNoSelected);
       }
       else {
-        callAPI(getData);
+        callAPI(getDataDetail);
       }
     }, [route.params?.welderSelected, route.params?.heatNoSelected, route.params?.index]
   );
@@ -93,7 +94,7 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const getData = async () => {
+  const getDataDetail = async () => {
     let token = await Helper.getData('TOKEN');
     try {
       await Promise.all([
@@ -122,24 +123,6 @@ export default ({ route, navigation }) => {
     }
   };
 
-  const getDrawingDetail = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
-      .then(res => {
-        if (res.success) {
-          setDetailDrawingList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
-  };
 
   const handleDataUpdateFitup = () => {
     updateDrawingList.forEach(element => {
@@ -175,7 +158,7 @@ export default ({ route, navigation }) => {
     let errorListData = [];
     let doneListData = [];
 
-    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Heat01 && i.Heat02 && i.Location && i.FittingTeam ) || i.IsClear);
+    doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Heat01 && i.Heat02 && i.Location && i.FittingTeam) || i.IsClear);
     const doneIds = doneListData.map(i => i.RowIndex);
     errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
 
@@ -799,14 +782,6 @@ export default ({ route, navigation }) => {
     return regexNumber.test(input) && input !== '';
   };
 
-  const formatEmptyData = data => {
-    return data != null ? data : '';
-  };
-
-  const formatDateData = data => {
-    return data != null ? Moment(data).format("DD-MMM-YY") : '';
-  };
-
   const formatEmptyWelder = data => {
     return data == 'CLEAR_WELDER_ID' ? null : data;
   };
@@ -863,16 +838,16 @@ export default ({ route, navigation }) => {
                 ?
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>
-                  <Text style={[styles.textMeta, styles.greenText]}>{formatEmptyData(item.WeldNo)}</Text>
+                  <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.WeldNo)}</Text>
                   <Text> - ConType: </Text>
-                  <Text style={[styles.textMeta, styles.greenText]}>{formatEmptyData(item.ConType)}</Text>
+                  <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.ConType)}</Text>
                 </Text>
                 :
                 <>
                   <Text>WeldNo: </Text>
-                  <Text style={styles.textMeta}>{formatEmptyData(item.WeldNo)}</Text>
+                  <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
                   <Text> - ConType: </Text>
-                  <Text style={styles.textMeta}>{formatEmptyData(item.ConType)}</Text>
+                  <Text style={styles.textMeta}>{Formater.formatEmptyData(item.ConType)}</Text>
                 </>
             }
           </View>
@@ -920,7 +895,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemAction}
                   onPress={() => _onPressShowPicker(item.FittingDate, index, 'FittingDate')}>
-                  <Text style={styles.textData} >{formatDateData(item.FittingDate)}</Text>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
                   {
                     isDisableItem
                       ?
@@ -940,7 +915,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemAction}
                   onPress={() => _onPressShowDialog(item.FitPercentage, index, 'FitPercentage')}>
-                  <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.FitPercentage)}</Text>
                   {
                     isDisableItem
                       ?
@@ -973,7 +948,7 @@ export default ({ route, navigation }) => {
                 <Text>ItemCode01:</Text>
               </View>
               <View style={styles.cellDataLine}>
-                <Text style={styles.textData} >{formatEmptyData(item.ItemCode01)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.ItemCode01)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -986,7 +961,7 @@ export default ({ route, navigation }) => {
                   <TouchableOpacity
                     style={styles.itemActionIcon}
                     onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
-                    <Text style={styles.textData}>{formatEmptyData(item.Heat01)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
                     {
                       isDisableItem
                         ?
@@ -999,7 +974,7 @@ export default ({ route, navigation }) => {
                   <TouchableOpacity
                     style={styles.itemActionIcon}
                     onPress={() => _onPressSelectHeatNo(item.ItemCode01, index, 'Heat01')}>
-                    <Text style={styles.textData}>{formatEmptyData(item.Heat01)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
                     {
                       isDisableItem
                         ?
@@ -1015,7 +990,7 @@ export default ({ route, navigation }) => {
                 <Text>ItemCode02:</Text>
               </View>
               <View style={styles.cellDataLine}>
-                <Text style={styles.textData} >{formatEmptyData(item.ItemCode02)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.ItemCode02)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -1028,7 +1003,7 @@ export default ({ route, navigation }) => {
                   <TouchableOpacity
                     style={styles.itemActionIcon}
                     onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
-                    <Text style={styles.textData}>{formatEmptyData(item.Heat02)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
                     {
                       isDisableItem
                         ?
@@ -1041,7 +1016,7 @@ export default ({ route, navigation }) => {
                   <TouchableOpacity
                     style={styles.itemActionIcon}
                     onPress={() => _onPressSelectHeatNo(item.ItemCode02, index, 'Heat02')}>
-                    <Text style={styles.textData}>{formatEmptyData(item.Heat02)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
                     {
                       isDisableItem
                         ?
@@ -1060,7 +1035,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemAction}
                   onPress={() => _onPressShowLocationPopup(index, 'Location')}>
-                  <Text style={styles.textData} >{formatEmptyData(item.Location)}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
                   {
                     isDisableItem
                       ?
@@ -1079,9 +1054,8 @@ export default ({ route, navigation }) => {
               <View style={styles.cellDataLine}>
                 <TouchableOpacity
                   style={styles.itemActionIcon}
-                  onPress={() => _onPressShowFittingTeamPopup(index, 'FittingTeam')}
-                >
-                  <Text style={styles.textData} >{item.FittingTeam}</Text>
+                  onPress={() => _onPressShowFittingTeamPopup(index, 'FittingTeam')}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.FittingTeam)}</Text>
                   {
                     isDisableItem
                       ?
@@ -1103,7 +1077,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemAction}
                   onPress={() => _onPressShowPicker(item.WeldingDate, index, 'WeldingDate')}>
-                  <Text style={styles.textData} >{formatDateData(item.WeldingDate)}</Text>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
                   {
                     isDisableItem
                       ?
@@ -1123,7 +1097,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemAction}
                   onPress={() => _onPressShowDialog(item.WeldPercentage, index, 'WeldPercentage')}>
-                  <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldPercentage)}</Text>
                   {
                     isDisableItem
                       ?
@@ -1175,7 +1149,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemActionIcon}
                   onPress={() => _onPressSelectWelder(item.WelderID, index, 'WelderID')}>
-                  <Text style={styles.textData} >{item.WelderID}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
                   {
                     isDisableItem
                       ?
@@ -1194,7 +1168,7 @@ export default ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.itemActionIcon}
                   onPress={() => _onPressShowWPSPopup(index, 'WPSNo')}>
-                  <Text style={styles.textData} >{item.WPSNo}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
                   {
                     isDisableItem
                       ?
@@ -1214,7 +1188,7 @@ export default ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDataDetail)} />
         :
         <View style={styles.container}>
           {
@@ -1414,13 +1388,19 @@ export default ({ route, navigation }) => {
         onCancel={() => setIsVisibleFittingTeam(false)}
         loaded={true}>
         {
-          fittingTeamList.map((item) => {
-            return (
-              <TouchableOpacity style={modals.row} onPress={() => _onChangeFittingTeam(item)}>
-                <Text style={modals.cell}>{item}</Text>
-              </TouchableOpacity>
-            );
-          })
+          fittingTeamList.length
+            ?
+            fittingTeamList.map((item) => {
+              return (
+                <TouchableOpacity style={modals.row} onPress={() => _onChangeFittingTeam(item)}>
+                  <Text style={modals.cell}>{item}</Text>
+                </TouchableOpacity>
+              );
+            })
+            :
+            <View>
+              <Text style={modals.emptyText}>No have any data!</Text>
+            </View>
         }
       </PickupDataModal>
     </SafeAreaView>
@@ -1480,7 +1460,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     borderColor: 'red',
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 4,
     marginBottom: 8,
   },
