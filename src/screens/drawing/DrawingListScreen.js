@@ -307,6 +307,18 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const _onPressOpenDrawing = link => {
+    navigation.navigate(
+      'PDFView',
+      {
+        link: link,
+        title: 'View Drawing Cons List',
+      }
+    );
+  };
+
+
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data with </Text>
@@ -314,9 +326,6 @@ export default ({ route, navigation }) => {
     </View>
   );
 
-  /**
-   * Drawing List
-   **/
   const ListSearchData = () => (
     <View style={styles.noDataContainer}>
       <ActivityIndicator size='large' color={BASE_COLOR} />
@@ -336,7 +345,15 @@ export default ({ route, navigation }) => {
       <View style={styles.box}>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>DrawingNo:</Text>
-          <Text style={styles.cellData}>{item.DrawingNo}</Text>
+          {
+            item.WebLink
+              ?
+              <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }} style={styles.cellData}>
+                <Text style={styles.textDataOpen}>{item.DrawingNo}</Text>
+              </TouchableOpacity>
+              :
+              <Text style={styles.cellData}>{item.DrawingNo}</Text>
+          }
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Sheet:</Text>
@@ -623,6 +640,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
     flexDirection: 'row',
+  },
+  textDataOpen: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    textDecorationLine: 'underline',
+    color: BASE_COLOR,
   },
   cellValue: {
     flex: 1,
