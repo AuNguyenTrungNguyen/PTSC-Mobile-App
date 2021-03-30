@@ -274,13 +274,13 @@ const QCSpendListScreen = ({ route, navigation }) => {
           <View style={styles.cellData}>
             <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
           </View>
-          {/* <View style={styles.cellImageAction}>
+          <View style={styles.cellImageAction}>
             {
               <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
                 <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
               </TouchableOpacity>
             }
-          </View> */}
+          </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cellTitle}>

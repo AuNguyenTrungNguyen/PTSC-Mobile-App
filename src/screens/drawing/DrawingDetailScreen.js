@@ -9,9 +9,11 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import CheckBox from '@react-native-community/checkbox';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
+import Constant from '../../utils/Constant';
 import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
 import { GetLocationListAPI, GetWPSListAPI, GetHeatNoListPopupAPI, GetFittingTeamAPI } from '../../apis/drawing/ConstructionDrawingAPI';
@@ -145,8 +147,18 @@ export default ({ route, navigation }) => {
       if (!element.hasOwnProperty('FittingTeam')) {
         element['FittingTeam'] = data['FittingTeam'];
       }
+      if (!element.hasOwnProperty('QCFittupRemark')) {
+        element['QCFittupRemark'] = data['QCFittupRemark'];
+      }
+
       // Check CLEAR
-      if (!element['ItemDate'] && !element['ItemPercent'] && !element['Heat01'] && !element['Heat02'] && !element['Location'] && !element['FittingTeam']) {
+      if (!element['ItemDate']
+        && !element['ItemPercent']
+        && !element['Heat01']
+        && !element['Heat02']
+        && !element['Location']
+        && !element['FittingTeam']
+        && (!element['QCFittupRemark'] || element['QCFittupRemark'] == Constant.EMPTY_VALUE_STRING)) {
         element['IsClear'] = true;
       }
     });
@@ -274,6 +286,25 @@ export default ({ route, navigation }) => {
         teamLeader: teamLeader
       }
     );
+  };
+
+  const _onChangeCheckbox = (index, key, value) => {
+    value = value ? 'TW' : Constant.EMPTY_VALUE_STRING;
+    let array = [...detailDrawingList];
+    array[index][key] = value;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[index].RowIndex;
+    let weldNo = detailDrawingList[index].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push(
+        { RowIndex: rowIndex, WeldNo: weldNo, [key]: value });
+    } else {
+      array[objIndex][key] = value;
+    }
+    setUpdateDrawingList(array);
   };
 
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
@@ -678,6 +709,9 @@ export default ({ route, navigation }) => {
       array[index]['ItemDescription02'] = valueClear;
       array[index]['Location'] = valueClear;
       array[index]['FittingTeam'] = valueClear;
+      if (array[index]['ConType'] == 'TW') {
+        array[index]['QCFittupRemark'] = Constant.EMPTY_VALUE_STRING;
+      }
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
@@ -841,6 +875,28 @@ export default ({ route, navigation }) => {
                   <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.WeldNo)}</Text>
                   <Text> - ConType: </Text>
                   <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.ConType)}</Text>
+                  {
+                    item.ConType == 'TW' && code == 'FitUp'
+                      ?
+                      <>
+                        <Text>   </Text>
+                        <CheckBox
+                          value={item.QCFittupRemark == 'TW'}
+                          onValueChange={newValue => _onChangeCheckbox(index, 'QCFittupRemark', newValue)}
+                          style={styles.checkBox}
+                          boxType='square'
+                          disabled={false}
+                          onCheckColor={OPP_COLOR}
+                          onFillColor={BASE_COLOR}
+                          onTintColor={BASE_COLOR}
+                          tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                          animationDuration={0.2}
+                          onAnimationType='flat'
+                        />
+                      </>
+                      :
+                      null
+                  }
                 </Text>
                 :
                 <>
@@ -848,6 +904,28 @@ export default ({ route, navigation }) => {
                   <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
                   <Text> - ConType: </Text>
                   <Text style={styles.textMeta}>{Formater.formatEmptyData(item.ConType)}</Text>
+                  {
+                    item.ConType == 'TW' && code == 'FitUp'
+                      ?
+                      <>
+                        <Text>   </Text>
+                        <CheckBox
+                          value={item.QCFittupRemark == 'TW'}
+                          onValueChange={newValue => _onChangeCheckbox(index, 'QCFittupRemark', newValue)}
+                          style={styles.checkBox}
+                          boxType='square'
+                          disabled={false}
+                          onCheckColor={OPP_COLOR}
+                          onFillColor={BASE_COLOR}
+                          onTintColor={BASE_COLOR}
+                          tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                          animationDuration={0.2}
+                          onAnimationType='flat'
+                        />
+                      </>
+                      :
+                      null
+                  }
                 </>
             }
           </View>
@@ -1474,6 +1552,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     alignItems: 'center',
+  },
+  checkBox: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    width: 20,
+    height: 20,
   },
   itemDone: {
     borderColor: BASE_COLOR,
