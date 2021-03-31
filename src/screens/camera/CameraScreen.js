@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import NetInfo from '@react-native-community/netinfo';
+import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../utils/Helper';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
@@ -9,10 +10,11 @@ import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAP
 export default ({ route, navigation }) => {
 
   const [isScanned, setIsScanned] = useState(false);
+  const isFocused = useIsFocused();
   const { projectCode, teamLeader, code, source } = route.params;
 
   const _onQRCodeRead = scanResult => {
-    if (scanResult.data !== null && !isScanned) {
+    if (scanResult.data !== null && !isScanned && isFocused) {
       var data = scanResult.data.split('_');
       getFacilityCode(data[0], data[1], data[2]);
     }
@@ -37,9 +39,12 @@ export default ({ route, navigation }) => {
                   rev: rev,
                   code: code,
                   teamLeader: teamLeader,
+                  title: code + ' Detail',
                 });
                 setIsScanned(false);
               } else {
+                let codeTitle = code == 'Visual' ? 'Weld' : code;
+                let title = 'QC ' + codeTitle + ' Detail';
                 navigation.navigate('QCDrawingDetail', {
                   projectCode: projectCode,
                   facilityCode: res.data,
@@ -48,6 +53,7 @@ export default ({ route, navigation }) => {
                   rev: rev,
                   code: code,
                   teamLeader: teamLeader,
+                  title: title,
                 });
                 setIsScanned(false);
               }

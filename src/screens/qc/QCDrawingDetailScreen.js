@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Moment from 'moment';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
+import Dialog from 'react-native-dialog';
 
 import Helper from '../../utils/Helper';
-import GetDrawingDetailAPI from '../../apis/qc/GetDrawingDetailAPI';
-import UpdateDrawingDetailAPI from '../../apis/qc/UpdateDrawingDetailAPI';
+import Formater from '../../utils/Formater';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
+import { GetQCDrawingDetailAPI, UpdateQCDrawingDetailAPI, GetQCInspectorListAPI } from '../../apis/qc/QCDrawingAPI';
+import PickupDataModal from '../../components/drawing/PickupDataModal';
 
 export default ({ route, navigation }) => {
 
@@ -20,24 +21,35 @@ export default ({ route, navigation }) => {
   const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader, source } = route.params;
+  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
+
+  const [errorList, setErrorList] = useState([]);
+  // INSPECTOR
+  const [isVisibleInspector, setIsVisibleInspector] = useState(false);
+  const [inspectorList, setInspectorList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
   useEffect(
     () => {
-      callAPI(getDrawingDetail);
-    }, [route.params?.welderSelected]
+      callAPI(getDataDetail);
+    }, []
   );
 
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
-          <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={toggle}>
+            <Ionicons
+              size={24}
+              name={isShowDescription.name} color={iconColor} />
+          </TouchableOpacity>
+        </View>
       ),
     });
   }, [navigation, isShowDescription]);
@@ -64,48 +76,77 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const getDrawingDetail = async () => {
+  const getDataDetail = async () => {
     let token = await Helper.getData('TOKEN');
-    GetDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
-      .then(res => {
-        if (res.success) {
-          setDetailDrawingList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-          setIsUploading(false);
-        } else {
+    try {
+      await Promise.all([
+        GetQCDrawingDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token),
+        GetQCInspectorListAPI(projectCode, teamLeader, token)
+      ])
+        .then(([drawingResult, inspectorResult]) => {
+          if (drawingResult.success && inspectorResult.success) {
+            setDetailDrawingList(drawingResult.data);
+            setInspectorList(inspectorResult.data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
           setIsLoading(false);
           setIsError(true);
-          setIsUploading(false);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-        setIsUploading(false);
-      });
+        });;
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      MessageAlert('ERROR', error.toString());
+    }
   };
 
   const updateDrawingDetail = async () => {
-    let token = await Helper.getData('TOKEN');
-    UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, code, updateDrawingList, token)
-      .then(res => {
-        if (res.success) {
-          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+    updateDrawingList.map((item) => {
+      let keys = Object.keys(item);
+      let column = keys.filter(k => (k !== 'RowIndex' && k !== 'WeldNo'));
+      item['ColumnChange'] = column;
+      return item;
+    });
+
+    let doneListData = [];
+    if (code == 'FitUp') {
+      doneListData = detailDrawingList.filter(i => i.QCFittupInspector);
+    } else {
+      doneListData = detailDrawingList.filter(i => i.QCVisualInspector);
+    }
+    const doneIds = doneListData.map(i => i.RowIndex);
+    const errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
+
+    if (errorListData.length) {
+      const errorIds = errorListData.map(i => i.RowIndex);
+      setErrorList(errorIds);
+    } else {
+      setErrorList([]);
+      setIsUploading(true);
+      let token = await Helper.getData('TOKEN');
+      UpdateQCDrawingDetailAPI(projectCode, facilityCode, drawingNo, code, updateDrawingList, token)
+        .then(res => {
+          if (res.success) {
+            Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          } else {
+            Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+          }
           setUpdateDrawingList([]);
-        } else {
+          setIsUploading(false);
+        }).catch(() => {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        }
-        callAPI(getDrawingDetail);
-      }).catch(() => {
-        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        setIsUploading(false);
-      });
+          setIsUploading(false);
+        });
+    }
   };
 
   const _onPressSubmitToServer = async () => {
     if (updateDrawingList.length) {
-      setIsUploading(true);
       callAPI(updateDrawingDetail);
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
@@ -126,32 +167,87 @@ export default ({ route, navigation }) => {
   };
 
   const _onPressChangeStatus = (value, index, key) => {
-    if (detailDrawingList[index][key] !== value) {
+    let array = [...detailDrawingList];
+    array[index][key] = value;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[index].RowIndex;
+    let weldNo = detailDrawingList[index].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [key]: value });
+    } else {
+      array[objIndex][key] = detailDrawingList[index][key];
+    }
+    setUpdateDrawingList(array);
+  };
+
+  const _onPressShowInspectorPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleInspector(true);
+  };
+
+  const _onChangeSpectorPopup = data => {
+    let array = [...detailDrawingList];
+    array[indexUpdate][keyUpdate] = data;
+    setDetailDrawingList(array);
+
+    array = [...updateDrawingList];
+    let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+    let weldNo = detailDrawingList[indexUpdate].WeldNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: data });
+    } else {
+      array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
+    }
+    setUpdateDrawingList(array);
+    setIsVisibleInspector(false);
+  };
+
+  // REMARK
+  const [remarkDisplay, setRemarkDisplay] = useState('');
+  const [isShowDialogRemark, setIsShowDialogRemark] = useState(false);
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+  const [keyUpdate, setKeyUpdate] = useState('');
+
+  const _onPressShowDialogRemark = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setRemarkDisplay(value.toString());
+    } else {
+      setRemarkDisplay('');
+    }
+    setIsShowDialogRemark(true);
+  };
+
+  const _onPressSubmitRemark = () => {
+    let value = remarkDisplay;
+    if (!value) {
+      value = null;
+    }
+    setRemarkDisplay(value);
+    setIsShowDialogRemark(false);
+    if (detailDrawingList[indexUpdate][keyUpdate] != value) {
       let array = [...detailDrawingList];
-      array[index][key] = value;
+      array[indexUpdate][keyUpdate] = value;
       setDetailDrawingList(array);
 
       array = [...updateDrawingList];
-      let rowIndex = detailDrawingList[index].RowIndex;
-      let weldNo = detailDrawingList[index].WeldNo;
+      let rowIndex = detailDrawingList[indexUpdate].RowIndex;
+      let weldNo = detailDrawingList[indexUpdate].WeldNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemResult']: value });
+        array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: value });
       } else {
-        array[objIndex]['ItemResult'] = detailDrawingList[index][key];
+        array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
       }
       setUpdateDrawingList(array);
     }
   };
-
-  const formatEmptyData = data => {
-    return data ? data : '';
-  };
-
-  const formatDateData = data => {
-    return data ? Moment(data).format("DD-MMM-YY") : '';
-  };
-
 
 
 
@@ -168,14 +264,15 @@ export default ({ route, navigation }) => {
   );
 
   const renderItem = ({ index, item }) => {
+    const isUserError = errorList.indexOf(item.RowIndex) > -1;
     return (
-      <View style={styles.box}>
+      <View style={isUserError ? styles.boxError : styles.box}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.WeldNo)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldNo)}</Text>
             <Text> - WeldType: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
         </View>
         {code == 'FitUp'
@@ -186,7 +283,7 @@ export default ({ route, navigation }) => {
                 <Text>FittingDate:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatDateData(item.FittingDate)}</Text>
+                <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -201,7 +298,7 @@ export default ({ route, navigation }) => {
                 <Text>FitPercent:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatEmptyData(item.FitPercentage)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.FitPercentage)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -221,18 +318,47 @@ export default ({ route, navigation }) => {
                     ?
                     item.FitUpResult == 'ACC'
                       ?
-                      <Text style={styles.textAccept} >{item.FitUpResult}</Text>
+                      <Text style={styles.textAccept}>{item.FitUpResult}</Text>
                       :
-                      <Text style={styles.textReject} >{item.FitUpResult}</Text>
+                      <Text style={styles.textReject}>{item.FitUpResult}</Text>
                     :
-                    <Text style={styles.textData} >{formatEmptyData(item.FitUpResult)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
                 }
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
                   style={styles.buttonClean}
                   onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
-                  <Text style={styles.labelClean}>Clean</Text>
+                  <Text style={styles.labelClean}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>Inspector:</Text>
+              </View>
+              <View style={styles.cellNoAction}>
+                <TouchableOpacity
+                  style={styles.itemIconAction}
+                  onPress={() => _onPressShowInspectorPopup(index, 'QCFittupInspector')}>
+                  <Text style={styles.textAction}>{Formater.formatEmptyData(item.QCFittupInspector)}</Text>
+                  <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>Remark:</Text>
+              </View>
+              <View style={styles.cellNoAction}>
+                <TouchableOpacity onPress={() => _onPressShowDialogRemark(item.QCFittupRemark, index, 'QCFittupRemark')}>
+                  {
+                    item.QCFittupRemark
+                      ?
+                      <Text style={styles.textData}>{Formater.formatEmptyData(item.QCFittupRemark)}</Text>
+                      :
+                      <Text style={styles.textEnter}>Enter remark ...</Text>
+                  }
                 </TouchableOpacity>
               </View>
             </View>
@@ -243,8 +369,8 @@ export default ({ route, navigation }) => {
               <View style={styles.cellTitle}>
                 <Text>WelderIDs:</Text>
               </View>
-              <View style={styles.cellWelder}>
-                <Text style={styles.textData} >{formatEmptyData(item.WelderID)}</Text>
+              <View style={styles.cellNoAction}>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -252,7 +378,7 @@ export default ({ route, navigation }) => {
                 <Text>WeldingDate:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatDateData(item.WeldingDate)}</Text>
+                <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -267,7 +393,7 @@ export default ({ route, navigation }) => {
                 <Text>WeldPercent:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData} >{formatEmptyData(item.WeldPercentage)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldPercentage)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -287,18 +413,47 @@ export default ({ route, navigation }) => {
                     ?
                     item.VisualResult == 'ACC'
                       ?
-                      <Text style={styles.textAccept} >{item.VisualResult}</Text>
+                      <Text style={styles.textAccept}>{item.VisualResult}</Text>
                       :
-                      <Text style={styles.textReject} >{item.VisualResult}</Text>
+                      <Text style={styles.textReject}>{item.VisualResult}</Text>
                     :
-                    <Text style={styles.textData} >{formatEmptyData(item.VisualResult)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualResult)}</Text>
                 }
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
                   style={styles.buttonClean}
                   onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
-                  <Text style={styles.labelClean}>Clean</Text>
+                  <Text style={styles.labelClean}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>Inspector:</Text>
+              </View>
+              <View style={styles.cellNoAction}>
+                <TouchableOpacity
+                  style={styles.itemIconAction}
+                  onPress={() => _onPressShowInspectorPopup(index, 'QCVisualInspector')}>
+                  <Text style={styles.textAction}>{Formater.formatEmptyData(item.QCVisualInspector)}</Text>
+                  <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cellTitle}>
+                <Text>Remark:</Text>
+              </View>
+              <View style={styles.cellNoAction}>
+                <TouchableOpacity onPress={() => _onPressShowDialogRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
+                  {
+                    item.QCVisualRemark
+                      ?
+                      <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
+                      :
+                      <Text style={styles.textEnter}>Enter remark ...</Text>
+                  }
                 </TouchableOpacity>
               </View>
             </View>
@@ -311,7 +466,7 @@ export default ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingDetail)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDataDetail)} />
         :
         <View style={styles.container}>
           {
@@ -394,6 +549,36 @@ export default ({ route, navigation }) => {
             closeOnTouchOutside={false}
             closeOnHardwareBackPress={false}
           />
+          <Dialog.Container visible={isShowDialogRemark}>
+            <Dialog.Title>{'Enter remark:'}</Dialog.Title>
+            <Dialog.Input
+              value={remarkDisplay}
+              onChangeText={(text) => setRemarkDisplay(text)}
+              underlineColorAndroid={BASE_COLOR}
+            />
+            <Dialog.Button label='Cancle' onPress={() => { setIsShowDialogRemark(false) }} />
+            <Dialog.Button label='OK' onPress={_onPressSubmitRemark} />
+          </Dialog.Container>
+          <PickupDataModal
+            visible={isVisibleInspector}
+            onCancel={() => setIsVisibleInspector(false)}
+            loaded={true}>
+            {
+              inspectorList.length
+                ?
+                inspectorList.map((item) => {
+                  return (
+                    <TouchableOpacity style={modals.row} onPress={() => _onChangeSpectorPopup(item)}>
+                      <Text style={modals.cell}>{item}</Text>
+                    </TouchableOpacity>
+                  );
+                })
+                :
+                <View>
+                  <Text style={modals.emptyText}>No have any data!</Text>
+                </View>
+            }
+          </PickupDataModal>
         </View>
       }
     </SafeAreaView>
@@ -449,6 +634,14 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
+  boxError: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: 'red',
+    borderWidth: 2,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -464,16 +657,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
+  textEnter: {
+    fontStyle: 'italic',
+    color: BASE_COLOR,
+  },
   cellTitle: {
     flex: 1,
     justifyContent: 'center',
   },
-  cellWelder: {
-    flex: 2,
-    justifyContent: 'center',
-  },
   cellData: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  cellAction: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  cellNoAction: {
+    flex: 2,
     justifyContent: 'center',
   },
   textAccept: {
@@ -483,11 +685,6 @@ const styles = StyleSheet.create({
   textReject: {
     fontWeight: 'bold',
     color: 'red',
-  },
-  cellAction: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   buttonAccept: {
     width: 70,
@@ -523,6 +720,20 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   labelClean: {
+    color: BASE_COLOR,
+  },
+  itemIconAction: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  iconAction: {
+    marginLeft: 4,
+    width: 20,
+    height: 20,
+  },
+  textAction: {
+    minWidth: 80,
+    fontWeight: 'bold',
     color: BASE_COLOR,
   },
 
@@ -563,5 +774,26 @@ const styles = StyleSheet.create({
   },
   buttonTitleDark: {
     color: BASE_COLOR,
+  },
+});
+
+const modals = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    height: 36,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  cell: {
+    flex: 1,
+    color: BASE_COLOR,
+    paddingHorizontal: 4,
+  },
+  emptyText: {
+    flex: 1,
+    color: BASE_COLOR,
+    textAlign: 'center',
+    fontSize: 15,
   },
 });

@@ -7,9 +7,9 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../utils/Helper';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
-import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
+import GetDrawingListAPI from '../../apis/qc/GetDrawingListAPI';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
-import GetDrawingCompletePercentAPI from '../../apis/drawing/GetDrawingCompletePercentAPI';
+import GetQCCompletePercentAPI from '../../apis/qc/GetQCCompletePercentAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
@@ -25,7 +25,8 @@ export default ({ route, navigation }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [drawingList, setDrawingList] = useState([]);
   const [drawingNo, setDrawingNo] = useState('');
-  const [oldDrawingNo, setOldDrawingNo] = useState('');
+
+  const [weldNo, setWeldNo] = useState('');
 
   const [isVisible, setIsVisible] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
@@ -33,7 +34,7 @@ export default ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -45,7 +46,9 @@ export default ({ route, navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
+        <TouchableOpacity
+          style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+          onPress={toggle}>
           <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
         </TouchableOpacity>
       ),
@@ -76,7 +79,7 @@ export default ({ route, navigation }) => {
   const getDrawingList = async () => {
     let token = await Helper.getData('TOKEN');
     try {
-      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', token)])
+      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', '', token)])
         .then(([facilityResult, drawingResult]) => {
           if (facilityResult.success && drawingResult.success) {
             setFacilityList(facilityResult.data);
@@ -102,28 +105,35 @@ export default ({ route, navigation }) => {
   const _onChangeDrawingNo = (no) => {
     setDrawingNo(no);
     if (no === '') {
-      callAPI(() => { searchDrawing(facilityCode, '') }, false);
+      callAPI(() => { searchDrawing(facilityCode, weldNo, no) }, false);
+    }
+  };
+
+  const _onChangeWeldNo = (no) => {
+    setWeldNo(no);
+    if (no === '') {
+      callAPI(() => { searchDrawing(facilityCode, '', drawingNo) }, false);
     }
   };
 
   const _onChangeFacilityCode = (code) => {
     if (code !== facilityCode) {
       setFacilityCode(code);
-      callAPI(() => { searchDrawing(code, drawingNo) }, false);
+      callAPI(() => { searchDrawing(code, weldNo, drawingNo) }, false);
     }
     setIsVisible(false);
   };
 
-  const searchDrawing = async (facilityCode, drawingNo) => {
+  const searchDrawing = async (facilityCode, weldNo, drawingNo) => {
     if (isSearch === false) {
       setIsSearch(true);
     }
     setIsSearching(true);
-    setOldDrawingNo(drawingNo);
     let token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
+    weldNo = weldNo != null ? weldNo : '';
     drawingNo = drawingNo != null ? drawingNo : '';
-    GetDrawingListAPI(projectCode, facilityCode, drawingNo, token)
+    GetDrawingListAPI(projectCode, facilityCode, weldNo, drawingNo, token)
       .then(res => {
         if (res.success) {
           let array = []
@@ -145,16 +155,14 @@ export default ({ route, navigation }) => {
   };
 
   const _onPressSearchDrawing = () => {
-    if (oldDrawingNo !== drawingNo) {
-      Keyboard.dismiss();
-      callAPI(() => { searchDrawing(facilityCode, drawingNo) }, false);
-    }
+    Keyboard.dismiss();
+    callAPI(() => { searchDrawing(facilityCode, weldNo, drawingNo) }, false);
   };
 
   const _onPressClearModel = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      callAPI(() => { searchDrawing('', drawingNo) }, false);
+      callAPI(() => { searchDrawing('', weldNo, drawingNo) }, false);
     }
     setIsVisible(false);
   };
@@ -175,7 +183,7 @@ export default ({ route, navigation }) => {
     Keyboard.dismiss();
     let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
     let token = await Helper.getData('TOKEN');
-    GetDrawingCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
+    GetQCCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
       .then(res => {
         if (res.success) {
           let array = [...drawingList];
@@ -204,6 +212,7 @@ export default ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: 'QC FitUp Detail',
         }
       );
     } else {
@@ -219,6 +228,7 @@ export default ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: 'QC FitUp Detail',
             });
           } else {
             setIsLoading(false);
@@ -246,6 +256,7 @@ export default ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: 'QC Weld Detail',
         }
       );
     } else {
@@ -261,6 +272,7 @@ export default ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: 'QC Weld Detail',
             });
           } else {
             setIsLoading(false);
@@ -301,6 +313,18 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const _onPressOpenDrawing = link => {
+    navigation.navigate(
+      'PDFView',
+      {
+        link: link,
+        title: 'View Drawing QC List',
+      }
+    );
+  };
+
+
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data with </Text>
@@ -308,9 +332,6 @@ export default ({ route, navigation }) => {
     </View>
   );
 
-  /**
-   * Drawing List
-   **/
   const ListSearchData = () => (
     <View style={styles.noDataContainer}>
       <ActivityIndicator size='large' color={BASE_COLOR} />
@@ -330,7 +351,15 @@ export default ({ route, navigation }) => {
       <View style={styles.box}>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>DrawingNo:</Text>
-          <Text style={styles.cellData}>{item.DrawingNo}</Text>
+          {
+            item.WebLink
+              ?
+              <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }} style={styles.cellData}>
+                <Text style={styles.textDataOpen}>{item.DrawingNo}</Text>
+              </TouchableOpacity>
+              :
+              <Text style={styles.cellData}>{item.DrawingNo}</Text>
+          }
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Sheet:</Text>
@@ -410,12 +439,26 @@ export default ({ route, navigation }) => {
                         style={styles.inputText}
                         value={drawingNo}
                         onChangeText={_onChangeDrawingNo}
-                        onSubmitEditing={_onPressSearchDrawing}
                         underlineColorAndroid='transparent'
                       />
                       {drawingNo == ''
                         ? null
                         : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>WeldNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {weldNo == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -618,6 +661,12 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     flexDirection: 'row',
   },
+  textDataOpen: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    textDecorationLine: 'underline',
+    color: BASE_COLOR,
+  },
   cellValue: {
     flex: 1,
     fontWeight: 'bold',
@@ -709,6 +758,7 @@ const modals = StyleSheet.create({
     borderRadius: 8,
   },
   list: {
+    flexShrink: 1,
     padding: 16,
     width: windowWidth * 0.85,
     height: undefined,
@@ -725,7 +775,7 @@ const modals = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    height: 36,
+    minHeight: 36,
     borderColor: BASE_COLOR,
     borderWidth: 1,
     alignItems: 'center',
@@ -739,11 +789,10 @@ const modals = StyleSheet.create({
   cell: {
     flex: 5,
     color: BASE_COLOR,
-    paddingLeft: 4,
-    paddingRight: 4,
+    padding: 4,
   },
   line: {
-    height: 36,
+    height: '100%',
     width: 1,
     backgroundColor: BASE_COLOR,
   },

@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import MessageAlert from '../components/MessageAlert';
 
@@ -20,7 +21,15 @@ export default class Helper {
   };
 
   static clearData = async () => {
-    await AsyncStorage.clear();
-  };
+    const asyncStorageKeys = await AsyncStorage.getAllKeys();
+    if (asyncStorageKeys.length > 0) {
+      if (Platform.OS === 'android') {
+        await AsyncStorage.clear();
+      }
+      if (Platform.OS === 'ios') {
+        await AsyncStorage.multiRemove(asyncStorageKeys);
+      }
+    };
+  }
 
 };

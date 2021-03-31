@@ -1,22 +1,93 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, StatusBar } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, StatusBar, Modal, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 import Helper from '../../utils/Helper';
 import MessageAlert from '../../components/MessageAlert';
 import LoginAPI from '../../apis/LoginAPI';
+import GetDataLoginAPI from '../../apis/app/GetDataLoginAPI';
+import GetProjectListAPI from '../../apis/app/GetProjectListAPI';
 export default ({ navigation }) => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassord, setShowPassord] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoadingLogin, setIsLoadingLogin] = useState(false);
+
+  const PROJECT_CODE_DEFAULT = 'Select Project';
+  const DISCIPLINE_CODE_DEFAULT = 'Select Module';
+
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
+  const [projectList, setProjectList] = useState([]);
+
+  const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(true);
+  const [disciplineList, setDisciplineList] = useState([]);
+
+  const [projectCode, setProjectCode] = useState(PROJECT_CODE_DEFAULT);
+  const [isVisibleProject, setIsVisibleProject] = useState(false);
+
+  const [disciplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
+  const [isVisibleDiscipline, setIsVisibleDiscipline] = useState(false);
 
   const nextInput = useRef(null);
   const _onSubmitEditingNextInput = () => {
     nextInput.current.focus();
+  };
+
+  useEffect(() => {
+    callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
+  }, []);
+
+  const callAPI = (executedAPI, key) => {
+    if (key === PROJECT_CODE_DEFAULT) {
+      setIsLoadingProject(true);
+    } else if (key === DISCIPLINE_CODE_DEFAULT) {
+      setIsLoadingDiscipline(true);
+    }
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoadingProject(false);
+        confirmAlert(key);
+      } else {
+        executedAPI();
+      }
+    });
+  };
+
+  const getModuleList = () => {
+    GetDataLoginAPI()
+      .then(res => {
+        if (res.success) {
+          setDisciplineList(res.disciplineList);
+          setIsLoadingDiscipline(false);
+        } else {
+          confirmAlert(DISCIPLINE_CODE_DEFAULT);
+        }
+      })
+      .catch(() => {
+        confirmAlert(DISCIPLINE_CODE_DEFAULT);
+      });
+  };
+
+  const confirmAlert = key => {
+    if (key === DISCIPLINE_CODE_DEFAULT) {
+      Alert.alert(
+        'ERROR',
+        'Check that you are using the company network and reload!',
+        [{ text: 'Reload', onPress: () => { callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT); } }],
+        { cancelable: false },
+      );
+    } else if (key === PROJECT_CODE_DEFAULT) {
+      Alert.alert(
+        'ERROR',
+        'Check that you are using the company network and reload!',
+        [{ text: 'Reload', onPress: () => { callAPI(getProjectList, PROJECT_CODE_DEFAULT); } }],
+        { cancelable: false },
+      );
+    }
   };
 
   const _onChangeUsername = text => {
@@ -37,15 +108,25 @@ export default ({ navigation }) => {
 
   const _onPressLogin = () => {
     Keyboard.dismiss();
-    setLoading(true);
+    setIsLoadingLogin(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         MessageAlert('WARNING', 'Network not available!');
-        setLoading(false);
+        setIsLoadingLogin(false);
       } else {
         if (username === '' || password === '') {
           MessageAlert('ERROR', 'The user name or password is invalid.');
-          setLoading(false);
+          setIsLoadingLogin(false);
+          return;
+        }
+        if (projectCode === PROJECT_CODE_DEFAULT) {
+          MessageAlert('ERROR', 'Please select a project.');
+          setIsLoadingLogin(false);
+          return;
+        }
+        if (disciplineCode === DISCIPLINE_CODE_DEFAULT) {
+          MessageAlert('ERROR', 'Please select a module.');
+          setIsLoadingLogin(false);
           return;
         }
         LoginAPI(username, password)
@@ -53,22 +134,72 @@ export default ({ navigation }) => {
             res = JSON.parse(res.data);
             if (res.error) {
               MessageAlert('ERROR', res.error_description);
-              setLoading(false);
+              setIsLoadingLogin(false);
               return;
             }
             if (res.access_token) {
               Helper.storeData('TOKEN', res.access_token);
               Helper.storeData('USERNAME', res.userName);
               Helper.storeData('EXPIRES', res['.expires']);
-              navigation.replace('Home');
+              Helper.storeData('PROJECT_CODE', projectCode);
+              Helper.storeData('DISCIPLINE_CODE', disciplineCode);
+              Helper.storeData('DATACODE', 'PTSCMC');
+              navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
             }
           })
           .catch(() => {
             MessageAlert('ERROR', 'Please check that you are using the company network!');
-            setLoading(false);
+            setIsLoadingLogin(false);
           });
       }
     });
+  };
+
+  const _onPressSelectProject = () => {
+    if (username === '' || password === '') {
+      MessageAlert('ERROR', 'The user name or password is invalid.');
+    } else {
+      callAPI(getProjectList, PROJECT_CODE_DEFAULT);
+    }
+  };
+
+  const getProjectList = async () => {
+    let token = await Helper.getData('TOKEN');
+    GetProjectListAPI(username, token)
+      .then(res => {
+        if (res.success) {
+          setIsLoadingProject(false);
+          if (!res.data.length) {
+            MessageAlert('ERROR', 'Don\'t have any projects with this account.\nTry entering another account.');
+          } else {
+            setProjectList(res.data);
+            setIsVisibleProject(true);
+          }
+        } else {
+          confirmAlert(PROJECT_CODE_DEFAULT);
+        }
+      })
+      .catch(() => {
+        confirmAlert(PROJECT_CODE_DEFAULT);
+      });
+  };
+
+  const _onChangeProjectCode = (item) => {
+    setProjectCode(item);
+    setIsVisibleProject(false);
+  };
+
+  const _onPressSelectDiscipline = () => {
+    if (!disciplineList.length) {
+      MessageAlert('ERROR', 'No have any module code with this account.');
+    } else {
+      setIsVisibleDiscipline(true);
+    }
+  };
+
+  const _onChangeDisciplineCode = (item) => {
+    setDisciplineCode(item);
+    setIsVisibleDiscipline(false);
   };
 
   return (
@@ -86,7 +217,7 @@ export default ({ navigation }) => {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>PTSC M&C</Text>
           </View>
-          <View style={styles.containerCenter} pointerEvents={loading ? 'none' : 'auto'}>
+          <View style={styles.containerCenter} pointerEvents={isLoadingLogin ? 'none' : 'auto'}>
             <View style={styles.inputContainer}>
               <Icon name='user-circle' style={styles.inputIcon} />
               <TextInput
@@ -119,21 +250,99 @@ export default ({ navigation }) => {
                   ? <Icon name="eye-slash" onPress={_onPressTogglePassword} style={styles.inputIcon} />
                   : <Icon name="eye" onPress={_onPressTogglePassword} style={styles.inputIcon} />)}
             </View>
-            {loading
-              ? <TouchableOpacity style={styles.buttonContainer}>
-                <ActivityIndicator size="large" color={OPP_COLOR} />
-              </TouchableOpacity>
-              : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
-                <Text style={styles.buttonTitle}>LOGIN</Text>
-              </TouchableOpacity>}
+            {
+              isLoadingProject
+                ? <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]}>
+                  <ActivityIndicator size="large" color={BASE_COLOR} />
+                </TouchableOpacity>
+                : <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]} onPress={_onPressSelectProject}>
+                  <Text style={styles.selectText}>{projectCode}</Text>
+                </TouchableOpacity>
+            }
+            <TouchableOpacity
+              style={[styles.selectContainer, styles.inputContainerLast]}
+              onPress={_onPressSelectDiscipline}>
+              <Text style={styles.selectText}>{disciplineCode}</Text>
+            </TouchableOpacity>
+            {
+              isLoadingLogin
+                ? <TouchableOpacity style={styles.buttonContainer}>
+                  <ActivityIndicator size="large" color={OPP_COLOR} />
+                </TouchableOpacity>
+                : <TouchableOpacity style={styles.buttonContainer} onPress={_onPressLogin}>
+                  <Text style={styles.buttonTitle}>LOGIN</Text>
+                </TouchableOpacity>
+            }
           </View>
         </KeyboardAwareScrollView>
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={isVisibleProject}>
+          <View style={modals.dim}>
+            <SafeAreaView>
+              <View style={modals.container}>
+                <View style={modals.list}>
+                  <ScrollView>
+                    {projectList.map((item) => {
+                      return (
+                        <TouchableOpacity style={modals.row} onPress={() => { _onChangeProjectCode(item) }}>
+                          <Text style={modals.cell}>{item}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+                <View style={modals.action}>
+                  <TouchableOpacity style={modals.button} onPress={() => { setIsVisibleProject(false) }} >
+                    <Text style={modals.buttonTitle}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </SafeAreaView>
+          </View>
+        </Modal>
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={isVisibleDiscipline}>
+          <View style={modals.dim}>
+            <SafeAreaView>
+              <View style={modals.container}>
+                <View style={modals.list}>
+                  <ScrollView>
+                    {disciplineList.map((item) => {
+                      return (
+                        <TouchableOpacity style={modals.row} onPress={() => _onChangeDisciplineCode(item)}>
+                          <Text style={modals.cell}>{item}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+                <View style={modals.action}>
+                  <TouchableOpacity style={modals.button} onPress={() => setIsVisibleDiscipline(false)} >
+                    <Text style={modals.buttonTitle}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </SafeAreaView>
+          </View>
+        </Modal>
+        <AwesomeAlert
+          show={isLoadingDiscipline}
+          showProgress={true}
+          closeOnTouchOutside={false}
+          closeOnHardwareBackPress={false}
+        />
       </SafeAreaView></>
   );
 };
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -146,7 +355,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleContainer: {
-    height: Dimensions.get('window').height * 0.15,
+    height: Dimensions.get('window').height * 0.1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -156,10 +365,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   containerCenter: {
-    height: Dimensions.get('window').height * 0.45,
+    height: Dimensions.get('window').height * 0.5,
     padding: 16,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -186,6 +395,19 @@ const styles = StyleSheet.create({
   inputContainerLast: {
     marginTop: 16,
   },
+  selectContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 32,
+    height: 48,
+    width: '100%',
+  },
+  selectText: {
+    fontSize: 16,
+    color: BASE_COLOR,
+  },
   buttonContainer: {
     height: 48,
     justifyContent: 'center',
@@ -199,5 +421,59 @@ const styles = StyleSheet.create({
     color: OPP_COLOR,
     fontSize: 18,
     fontWeight: 'bold',
+  },
+});
+const modals = StyleSheet.create({
+  dim: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  container: {
+    backgroundColor: OPP_COLOR,
+    width: windowWidth * 0.85,
+    height: undefined,
+    maxHeight: windowHeight * 0.85,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  list: {
+    flexShrink: 1,
+    padding: 16,
+    width: windowWidth * 0.85,
+    height: undefined,
+  },
+  row: {
+    flexDirection: 'row',
+    minHeight: 36,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  cell: {
+    flex: 5,
+    color: BASE_COLOR,
+    padding: 4,
+  },
+  action: {
+    width: windowWidth * 0.85,
+    height: 36,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginRight: 16,
+    marginBottom: 16,
+  },
+  button: {
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: BASE_COLOR,
+    padding: 4,
+    marginRight: 8,
+  },
+  buttonTitle: {
+    color: OPP_COLOR,
   },
 });

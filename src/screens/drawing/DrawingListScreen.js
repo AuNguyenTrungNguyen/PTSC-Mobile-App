@@ -33,7 +33,7 @@ export default ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : 'black';
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -45,7 +45,9 @@ export default ({ route, navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ paddingRight: 16 }} onPress={toggle}>
+        <TouchableOpacity
+          style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+          onPress={toggle}>
           <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
         </TouchableOpacity>
       ),
@@ -204,6 +206,7 @@ export default ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: 'FitUp Detail',
         }
       );
     } else {
@@ -219,6 +222,7 @@ export default ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: 'FitUp Detail',
             });
           } else {
             setIsLoading(false);
@@ -246,6 +250,7 @@ export default ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          title: 'Weld Detail',
         }
       );
     } else {
@@ -261,6 +266,7 @@ export default ({ route, navigation }) => {
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              title: 'Weld Detail',
             });
           } else {
             setIsLoading(false);
@@ -301,6 +307,18 @@ export default ({ route, navigation }) => {
     );
   };
 
+  const _onPressOpenDrawing = link => {
+    navigation.navigate(
+      'PDFView',
+      {
+        link: link,
+        title: 'View Drawing Cons List',
+      }
+    );
+  };
+
+
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data with </Text>
@@ -308,9 +326,6 @@ export default ({ route, navigation }) => {
     </View>
   );
 
-  /**
-   * Drawing List
-   **/
   const ListSearchData = () => (
     <View style={styles.noDataContainer}>
       <ActivityIndicator size='large' color={BASE_COLOR} />
@@ -330,7 +345,15 @@ export default ({ route, navigation }) => {
       <View style={styles.box}>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>DrawingNo:</Text>
-          <Text style={styles.cellData}>{item.DrawingNo}</Text>
+          {
+            item.WebLink
+              ?
+              <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }} style={styles.cellData}>
+                <Text style={styles.textDataOpen}>{item.DrawingNo}</Text>
+              </TouchableOpacity>
+              :
+              <Text style={styles.cellData}>{item.DrawingNo}</Text>
+          }
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Sheet:</Text>
@@ -618,6 +641,12 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     flexDirection: 'row',
   },
+  textDataOpen: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    textDecorationLine: 'underline',
+    color: BASE_COLOR,
+  },
   cellValue: {
     flex: 1,
     fontWeight: 'bold',
@@ -709,6 +738,7 @@ const modals = StyleSheet.create({
     borderRadius: 8,
   },
   list: {
+    flexShrink: 1,
     padding: 16,
     width: windowWidth * 0.85,
     height: undefined,
@@ -725,7 +755,7 @@ const modals = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    height: 36,
+    minHeight: 36,
     borderColor: BASE_COLOR,
     borderWidth: 1,
     alignItems: 'center',
@@ -739,11 +769,10 @@ const modals = StyleSheet.create({
   cell: {
     flex: 5,
     color: BASE_COLOR,
-    paddingLeft: 4,
-    paddingRight: 4,
+    padding: 4,
   },
   line: {
-    height: 36,
+    height: '100%',
     width: 1,
     backgroundColor: BASE_COLOR,
   },

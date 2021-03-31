@@ -4,13 +4,13 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../utils/Helper';
-import GetWelderListAPI from '../../apis/drawing/GetWelderListAPI';
+import { GetWelderListAPI } from '../../apis/drawing/ConstructionDrawingAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
 export default ({ route, navigation }) => {
 
-  const { projectCode, welders } = route.params;
+  const { projectCode, welders, index } = route.params;
 
   const [welderId, setWelderId] = useState('');
   const [welderName, setWelderName] = useState('');
@@ -109,9 +109,9 @@ export default ({ route, navigation }) => {
 
   const _onPressAddWelder = () => {
     if (!welderSelected) {
-      navigation.navigate('DrawingDetail', { welderSelected: 'WELDER_ID_NULL' });
+      navigation.navigate('DrawingDetail', { welderSelected: 'CLEAR_WELDER_ID', index: index });
     } else {
-      navigation.navigate('DrawingDetail', { welderSelected: welderSelected });
+      navigation.navigate('DrawingDetail', { welderSelected: welderSelected, index: index });
     }
   };
 
@@ -120,7 +120,7 @@ export default ({ route, navigation }) => {
   };
 
   const formatEmptyWelder = data => {
-    return (!data || data != 'WELDER_ID_NULL') ? data : '';
+    return (!data || data != 'CLEAR_WELDER_ID') ? data : '';
   };
 
 

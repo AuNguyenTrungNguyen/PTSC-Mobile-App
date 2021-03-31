@@ -8,24 +8,35 @@ import LoginScreen from './screens/authentication/LoginScreen';
 
 import HomeScreen from './screens/HomeScreen';
 import ReportsScreen from './screens/ReportsScreen';
+import ConstructionUpdateManageScreen from './screens/ConstructionUpdateManageScreen';
 
 import CameraScreen from './screens/camera/CameraScreen';
+import AllStatusCameraScreen from './screens/camera/AllStatusCameraScreen';
+
 import DrawingListScreen from './screens/drawing/DrawingListScreen';
+import DrawingSearchScreen from './screens/drawing/DrawingSearchScreen';
+import DrawingAllStatusScreen from './screens/drawing/DrawingAllStatusScreen';
 import DrawingDetailScreen from './screens/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/drawing/DrawingAddWelderScreen';
+import DrawingAddHeatNoScreen from './screens/drawing/DrawingAddHeatNoScreen';
+
+import SpoolMatrixScreen from './screens/spool/SpoolMatrixScreen';
+import SpoolCameraScreen from './screens/spool/SpoolCameraScreen';
 
 import QCDrawingListScreen from './screens/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
+import QCSpendListScreen from './screens/qc/QCSpendListScreen';
 
 import ConstructionListScreen from './screens/construction/ConstructionListScreen';
 
 import DisciplineListScreen from './screens/discipline/DisciplineListScreen';
 
 import HistogramListScreen from './screens/histogram/HistogramListScreen';
-import HistogramViewScreen from './screens/histogram/HistogramViewScreen';
 
 import DailyManpowerScreen from './screens/manpower/DailyManpowerScreen';
+
+import PDFViewScreen from './screens/pdf/PDFViewScreen';
 
 const Stack = createStackNavigator();
 export default () => {
@@ -56,10 +67,22 @@ export default () => {
           component={HomeScreen}
           options={
             {
-              title: 'Select Project',
+              title: 'PTSC M&C',
             }
           }
         />
+
+        <Stack.Screen
+          name='ConstructionUpdateManage'
+          component={ConstructionUpdateManageScreen}
+          options={
+            {
+              title: 'Construction Update',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
         <Stack.Screen
           name='Reports'
           component={ReportsScreen}
@@ -92,14 +115,42 @@ export default () => {
           }
         />
         <Stack.Screen
-          name='DrawingDetail'
-          component={DrawingDetailScreen}
+          name='AllStatusCamera'
+          component={AllStatusCameraScreen}
           options={
             {
-              title: 'Drawing Detail',
+              title: 'QRCode Scanner',
               headerBackTitle: 'Back',
             }
           }
+        />
+        <Stack.Screen
+          name='DrawingSearch'
+          component={DrawingSearchScreen}
+          options={
+            {
+              title: 'Search Drawing',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingAllStatus'
+          component={DrawingAllStatusScreen}
+          options={
+            {
+              title: 'Drawing Detail Status',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingDetail'
+          component={DrawingDetailScreen}
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
         />
         <Stack.Screen
           name='DrawingImage'
@@ -112,11 +163,43 @@ export default () => {
           }
         />
         <Stack.Screen
-          name='DrawingWelder'
+          name='DrawingAddWelder'
           component={DrawingAddWelderScreen}
           options={
             {
               title: 'Select Welders',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='DrawingAddHeatNo'
+          component={DrawingAddHeatNoScreen}
+          options={
+            {
+              title: 'Select HeatNo',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='SpoolMatrix'
+          component={SpoolMatrixScreen}
+          options={
+            {
+              title: 'Spool Matrix',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='SpoolCamera'
+          component={SpoolCameraScreen}
+          options={
+            {
+              title: 'QRCode Scanner',
               headerBackTitle: 'Back',
             }
           }
@@ -132,16 +215,21 @@ export default () => {
             }
           }
         />
-
         <Stack.Screen
           name='QCDrawingDetail'
           component={QCDrawingDetailScreen}
-          options={
-            {
-              title: 'QC Drawing Detail',
-              headerBackTitle: 'Back',
-            }
-          }
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
+        />
+        <Stack.Screen
+          name='QCSpendList'
+          component={QCSpendListScreen}
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
         />
 
         <Stack.Screen
@@ -176,16 +264,6 @@ export default () => {
             }
           }
         />
-        <Stack.Screen
-          name='HistogramView'
-          component={HistogramViewScreen}
-          options={
-            {
-              title: 'Histogram Chart',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
 
         <Stack.Screen
           name='DailyManpower'
@@ -196,6 +274,15 @@ export default () => {
               headerBackTitle: 'Back',
             }
           }
+        />
+
+        <Stack.Screen
+          name='PDFView'
+          component={PDFViewScreen}
+          options={({ route }) => ({
+            title: route.params.title,
+            headerBackTitle: 'Back',
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
