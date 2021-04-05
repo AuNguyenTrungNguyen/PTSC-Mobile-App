@@ -23,11 +23,11 @@ const TotalLocationModal = props => {
                     ?
                     props.data.map((item) => {
                       return (
-                        <View style={modals.row}>
+                        <TouchableOpacity style={modals.row} onPress={() => props.onPressChangeLocation(item.Location)}>
                           <Text style={modals.cellTitle}>{item.Location}</Text>
                           <View style={modals.cellLine} />
                           <Text style={modals.cellData}>{item.Total}</Text>
-                        </View>
+                        </TouchableOpacity>
                       );
                     })
                     :
@@ -41,8 +41,11 @@ const TotalLocationModal = props => {
               }
             </View>
             <View style={modals.action}>
-              <TouchableOpacity style={modals.button} onPress={props.onClose} >
-                <Text style={modals.buttonTitle}>Close</Text>
+              <TouchableOpacity style={modals.button} onPress={props.onPressClearLocation}>
+                <Text style={modals.buttonTitle}>Clear</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modals.button} onPress={props.onClose}>
+                <Text style={modals.buttonTitle}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
