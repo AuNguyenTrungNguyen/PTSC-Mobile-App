@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
+import Dialog from 'react-native-dialog';
 
 import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
@@ -229,6 +229,48 @@ const QCSpendListScreen = ({ route, navigation }) => {
     _onPressChangeLocation('');
   };
 
+  // REMARK
+  const [remarkDisplay, setRemarkDisplay] = useState('');
+  const [isShowDialogRemark, setIsShowDialogRemark] = useState(false);
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+
+  const _onPressShowDialogRemark = (index, value) => {
+    setIndexUpdate(index);
+    if (value) {
+      value = value == Constant.EMPTY_VALUE_STRING ? null : value;
+      setRemarkDisplay(value);
+    } else {
+      setRemarkDisplay('');
+    }
+    setIsShowDialogRemark(true);
+  };
+
+  const _onPressSubmitRemark = () => {
+    let keyStatus = code == 'FitUp' ? 'FitUpResult' : 'VisualResult';
+    let keyRemark = code == 'FitUp' ? 'QCFittupRemark' : 'QCVisualRemark';
+    let value = remarkDisplay ? remarkDisplay : Constant.EMPTY_VALUE_STRING;
+
+    setIsShowDialogRemark(false);
+
+    let array = [...spendList];
+    array[indexUpdate][keyRemark] = value;
+    array[indexUpdate][keyStatus] = 'REJ';
+    setSpendList(array);
+
+    array = [...updateSpendList];
+    let rowIndex = spendList[indexUpdate].RowIndex;
+    let weldNo = spendList[indexUpdate].WeldNo;
+    let facilityCode = spendList[indexUpdate].FacilityCode;
+    let drawingNo = spendList[indexUpdate].DrawingNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, ['ItemRemark']: value, ['ItemResult']: 'REJ' });
+    } else {
+      array[objIndex]['ItemResult'] = spendList[indexUpdate][keyStatus];
+      array[objIndex]['ItemRemark'] = value;
+    }
+    setUpdateSpendList(array);
+  };
 
 
   const ListSearchData = () => (
@@ -275,11 +317,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
-            {
-              <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
-                <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
-              </TouchableOpacity>
-            }
+            <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
+              <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.row}>
@@ -352,6 +392,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
               </View>
               <View style={styles.cellAction}>
+                <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCFittupRemark)}>
+                  <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.buttonReject}
                   onPress={() => _onPressChangeStatus('REJ', index, 'FitUpResult')}>
@@ -426,6 +469,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
               </View>
               <View style={styles.cellAction}>
+                <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCVisualRemark)}>
+                  <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.buttonReject}
                   onPress={() => _onPressChangeStatus('REJ', index, 'VisualResult')}>
@@ -680,6 +726,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
         onPressChangeLocation={_onPressChangeLocation}
         onPressClearLocation={_onPressClearLocation}
       />
+      <Dialog.Container visible={isShowDialogRemark}>
+        <Dialog.Title>{'Enter remark REJECT:'}</Dialog.Title>
+        <Dialog.Input
+          value={remarkDisplay}
+          onChangeText={(text) => setRemarkDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialogRemark(false) }} />
+        <Dialog.Button label='OK' onPress={_onPressSubmitRemark} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 }
@@ -830,8 +886,9 @@ const styles = StyleSheet.create({
   },
   cellAction: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   buttonAccept: {
     width: 70,
