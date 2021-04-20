@@ -31,7 +31,7 @@ export const UpdateQCDrawingDetailAPI = (projectCode, facilityCode, drawingNo, k
 export const GetQCInspectorListAPI = (projectCode, userLogin, token) =>
   fetch(
     Port_Server
-    + '/api/QCUpdate/GetQCInspectorList?projectCode=' + 'DNWHP'
+    + '/api/QCUpdate/GetQCInspectorList?projectCode=' + projectCode
     + '&PMSUserLogin=' + userLogin,
     {
       headers: {
