@@ -494,22 +494,24 @@ export default ({ route }) => {
                 underlineColorAndroid='transparent' />
             </View>
             <View style={styles.actionContainer}>
-              {isUploading
-                ?
-                <TouchableOpacity style={styles.buttonLeft}>
-                  <ActivityIndicator size='small' color={OPP_COLOR} />
-                </TouchableOpacity>
-                :
-                <TouchableOpacity style={styles.buttonLeft} onPress={_onPressUploadImage}>
-                  <Text style={styles.buttonTitle}>Upload Pictures</Text>
-                </TouchableOpacity>}
-              <TouchableOpacity style={styles.buttonRight} onPress={() => {
+              <TouchableOpacity style={styles.buttonLeft} onPress={() => {
                 setIsLoading(false);
                 setIsSelecting(false);
                 setPictureNote(null);
               }}>
                 <Text style={styles.buttonTitle}>Cancel</Text>
               </TouchableOpacity>
+              {
+                isUploading
+                  ?
+                  <TouchableOpacity style={styles.buttonRight}>
+                    <ActivityIndicator size='small' color={OPP_COLOR} />
+                  </TouchableOpacity>
+                  :
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressUploadImage}>
+                    <Text style={styles.buttonTitle}>Upload Pictures</Text>
+                  </TouchableOpacity>
+              }
             </View>
           </View>
         </SafeAreaView>
@@ -517,6 +519,8 @@ export default ({ route }) => {
       <Dialog.Container visible={isShowDialog}>
         <Dialog.Title>{'Edit Picture Note'}</Dialog.Title>
         <Dialog.Input
+          multiline={true}
+          numberOfLines={7}
           value={pictureNote}
           placeholder={'Enter note to update'}
           onChangeText={(text) => setPictureNote(text)}
@@ -542,7 +546,7 @@ export default ({ route }) => {
                   <TouchableOpacity
                     style={styles.bottomSaveButton}
                     onPress={_onPressSaveImage} >
-                     <Text style={styles.buttonTitleDark}>Save Picture</Text>
+                    <Text style={styles.buttonTitleDark}>Save Picture</Text>
                   </TouchableOpacity>
                 </View>
               </SafeAreaView>
@@ -603,7 +607,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 8,
     marginTop: 8,
-    height: 100,
+    height: '20%',
     textAlignVertical: 'top'
   },
   imageContainer: {
