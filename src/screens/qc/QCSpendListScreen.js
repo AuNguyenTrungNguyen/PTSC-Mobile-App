@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
+import Dialog from 'react-native-dialog';
 
 import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
+import Formater from '../../utils/Formater';
 import GetSpendListAPI from '../../apis/qc/GetSpendListAPI';
 import UpdateSpendListAPI from '../../apis/qc/UpdateSpendListAPI';
 import MessageAlert from '../../components/MessageAlert';
@@ -31,6 +32,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
 
   const [weldNo, setWeldNo] = useState('');
   const [drawingNo, setDrawingNo] = useState('');
+  const [location, setLocation] = useState('');
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -85,9 +87,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
     });
   };
 
-  const getSpendListData = async (weld = weldNo, drawing = drawingNo) => {
+  const getSpendListData = async (weld = weldNo, drawing = drawingNo, locate = location) => {
     let token = await Helper.getData('TOKEN');
-    GetSpendListAPI(projectCode, weld, drawing, code, token)
+    GetSpendListAPI(projectCode, weld, drawing, locate, code, token)
       .then(res => {
         if (res.success) {
           setSpendList(res.data);
@@ -127,14 +129,14 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onChangeWeldNo = no => {
     setWeldNo(no);
     if (!no) {
-      callAPI(() => { getSpendListData(no, drawingNo) });
+      callAPI(() => { getSpendListData(no, drawingNo, location) });
     }
   };
 
   const _onChangeDrawingNo = (no) => {
     setDrawingNo(no);
     if (!no) {
-      callAPI(() => { getSpendListData(weldNo, no) });
+      callAPI(() => { getSpendListData(weldNo, no, location) });
     }
   };
 
@@ -215,14 +217,60 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setUpdateSpendList(array);
   };
 
-  const formatEmptyData = data => {
-    return data ? data : '';
+  const _onPressChangeLocation = loc => {
+    if (loc != location) {
+      setLocation(loc);
+      callAPI(() => { getSpendListData(weldNo, drawingNo, loc) });
+    }
+    setIsVisibleTotal(false);
   };
 
-  const formatDateData = data => {
-    return data ? Moment(data).format("DD-MMM-YY") : '';
+  const _onPressClearLocation = () => {
+    _onPressChangeLocation('');
   };
 
+  // REMARK
+  const [remarkDisplay, setRemarkDisplay] = useState('');
+  const [isShowDialogRemark, setIsShowDialogRemark] = useState(false);
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+
+  const _onPressShowDialogRemark = (index, value) => {
+    setIndexUpdate(index);
+    if (value) {
+      value = value == Constant.EMPTY_VALUE_STRING ? null : value;
+      setRemarkDisplay(value);
+    } else {
+      setRemarkDisplay('');
+    }
+    setIsShowDialogRemark(true);
+  };
+
+  const _onPressSubmitRemark = () => {
+    let keyStatus = code == 'FitUp' ? 'FitUpResult' : 'VisualResult';
+    let keyRemark = code == 'FitUp' ? 'QCFittupRemark' : 'QCVisualRemark';
+    let value = remarkDisplay ? remarkDisplay : Constant.EMPTY_VALUE_STRING;
+
+    setIsShowDialogRemark(false);
+
+    let array = [...spendList];
+    array[indexUpdate][keyRemark] = value;
+    array[indexUpdate][keyStatus] = 'REJ';
+    setSpendList(array);
+
+    array = [...updateSpendList];
+    let rowIndex = spendList[indexUpdate].RowIndex;
+    let weldNo = spendList[indexUpdate].WeldNo;
+    let facilityCode = spendList[indexUpdate].FacilityCode;
+    let drawingNo = spendList[indexUpdate].DrawingNo;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, ['ItemRemark']: value, ['ItemResult']: 'REJ' });
+    } else {
+      array[objIndex]['ItemResult'] = spendList[indexUpdate][keyStatus];
+      array[objIndex]['ItemRemark'] = value;
+    }
+    setUpdateSpendList(array);
+  };
 
 
   const ListSearchData = () => (
@@ -262,24 +310,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
     return (
       <View style={styles.box}>
         <View style={styles.row}>
-          <View style={styles.cellTitle}>
-            <Text>WeldNo:</Text>
-          </View>
-          <View style={styles.cellData}>
-            <Text style={styles.textData}>{formatEmptyData(item.WeldNo)}</Text>
-          </View>
-          <View style={styles.cellTitle}>
-            <Text>WeldType:</Text>
-          </View>
-          <View style={styles.cellData}>
-            <Text style={styles.textData}>{formatEmptyData(item.WeldType)}</Text>
+          <View style={styles.cellTitleLine}>
+            <Text>WeldNo: </Text>
+            <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
+            <Text> - WeldType: </Text>
+            <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
-            {
-              <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
-                <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
-              </TouchableOpacity>
-            }
+            <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
+              <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.row}>
@@ -291,10 +331,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
               item.WebLink
                 ?
                 <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }}>
-                  <Text style={styles.textDataOpen}>{formatEmptyData(item.DrawingNo)}</Text>
+                  <Text style={styles.textDataOpen}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
                 </TouchableOpacity>
                 :
-                <Text style={styles.textData}>{formatEmptyData(item.DrawingNo)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
             }
           </View>
         </View>
@@ -303,13 +343,13 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <Text>Sheet:</Text>
           </View>
           <View style={styles.cellData}>
-            <Text style={styles.textData}>{formatEmptyData(item.Sheet)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.Sheet)}</Text>
           </View>
           <View style={styles.cellTitle}>
             <Text>Rev:</Text>
           </View>
           <View style={styles.cellData}>
-            <Text style={styles.textData}>{formatEmptyData(item.Rev)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.Rev)}</Text>
           </View>
         </View>
         {code == 'FitUp'
@@ -320,13 +360,13 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>HeatNo01:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData}>{formatEmptyData(item.Heat01)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
               </View>
               <View style={styles.cellTitle}>
                 <Text>HeatNo02:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData}>{formatEmptyData(item.Heat02)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -334,7 +374,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>FittingDate:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData}>{formatDateData(item.FittingDate)}</Text>
+                <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -349,9 +389,12 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>Location:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData}>{formatEmptyData(item.Location)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
               </View>
               <View style={styles.cellAction}>
+                <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCFittupRemark)}>
+                  <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.buttonReject}
                   onPress={() => _onPressChangeStatus('REJ', index, 'FitUpResult')}>
@@ -373,7 +416,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                       :
                       <Text style={styles.textReject}>{item.FitUpResult}</Text>
                     :
-                    <Text style={styles.textData}>{formatEmptyData(item.FitUpResult)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
                 }
               </View>
               <View style={styles.cellAction}>
@@ -392,7 +435,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>WelderIDs:</Text>
               </View>
               <View style={styles.cellWelder}>
-                <Text style={styles.textData}>{formatEmptyData(item.WelderID)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -400,7 +443,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>WPSNo:</Text>
               </View>
               <View style={styles.cellWelder}>
-                <Text style={styles.textData}>{formatEmptyData(item.WPSNo)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -408,7 +451,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>WeldingDate:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData}>{formatDateData(item.WeldingDate)}</Text>
+                <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
               </View>
               <View style={styles.cellAction}>
                 <TouchableOpacity
@@ -423,9 +466,12 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>Location:</Text>
               </View>
               <View style={styles.cellData}>
-                <Text style={styles.textData}>{formatEmptyData(item.Location)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
               </View>
               <View style={styles.cellAction}>
+                <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCVisualRemark)}>
+                  <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.buttonReject}
                   onPress={() => _onPressChangeStatus('REJ', index, 'VisualResult')}>
@@ -447,7 +493,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                       :
                       <Text style={styles.textReject}>{item.VisualResult}</Text>
                     :
-                    <Text style={styles.textData}>{formatEmptyData(item.VisualResult)}</Text>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualResult)}</Text>
                 }
               </View>
               <View style={styles.cellAction}>
@@ -463,7 +509,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <Text>NDTPercent:</Text>
               </View>
               <View style={styles.cellWelder}>
-                <Text style={styles.textData}>{formatEmptyData(item.NDTPercent)}</Text>
+                <Text style={styles.textData}>{Formater.formatEmptyData(item.NDTPercent)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -676,7 +722,20 @@ const QCSpendListScreen = ({ route, navigation }) => {
       <TotalLocationModal
         visible={isVisibleTotal}
         data={totalList}
-        onClose={() => setIsVisibleTotal(false)} />
+        onClose={() => setIsVisibleTotal(false)}
+        onPressChangeLocation={_onPressChangeLocation}
+        onPressClearLocation={_onPressClearLocation}
+      />
+      <Dialog.Container visible={isShowDialogRemark}>
+        <Dialog.Title>{'Enter remark REJECT:'}</Dialog.Title>
+        <Dialog.Input
+          value={remarkDisplay}
+          onChangeText={(text) => setRemarkDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialogRemark(false) }} />
+        <Dialog.Button label='OK' onPress={_onPressSubmitRemark} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 }
@@ -791,6 +850,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  cellTitleLine: {
+    flexDirection: 'row',
+    flex: 3,
+    alignItems: 'center',
+  },
   cellWelder: {
     flex: 2,
     justifyContent: 'center',
@@ -808,6 +872,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  textMeta: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
   textAccept: {
     fontWeight: 'bold',
     color: 'green',
@@ -818,8 +886,9 @@ const styles = StyleSheet.create({
   },
   cellAction: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   buttonAccept: {
     width: 70,

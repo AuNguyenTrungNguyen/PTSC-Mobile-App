@@ -1,10 +1,11 @@
 import { Port_Server } from '../../utils/Core';
 
-const GetSpendListAPI = async(projectCode, weldNo, drawingNo, code, token) =>
+const GetSpendListAPI = async(projectCode, weldNo, drawingNo, location, code, token) =>
   fetch(Port_Server
     + '/api/QCUpdate/GetSpendList?projectCode=' + projectCode
     + '&weldNo=' + weldNo
     + '&drawingNo=' + drawingNo
+    + '&location=' + location
     + '&code=' + code,
     {
       headers: {

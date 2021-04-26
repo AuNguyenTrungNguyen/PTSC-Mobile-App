@@ -32,4 +32,14 @@ export default class Helper {
     };
   }
 
+  static openDrawingPDF = (navigation, link, title) => {
+    navigation.navigate(
+      'PDFView',
+      {
+        link: link,
+        title: title,
+      }
+    );
+  };
+
 };

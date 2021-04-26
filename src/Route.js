@@ -38,14 +38,53 @@ import DailyManpowerScreen from './screens/manpower/DailyManpowerScreen';
 
 import PDFViewScreen from './screens/pdf/PDFViewScreen';
 
+//NDT
+import NDTManagerScreen from './screens/ndt/NDTManagerScreen';
+import NDTDetailScreen from './screens/ndt/NDTDetailScreen';
+import NDTIssueScreen from './screens/ndt/NDTIssueScreen';
+
 const Stack = createStackNavigator();
+const NDTStack = createStackNavigator();
+
+let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
+if (Appearance.getColorScheme() === 'dark') {
+  optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
+};
+
+const NDTStackScreens = () => {
+  return (
+    <NDTStack.Navigator screenOptions={optionNavigation}>
+      <NDTStack.Screen
+        name='NDTManager'
+        component={NDTManagerScreen}
+        options={
+          {
+            title: 'NDT Update',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <NDTStack.Screen
+        name='NDTDetail'
+        component={NDTDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <NDTStack.Screen
+        name='NDTIssue'
+        component={NDTIssueScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+    </NDTStack.Navigator>
+  );
+}
+
 export default () => {
-
-  let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
-  if (Appearance.getColorScheme() === 'dark') {
-    optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
-  };
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -283,6 +322,12 @@ export default () => {
             title: route.params.title,
             headerBackTitle: 'Back',
           })}
+        />
+
+        <Stack.Screen
+          name='NDT'
+          component={NDTStackScreens}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
