@@ -95,6 +95,13 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate('QCDrawingList', { projectCode: projectCode });
   };
 
+  const _onPressNDTUpdate = () => {
+    navigation.navigate('NDT', {
+      screen: 'NDTManager',
+      params: { projectCode: projectCode },
+    });
+  };
+
   const _onPressViewReports = () => {
     navigation.navigate('Reports', { projectCode: projectCode });
   };
@@ -303,15 +310,20 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
           </View>
           <View style={styles.action}>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressConstructionUpdate}>
-              <Text style={styles.buttonTitle}>Construction Update</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressQCUpdate}>
-              <Text style={styles.buttonTitle}>QC Update</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewReports}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewReports}>
               <Text style={styles.buttonTitle}>View Reports</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressConstructionUpdate}>
+              <Text style={styles.buttonTitle}>Construction Update</Text>
+            </TouchableOpacity>
+            <View style={styles.containerMultiButtons}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQCUpdate}>
+                <Text style={styles.buttonTitle}>QC Update</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonRight} onPress={_onPressNDTUpdate}>
+                <Text style={styles.buttonTitle}>NDT Update</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       }
@@ -427,6 +439,25 @@ const styles = StyleSheet.create({
   buttonTitle: {
     color: OPP_COLOR,
     fontSize: 16,
+  },
+  containerMultiButtons: {
+    height: 42,
+    marginTop: 12,
+    flexDirection: 'row',
+  },
+  buttonLeft: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    marginRight: 4,
+  },
+  buttonRight: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    marginLeft: 4,
   },
 });
 
