@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, StatusBar, Modal, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import Helper from '../../utils/Helper';
@@ -203,17 +202,16 @@ export default ({ navigation }) => {
   };
 
   return (
-    <>
-      <StatusBar barStyle='dark-content' />
-      <SafeAreaView style={styles.safeArea}>
-        <KeyboardAwareScrollView>
-          <View style={styles.imageContainer}>
-            <Image
-              style={styles.image}
-              resizeMode='stretch'
-              source={require('../../images/background.jpg')}
-            />
-          </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.safeArea}>
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.image}
+            resizeMode='stretch'
+            source={require('../../images/background.jpg')}
+          />
+        </View>
+        <View style={styles.safeArea}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>PTSC M&C</Text>
           </View>
@@ -233,7 +231,7 @@ export default ({ navigation }) => {
                 ? null
                 : <Icon name="times-circle" onPress={_onPressClearUsername} style={styles.inputIcon} />}
             </View>
-            <View style={[styles.inputContainer, styles.inputContainerLast]}>
+            <View style={styles.inputContainer}>
               <Icon name="unlock-alt" style={styles.inputIcon} />
               <TextInput
                 blurOnSubmit={true}
@@ -252,15 +250,15 @@ export default ({ navigation }) => {
             </View>
             {
               isLoadingProject
-                ? <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]}>
+                ? <TouchableOpacity style={styles.selectContainer}>
                   <ActivityIndicator size="large" color={BASE_COLOR} />
                 </TouchableOpacity>
-                : <TouchableOpacity style={[styles.selectContainer, styles.inputContainerLast]} onPress={_onPressSelectProject}>
+                : <TouchableOpacity style={styles.selectContainer} onPress={_onPressSelectProject}>
                   <Text style={styles.selectText}>{projectCode}</Text>
                 </TouchableOpacity>
             }
             <TouchableOpacity
-              style={[styles.selectContainer, styles.inputContainerLast]}
+              style={styles.selectContainer}
               onPress={_onPressSelectDiscipline}>
               <Text style={styles.selectText}>{disciplineCode}</Text>
             </TouchableOpacity>
@@ -274,73 +272,76 @@ export default ({ navigation }) => {
                 </TouchableOpacity>
             }
           </View>
-        </KeyboardAwareScrollView>
-        <Modal
-          animationType='fade'
-          transparent={true}
-          visible={isVisibleProject}>
-          <View style={modals.dim}>
-            <SafeAreaView>
-              <View style={modals.container}>
-                <View style={modals.list}>
-                  <ScrollView>
-                    {projectList.map((item) => {
-                      return (
-                        <TouchableOpacity style={modals.row} onPress={() => { _onChangeProjectCode(item) }}>
-                          <Text style={modals.cell}>{item}</Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-                <View style={modals.action}>
-                  <TouchableOpacity style={modals.button} onPress={() => { setIsVisibleProject(false) }} >
-                    <Text style={modals.buttonTitle}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
+        </View>
+      </View>
+      <Modal
+        animationType='fade'
+        transparent={true}
+        visible={isVisibleProject}>
+        <View style={modals.dim}>
+          <SafeAreaView>
+            <View style={modals.container}>
+              <View style={modals.list}>
+                <ScrollView>
+                  {projectList.map((item) => {
+                    return (
+                      <TouchableOpacity style={modals.row} onPress={() => { _onChangeProjectCode(item) }}>
+                        <Text style={modals.cell}>{item}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
               </View>
-            </SafeAreaView>
-          </View>
-        </Modal>
-        <Modal
-          animationType='fade'
-          transparent={true}
-          visible={isVisibleDiscipline}>
-          <View style={modals.dim}>
-            <SafeAreaView>
-              <View style={modals.container}>
-                <View style={modals.list}>
-                  <ScrollView>
-                    {disciplineList.map((item) => {
-                      return (
-                        <TouchableOpacity style={modals.row} onPress={() => _onChangeDisciplineCode(item)}>
-                          <Text style={modals.cell}>{item}</Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-                <View style={modals.action}>
-                  <TouchableOpacity style={modals.button} onPress={() => setIsVisibleDiscipline(false)} >
-                    <Text style={modals.buttonTitle}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
+              <View style={modals.action}>
+                <TouchableOpacity style={modals.button} onPress={() => { setIsVisibleProject(false) }} >
+                  <Text style={modals.buttonTitle}>Cancel</Text>
+                </TouchableOpacity>
               </View>
-            </SafeAreaView>
-          </View>
-        </Modal>
-        <AwesomeAlert
-          show={isLoadingDiscipline}
-          showProgress={true}
-          closeOnTouchOutside={false}
-          closeOnHardwareBackPress={false}
-        />
-      </SafeAreaView></>
+            </View>
+          </SafeAreaView>
+        </View>
+      </Modal>
+      <Modal
+        animationType='fade'
+        transparent={true}
+        visible={isVisibleDiscipline}>
+        <View style={modals.dim}>
+          <SafeAreaView>
+            <View style={modals.container}>
+              <View style={modals.list}>
+                <ScrollView>
+                  {disciplineList.map((item) => {
+                    return (
+                      <TouchableOpacity style={modals.row} onPress={() => _onChangeDisciplineCode(item)}>
+                        <Text style={modals.cell}>{item}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+              <View style={modals.action}>
+                <TouchableOpacity style={modals.button} onPress={() => setIsVisibleDiscipline(false)} >
+                  <Text style={modals.buttonTitle}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </SafeAreaView>
+        </View>
+      </Modal>
+      <AwesomeAlert
+        show={isLoadingDiscipline}
+        showProgress={true}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+      />
+    </SafeAreaView>
   );
 };
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
+const BP_600 = 600;
+const BP_750 = 750;
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
@@ -355,20 +356,20 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleContainer: {
-    height: Dimensions.get('window').height * 0.1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginVertical: Dimensions.get('window').height > BP_750 ? 24 : 8,
   },
   title: {
-    fontSize: 42,
+    fontSize: Dimensions.get('window').height > BP_600 ? 44 : 32,
     color: BASE_COLOR,
     fontWeight: 'bold',
   },
   containerCenter: {
-    height: Dimensions.get('window').height * 0.5,
+    flex: 1,
     padding: 16,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    paddingTop: 0,
+    justifyContent: 'space-between',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -377,11 +378,11 @@ const styles = StyleSheet.create({
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 32,
-    height: 48,
+    height: Dimensions.get('window').height > BP_600 ? 48 : 40,
     width: '100%',
   },
   inputText: {
-    fontSize: 16,
+    fontSize: Dimensions.get('window').height > BP_600 ? 16 : 12,
     flex: 1,
     height: '100%',
     color: BASE_COLOR,
@@ -389,11 +390,8 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginLeft: 16,
     marginRight: 16,
-    fontSize: 20,
+    fontSize: Dimensions.get('window').height > BP_600 ? 20 : 16,
     color: BASE_COLOR,
-  },
-  inputContainerLast: {
-    marginTop: 16,
   },
   selectContainer: {
     justifyContent: 'center',
@@ -401,25 +399,24 @@ const styles = StyleSheet.create({
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 32,
-    height: 48,
+    height: Dimensions.get('window').height > BP_600 ? 48 : 40,
     width: '100%',
   },
   selectText: {
-    fontSize: 16,
+    fontSize: Dimensions.get('window').height > BP_600 ? 16 : 12,
     color: BASE_COLOR,
   },
   buttonContainer: {
-    height: 48,
+    height: Dimensions.get('window').height > BP_600 ? 48 : 40,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
     borderRadius: 32,
-    marginTop: 48,
     width: '100%',
   },
   buttonTitle: {
     color: OPP_COLOR,
-    fontSize: 18,
+    fontSize: Dimensions.get('window').height > BP_600 ? 16 : 12,
     fontWeight: 'bold',
   },
 });
