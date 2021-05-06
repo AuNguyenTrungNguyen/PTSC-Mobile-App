@@ -6,10 +6,13 @@ import Moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Helper from '../../utils/Helper';
-import GetManpowerListAPI from '../../apis/manpower/GetManpowerListAPI';
 import MessageAlert from '../../components/MessageAlert';
 
-export default ({ route }) => {
+import { GetManpowerListAPI } from '../../apis/report/ReportAPI';
+
+
+
+const ReportDailyManpowerListScreen = ({ route }) => {
 
   const { projectCode, username } = route.params;
 
@@ -27,7 +30,6 @@ export default ({ route }) => {
       callAPI(() => { getManPowerList(selectedDate) });
     }
   };
-
 
   const callAPI = executedAPI => {
     NetInfo.fetch().then(state => {
@@ -62,9 +64,9 @@ export default ({ route }) => {
       });
   };
 
-  // *******
-  // Viewing
-  // *******
+
+
+
 
   const formatDateData = date => {
     return date == null ? 'Select a date' : Moment(date).format("YYYY-MM-DD");
@@ -290,3 +292,5 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
 });
+
+export default ReportDailyManpowerListScreen;

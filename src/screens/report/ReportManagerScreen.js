@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
-import Helper from '../utils/Helper';
+import Helper from '../../utils/Helper';
 
-export default ({ route, navigation }) => {
+const ReportManagerScreen = ({ route, navigation }) => {
 
   const { projectCode } = route.params;
 
@@ -13,7 +13,7 @@ export default ({ route, navigation }) => {
       Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
-    navigation.navigate('ConstructionList', { projectCode: projectCode });
+    navigation.navigate('ReportConstruction', { projectCode: projectCode });
   };
 
   const _onPressViewDiscipline = () => {
@@ -21,7 +21,7 @@ export default ({ route, navigation }) => {
       Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
-    navigation.navigate('DisciplineList', { projectCode: projectCode });
+    navigation.navigate('ReportDiscipline', { projectCode: projectCode });
   };
 
   const _onPressViewHistogram = () => {
@@ -29,7 +29,7 @@ export default ({ route, navigation }) => {
       Toast.show('Please select a project!', Toast.SHORT);
       return;
     }
-    navigation.navigate('HistogramList', { projectCode: projectCode });
+    navigation.navigate('ReportHistogram', { projectCode: projectCode });
   };
 
   const _onPressViewDailyMaipower = async () => {
@@ -39,7 +39,7 @@ export default ({ route, navigation }) => {
     }
     let username = await Helper.getData('USERNAME');
     navigation.navigate(
-      'DailyManpower',
+      'ReportDailyManpower',
       {
         projectCode: projectCode,
         username: username
@@ -61,7 +61,7 @@ export default ({ route, navigation }) => {
             <Text style={styles.buttonTitle}>View Construction ID</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewDiscipline}>
-            <Text style={styles.buttonTitle}>View Disclipline</Text>
+            <Text style={styles.buttonTitle}>View Discipline</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressViewHistogram}>
             <Text style={styles.buttonTitle}>View Histogram</Text>
@@ -130,3 +130,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export default ReportManagerScreen;

@@ -5,13 +5,12 @@ import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 
 import Helper from '../../utils/Helper';
-import GetConstructionFacilityListAPI from '../../apis/construction/GetConstructionFacilityListAPI';
-import GetConstructionDisciplineListAPI from '../../apis/construction/GetConstructionDisciplineListAPI';
-import GetConstructionListAPI from '../../apis/construction/GetConstructionListAPI';
+import Formater from '../../utils/Formater';
+import { GetConstructionFacilityListAPI, GetConstructionDisciplineListAPI, GetConstructionListAPI } from '../../apis/report/ReportAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-export default ({ route, navigation }) => {
+const ReportConstructionListScreen = ({ route, navigation }) => {
 
   const CODE_FACILITY = 1;
   const CODE_DISCIPLINE = 2;
@@ -69,6 +68,8 @@ export default ({ route, navigation }) => {
   const callAPI = (executedAPI, loading = true) => {
     if (loading) {
       setIsLoading(true);
+    } else {
+      setIsSearching(true);
     }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
@@ -135,7 +136,6 @@ export default ({ route, navigation }) => {
     if (code == CODE_FACILITY) {
       if (facilityCode !== FACILITY_CODE_DEFAULT) {
         setFacilityCode(FACILITY_CODE_DEFAULT);
-        callAPI(searchConstruction, false);
         callAPI(() => { searchConstruction(FACILITY_CODE_DEFAULT, discicplineCode) }, false);
       }
       setVisibleFacility(false);
@@ -167,10 +167,6 @@ export default ({ route, navigation }) => {
     }
   };
 
-  const _onPressSearchConstruction = () => {
-    callAPI(() => { searchConstruction(facilityCode, discicplineCode) }, false);
-  };
-
   const searchConstruction = async (facilityCode, discicplineCode) => {
     let token = await Helper.getData('TOKEN');
     let facilityCodeSearch = facilityCode == FACILITY_CODE_DEFAULT ? '' : facilityCode;
@@ -193,6 +189,9 @@ export default ({ route, navigation }) => {
         setIsSearching(false);
       });
   };
+
+
+
 
 
   const ListSearchData = () => (
@@ -243,32 +242,50 @@ export default ({ route, navigation }) => {
       <View style={styles.box}>
         <View style={styles.row}>
           <View style={styles.cell}>
-            <Text style={styles.textTitle}>ConstructionID: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.ConstructionID)}</Text>
+            <Text style={styles.textTitle}>Cons. ID: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.ConstructionID)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
-            <Text style={styles.textTitle}>ConstructionName: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.ConstructionName)}</Text>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.cell}>
-            <Text style={styles.textTitle}>ActualProgress: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.ActualProgress)}</Text>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.cell}>
-            <Text style={styles.textTitle}>ActualMHRS: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.ActualMHRS)}</Text>
+            <Text style={styles.textTitle}>Cons. Name: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.ConstructionName)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>BaseBudgetMHRS: </Text>
-            <Text style={styles.textData}>{formatEmptyData(item.BaseBudgetMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.BaseBudgetMHRS)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>ActualMHRS: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualMHRS)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>PlanMHRS: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualMHRS)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>ActualProgress: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualProgress)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>EarnedMHRS: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.EarnedMHRS)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>CPI: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.CPI)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -277,18 +294,14 @@ export default ({ route, navigation }) => {
             {
               item.RemainMHRS < 0
                 ?
-                <Text style={[styles.textData, { color: 'red' }]}>{formatEmptyData(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'red' }]}>{Formater.formatEmptyNumber(item.RemainMHRS)}</Text>
                 :
-                <Text style={[styles.textData, { color: 'green' }]}>{formatEmptyData(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'green' }]}>{Formater.formatEmptyNumber(item.RemainMHRS)}</Text>
             }
           </View>
         </View>
       </View>
     );
-  };
-
-  const formatEmptyData = data => {
-    return data != null ? data : '';
   };
 
   return (
@@ -545,3 +558,5 @@ const modals = StyleSheet.create({
     marginRight: 8,
   },
 });
+
+export default ReportConstructionListScreen;

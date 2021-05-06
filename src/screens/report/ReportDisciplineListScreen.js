@@ -5,13 +5,12 @@ import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
 
 import Helper from '../../utils/Helper';
-import GetConstructionFacilityListAPI from '../../apis/construction/GetConstructionFacilityListAPI';
-import GetSumFacilityAPI from '../../apis/discipline/GetSumFacilityAPI';
-import GetDisciplineListByFacilityAPI from '../../apis/discipline/GetDisciplineListByFacilityAPI';
+import Formater from '../../utils/Formater';
+import { GetConstructionFacilityListAPI, GetSumFacilityAPI, GetDisciplineListByFacilityAPI } from '../../apis/report/ReportAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-export default ({ route, navigation }) => {
+const ReportDisciplineListScreen = ({ route, navigation }) => {
 
   const FACILITY_CODE_DEFAULT = 'Select Facility Code';
 
@@ -148,6 +147,8 @@ export default ({ route, navigation }) => {
 
 
 
+
+
   const ListSearchData = () => (
     <View style={styles.noDataContainer}>
       <ActivityIndicator size='large' color={BASE_COLOR} />
@@ -177,26 +178,38 @@ export default ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
-            <Text style={styles.textTitle}>ActualProgress: </Text>
-            <Text style={styles.textData}>{formatEmptyNumber(item.ActualProgress)}</Text>
+            <Text style={styles.textTitle}>BaseBudgetMHRS: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.BaseBudgetMHRS)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>ActualMHRS: </Text>
-            <Text style={styles.textData}>{formatEmptyNumber(item.ActualMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualMHRS)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
-            <Text style={styles.textTitle}>BaseBudgetMHRS: </Text>
-            <Text style={styles.textData}>{formatEmptyNumber(item.BaseBudgetMHRS)}</Text>
+            <Text style={styles.textTitle}>PlanMHRS: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualMHRS)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>ActualProgress: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualProgress)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>EarnedMHRS: </Text>
-            <Text style={styles.textData}>{formatEmptyNumber(item.EarnedMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.EarnedMHRS)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>CPI: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.CPI)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -205,9 +218,9 @@ export default ({ route, navigation }) => {
             {
               item.RemainMHRS < 0
                 ?
-                <Text style={[styles.textData, { color: 'red' }]}>{formatEmptyNumber(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'red' }]}>{Formater.formatEmptyNumber(item.RemainMHRS)}</Text>
                 :
-                <Text style={[styles.textData, { color: 'green' }]}>{formatEmptyNumber(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'green' }]}>{Formater.formatEmptyNumber(item.RemainMHRS)}</Text>
             }
           </View>
         </View>
@@ -245,64 +258,64 @@ export default ({ route, navigation }) => {
       if (isSearching || summaryFacility == null) {
         return null
       } else {
-        return (<View style={styles.summaryContainer}>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>ActualProgress:</Text>
-              <View style={styles.summaryTextContainer}>
-                <Text style={styles.summaryTextData}>{formatEmptyNumber(summaryFacility.ActualProgress)}</Text>
+        return (
+          <View style={styles.summaryContainer}>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>BaseBudgetMHRS: </Text>
+                <Text style={styles.textData}>{Formater.formatEmptyNumber(summaryFacility.BaseBudgetMHRS)}</Text>
               </View>
             </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>ActualMHRS:</Text>
-              <View style={styles.summaryTextContainer}>
-                <Text style={styles.summaryTextData}>{formatEmptyNumber(summaryFacility.ActualMHRS)}</Text>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>ActualMHRS: </Text>
+                <Text style={styles.textData}>{Formater.formatEmptyNumber(summaryFacility.ActualMHRS)}</Text>
               </View>
             </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>BaseBudgetMHRS: </Text>
-              <View style={styles.summaryTextContainer}>
-                <Text style={styles.summaryTextData}>{formatEmptyNumber(summaryFacility.BaseBudgetMHRS)}</Text>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>PlanMHRS: </Text>
+                <Text style={styles.textData}>{Formater.formatEmptyNumber(summaryFacility.ActualMHRS)}</Text>
               </View>
             </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>EarnedMHRS: </Text>
-              <View style={styles.summaryTextContainer}>
-                <Text style={styles.summaryTextData}>{formatEmptyNumber(summaryFacility.EarnedMHRS)}</Text>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>ActualProgress: </Text>
+                <Text style={styles.textData}>{Formater.formatEmptyNumber(summaryFacility.ActualProgress)}</Text>
               </View>
             </View>
-          </View>
-          <View style={styles.row}>
-            <View style={styles.cell}>
-              <Text style={styles.textTitle}>RemainMHRS: </Text>
-              <View style={styles.summaryTextContainerEnd}>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>EarnedMHRS: </Text>
+                <Text style={styles.textData}>{Formater.formatEmptyNumber(summaryFacility.EarnedMHRS)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>CPI: </Text>
+                <Text style={styles.textData}>{Formater.formatEmptyNumber(summaryFacility.CPI)}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.cell}>
+                <Text style={styles.textTitle}>RemainMHRS: </Text>
                 {
                   summaryFacility.RemainMHRS < 0
                     ?
-                    <Text style={[styles.summaryTextData, { color: 'red' }]}>{formatEmptyNumber(summaryFacility.RemainMHRS)}</Text>
+                    <Text style={[styles.textData, { color: 'red' }]}>{Formater.formatEmptyNumber(summaryFacility.RemainMHRS)}</Text>
                     :
-                    <Text style={[styles.summaryTextData, { color: 'green' }]}>{formatEmptyNumber(summaryFacility.RemainMHRS)}</Text>
+                    <Text style={[styles.textData, { color: 'green' }]}>{Formater.formatEmptyNumber(summaryFacility.RemainMHRS)}</Text>
                 }
               </View>
             </View>
           </View>
-        </View>)
+        )
       }
     }
   };
 
   const formatEmptyData = data => {
     return data ? data : '';
-  };
-
-  const formatEmptyNumber = data => {
-    return data ? data : 0.00;
   };
 
   return (
@@ -531,3 +544,5 @@ const modals = StyleSheet.create({
     marginRight: 8,
   },
 });
+
+export default ReportDisciplineListScreen;

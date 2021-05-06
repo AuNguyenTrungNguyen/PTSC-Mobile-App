@@ -3,11 +3,14 @@ import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList
 import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../utils/Helper';
-import GetHistogramListAPI from '../../apis/histogram/GetHistogramListAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-export default ({ route, navigation }) => {
+import { GetHistogramListAPI } from '../../apis/report/ReportAPI';
+
+
+
+const ReportHistogramListScreen = ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -62,6 +65,10 @@ export default ({ route, navigation }) => {
     );
   };
 
+
+
+
+
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
       <Text style={styles.noDataTitle}>No have any data with </Text>
@@ -79,7 +86,7 @@ export default ({ route, navigation }) => {
           </View>
           <View style={styles.cellSmall}>
             <Text style={styles.textTitle}>Group: </Text>
-            <Text style={styles.textData}>{item.Group}</Text>
+            <Text style={styles.textDataSmall}>{item.Group}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -89,7 +96,7 @@ export default ({ route, navigation }) => {
           </View>
           <View style={styles.cellSmall}>
             <Text style={styles.textTitle}>Deck: </Text>
-            <Text style={styles.textData}>{item.Deck}</Text>
+            <Text style={styles.textDataSmall}>{item.Deck}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -99,7 +106,7 @@ export default ({ route, navigation }) => {
           </View>
           <View style={styles.cellSmall}>
             <Text style={styles.textTitle}>Scope: </Text>
-            <Text style={styles.textData}>{item.Scope}</Text>
+            <Text style={styles.textDataSmall}>{item.Scope}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -109,7 +116,7 @@ export default ({ route, navigation }) => {
           </View>
           <View style={styles.cellSmall}>
             <Text style={styles.textTitle}>Phase: </Text>
-            <Text style={styles.textData}>{item.Phase}</Text>
+            <Text style={styles.textDataSmall}>{item.Phase}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -209,13 +216,19 @@ const styles = StyleSheet.create({
   cellSmall: {
     flexDirection: 'row',
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end'
   },
   textTitle: {
     flex: 1,
   },
   textData: {
     flex: 1.5,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  textDataSmall: {
+    flex: 1,
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
@@ -262,3 +275,5 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
 });
+
+export default ReportHistogramListScreen;

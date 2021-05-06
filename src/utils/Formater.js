@@ -10,4 +10,8 @@ export default class Formater {
     return data ? Moment(data).format("DD-MMM-YY") : '';
   };
 
+  static formatEmptyNumber = number => {
+    return number ? number : '0';
+  }
+
 };
