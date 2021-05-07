@@ -16,9 +16,7 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* PTSC_CLOUDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* PTSC_CLOUDTests.m */; };
-		358ACCC57EA1ACD60FAFC50B /* libPods-PTSC_CLOUD-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E5FF387BB3C328B9BFE2D2E /* libPods-PTSC_CLOUD-tvOS.a */; };
 		72F9D587747C0FE15E6CBE78 /* libPods-PTSC_CLOUD.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D06C56EC6771F54A80FCF9C /* libPods-PTSC_CLOUD.a */; };
-		D7E4AA8DB6E226168A02464B /* libPods-PTSC_CLOUD-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 549ABD7F3A0D397D51A7B4BB /* libPods-PTSC_CLOUD-tvOSTests.a */; };
 		F86228CE6419119F266E36A5 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED5E07FCDC587D371F7EEE41 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */; };
 /* End PBXBuildFile section */
 
@@ -53,20 +51,14 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PTSC_CLOUD/main.m; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* PTSC_CLOUD-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PTSC_CLOUD-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* PTSC_CLOUD-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PTSC_CLOUD-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		47A630FF684A988AF52DF58D /* Pods-PTSC_CLOUD-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-tvOSTests/Pods-PTSC_CLOUD-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		4E5FF387BB3C328B9BFE2D2E /* libPods-PTSC_CLOUD-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		549ABD7F3A0D397D51A7B4BB /* libPods-PTSC_CLOUD-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5E1A9A00448741A9E66A421B /* Pods-PTSC_CLOUD-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-tvOS.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-tvOS/Pods-PTSC_CLOUD-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		6D9C60FB4F9C7F25206E7C7E /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig"; sourceTree = "<group>"; };
 		70FEF9FC1570686C152AFD55 /* Pods-PTSC_CLOUD.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD.release.xcconfig"; sourceTree = "<group>"; };
 		8D06C56EC6771F54A80FCF9C /* libPods-PTSC_CLOUD.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8DAAA32418AE843DFF6898E9 /* Pods-PTSC_CLOUD-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-tvOSTests/Pods-PTSC_CLOUD-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9526B8DA148A5803C47D0D79 /* Pods-PTSC_CLOUD.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD.debug.xcconfig"; sourceTree = "<group>"; };
 		E8E1FE9E81B60EEA1B325403 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		ED5E07FCDC587D371F7EEE41 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD-PTSC_CLOUDTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED6CE7FCCBECF514DD15D79B /* Pods-PTSC_CLOUD-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-tvOS/Pods-PTSC_CLOUD-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +82,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				358ACCC57EA1ACD60FAFC50B /* libPods-PTSC_CLOUD-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,7 +89,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D7E4AA8DB6E226168A02464B /* libPods-PTSC_CLOUD-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,8 +133,6 @@
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				8D06C56EC6771F54A80FCF9C /* libPods-PTSC_CLOUD.a */,
 				ED5E07FCDC587D371F7EEE41 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */,
-				4E5FF387BB3C328B9BFE2D2E /* libPods-PTSC_CLOUD-tvOS.a */,
-				549ABD7F3A0D397D51A7B4BB /* libPods-PTSC_CLOUD-tvOSTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -156,10 +144,6 @@
 				70FEF9FC1570686C152AFD55 /* Pods-PTSC_CLOUD.release.xcconfig */,
 				E8E1FE9E81B60EEA1B325403 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */,
 				6D9C60FB4F9C7F25206E7C7E /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */,
-				ED6CE7FCCBECF514DD15D79B /* Pods-PTSC_CLOUD-tvOS.debug.xcconfig */,
-				5E1A9A00448741A9E66A421B /* Pods-PTSC_CLOUD-tvOS.release.xcconfig */,
-				8DAAA32418AE843DFF6898E9 /* Pods-PTSC_CLOUD-tvOSTests.debug.xcconfig */,
-				47A630FF684A988AF52DF58D /* Pods-PTSC_CLOUD-tvOSTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -255,7 +239,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "PTSC_CLOUD-tvOS" */;
 			buildPhases = (
-				1345F84A512D196A93DC406A /* [CP] Check Pods Manifest.lock */,
 				FD10A7F122414F3F0027D42C /* Start Packager */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
@@ -275,7 +258,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "PTSC_CLOUD-tvOSTests" */;
 			buildPhases = (
-				4490E79F9EF47F7A65011F84 /* [CP] Check Pods Manifest.lock */,
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
 				2D02E48E1E0B4A5D006451C7 /* Resources */,
@@ -388,28 +370,6 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		1345F84A512D196A93DC406A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PTSC_CLOUD-tvOS-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -423,28 +383,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		4490E79F9EF47F7A65011F84 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PTSC_CLOUD-tvOSTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
 		};
 		5A3436F19A427CBBDC6FA4E2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -488,6 +426,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -509,6 +448,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -540,6 +480,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -561,6 +502,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -838,7 +780,6 @@
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ED6CE7FCCBECF514DD15D79B /* Pods-PTSC_CLOUD-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -865,7 +806,6 @@
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5E1A9A00448741A9E66A421B /* Pods-PTSC_CLOUD-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -892,7 +832,6 @@
 		};
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DAAA32418AE843DFF6898E9 /* Pods-PTSC_CLOUD-tvOSTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -919,7 +858,6 @@
 		};
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 47A630FF684A988AF52DF58D /* Pods-PTSC_CLOUD-tvOSTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -977,6 +915,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1038,6 +977,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
