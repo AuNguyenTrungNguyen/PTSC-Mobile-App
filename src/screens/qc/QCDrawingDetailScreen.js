@@ -8,12 +8,13 @@ import Dialog from 'react-native-dialog';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
+import CoreStyle from '../../utils/CoreStyle';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import { GetQCDrawingDetailAPI, UpdateQCDrawingDetailAPI, GetQCInspectorListAPI } from '../../apis/qc/QCDrawingAPI';
 import PickupDataModal from '../../components/drawing/PickupDataModal';
 
-export default ({ route, navigation }) => {
+const QCDrawingDetailScreen = ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -21,7 +22,7 @@ export default ({ route, navigation }) => {
   const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
+  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader, link } = route.params;
 
   const [errorList, setErrorList] = useState([]);
   // INSPECTOR
@@ -488,7 +489,15 @@ export default ({ route, navigation }) => {
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>
                   <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
+                    {
+                      link
+                        ?
+                        <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, link, 'Open QC Detail Drawing')}>
+                          <Text style={CoreStyle.textLink}>{drawingNo.toUpperCase()}</Text>
+                        </TouchableOpacity>
+                        :
+                        <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
+                    }
                   </View>
                 </View>
                 <View style={styles.rowInfo}>
@@ -776,7 +785,6 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
 });
-
 const modals = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -797,3 +805,5 @@ const modals = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+export default QCDrawingDetailScreen;

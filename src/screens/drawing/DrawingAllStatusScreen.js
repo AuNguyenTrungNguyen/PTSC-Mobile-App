@@ -4,6 +4,8 @@ import NetInfo from '@react-native-community/netinfo';
 import Moment from 'moment';
 
 import Helper from '../../utils/Helper';
+import CoreStyle from '../../utils/CoreStyle';
+import Formater from '../../utils/Formater';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
 import GetDrawingCompleteAllPercentAPI from '../../apis/drawing/GetDrawingCompleteAllPercentAPI';
 import GetSpoolMatrixListAPI from '../../apis/spool/GetSpoolMatrixListAPI';
@@ -14,7 +16,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const { projectCode, facilityCode, drawingNo, sheet, rev } = route.params;
+  const { projectCode, facilityCode, drawingNo, sheet, rev, link } = route.params;
 
   const [facilityCodeCalled, setFacilityCodeCalled] = useState([]);
   const [percentList, setPercentList] = useState([]);
@@ -182,23 +184,23 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
       <View style={styles.spoolBox}>
         <View style={styles.spoolRow}>
           <Text style={styles.spoolCellTitle}>SpoolNo:</Text>
-          <Text style={styles.spoolCellData}>{formatEmptyData(item.SpoolNo)}</Text>
+          <Text style={styles.spoolCellData}>{Formater.formatEmptyData(item.SpoolNo)}</Text>
         </View>
         <View style={styles.spoolRow}>
           <Text style={styles.spoolCellTitle}>WS_WeldedStatus:</Text>
-          <Text style={styles.spoolCellData}>{formatEmptyData(item.WS_WeldedStatus)}</Text>
+          <Text style={styles.spoolCellData}>{Formater.formatEmptyData(item.WS_WeldedStatus)}</Text>
         </View>
         <View style={styles.spoolRow}>
           <Text style={styles.spoolCellTitle}>Field_FitUpStatus:</Text>
-          <Text style={styles.spoolCellData}>{formatEmptyData(item.Field_FitUpStatus)}</Text>
+          <Text style={styles.spoolCellData}>{Formater.formatEmptyData(item.Field_FitUpStatus)}</Text>
         </View>
         <View style={styles.spoolRow}>
           <Text style={styles.spoolCellTitle}>Field_WeldedStatus:</Text>
-          <Text style={styles.spoolCellData}>{formatEmptyData(item.Field_WeldedStatus)}</Text>
+          <Text style={styles.spoolCellData}>{Formater.formatEmptyData(item.Field_WeldedStatus)}</Text>
         </View>
         <View style={styles.spoolRow}>
           <Text style={styles.spoolCellTitle}>SpoolRigUpToSite:</Text>
-          <Text style={styles.spoolCellData} >{formatDateData(item.SpoolRigUpToSite)}</Text>
+          <Text style={styles.spoolCellData} >{Formater.formatDateData(item.SpoolRigUpToSite)}</Text>
         </View>
       </View>
     );
@@ -209,14 +211,6 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
       <Text style={styles.noDataTitle}>No have any spool!</Text>
     </View>
   );
-
-  const formatEmptyData = data => {
-    return data != null ? data : '';
-  };
-
-  const formatDateData = data => {
-    return data != null ? Moment(data).format("DD-MMM-YY") : '';
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -236,7 +230,15 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <Text style={styles.cellTitle}>DrawingNo:</Text>
-              <Text style={styles.cellData}>{drawingNo}</Text>
+              {
+                link
+                  ?
+                  <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, link, 'Open All Status Drawing')} style={styles.cellData}>
+                    <Text style={CoreStyle.textLinkWithLine}>{drawingNo.toUpperCase()}</Text>
+                  </TouchableOpacity>
+                  :
+                  <Text style={styles.cellData}>{drawingNo.toUpperCase()}</Text>
+              }
             </View>
             <View style={styles.row}>
               <Text style={styles.cellTitle}>Sheet:</Text>

@@ -6,6 +6,7 @@ import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../utils/Helper';
+import CoreStyle from '../../utils/CoreStyle';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
 import GetDrawingListAPI from '../../apis/qc/GetDrawingListAPI';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
@@ -13,7 +14,7 @@ import GetQCCompletePercentAPI from '../../apis/qc/GetQCCompletePercentAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-export default ({ route, navigation }) => {
+const QCDrawingListScreen = ({ route, navigation }) => {
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -197,7 +198,7 @@ export default ({ route, navigation }) => {
       });
   };
 
-  const _onPressViewFitUp = async (drawingNo, sheet, rev) => {
+  const _onPressViewFitUp = async (drawingNo, sheet, rev, link) => {
     Keyboard.dismiss();
     let teamLeader = await Helper.getData('USERNAME');
     let code = 'FitUp';
@@ -213,6 +214,7 @@ export default ({ route, navigation }) => {
           code: code,
           teamLeader: teamLeader,
           title: 'QC FitUp Detail',
+          link: link,
         }
       );
     } else {
@@ -229,6 +231,7 @@ export default ({ route, navigation }) => {
               code: code,
               teamLeader: teamLeader,
               title: 'QC FitUp Detail',
+              link: link,
             });
           } else {
             setIsLoading(false);
@@ -241,7 +244,7 @@ export default ({ route, navigation }) => {
     }
   };
 
-  const _onPressViewVisual = async (drawingNo, sheet, rev) => {
+  const _onPressViewVisual = async (drawingNo, sheet, rev, link) => {
     Keyboard.dismiss();
     let teamLeader = await Helper.getData('USERNAME');
     let code = 'Visual';
@@ -257,6 +260,7 @@ export default ({ route, navigation }) => {
           code: code,
           teamLeader: teamLeader,
           title: 'QC Weld Detail',
+          link: link,
         }
       );
     } else {
@@ -273,6 +277,7 @@ export default ({ route, navigation }) => {
               code: code,
               teamLeader: teamLeader,
               title: 'QC Weld Detail',
+              link: link,
             });
           } else {
             setIsLoading(false);
@@ -313,15 +318,7 @@ export default ({ route, navigation }) => {
     );
   };
 
-  const _onPressOpenDrawing = link => {
-    navigation.navigate(
-      'PDFView',
-      {
-        link: link,
-        title: 'View Drawing QC List',
-      }
-    );
-  };
+
 
 
 
@@ -354,8 +351,8 @@ export default ({ route, navigation }) => {
           {
             item.WebLink
               ?
-              <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }} style={styles.cellData}>
-                <Text style={styles.textDataOpen}>{item.DrawingNo}</Text>
+              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Open QC Drawing')} style={styles.cellData}>
+                <Text style={CoreStyle.textLinkWithLine}>{item.DrawingNo}</Text>
               </TouchableOpacity>
               :
               <Text style={styles.cellData}>{item.DrawingNo}</Text>
@@ -392,10 +389,10 @@ export default ({ route, navigation }) => {
           <View style={styles.cellData}>
             <View style={styles.cellValue} />
             <View style={styles.cellProgress}>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.DrawingNo, item.Sheet, item.Rev) }}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewFitUp(item.DrawingNo, item.Sheet, item.Rev, item.WebLink) }}>
                 <Text style={styles.textAction}>View FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewVisual(item.DrawingNo, item.Sheet, item.Rev) }}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewVisual(item.DrawingNo, item.Sheet, item.Rev, item.WebLink) }}>
                 <Text style={styles.textAction}>View Visual</Text>
               </TouchableOpacity>
             </View>
@@ -661,12 +658,6 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     flexDirection: 'row',
   },
-  textDataOpen: {
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    textDecorationLine: 'underline',
-    color: BASE_COLOR,
-  },
   cellValue: {
     flex: 1,
     fontWeight: 'bold',
@@ -814,3 +805,4 @@ const modals = StyleSheet.create({
   },
 });
 
+export default QCDrawingListScreen;

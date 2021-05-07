@@ -7,7 +7,7 @@ import { useIsFocused } from '@react-navigation/native';
 import Helper from '../../utils/Helper';
 import GetFacilityCodeByDrawingAPI from '../../apis/drawing/GetTopFacilityCodeAPI';
 
-export default ({ route, navigation }) => {
+const CameraScreen = ({ route, navigation }) => {
 
   const [isScanned, setIsScanned] = useState(false);
   const isFocused = useIsFocused();
@@ -40,6 +40,7 @@ export default ({ route, navigation }) => {
                   code: code,
                   teamLeader: teamLeader,
                   title: code + ' Detail',
+                  link: res.link,
                 });
                 setIsScanned(false);
               } else {
@@ -54,6 +55,7 @@ export default ({ route, navigation }) => {
                   code: code,
                   teamLeader: teamLeader,
                   title: title,
+                  link: res.link,
                 });
                 setIsScanned(false);
               }
@@ -178,3 +180,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+export default CameraScreen;
