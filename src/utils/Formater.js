@@ -10,8 +10,12 @@ export default class Formater {
     return data ? Moment(data).format("DD-MMM-YY") : '';
   };
 
-  static formatEmptyNumber = number => {
-    return number ? number : '0';
+  static formatTwoDigits = number => {
+    try {
+      return number.toFixed(2);
+    } catch {
+      return '0.00';
+    }
   }
 
 };

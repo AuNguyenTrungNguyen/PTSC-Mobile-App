@@ -255,37 +255,37 @@ const ReportConstructionListScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>BaseBudgetMHRS: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.BaseBudgetMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.BaseBudgetMHRS)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>ActualMHRS: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>PlanMHRS: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>ActualProgress: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.ActualProgress)}</Text>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.ActualProgress)} %</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>EarnedMHRS: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.EarnedMHRS)}</Text>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.EarnedMHRS)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>CPI: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyNumber(item.CPI)}</Text>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.CPI)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -294,9 +294,9 @@ const ReportConstructionListScreen = ({ route, navigation }) => {
             {
               item.RemainMHRS < 0
                 ?
-                <Text style={[styles.textData, { color: 'red' }]}>{Formater.formatEmptyNumber(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'red' }]}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
                 :
-                <Text style={[styles.textData, { color: 'green' }]}>{Formater.formatEmptyNumber(item.RemainMHRS)}</Text>
+                <Text style={[styles.textData, { color: 'green' }]}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
             }
           </View>
         </View>
