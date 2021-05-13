@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, StatusBar, Modal, ScrollView, Alert } from 'react-native';
+import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, Modal, ScrollView, Alert, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
@@ -38,6 +38,11 @@ export default ({ navigation }) => {
 
   useEffect(() => {
     callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
+    nextInput.current.setNativeProps({
+      style: {
+        fontFamily: FONT
+      },
+    });
   }, []);
 
   const callAPI = (executedAPI, key) => {
@@ -342,6 +347,7 @@ const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
 const BP_600 = 600;
 const BP_750 = 750;
+const FONT = Platform.OS === 'android' ? 'roboto-regular' : undefined;
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
@@ -386,6 +392,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     color: BASE_COLOR,
+    fontFamily: FONT
   },
   inputIcon: {
     marginLeft: 16,
@@ -405,6 +412,7 @@ const styles = StyleSheet.create({
   selectText: {
     fontSize: Dimensions.get('window').height > BP_600 ? 16 : 12,
     color: BASE_COLOR,
+    fontFamily: FONT
   },
   buttonContainer: {
     height: Dimensions.get('window').height > BP_600 ? 48 : 40,
@@ -418,6 +426,7 @@ const styles = StyleSheet.create({
     color: OPP_COLOR,
     fontSize: Dimensions.get('window').height > BP_600 ? 16 : 12,
     fontWeight: 'bold',
+    fontFamily: FONT
   },
 });
 const modals = StyleSheet.create({
