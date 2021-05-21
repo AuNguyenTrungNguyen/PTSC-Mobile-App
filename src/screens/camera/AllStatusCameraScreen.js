@@ -1,27 +1,52 @@
-import React from 'react';
-import { StyleSheet, SafeAreaView, View, Text, Alert, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import NetInfo from '@react-native-community/netinfo';
 import { useIsFocused } from '@react-navigation/native';
+
+import Helper from '../../utils/Helper';
+import { GetDrawingLinkAPI } from '../../apis/app/AppAPI';
 
 const AllStatusCameraScreen = ({ route, navigation }) => {
 
-  const { projectCode } = route.params;
+  const [isScanned, setIsScanned] = useState(false);
   const isFocused = useIsFocused();
+  const { projectCode } = route.params;
 
   const _onQRCodeRead = scanResult => {
-    if (scanResult.data !== null && isFocused) {
+    if (scanResult.data !== null && !isScanned && isFocused) {
       goAllStatusScreen(scanResult.data);
     }
   };
 
-  const goAllStatusScreen = (scanResult) => {
+  const goAllStatusScreen = async scanResult => {
     var data = scanResult.split('_');
     if (data != null && data[0] && data[1] && data[2]) {
-      navigation.navigate('DrawingAllStatus', {
-        projectCode: projectCode,
-        drawingNo: data[0],
-        sheet: data[1],
-        rev: data[2]
+      let token = await Helper.getData('TOKEN');
+      NetInfo.fetch().then(state => {
+        if (!state.isConnected) {
+          showComfirm('ERROR', 'Network not available!');
+        } else {
+          GetDrawingLinkAPI(projectCode, data[0], data[1], data[2], token)
+            .then(res => {
+              if (res.success) {
+                navigation.navigate('DrawingAllStatus', {
+                  projectCode: projectCode,
+                  drawingNo: data[0],
+                  sheet: data[1],
+                  rev: data[2],
+                  link: res.data
+                });
+                setIsScanned(false);
+              } else {
+                showComfirm('ERROR', 'Please check that you are using the company network!');
+                setIsScanned(true);
+              }
+            }).catch(() => {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
+              setIsScanned(true);
+            });
+        }
       });
     } else {
       Alert.alert(
@@ -53,6 +78,27 @@ const AllStatusCameraScreen = ({ route, navigation }) => {
         { cancelable: false },
       );
     }
+  };
+
+  const showComfirm = (type, message) => {
+    Alert.alert(
+      type,
+      message,
+      [
+        {
+          text: 'Back',
+          onPress: () => {
+            navigation.goBack();
+          },
+          style: 'cancel'
+        },
+        {
+          text: 'Rescan',
+          onPress: () => { setIsScanned(false) }
+        }
+      ],
+      { cancelable: false },
+    );
   };
 
   return (

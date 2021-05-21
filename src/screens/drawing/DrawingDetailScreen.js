@@ -14,6 +14,7 @@ import CheckBox from '@react-native-community/checkbox';
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
 import Constant from '../../utils/Constant';
+import CoreStyle from '../../utils/CoreStyle';
 import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
 import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
 import { GetLocationListAPI, GetWPSListAPI, GetHeatNoListPopupAPI, GetFittingTeamAPI } from '../../apis/drawing/ConstructionDrawingAPI';
@@ -23,7 +24,7 @@ import HelpModal from '../../components/drawing/HelpModal';
 import PickupDataModal from '../../components/drawing/PickupDataModal';
 import PickupDataModalHeader from '../../components/drawing/PickupDataModalHeader';
 
-export default ({ route, navigation }) => {
+const DrawingDetailScreen = ({ route, navigation }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -32,7 +33,7 @@ export default ({ route, navigation }) => {
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
   const [errorList, setErrorList] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader } = route.params;
+  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader, link } = route.params;
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
@@ -124,7 +125,6 @@ export default ({ route, navigation }) => {
       MessageAlert('ERROR', error.toString());
     }
   };
-
 
   const handleDataUpdateFitup = () => {
     updateDrawingList.forEach(element => {
@@ -1288,7 +1288,15 @@ export default ({ route, navigation }) => {
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>
                   <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
+                    {
+                      link
+                        ?
+                        <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, link, 'Open Cons Detail Drawing')}>
+                          <Text style={CoreStyle.textLink}>{drawingNo.toUpperCase()}</Text>
+                        </TouchableOpacity>
+                        :
+                        <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
+                    }
                   </View>
                 </View>
                 <View style={styles.rowInfo}>
@@ -1694,7 +1702,6 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
 });
-
 const modals = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -1720,3 +1727,5 @@ const modals = StyleSheet.create({
     backgroundColor: BASE_COLOR,
   },
 });
+
+export default DrawingDetailScreen;

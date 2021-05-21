@@ -7,7 +7,6 @@ import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
 
 import HomeScreen from './screens/HomeScreen';
-import ReportsScreen from './screens/ReportsScreen';
 import ConstructionUpdateManageScreen from './screens/ConstructionUpdateManageScreen';
 
 import CameraScreen from './screens/camera/CameraScreen';
@@ -28,14 +27,6 @@ import QCDrawingListScreen from './screens/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
 import QCSpendListScreen from './screens/qc/QCSpendListScreen';
 
-import ConstructionListScreen from './screens/construction/ConstructionListScreen';
-
-import DisciplineListScreen from './screens/discipline/DisciplineListScreen';
-
-import HistogramListScreen from './screens/histogram/HistogramListScreen';
-
-import DailyManpowerScreen from './screens/manpower/DailyManpowerScreen';
-
 import PDFViewScreen from './screens/pdf/PDFViewScreen';
 
 //NDT
@@ -43,8 +34,16 @@ import NDTManagerScreen from './screens/ndt/NDTManagerScreen';
 import NDTDetailScreen from './screens/ndt/NDTDetailScreen';
 import NDTIssueScreen from './screens/ndt/NDTIssueScreen';
 
+//Report
+import ReportManagerScreen from './screens/report/ReportManagerScreen';
+import ReportConstructionListScreen from './screens/report/ReportConstructionListScreen';
+import ReportDisciplineListScreen from './screens/report/ReportDisciplineListScreen';
+import ReportHistogramListScreen from './screens/report/ReportHistogramListScreen';
+import ReportDailyManpowerListScreen from './screens/report/ReportDailyManpowerListScreen';
+
 const Stack = createStackNavigator();
 const NDTStack = createStackNavigator();
+const ReportStack = createStackNavigator();
 
 let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
 if (Appearance.getColorScheme() === 'dark') {
@@ -84,6 +83,63 @@ const NDTStackScreens = () => {
   );
 }
 
+const ReportStackScreens = () => {
+  return (
+    <ReportStack.Navigator screenOptions={optionNavigation}>
+      <ReportStack.Screen
+          name='ReportManager'
+          component={ReportManagerScreen}
+          options={
+            {
+              title: 'Reports',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+      <ReportStack.Screen
+          name='ReportConstruction'
+          component={ReportConstructionListScreen}
+          options={
+            {
+              title: 'Construction List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <ReportStack.Screen
+          name='ReportDiscipline'
+          component={ReportDisciplineListScreen}
+          options={
+            {
+              title: 'Discipline List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <ReportStack.Screen
+          name='ReportHistogram'
+          component={ReportHistogramListScreen}
+          options={
+            {
+              title: 'Histogram List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <ReportStack.Screen
+          name='ReportDailyManpower'
+          component={ReportDailyManpowerListScreen}
+          options={
+            {
+              title: 'Daily Manpower List',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+    </ReportStack.Navigator>
+  );
+}
+
 export default () => {
   return (
     <NavigationContainer>
@@ -117,17 +173,6 @@ export default () => {
           options={
             {
               title: 'Construction Update',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
-          name='Reports'
-          component={ReportsScreen}
-          options={
-            {
-              title: 'Reports',
               headerBackTitle: 'Back',
             }
           }
@@ -272,50 +317,6 @@ export default () => {
         />
 
         <Stack.Screen
-          name='ConstructionList'
-          component={ConstructionListScreen}
-          options={
-            {
-              title: 'Construction List',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
-          name='DisciplineList'
-          component={DisciplineListScreen}
-          options={
-            {
-              title: 'Discipline List',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
-          name='HistogramList'
-          component={HistogramListScreen}
-          options={
-            {
-              title: 'Histogram List',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
-          name='DailyManpower'
-          component={DailyManpowerScreen}
-          options={
-            {
-              title: 'Daily Manpower',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
           name='PDFView'
           component={PDFViewScreen}
           options={({ route }) => ({
@@ -327,6 +328,12 @@ export default () => {
         <Stack.Screen
           name='NDT'
           component={NDTStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name='Report'
+          component={ReportStackScreens}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

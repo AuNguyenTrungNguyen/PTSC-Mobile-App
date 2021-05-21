@@ -6,6 +6,7 @@ import Toast from 'react-native-simple-toast';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../utils/Helper';
+import CoreStyle from '../../utils/CoreStyle';
 import GetFacilityListAPI from '../../apis/app/GetFacilityListAPI';
 import GetDrawingListAPI from '../../apis/drawing/GetDrawingListAPI';
 import MessageAlert from '../../components/MessageAlert';
@@ -213,12 +214,21 @@ const DrawingSearchScreen = ({ route, navigation }) => {
           facilityCode: facilityCode !== FACILITY_CODE_DEFAULT ? facilityCode : null,
           drawingNo: item.DrawingNo,
           sheet: item.Sheet,
-          rev: item.Rev
+          rev: item.Rev,
+          link: item.WebLink
         });
       }}>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>DrawingNo:</Text>
-          <Text style={styles.cellData}>{formatEmptyData(item.DrawingNo)}</Text>
+          {
+            item.WebLink
+              ?
+              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Open All Status Drawing')} style={styles.cellData}>
+                <Text style={CoreStyle.textLinkWithLine}>{item.DrawingNo}</Text>
+              </TouchableOpacity>
+              :
+              <Text style={styles.cellData}>{formatEmptyData(item.DrawingNo)}</Text>
+          }
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Sheet:</Text>

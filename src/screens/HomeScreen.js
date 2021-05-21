@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
@@ -103,7 +103,10 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   const _onPressViewReports = () => {
-    navigation.navigate('Reports', { projectCode: projectCode });
+    navigation.navigate('Report', {
+      screen: 'ReportManager',
+      params: { projectCode: projectCode },
+    });
   };
 
   const _onPressQRCodeFitUp = async () => {
@@ -252,13 +255,13 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.cell}>
                 <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp} activeOpacity={1}>
                   <Text style={styles.itemTitle}>Cons Scan FitUp</Text>
-                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                 </TouchableOpacity>
               </View>
               <View style={styles.cell}>
                 <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld} activeOpacity={1}>
                   <Text style={styles.itemTitle}>Cons Scan Weld</Text>
-                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -266,7 +269,7 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.cell}>
                 <TouchableOpacity style={styles.itemContainer} onPress={_onPressMamageQCFitUp} activeOpacity={1}>
                   <Text style={styles.itemTitle}>QC Scan FitUp</Text>
-                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                 </TouchableOpacity>
                 {
                   spendNumbers.FitUp
@@ -281,7 +284,7 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.cell}>
                 <TouchableOpacity style={styles.itemContainer} onPress={_onPressMamageQCWeld} activeOpacity={1}>
                   <Text style={styles.itemTitle}>QC Scan Weld</Text>
-                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                 </TouchableOpacity>
                 {
                   spendNumbers.Weld
@@ -298,13 +301,13 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.cell}>
                 <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeAllStatus} activeOpacity={1}>
                   <Text style={styles.itemTitle}>Scan All Status</Text>
-                  <Ionicons name='qr-code-outline' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                 </TouchableOpacity>
               </View>
               <View style={styles.cell}>
                 <TouchableOpacity style={styles.itemContainer} onPress={_onPressSearchAllStatus} activeOpacity={1}>
                   <Text style={styles.itemTitle}>Search All Status</Text>
-                  <Ionicons name='md-search' size={48} color={BASE_COLOR} style={styles.itemIcon} />
+                  <Ionicons name='md-search' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -384,24 +387,22 @@ const styles = StyleSheet.create({
   itemContainer: {
     height: '90%',
     width: '90%',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     alignItems: 'center',
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 12,
-    padding: 4,
+    padding: Dimensions.get('window').height > 700 ? 12 : 4,
   },
   itemTitle: {
     textAlign: 'center',
     color: BASE_COLOR,
-    fontSize: 16,
+    fontSize: Dimensions.get('window').height > 700 ? 16 : 14,
   },
   itemIcon: {
     color: BASE_COLOR,
-    height: 48,
-    width: 48,
-    margin: 4,
-    marginVertical: 16,
+    height: Dimensions.get('window').height > 700 ? 48 : 36,
+    width: Dimensions.get('window').height > 700 ? 48 : 36,
   },
   badgeContainer: {
     width: 36,
@@ -424,13 +425,13 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   buttonContainer: {
-    height: 42,
+    height: Dimensions.get('window').height > 700 ? 40 : 36,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
   },
   buttonContainerPadding: {
-    height: 42,
+    height: Dimensions.get('window').height > 700 ? 40 : 36,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
@@ -438,10 +439,10 @@ const styles = StyleSheet.create({
   },
   buttonTitle: {
     color: OPP_COLOR,
-    fontSize: 16,
+    fontSize: Dimensions.get('window').height > 700 ? 16 : 14,
   },
   containerMultiButtons: {
-    height: 42,
+    height: Dimensions.get('window').height > 700 ? 40 : 36,
     marginTop: 12,
     flexDirection: 'row',
   },
