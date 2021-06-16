@@ -6,13 +6,13 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import Dialog from 'react-native-dialog';
 
-import Helper from '../../utils/Helper';
-import Formater from '../../utils/Formater';
-import CoreStyle from '../../utils/CoreStyle';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
-import { GetQCDrawingDetailAPI, UpdateQCDrawingDetailAPI, GetQCInspectorListAPI } from '../../apis/qc/QCDrawingAPI';
-import PickupDataModal from '../../components/drawing/PickupDataModal';
+import Helper from '../../../utils/Helper';
+import Formater from '../../../utils/Formater';
+import CoreStyle from '../../../utils/CoreStyle';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
+import { GetQCDrawingDetailAPI, UpdateQCDrawingDetailAPI, GetQCInspectorListAPI } from '../../../apis/qc/QCDrawingAPI';
+import PickupDataModal from '../../../components/drawing/PickupDataModal';
 
 const QCDrawingDetailScreen = ({ route, navigation }) => {
 

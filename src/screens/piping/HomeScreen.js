@@ -4,10 +4,10 @@ import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 
-import Helper from '../utils/Helper';
-import GetSpendNumbersAPI from '../apis/qc/GetSpendNumbersAPI';
-import MessageAlert from '../components/MessageAlert';
-import LoadingRefresh from '../components/LoadingRefresh';
+import Helper from '../../utils/Helper';
+import GetSpendNumbersAPI from '../../apis/qc/GetSpendNumbersAPI';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
 
 const HomeScreen = ({ route, navigation }) => {
 

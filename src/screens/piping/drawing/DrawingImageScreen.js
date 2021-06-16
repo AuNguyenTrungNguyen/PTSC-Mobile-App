@@ -1,7 +1,6 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Dimensions, Alert, Modal, ActivityIndicator, PermissionsAndroid, Platform, Appearance } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Dimensions, Alert, Modal, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -10,57 +9,37 @@ import FastImage from 'react-native-fast-image';
 import Dialog from 'react-native-dialog';
 import ImageView from 'react-native-image-viewing';
 import CameraRoll from '@react-native-community/cameraroll';
+
+import { Port_Server } from '../../../utils/Core';
+import Helper from '../../../utils/Helper';
+import GetDrawingImageAPI from '../../../apis/drawing/GetDrawingImageAPI';
+import DeleteDrawingImageAPI from '../../../apis/drawing/DeleteDrawingImageAPI';
+import EditDrawingImageAPI from '../../../apis/drawing/EditDrawingImageAPI';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
 import { TextInput } from 'react-native-gesture-handler';
 
-import Helper from '../../utils/Helper';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
-
-import { GetNDTIssueListAPI, UploadNDTIssueListAPI, DeleteNDTIssueAPI, EditNDTIssueAPI } from '../../apis/ndt/NDTAPI';
-
-const NDTIssueScreen = ({ route, navigation }) => {
-
-  const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
-  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
-  const toggle = () => {
-    setIsShowDescription(prevState => {
-      return {
-        show: !prevState.show,
-        name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
-      }
-    });
-  };
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
-          onPress={toggle}>
-          <Ionicons size={24} name={isShowDescription.name} color={iconColor} />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation, isShowDescription]);
+export default ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [NDTIssueList, setNDTIssueList] = useState([]);
-  const [NDTIssueListUpload, setNDTIssueListUpload] = useState([]);
+  const [drawingImageList, setDrawingImageList] = useState([]);
+  const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
 
-  const { projectCode, rowIndex, spoolNo, jointNo, drawingNo, code, username } = route.params;
+  const { projectCode, facilityCode, drawingNo, code, teamLeader } = route.params;
 
-  const [isShowDialogEdit, setIsShowDialogEdit] = useState(false);
+  const [isShowDialog, setIsShowDialog] = useState(false);
   const [pictureId, setPictureId] = useState(null);
   const [pictureNote, setPictureNote] = useState(null);
 
-  const [isOpenPicture, setIsOpenPicture] = useState(false);
-  const [openPicture, setOpenPicture] = useState([]);
+  const [isOpenImage, setIsOpenImage] = useState(false);
+  const [openImage, setOpenImage] = useState([]);
 
   useEffect(
     () => {
-      callAPI(getNDTIssueList);
+      callAPI(getDrawingImage);
     }, []
   );
 
@@ -77,12 +56,12 @@ const NDTIssueScreen = ({ route, navigation }) => {
     });
   };
 
-  const getNDTIssueList = async () => {
+  const getDrawingImage = async () => {
     let token = await Helper.getData('TOKEN');
-    GetNDTIssueListAPI(projectCode, jointNo, drawingNo, code, token)
+    GetDrawingImageAPI(projectCode, facilityCode, drawingNo, code, token)
       .then(res => {
         if (res.success) {
-          setNDTIssueList(res.data);
+          setDrawingImageList(res.data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -96,7 +75,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
       });
   };
 
-  const _onPressAddPicture = () => {
+  const _onPressAddImage = () => {
     Alert.alert(
       'Add Drawing Picture',
       'Please select an option',
@@ -123,12 +102,12 @@ const NDTIssueScreen = ({ route, navigation }) => {
     ImagePicker.openPicker({
       multiple: true,
       maxFiles: 100,
-    }).then(pictures => {
-      picturesUpload = [];
-      pictures.forEach(picture => {
-        picturesUpload.push({ uri: picture.path });
+    }).then(images => {
+      imagesUpload = [];
+      images.forEach(image => {
+        imagesUpload.push({ uri: image.path });
       });
-      setNDTIssueListUpload(picturesUpload);
+      setDrawingImageListUpload(imagesUpload);
       setIsSelecting(true);
     }).catch(() => {
       setIsLoading(false);
@@ -141,10 +120,10 @@ const NDTIssueScreen = ({ route, navigation }) => {
     ImagePicker.openCamera({
       cropping: false,
     })
-      .then(picture => {
-        let picturesUpload = [];
-        picturesUpload.push({ uri: picture.path });
-        setNDTIssueListUpload(picturesUpload);
+      .then(image => {
+        let imagesUpload = [];
+        imagesUpload.push({ uri: image.path });
+        setDrawingImageListUpload(imagesUpload);
         setIsSelecting(true);
       }).catch(() => {
         setIsLoading(false);
@@ -153,8 +132,8 @@ const NDTIssueScreen = ({ route, navigation }) => {
   };
 
   const addFilesToBody = () => {
-    const promises = NDTIssueListUpload.map(async picture => {
-      return await ImageResizer.createResizedImage(picture.uri, 900, 450, 'PNG', 0)
+    const promises = drawingImageListUpload.map(async (image) => {
+      return await ImageResizer.createResizedImage(image.uri, 900, 450, 'PNG', 0)
         .then(res => {
           let file = {
             name: 'file',
@@ -167,17 +146,18 @@ const NDTIssueScreen = ({ route, navigation }) => {
     return Promise.all(promises);
   };
 
-  const _onPressUploadNDTIssueList = async () => {
+  const _onPressUploadImage = async () => {
     setIsUploading(true);
     let token = await Helper.getData('TOKEN');
+    let username = await Helper.getData('USERNAME');
     let dataCode = await Helper.getData('DATACODE');
+
     let body = [
       { name: 'projectCode', data: projectCode },
-      { name: 'rowIndex', data: String(rowIndex) },
-      { name: 'jointNo', data: jointNo },
+      { name: 'facilityCode', data: facilityCode },
       { name: 'drawingNo', data: drawingNo },
       { name: 'code', data: code },
-      { name: 'userUpdate', data: username },
+      { name: 'username', data: username },
       { name: 'dataCode', data: dataCode },
     ];
 
@@ -187,17 +167,26 @@ const NDTIssueScreen = ({ route, navigation }) => {
         if (pictureNote) {
           body = body.concat({ name: 'note', data: pictureNote });
         }
-        UploadNDTIssueListAPI(body, token)
+        RNFetchBlob.fetch(
+          'POST',
+          Port_Server + '/api/Drawing/UploadDrawingImage',
+          {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'multipart/form-data',
+          },
+          body,
+        )
           .then(res => {
             res = JSON.parse(res.data);
             if (res.success) {
-              setNDTIssueListUpload([]);
+              setDrawingImageListUpload([]);
+              setIsLoading(false);
               setIsLoading(false);
               setIsSelecting(false);
               setIsUploading(false);
               setPictureNote(null);
               Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-              callAPI(getNDTIssueList);
+              callAPI(getDrawingImage);
             } else {
               Toast.show('Please check that you are using the company network!', Toast.SHORT);
               setIsLoading(false);
@@ -209,19 +198,19 @@ const NDTIssueScreen = ({ route, navigation }) => {
             Toast.show('Please check that you are using the company network!', Toast.SHORT);
             setIsLoading(false);
             setIsError(true);
-            setIsUploading(false)
+            setIsUploading(false);
           });
       });
   };
 
-  const _onPressDeleteNDTIssue = async id => {
+  const _onPressDeleteImage = async id => {
     Alert.alert(
       'Delete Drawing Picture',
       'Are you sure you want to delete this picture',
       [
         {
           text: 'Delete',
-          onPress: () => { deleteNDTIssue(id) },
+          onPress: () => { deleteDrawingImage(id) },
         },
         {
           text: 'Cancel',
@@ -232,37 +221,37 @@ const NDTIssueScreen = ({ route, navigation }) => {
     );
   };
 
-  const deleteNDTIssue = async id => {
+  const deleteDrawingImage = async id => {
     let token = await Helper.getData('TOKEN');
-    DeleteNDTIssueAPI(id, token)
+    DeleteDrawingImageAPI(id, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
-          let array = NDTIssueList.filter(picture => picture.id !== id);
-          setNDTIssueList(array);
+          let array = drawingImageList.filter(image => image.id !== id);
+          setDrawingImageList(array);
         }
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT);
       });
   }
 
-  const _onPressEditNDTIssue = (id, note) => {
-    setIsShowDialogEdit(true);
+  const _onPressEditImage = (id, note) => {
+    setIsShowDialog(true);
     setPictureId(id);
     setPictureNote(note);
   };
 
-  const editNDTIssue = async () => {
+  const _onPressUpdateImage = async () => {
     let token = await Helper.getData('TOKEN');
-    EditNDTIssueAPI(pictureId, pictureNote, token)
+    EditDrawingImageAPI(pictureId, pictureNote, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
-          let index = NDTIssueList.findIndex(picture => picture.id === pictureId);
-          let array = [...NDTIssueList]
+          let index = drawingImageList.findIndex(image => image.id === pictureId);
+          let array = [...drawingImageList]
           array[index]['note'] = pictureNote;
-          setNDTIssueList(array);
-          setIsShowDialogEdit(false);
+          setDrawingImageList(array);
+          setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);
         }
@@ -271,12 +260,12 @@ const NDTIssueScreen = ({ route, navigation }) => {
       });
   };
 
-  const _onPressOpenPicture = uri => {
-    setOpenPicture([{ uri: uri }]);
-    setIsOpenPicture(true);
+  const _onPressOpenImage = uri => {
+    setOpenImage([{ uri: uri }]);
+    setIsOpenImage(true);
   };
 
-  const _onPressSavePicture = async () => {
+  const _onPressSaveImage = async () => {
     if (Platform.OS === 'android' && !(await hasAndroidPermissionSaveStorage())) {
       Alert.alert(
         'WARNING',
@@ -296,18 +285,18 @@ const NDTIssueScreen = ({ route, navigation }) => {
 
   const savePicture = async () => {
     try {
-      let indexFileName = openPicture[0].uri.lastIndexOf('/');
-      let pictureName = openPicture[0].uri.substring(indexFileName);
-      let indexExtension = pictureName.lastIndexOf('.');
-      let pictureExtension = pictureName.substring(indexExtension + 1);
-      let path = RNFetchBlob.fs.dirs.MainBundleDir + pictureName;
+      let indexFileName = openImage[0].uri.lastIndexOf('/');
+      let imageName = openImage[0].uri.substring(indexFileName);
+      let indexExtension = imageName.lastIndexOf('.');
+      let imageExtension = imageName.substring(indexExtension + 1);
+      let path = RNFetchBlob.fs.dirs.MainBundleDir + imageName;
       RNFetchBlob
         .config({
           fileCache: true,
-          appendExt: pictureExtension,
+          appendExt: imageExtension,
           path: path,
         })
-        .fetch('GET', openPicture[0].uri)
+        .fetch('GET', openImage[0].uri)
         .then((res) => {
           CameraRoll.save(res.path())
             .then(() => {
@@ -349,8 +338,6 @@ const NDTIssueScreen = ({ route, navigation }) => {
     }
   };
 
-
-
   const hasAndroidPermissionSaveStorage = async () => {
     const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
 
@@ -365,15 +352,15 @@ const NDTIssueScreen = ({ route, navigation }) => {
 
   const ListEmptyData = () => (
     <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>There aren't any issues</Text>
+      <Text style={styles.noDataTitle}>No have any picture</Text>
     </View>
   );
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.pictureContainer}>
+      <View style={styles.imageContainer}>
         <FastImage
-          style={styles.pictureItem}
+          style={styles.imageItem}
           source={{
             uri: item.uri,
             priority: FastImage.priority.normal,
@@ -385,23 +372,23 @@ const NDTIssueScreen = ({ route, navigation }) => {
 
   const renderItemWithAction = ({ item }) => {
     return (
-      <View style={styles.pictureContainer}>
-        <TouchableOpacity style={styles.pictureItem} activeOpacity={1} onPress={() => { _onPressOpenPicture(item.uri) }}>
+      <View style={styles.imageContainer}>
+        <TouchableOpacity style={styles.imageItem} activeOpacity={1} onPress={() => { _onPressOpenImage(item.uri) }}>
           <FastImage
-            style={styles.pictureItem}
+            style={styles.imageItem}
             source={{
               uri: item.uri,
             }}
           />
         </TouchableOpacity>
         <View style={styles.infoContainer}>
-          <Text style={styles.infoText}>{item.userUpdate}</Text>
+          <Text style={styles.infoText}>{item.username}</Text>
           {
-            item.userUpdate.toLowerCase() == username.toLowerCase()
+            item.username.toLowerCase() == teamLeader.toLowerCase()
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
-                onPress={() => _onPressDeleteNDTIssue(item.id)}>
+                onPress={() => _onPressDeleteImage(item.id)}>
                 <Text style={styles.buttonTitleDark}>Delete</Text>
               </TouchableOpacity>)
               :
@@ -415,11 +402,11 @@ const NDTIssueScreen = ({ route, navigation }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
           {
-            item.userUpdate.toLowerCase() == username.toLowerCase()
+            item.username.toLowerCase() == teamLeader.toLowerCase()
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
-                onPress={() => _onPressEditNDTIssue(item.id, item.note)}>
+                onPress={() => _onPressEditImage(item.id, item.note)}>
                 <Text style={styles.buttonTitleDark}>Edit</Text>
               </TouchableOpacity>)
               :
@@ -438,48 +425,30 @@ const NDTIssueScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNDTIssueList)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingImage)} />
         :
         <View style={styles.container}>
-          {
-            isShowDescription.show
-              ?
-              <View style={styles.headerContainer}>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
-                  </View>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>SpoolNo:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{spoolNo.toUpperCase()}</Text>
-                  </View>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>DrawingNo:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
-                  </View>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>JointNo:</Text>
-                  <View style={styles.infoDataLine}>
-                    <Text style={styles.infoData}>{jointNo.toUpperCase()}</Text>
-                  </View>
-                </View>
+          <View style={styles.headerContainer}>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>DrawingNo:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
               </View>
-              :
-              null
-          }
+            </View>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>Type:</Text>
+              <View style={styles.infoDataLine}>
+                <Text style={styles.infoData}>{code}</Text>
+              </View>
+            </View>
+          </View>
           {
-            NDTIssueList.length
+            drawingImageList.length
               ?
               <View style={styles.safeArea}>
                 <VirtualizedList
                   style={styles.table}
-                  data={NDTIssueList}
+                  data={drawingImageList}
                   getItemCount={(data) => data.length}
                   getItem={(data, index) => {
                     return data[index];
@@ -494,7 +463,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
               <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddPicture}>
+            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
               <Text style={styles.buttonTitle}>Add Pictures</Text>
             </TouchableOpacity>
           </View>
@@ -506,7 +475,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
             <View style={styles.safeArea}>
               <VirtualizedList
                 style={styles.table}
-                data={NDTIssueListUpload}
+                data={drawingImageListUpload}
                 getItemCount={(data) => data.length}
                 getItem={(data, index) => {
                   return data[index];
@@ -525,13 +494,11 @@ const NDTIssueScreen = ({ route, navigation }) => {
                 underlineColorAndroid='transparent' />
             </View>
             <View style={styles.actionContainer}>
-              <TouchableOpacity
-                style={styles.buttonLeft}
-                onPress={() => {
-                  setIsLoading(false);
-                  setIsSelecting(false);
-                  setPictureNote(null);
-                }}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={() => {
+                setIsLoading(false);
+                setIsSelecting(false);
+                setPictureNote(null);
+              }}>
                 <Text style={styles.buttonTitle}>Cancel</Text>
               </TouchableOpacity>
               {
@@ -541,7 +508,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
                     <ActivityIndicator size='small' color={OPP_COLOR} />
                   </TouchableOpacity>
                   :
-                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressUploadNDTIssueList}>
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressUploadImage}>
                     <Text style={styles.buttonTitle}>Upload Pictures</Text>
                   </TouchableOpacity>
               }
@@ -549,30 +516,28 @@ const NDTIssueScreen = ({ route, navigation }) => {
           </View>
         </SafeAreaView>
       </Modal>
-      <Dialog.Container visible={isShowDialogEdit}>
+      <Dialog.Container visible={isShowDialog}>
         <Dialog.Title>{'Edit Picture Note'}</Dialog.Title>
         <Dialog.Input
           multiline={true}
-          numberOfLines={5}
-          textAlignVertical={'top'}
-          wrapperStyle={styles.dialogInputWrapper}
+          numberOfLines={7}
           value={pictureNote}
           placeholder={'Enter note to update'}
           onChangeText={(text) => setPictureNote(text)}
-          underlineColorAndroid={OPP_COLOR}
+          underlineColorAndroid={BASE_COLOR}
         />
         <Dialog.Button label='Cancle' onPress={() => {
-          setIsShowDialogEdit(false);
+          setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);
         }} />
-        <Dialog.Button label='Update' onPress={editNDTIssue} />
+        <Dialog.Button label='Update' onPress={_onPressUpdateImage} />
       </Dialog.Container>
       <ImageView
-        visible={isOpenPicture}
-        images={openPicture}
+        visible={isOpenImage}
+        images={openImage}
         imageIndex={0}
-        onRequestClose={() => setIsOpenPicture(false)}
+        onRequestClose={() => setIsOpenImage(false)}
         FooterComponent={
           ({ imageIndex }) => {
             return (
@@ -580,7 +545,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
                 <View style={styles.bottomImageContanier}>
                   <TouchableOpacity
                     style={styles.bottomSaveButton}
-                    onPress={_onPressSavePicture} >
+                    onPress={_onPressSaveImage} >
                     <Text style={styles.buttonTitleDark}>Save Picture</Text>
                   </TouchableOpacity>
                 </View>
@@ -645,7 +610,7 @@ const styles = StyleSheet.create({
     height: '20%',
     textAlignVertical: 'top'
   },
-  pictureContainer: {
+  imageContainer: {
     width: SCREEN_WIDTH - 28,
     height: 'auto',
     marginBottom: 8,
@@ -654,7 +619,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pictureItem: {
+  imageItem: {
     width: '100%',
     height: (SCREEN_WIDTH - 28) * 9 / 16,
   },
@@ -752,13 +717,4 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 8,
   },
-
-  dialogInputWrapper: {
-    borderColor: 'lightgray',
-    borderWidth: 1,
-    paddingHorizontal: 8,
-  },
-
 });
-
-export default NDTIssueScreen;

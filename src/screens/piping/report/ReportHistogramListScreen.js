@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 
-import Helper from '../../utils/Helper';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
+import Helper from '../../../utils/Helper';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
 
-import { GetHistogramListAPI } from '../../apis/report/ReportAPI';
+import { GetHistogramListAPI } from '../../../apis/report/ReportAPI';
 
 
 

@@ -4,12 +4,12 @@ import { useIsFocused } from '@react-navigation/native';
 import NetInfo from '@react-native-community/netinfo';
 import MCIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import Helper from '../../utils/Helper';
-import Constant from '../../utils/Constant';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
+import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
 
-import { GetNDTNumbersAPI } from '../../apis/ndt/NDTAPI';
+import { GetNDTNumbersAPI } from '../../../apis/ndt/NDTAPI';
 
 const NDTManagerScreen = ({ route, navigation }) => {
 

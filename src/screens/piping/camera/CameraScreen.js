@@ -4,80 +4,76 @@ import { RNCamera } from 'react-native-camera';
 import NetInfo from '@react-native-community/netinfo';
 import { useIsFocused } from '@react-navigation/native';
 
-import Helper from '../../utils/Helper';
-import { GetDrawingLinkAPI } from '../../apis/app/AppAPI';
+import Helper from '../../../utils/Helper';
+import GetFacilityCodeByDrawingAPI from '../../../apis/drawing/GetTopFacilityCodeAPI';
 
-const AllStatusCameraScreen = ({ route, navigation }) => {
+const CameraScreen = ({ route, navigation }) => {
 
   const [isScanned, setIsScanned] = useState(false);
   const isFocused = useIsFocused();
-  const { projectCode } = route.params;
+  const { projectCode, teamLeader, code, source } = route.params;
 
   const _onQRCodeRead = scanResult => {
     if (scanResult.data !== null && !isScanned && isFocused) {
-      goAllStatusScreen(scanResult.data);
+      var data = scanResult.data.split('_');
+      getFacilityCode(data[0], data[1], data[2]);
     }
   };
 
-  const goAllStatusScreen = async scanResult => {
-    var data = scanResult.split('_');
-    if (data != null && data[0] && data[1] && data[2]) {
-      let token = await Helper.getData('TOKEN');
-      NetInfo.fetch().then(state => {
-        if (!state.isConnected) {
-          showComfirm('ERROR', 'Network not available!');
-        } else {
-          GetDrawingLinkAPI(projectCode, data[0], data[1], data[2], token)
-            .then(res => {
-              if (res.success) {
-                navigation.navigate('DrawingAllStatus', {
+  const getFacilityCode = async (drawingNo, sheet, rev) => {
+    setIsScanned(true);
+    let token = await Helper.getData('TOKEN');
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        showComfirm('ERROR', 'Network not available!');
+      } else {
+        GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+          .then(res => {
+            if (res.success && res.data != null) {
+              if (source == 'Drawing') {
+                navigation.navigate('DrawingDetail', {
                   projectCode: projectCode,
-                  drawingNo: data[0],
-                  sheet: data[1],
-                  rev: data[2],
-                  link: res.data
+                  facilityCode: res.data,
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
+                  code: code,
+                  teamLeader: teamLeader,
+                  title: code + ' Detail',
+                  link: res.link,
                 });
                 setIsScanned(false);
               } else {
-                showComfirm('ERROR', 'Please check that you are using the company network!');
-                setIsScanned(true);
+                let codeTitle = code == 'Visual' ? 'Weld' : code;
+                let title = 'QC ' + codeTitle + ' Detail';
+                navigation.navigate('QCDrawingDetail', {
+                  projectCode: projectCode,
+                  facilityCode: res.data,
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
+                  code: code,
+                  teamLeader: teamLeader,
+                  title: title,
+                  link: res.link,
+                });
+                setIsScanned(false);
               }
-            }).catch(() => {
+            } else if (res.data == null) {
+              let message = 'Not find FacilityCode with: \n'
+                + 'ProjectCode: ' + projectCode + '\n'
+                + 'DrawingNo: ' + drawingNo + '\n'
+                + 'Sheet: ' + sheet + '\n'
+                + 'Rev: ' + rev;
+              showComfirm('ERROR', message);
+            } else {
               showComfirm('ERROR', 'Please check that you are using the company network!');
-              setIsScanned(true);
-            });
-        }
-      });
-    } else {
-      Alert.alert(
-        'ERROR',
-        'Have error when scan Drawing!',
-        [
-          {
-            text: 'Back',
-            onPress: () => {
-              navigation.goBack();
-            },
-            style: 'cancel'
-          },
-          {
-            text: 'Search',
-            onPress: () => {
-              navigation.navigate(
-                'DrawingSearch',
-                {
-                  projectCode: projectCode
-                }
-              );
             }
-          },
-          {
-            text: 'Rescan',
-          }
-        ],
-        { cancelable: false },
-      );
-    }
+          }).catch(() => {
+            showComfirm('ERROR', 'Please check that you are using the company network!');
+          });
+      }
+    });
   };
 
   const showComfirm = (type, message) => {
@@ -185,4 +181,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AllStatusCameraScreen;
+export default CameraScreen;

@@ -11,18 +11,18 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
 
-import Helper from '../../utils/Helper';
-import Formater from '../../utils/Formater';
-import Constant from '../../utils/Constant';
-import CoreStyle from '../../utils/CoreStyle';
-import GetDrawingDetailAPI from '../../apis/drawing/GetDrawingDetailAPI';
-import UpdateDrawingDetailAPI from '../../apis/drawing/UpdateDrawingDetailAPI';
-import { GetLocationListAPI, GetWPSListAPI, GetHeatNoListPopupAPI, GetFittingTeamAPI } from '../../apis/drawing/ConstructionDrawingAPI';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
-import HelpModal from '../../components/drawing/HelpModal';
-import PickupDataModal from '../../components/drawing/PickupDataModal';
-import PickupDataModalHeader from '../../components/drawing/PickupDataModalHeader';
+import Helper from '../../../utils/Helper';
+import Formater from '../../../utils/Formater';
+import Constant from '../../../utils/Constant';
+import CoreStyle from '../../../utils/CoreStyle';
+import GetDrawingDetailAPI from '../../../apis/drawing/GetDrawingDetailAPI';
+import UpdateDrawingDetailAPI from '../../../apis/drawing/UpdateDrawingDetailAPI';
+import { GetLocationListAPI, GetWPSListAPI, GetHeatNoListPopupAPI, GetFittingTeamAPI } from '../../../apis/drawing/ConstructionDrawingAPI';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
+import HelpModal from '../../../components/drawing/HelpModal';
+import PickupDataModal from '../../../components/drawing/PickupDataModal';
+import PickupDataModalHeader from '../../../components/drawing/PickupDataModalHeader';
 
 const DrawingDetailScreen = ({ route, navigation }) => {
 

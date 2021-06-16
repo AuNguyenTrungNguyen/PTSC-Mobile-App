@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
-import Helper from '../../utils/Helper';
+import Helper from '../../../utils/Helper';
 
 const ReportManagerScreen = ({ route, navigation }) => {
 

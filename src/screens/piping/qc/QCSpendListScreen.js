@@ -7,14 +7,14 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
 import Dialog from 'react-native-dialog';
 
-import Helper from '../../utils/Helper';
-import Constant from '../../utils/Constant';
-import Formater from '../../utils/Formater';
-import GetSpendListAPI from '../../apis/qc/GetSpendListAPI';
-import UpdateSpendListAPI from '../../apis/qc/UpdateSpendListAPI';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
-import TotalLocationModal from '../../components/drawing/TotalLocationModal';
+import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
+import Formater from '../../../utils/Formater';
+import GetSpendListAPI from '../../../apis/qc/GetSpendListAPI';
+import UpdateSpendListAPI from '../../../apis/qc/UpdateSpendListAPI';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
+import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
 
 const QCSpendListScreen = ({ route, navigation }) => {
 

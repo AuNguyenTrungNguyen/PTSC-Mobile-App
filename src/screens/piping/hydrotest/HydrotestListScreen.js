@@ -10,12 +10,12 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Dialog from 'react-native-dialog';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetHydrotestPlanListAPI, UpdateHydrotestPlanListAPI } from '../../apis/hydrotest/HydroTestAPI';
+import { GetHydrotestPlanListAPI, UpdateHydrotestPlanListAPI } from '../../../apis/hydrotest/HydroTestAPI';
 
-import Helper from '../../utils/Helper';
-import Formater from '../../utils/Formater';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
+import Helper from '../../../utils/Helper';
+import Formater from '../../../utils/Formater';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const HydrotestListScreen = ({ route, navigation }) => {
 

@@ -5,14 +5,14 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import Helper from '../../utils/Helper';
-import Constant from '../../utils/Constant';
-import Formater from '../../utils/Formater';
-import MessageAlert from '../../components/MessageAlert';
-import LoadingRefresh from '../../components/LoadingRefresh';
-import SelectPopup from '../../components/SelectPopup';
+import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
+import Formater from '../../../utils/Formater';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
+import SelectPopup from '../../../components/SelectPopup';
 
-import { GetNDTDetailListAPI, UpdateNDTDetailListAPI } from '../../apis/ndt/NDTAPI';
+import { GetNDTDetailListAPI, UpdateNDTDetailListAPI } from '../../../apis/ndt/NDTAPI';
 
 const NDTDetailScreen = ({ route, navigation }) => {
 
