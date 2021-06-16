@@ -172,16 +172,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setUpdateSpendList(array);
   };
 
-  const _onPressOpenDrawing = link => {
-    navigation.navigate(
-      'PDFView',
-      {
-        link: link,
-        title: 'View Drawing Spend List',
-      }
-    );
-  };
-
   const _onPressManagePicture = async (facilityCode, drawingNo) => {
     navigation.navigate(
       'DrawingImage',
@@ -330,7 +320,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
             {
               item.WebLink
                 ?
-                <TouchableOpacity onPress={() => { _onPressOpenDrawing(item.WebLink) }}>
+                <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'View Drawing Spend List')}>
                   <Text style={styles.textDataOpen}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
                 </TouchableOpacity>
                 :

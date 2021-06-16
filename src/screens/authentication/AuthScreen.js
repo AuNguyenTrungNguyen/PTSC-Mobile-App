@@ -61,7 +61,10 @@ export default ({ navigation }) => {
       let projectCode = await Helper.getData('PROJECT_CODE');
       let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
       SplashScreen.hide();
-      navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
+      navigation.replace('PIPING', {
+        screen: 'Home',
+        params: { projectCode: projectCode, disciplineCode: disciplineCode }
+      });
     } else {
       Helper.clearData();
       SplashScreen.hide();

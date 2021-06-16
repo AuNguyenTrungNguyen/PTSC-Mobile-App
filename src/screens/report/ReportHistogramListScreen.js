@@ -55,16 +55,6 @@ const ReportHistogramListScreen = ({ route, navigation }) => {
       });
   };
 
-  const _onPressHistogramView = link => {
-    navigation.navigate(
-      'PDFView',
-      {
-        link: link,
-        title: 'View Histogram Chart',
-      }
-    );
-  };
-
 
 
 
@@ -78,7 +68,7 @@ const ReportHistogramListScreen = ({ route, navigation }) => {
 
   const renderItem = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.box} onPress={() => { _onPressHistogramView(item.WebLinkPdf) }}>
+      <TouchableOpacity style={styles.box} onPress={() => Helper.openDrawingPDF(navigation, item.WebLinkPdf, 'View Histogram Chart')}>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text style={styles.textTitle}>FacilityCode: </Text>

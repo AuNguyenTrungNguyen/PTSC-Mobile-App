@@ -148,7 +148,10 @@ export default ({ navigation }) => {
               Helper.storeData('PROJECT_CODE', projectCode);
               Helper.storeData('DISCIPLINE_CODE', disciplineCode);
               Helper.storeData('DATACODE', 'PTSCMC');
-              navigation.replace('Home', { projectCode: projectCode, disciplineCode: disciplineCode });
+              navigation.replace('PIPING', {
+                screen: 'Home',
+                params: { projectCode: projectCode, disciplineCode: disciplineCode }
+              });
             }
           })
           .catch(() => {
