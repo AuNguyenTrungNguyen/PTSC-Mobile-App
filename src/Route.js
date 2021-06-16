@@ -23,6 +23,8 @@ import DrawingAddHeatNoScreen from './screens/drawing/DrawingAddHeatNoScreen';
 import SpoolMatrixScreen from './screens/spool/SpoolMatrixScreen';
 import SpoolCameraScreen from './screens/spool/SpoolCameraScreen';
 
+import HydrotestListScreen from './screens/hydrotest/HydrotestListScreen';
+
 import QCDrawingListScreen from './screens/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/qc/QCDrawingDetailScreen';
 import QCSpendListScreen from './screens/qc/QCSpendListScreen';
@@ -87,55 +89,55 @@ const ReportStackScreens = () => {
   return (
     <ReportStack.Navigator screenOptions={optionNavigation}>
       <ReportStack.Screen
-          name='ReportManager'
-          component={ReportManagerScreen}
-          options={
-            {
-              title: 'Reports',
-              headerBackTitle: 'Back',
-            }
+        name='ReportManager'
+        component={ReportManagerScreen}
+        options={
+          {
+            title: 'Reports',
+            headerBackTitle: 'Back',
           }
-        />
+        }
+      />
       <ReportStack.Screen
-          name='ReportConstruction'
-          component={ReportConstructionListScreen}
-          options={
-            {
-              title: 'Construction List',
-              headerBackTitle: 'Back',
-            }
+        name='ReportConstruction'
+        component={ReportConstructionListScreen}
+        options={
+          {
+            title: 'Construction List',
+            headerBackTitle: 'Back',
           }
-        />
-        <ReportStack.Screen
-          name='ReportDiscipline'
-          component={ReportDisciplineListScreen}
-          options={
-            {
-              title: 'Discipline List',
-              headerBackTitle: 'Back',
-            }
+        }
+      />
+      <ReportStack.Screen
+        name='ReportDiscipline'
+        component={ReportDisciplineListScreen}
+        options={
+          {
+            title: 'Discipline List',
+            headerBackTitle: 'Back',
           }
-        />
-        <ReportStack.Screen
-          name='ReportHistogram'
-          component={ReportHistogramListScreen}
-          options={
-            {
-              title: 'Histogram List',
-              headerBackTitle: 'Back',
-            }
+        }
+      />
+      <ReportStack.Screen
+        name='ReportHistogram'
+        component={ReportHistogramListScreen}
+        options={
+          {
+            title: 'Histogram List',
+            headerBackTitle: 'Back',
           }
-        />
-        <ReportStack.Screen
-          name='ReportDailyManpower'
-          component={ReportDailyManpowerListScreen}
-          options={
-            {
-              title: 'Daily Manpower List',
-              headerBackTitle: 'Back',
-            }
+        }
+      />
+      <ReportStack.Screen
+        name='ReportDailyManpower'
+        component={ReportDailyManpowerListScreen}
+        options={
+          {
+            title: 'Daily Manpower List',
+            headerBackTitle: 'Back',
           }
-        />
+        }
+      />
     </ReportStack.Navigator>
   );
 }
@@ -273,6 +275,17 @@ export default () => {
           options={
             {
               title: 'Spool Matrix',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='HydrotestList'
+          component={HydrotestListScreen}
+          options={
+            {
+              title: 'Hydrotest List',
               headerBackTitle: 'Back',
             }
           }

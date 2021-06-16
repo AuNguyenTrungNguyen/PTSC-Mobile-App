@@ -1,31 +1,24 @@
 import React from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-simple-toast';
-
-import Helper from '../utils/Helper';
 
 const ConstructionUpdateManageScreen = ({ route, navigation }) => {
 
   const { projectCode } = route.params;
 
   const _onPressFabricationControl = () => {
-    if (projectCode == null) {
-      Toast.show('Please select a project!', Toast.SHORT);
-      return;
-    }
     navigation.navigate('DrawingList', { projectCode: projectCode });
   };
 
   const _onPressSpoolMatrix = () => {
-    if (projectCode == null) {
-      Toast.show('Please select a project!', Toast.SHORT);
-      return;
-    }
     navigation.navigate('SpoolMatrix', { projectCode: projectCode });
   };
 
-  const _onPressPipSupport = () => {
+  // const _onPressPipSupport = () => {
     
+  // };
+
+  const _onPressHydrotestUpdate = () => {
+    navigation.navigate('HydrotestList', { projectCode: projectCode });
   };
 
   return (
@@ -44,8 +37,11 @@ const ConstructionUpdateManageScreen = ({ route, navigation }) => {
           <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressSpoolMatrix}>
             <Text style={styles.buttonTitle}>Spool Matrix</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressPipSupport}>
+          {/* <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressPipSupport}>
             <Text style={styles.buttonTitle}>PIP Support</Text>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressHydrotestUpdate}>
+            <Text style={styles.buttonTitle}>Hydrotest Update</Text>
           </TouchableOpacity>
         </View>
       </View>

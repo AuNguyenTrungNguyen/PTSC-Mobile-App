@@ -42,4 +42,15 @@ export default class Helper {
     );
   };
 
+  static handleListUpdate = list => {
+    let result = [];
+    list.map(item => {
+      let keys = Object.keys(item);
+      let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id'));
+      result.push({ 'ColumnChange': column, 'Model': item });
+      return item;
+    });
+    return result;
+  };
+
 };
