@@ -7,6 +7,7 @@ import DeviceInfo from 'react-native-device-info';
 import RNExitApp from 'react-native-exit-app';
 import NetInfo from '@react-native-community/netinfo';
 
+import Constant from '../../utils/Constant';
 import Helper from '../../utils/Helper';
 import GetVersionAppAPI from '../../apis/app/GetVersionAppAPI';
 
@@ -61,7 +62,13 @@ export default ({ navigation }) => {
       let projectCode = await Helper.getData('PROJECT_CODE');
       let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
       SplashScreen.hide();
-      navigation.replace('PIPING', {
+      let key;
+      if (disciplineCode.toUpperCase() === Constant.STRUCTURAL){
+        key = Constant.STRUCTURAL
+      } else {
+        key = Constant.PIPING
+      }
+      navigation.replace(key, {
         screen: 'Home',
         params: { projectCode: projectCode, disciplineCode: disciplineCode }
       });

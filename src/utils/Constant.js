@@ -1,4 +1,11 @@
 export default class Constant {
+
+  static PIPING = 'PIPING';
+  static STRUCTURAL = 'STRUCTURAL';
+
+  static CODE_FITUP = 'FitUp';
+  static CODE_WELD = 'Weld';
+
   static EMPTY_VALUE_STRING = 'EMPTY_VALUE';
   static COLUMN_CHANGE = 'ColumnChange';
 

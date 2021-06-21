@@ -3,6 +3,8 @@ import { Appearance } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import Constant from './utils/Constant';
+
 import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
 import PDFViewScreen from './screens/pdf/PDFViewScreen';
@@ -33,8 +35,15 @@ import ReportDisciplineListScreen from './screens/piping/report/ReportDiscipline
 import ReportHistogramListScreen from './screens/piping/report/ReportHistogramListScreen';
 import ReportDailyManpowerListScreen from './screens/piping/report/ReportDailyManpowerListScreen';
 
+import StructuralHomeScreen from './screens/structural/HomeScreen';
+import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
+import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
+import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
+import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
+
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
+const StructuralStack = createStackNavigator();
 const NDTStack = createStackNavigator();
 const ReportStack = createStackNavigator();
 
@@ -231,6 +240,60 @@ const PipingStackScreens = () => {
   );
 };
 
+const StructuralStackScreens = () => {
+  return (
+    <StructuralStack.Navigator screenOptions={optionNavigation}>
+      <StructuralStack.Screen
+        name='Home'
+        component={StructuralHomeScreen}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+      <StructuralStack.Screen
+        name='Camera'
+        component={StructuralCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralStack.Screen
+        name='ConstructionList'
+        component={StructuralConstructionListScreen}
+        options={
+          {
+            title: 'Construction List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralStack.Screen
+        name='ConstructionDetail'
+        component={StructuralConstructionDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralStack.Screen
+        name='ConstructionAddWelder'
+        component={StructuralAddWelderScreen}
+        options={
+          {
+            title: 'Select Welders',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </StructuralStack.Navigator>
+  );
+};
+
 const NDTStackScreens = () => {
   return (
     <NDTStack.Navigator screenOptions={optionNavigation}>
@@ -340,8 +403,14 @@ export default () => {
         />
 
         <Stack.Screen
-          name='PIPING'
+          name={Constant.PIPING}
           component={PipingStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.STRUCTURAL}
+          component={StructuralStackScreens}
           options={{ headerShown: false }}
         />
 

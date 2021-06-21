@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator } from 'react-native';
 
 const SelectPopup = props => {
-
   return (
     <Modal
       animationType='fade'
@@ -18,10 +17,11 @@ const SelectPopup = props => {
                     ?
                     props.data.length
                       ?
-                      props.data.map((item) => {
+                      props.data.map(item => {
+                        let code = item.code ? item.code : item;
                         return (
-                          <TouchableOpacity style={modals.row} onPress={() => props.onChangeItem(item)}>
-                            <Text style={modals.cell}>{item}</Text>
+                          <TouchableOpacity style={modals.row} key={code} onPress={() => props.onChangeItem(code)}>
+                            <Text style={modals.cell}>{code} </Text>
                           </TouchableOpacity>
                         );
                       })
@@ -80,7 +80,7 @@ const modals = StyleSheet.create({
   list: {
     padding: 16,
     width: windowWidth * 0.85,
-    height: undefined,
+    maxHeight: windowHeight * 0.85 - 36 - 16,
   },
   row: {
     flexDirection: 'row',

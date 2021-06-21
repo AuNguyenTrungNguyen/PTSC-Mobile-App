@@ -48,9 +48,9 @@ const HelpModalDetail = props => {
               {
                 props.code == 'FitUp'
                   ?
-                  HELP_DATA_FITIP.map((item) => {
+                  HELP_DATA_FITIP.map((item, index) => {
                     return (
-                      <View style={modals.row}>
+                      <View style={modals.row} key={index}>
                         <Text style={modals.cellTitle}>{item.percent}</Text>
                         <View style={modals.cellLine} />
                         <Text style={modals.cellData}>{item.description}</Text>
@@ -58,9 +58,9 @@ const HelpModalDetail = props => {
                     );
                   })
                   :
-                  HELP_DATA_WELD.map((item) => {
+                  HELP_DATA_WELD.map((item, index) => {
                     return (
-                      <View style={modals.row}>
+                      <View style={modals.row} key={index}>
                         <Text style={modals.cellTitle}>{item.percent}</Text>
                         <View style={modals.cellLine} />
                         <Text style={modals.cellData}>{item.description}</Text>

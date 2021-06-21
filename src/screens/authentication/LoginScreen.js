@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
+import Constant from '../../utils/Constant';
 import Helper from '../../utils/Helper';
 import MessageAlert from '../../components/MessageAlert';
 import LoginAPI from '../../apis/LoginAPI';
@@ -148,7 +149,13 @@ export default ({ navigation }) => {
               Helper.storeData('PROJECT_CODE', projectCode);
               Helper.storeData('DISCIPLINE_CODE', disciplineCode);
               Helper.storeData('DATACODE', 'PTSCMC');
-              navigation.replace('PIPING', {
+              let key;
+              if (disciplineCode.toUpperCase() === Constant.STRUCTURAL) {
+                key = Constant.STRUCTURAL
+              } else {
+                key = Constant.PIPING
+              }
+              navigation.replace(key, {
                 screen: 'Home',
                 params: { projectCode: projectCode, disciplineCode: disciplineCode }
               });
