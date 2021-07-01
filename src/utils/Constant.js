@@ -5,6 +5,12 @@ export default class Constant {
 
   static CODE_FITUP = 'FitUp';
   static CODE_WELD = 'Weld';
+  static CODE_CUT = 'Cut';
+  static CODE_PAINT = 'Paint';
+
+  static PIECE_MARK_ALL = 'ALL';
+  static PIECE_MARK_CHECKED = 'CHECKED';
+  static PIECE_MARK_UNCHECKED = 'UNCHECKED';
 
   static EMPTY_VALUE_STRING = 'EMPTY_VALUE';
   static COLUMN_CHANGE = 'ColumnChange';

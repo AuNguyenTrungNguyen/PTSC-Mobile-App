@@ -40,6 +40,8 @@ import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
 import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
 import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
+import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
+import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
@@ -289,6 +291,23 @@ const StructuralStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+
+      <StructuralStack.Screen
+        name='PieceMarkList'
+        component={StructuralPieceMarkListScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralStack.Screen
+        name='PieceMarkDetail'
+        component={StructuralPieceMarkDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
     </StructuralStack.Navigator>
   );
