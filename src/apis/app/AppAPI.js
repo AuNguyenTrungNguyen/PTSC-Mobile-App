@@ -79,3 +79,13 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
         'Content-Type': 'application/json',
       }
     }).then(res => res.json());
+
+export const GetNotifyNumberAPI = (projectCode, token) =>
+  fetch(
+    Port_Server + '/api/App/GetNotifyNumber?projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());

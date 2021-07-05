@@ -7,14 +7,14 @@ import NetInfo from '@react-native-community/netinfo';
 import Header from '../../components/Header';
 import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
-import GetSpendNumbersAPI from '../../apis/qc/GetSpendNumbersAPI';
+import { GetNotifyNumberAPI } from '../../apis/app/AppAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
 const HomeScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Weld: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCWeld: 0, LamCheckTodo: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -34,7 +34,7 @@ const HomeScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(getSpendNumbers);
+      callAPI(getNotifyNumber);
     }, [isFocused]
   );
 
@@ -53,9 +53,9 @@ const HomeScreen = ({ route, navigation }) => {
     }
   };
 
-  const getSpendNumbers = async () => {
+  const getNotifyNumber = async () => {
     let token = await Helper.getData('TOKEN');
-    GetSpendNumbersAPI(projectCode, token)
+    GetNotifyNumberAPI(projectCode, token)
       .then(res => {
         if (res.success) {
           setSpendNumbers(res.data);
@@ -87,75 +87,6 @@ const HomeScreen = ({ route, navigation }) => {
   const logout = () => {
     Helper.clearData();
     navigation.replace('Login');
-  };
-
-  const _onPressConstructionUpdate = () => {
-    // navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
-  };
-
-  const _onPressQCUpdate = () => {
-    // navigation.navigate('QCDrawingList', { projectCode: projectCode });
-  };
-
-  const _onPressNDTUpdate = () => {
-    // navigation.navigate('NDT', {
-    //   screen: 'NDTManager',
-    //   params: { projectCode: projectCode },
-    // });
-  };
-
-  const _onPressViewReports = () => {
-    // navigation.navigate('Report', {
-    //   screen: 'ReportManager',
-    //   params: { projectCode: projectCode },
-    // });
-  };
-
-  const _onPressMamageFitUp = async () => {
-    Alert.alert(
-      '',
-      'Scan: Scan QRCode Construction FitUp\n\nSearch: Search Construction FitUp',
-      [
-        { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_FITUP) } },
-        { text: 'Search', onPress: _onPressSearchConstruction },
-        { text: 'Cancel', style: 'cancel' }
-      ],
-    );
-  };
-
-  const _onPressMamageWeld = async () => {
-    Alert.alert(
-      '',
-      'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld',
-      [
-        { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_WELD) } },
-        { text: 'Search', onPress: _onPressSearchConstruction },
-        { text: 'Cancel', style: 'cancel' }
-      ],
-    );
-  };
-
-  const _onPressQRCodeConstruction = async code => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'Camera',
-      {
-        projectCode: projectCode,
-        userLogin: userLogin,
-        code: code,
-      }
-    );
-  };
-
-  const _onPressSearchConstruction = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'ConstructionList',
-      {
-        projectCode: projectCode,
-        userLogin: userLogin,
-      }
-    );
   };
 
   // PIECE MARK
@@ -206,8 +137,118 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  // LAM CHECK SPENDING
+  const _onPressMamageLamCheckSpending = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Lam Check Spending\n\nSearch: Search Lam Check Spending',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeLamCheckSpending },
+        { text: 'Search', onPress: _onPressSearchLamCheckSpending },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeLamCheckSpending = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+      }
+    );
+  };
+  const _onPressSearchLamCheckSpending = async () => {
+    navigation.navigate(
+      'LamCheckSpendingList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
 
+  // LAM CHECK TODO
+  const _onPressMamageLamCheckTodo = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Lam Check Todo\n\nSearch: Search Lam Check Todo',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeLamCheckTodo },
+        { text: 'Search', onPress: _onPressSearchLamCheckTodo },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeLamCheckTodo = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+      }
+    );
+  };
+  const _onPressSearchLamCheckTodo = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'LamCheckTodoList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
 
+  //FIT && WELD
+  const _onPressMamageFitUp = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Construction FitUp\n\nSearch: Search Construction FitUp',
+      [
+        { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_FITUP) } },
+        { text: 'Search', onPress: _onPressSearchConstruction },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressMamageWeld = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld',
+      [
+        { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_WELD) } },
+        { text: 'Search', onPress: _onPressSearchConstruction },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeConstruction = async code => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+      }
+    );
+  };
+  const _onPressSearchConstruction = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'ConstructionList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+
+  //QC
   const _onPressQRCodeFitUpQC = async () => {
     // let teamLeader = await Helper.getData('USERNAME');
     // navigation.navigate(
@@ -221,62 +262,62 @@ const HomeScreen = ({ route, navigation }) => {
     // );
   };
 
-  const _onPressQRCodeVisualQC = async () => {
-    // let teamLeader = await Helper.getData('USERNAME');
-    // navigation.navigate(
-    //   'Camera',
-    //   {
-    //     code: 'Visual',
-    //     source: 'QCDrawing',
-    //     projectCode: projectCode,
-    //     teamLeader: teamLeader,
-    //   }
-    // );
-  };
+  // const _onPressQRCodeVisualQC = async () => {
+  //   // let teamLeader = await Helper.getData('USERNAME');
+  //   // navigation.navigate(
+  //   //   'Camera',
+  //   //   {
+  //   //     code: 'Visual',
+  //   //     source: 'QCDrawing',
+  //   //     projectCode: projectCode,
+  //   //     teamLeader: teamLeader,
+  //   //   }
+  //   // );
+  // };
 
-  const _onPressQCSpendFitUpList = async () => {
-    // let userLogin = await Helper.getData('USERNAME');
-    // navigation.navigate(
-    //   'QCSpendList',
-    //   {
-    //     code: 'FitUp',
-    //     projectCode: projectCode,
-    //     userLogin: userLogin,
-    //     title: 'QC Spend FitUp'
-    //   }
-    // );
-  };
+  // const _onPressQCSpendFitUpList = async () => {
+  //   // let userLogin = await Helper.getData('USERNAME');
+  //   // navigation.navigate(
+  //   //   'QCSpendList',
+  //   //   {
+  //   //     code: 'FitUp',
+  //   //     projectCode: projectCode,
+  //   //     userLogin: userLogin,
+  //   //     title: 'QC Spend FitUp'
+  //   //   }
+  //   // );
+  // };
 
-  const _onPressQCSpendVisualList = async () => {
-    // let userLogin = await Helper.getData('USERNAME');
-    // navigation.navigate(
-    //   'QCSpendList',
-    //   {
-    //     code: 'Visual',
-    //     projectCode: projectCode,
-    //     userLogin: userLogin,
-    //     title: 'QC Spend Weld'
-    //   }
-    // );
-  };
+  // const _onPressQCSpendVisualList = async () => {
+  //   // let userLogin = await Helper.getData('USERNAME');
+  //   // navigation.navigate(
+  //   //   'QCSpendList',
+  //   //   {
+  //   //     code: 'Visual',
+  //   //     projectCode: projectCode,
+  //   //     userLogin: userLogin,
+  //   //     title: 'QC Spend Weld'
+  //   //   }
+  //   // );
+  // };
 
-  const _onPressQRCodeAllStatus = () => {
-    // navigation.navigate(
-    //   'AllStatusCamera',
-    //   {
-    //     projectCode: projectCode,
-    //   }
-    // );
-  };
+  // const _onPressQRCodeAllStatus = () => {
+  //   // navigation.navigate(
+  //   //   'AllStatusCamera',
+  //   //   {
+  //   //     projectCode: projectCode,
+  //   //   }
+  //   // );
+  // };
 
-  const _onPressSearchAllStatus = () => {
-    // navigation.navigate(
-    //   'DrawingSearch',
-    //   {
-    //     projectCode: projectCode,
-    //   }
-    // );
-  };
+  // const _onPressSearchAllStatus = () => {
+  //   // navigation.navigate(
+  //   //   'DrawingSearch',
+  //   //   {
+  //   //     projectCode: projectCode,
+  //   //   }
+  //   // );
+  // };
 
   const _onPressMamageQCFitUp = () => {
     // Alert.alert(
@@ -289,7 +330,6 @@ const HomeScreen = ({ route, navigation }) => {
     //   ],
     // );
   };
-
   const _onPressMamageQCWeld = () => {
     // Alert.alert(
     //   '',
@@ -302,22 +342,50 @@ const HomeScreen = ({ route, navigation }) => {
     // );
   };
 
+  // ACTION
+  const _onPressViewReports = () => {
+    // navigation.navigate('Report', {
+    //   screen: 'ReportManager',
+    //   params: { projectCode: projectCode },
+    // });
+  };
+  const _onPressConstructionUpdate = () => {
+    // navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
+  };
+  const _onPressQCUpdate = () => {
+    // navigation.navigate('QCDrawingList', { projectCode: projectCode });
+  };
+  const _onPressNDTUpdate = () => {
+    // navigation.navigate('NDT', {
+    //   screen: 'NDTManager',
+    //   params: { projectCode: projectCode },
+    // });
+  };
+
+
+
+
+
   const RenderItemBox = props => {
-    console.log(props);
     return (
       <View style={styles.cell}>
-        <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
-          <Text style={styles.itemTitle}>{props.title}</Text>
-          <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-        </TouchableOpacity>
         {
-          props.number
-            ?
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
-            </View>
-            :
-            null
+          !props.disable &&
+          <>
+            <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
+              <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
+              <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+            </TouchableOpacity>
+            {
+              props.number
+                ?
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
+                </View>
+                :
+                null
+            }
+          </>
         }
       </View>
     );
@@ -327,7 +395,7 @@ const HomeScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendNumbers)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumber)} />
         :
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
@@ -337,16 +405,24 @@ const HomeScreen = ({ route, navigation }) => {
               <RenderItemBox title='Piece Mark Paint' onPress={_onPressMamagePieceMarkPaint} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title='Lam Check Spending' onPress={_onPressMamageLamCheckSpending} />
               <RenderItemBox title='Cons FitUp' onPress={_onPressMamageFitUp} />
+            </View>
+            <View style={styles.row}>
               <RenderItemBox title='Cons Weld' onPress={_onPressMamageWeld} />
+              <RenderItemBox title='Manpower' />
             </View>
-            <View style={styles.row}>
-              <RenderItemBox title='QC Scan FitUp' onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
-              <RenderItemBox title='QC Scan Weld' onPress={_onPressMamageQCWeld} number={spendNumbers.Weld} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title='Scan All Status<' onPress={_onPressQRCodeAllStatus} />
+            {/* <View style={styles.row}>
+              <RenderItemBox title='Scan All Status' onPress={_onPressQRCodeAllStatus} />
               <RenderItemBox title='Search All Status' onPress={_onPressSearchAllStatus} />
+            </View> */}
+            <View style={styles.row}>
+              <RenderItemBox title='Lam Check Todo' onPress={_onPressMamageLamCheckTodo} number={spendNumbers.LamcheckTodo} />
+              <RenderItemBox title='QC Scan FitUp' onPress={_onPressMamageQCFitUp} number={spendNumbers.QCFitUp} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title='QC Scan Weld' onPress={_onPressMamageQCWeld} number={spendNumbers.QCWeld} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
           <View style={styles.action}>
@@ -408,7 +484,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-
   table: {
     flexGrow: 1,
   },
@@ -420,7 +495,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 8,
+    marginBottom: 20,
   },
   itemContainer: {
     width: '90%',
@@ -435,10 +510,11 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     fontSize: Dimensions.get('window').height > 700 ? 16 : 14,
     marginVertical: Dimensions.get('window').height > 700 ? 16 : 12,
+    minHeight: 40,
   },
   itemIcon: {
     color: BASE_COLOR,
-    marginVertical: Dimensions.get('window').height > 700 ? 16 : 12,
+    marginBottom: Dimensions.get('window').height > 700 ? 8 : 4,
     height: Dimensions.get('window').height > 700 ? 48 : 36,
     width: Dimensions.get('window').height > 700 ? 48 : 36,
   },
@@ -449,7 +525,7 @@ const styles = StyleSheet.create({
     borderRadius: 36 / 2,
     backgroundColor: '#FF8C00',
     position: 'absolute',
-    top: 0,
+    top: -36 / 2,
     right: 0,
     justifyContent: 'center',
     alignItems: 'center',

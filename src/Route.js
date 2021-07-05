@@ -42,6 +42,8 @@ import StructuralConstructionDetailScreen from './screens/structural/constructio
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
 import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
+import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
+import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
@@ -308,6 +310,27 @@ const StructuralStackScreens = () => {
           title: route.params.title,
           headerBackTitle: 'Back',
         })}
+      />
+
+      <StructuralStack.Screen
+        name='LamCheckSpendingList'
+        component={StructuralLamCheckSpendingListScreen}
+        options={
+          {
+            title: 'Lam Check Spending',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralStack.Screen
+        name='LamCheckTodoList'
+        component={StructuralLamCheckTodoListScreen}
+        options={
+          {
+            title: 'Lam Check Todo',
+            headerBackTitle: 'Back',
+          }
+        }
       />
     </StructuralStack.Navigator>
   );

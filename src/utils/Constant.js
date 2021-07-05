@@ -15,6 +15,9 @@ export default class Constant {
   static EMPTY_VALUE_STRING = 'EMPTY_VALUE';
   static COLUMN_CHANGE = 'ColumnChange';
 
+  static STATUS_ACCEPT = 'ACC';
+  static STATUS_REJECT = 'REJ';
+
   //NDT
   static NDT_MT_CODE = 'MT';
   static NDT_PT_CODE = 'PT';
