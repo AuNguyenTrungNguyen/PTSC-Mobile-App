@@ -5,6 +5,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 import GetCurrentConstructionInfoAPI from '../../../apis/structural/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
@@ -16,8 +17,20 @@ const CameraScreen = ({ route, navigation }) => {
 
   const _onQRCodeRead = scanResult => {
     if (scanResult.data !== null && !isScanned && isFocused) {
-      var data = scanResult.data.split('@');
-      getFacilityCode(data[0], data[1], data[2]);
+      if (scanResult.data.split('@').length != 3) {
+        setIsScanned(true);
+        showComfirm('ERROR', 'The drawing not correct format!');
+        return;
+      }
+      const result = scanResult.data.split('@');
+      let drawingNo = result[0];
+      if ((code === Constant.CODE_CUT && !drawingNo.includes('CP'))
+        || (code === Constant.CODE_PAINT && !drawingNo.includes('PM'))) {
+        setIsScanned(true);
+        showComfirm('ERROR', 'Please scan ' + code + 'drawing type!');
+        return;
+      }
+      getFacilityCode(drawingNo, result[1], result[2]);
     }
   };
 
