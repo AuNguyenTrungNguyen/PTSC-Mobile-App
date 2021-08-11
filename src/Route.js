@@ -9,6 +9,11 @@ import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
 import PDFViewScreen from './screens/pdf/PDFViewScreen';
 
+import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
+import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHoursImpactDetailScreen';
+import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
+import TimeSheetScreen from './screens/general/TimeSheetScreen';
+
 import HomeScreen from './screens/piping/HomeScreen';
 import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
@@ -464,6 +469,49 @@ export default () => {
             headerBackTitle: 'Back',
           })}
         />
+
+        <Stack.Screen
+          name='ManHoursImpact'
+          component={ManHoursImpactListScreen}
+          options={
+            {
+              title: 'Man-hours Impact',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='ManHoursImpactDetail'
+          component={ManHoursImpactDetailScreen}
+          options={
+            {
+              title: 'Create Impact',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+        <Stack.Screen
+          name='ManHoursImpactImage'
+          component={ManHoursImpactImageScreen}
+          options={
+            {
+              title: 'Man-hours Pictures',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
+        <Stack.Screen
+          name='TimeSheet'
+          component={TimeSheetScreen}
+          options={
+            {
+              title: 'Company TimeSheet',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

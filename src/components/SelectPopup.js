@@ -87,12 +87,12 @@ const modals = StyleSheet.create({
     borderColor: BASE_COLOR,
     borderWidth: 1,
     alignItems: 'center',
-    height: 36,
+    minHeight: 36,
+    padding: 4,
   },
   cell: {
     flex: 1,
     color: BASE_COLOR,
-    textAlign: 'center',
     fontSize: 15,
   },
 

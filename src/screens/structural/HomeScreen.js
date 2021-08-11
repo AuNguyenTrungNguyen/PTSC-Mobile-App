@@ -249,18 +249,18 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   //QC
-  const _onPressQRCodeFitUpQC = async () => {
-    // let teamLeader = await Helper.getData('USERNAME');
-    // navigation.navigate(
-    //   'Camera',
-    //   {
-    //     code: 'FitUp',
-    //     source: 'QCDrawing',
-    //     projectCode: projectCode,
-    //     teamLeader: teamLeader,
-    //   }
-    // );
-  };
+  // const _onPressQRCodeFitUpQC = async () => {
+  //   // let teamLeader = await Helper.getData('USERNAME');
+  //   // navigation.navigate(
+  //   //   'Camera',
+  //   //   {
+  //   //     code: 'FitUp',
+  //   //     source: 'QCDrawing',
+  //   //     projectCode: projectCode,
+  //   //     teamLeader: teamLeader,
+  //   //   }
+  //   // );
+  // };
 
   // const _onPressQRCodeVisualQC = async () => {
   //   // let teamLeader = await Helper.getData('USERNAME');
@@ -340,6 +340,30 @@ const HomeScreen = ({ route, navigation }) => {
     //     { text: 'Cancel', style: 'cancel' }
     //   ],
     // );
+  };
+
+  // ManHours Impact
+  const _onPressManHoursImpact = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'ManHoursImpact',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+
+  // TimeSheet
+  const _onPressTimeSheet = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'TimeSheet',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
   };
 
   // ACTION
@@ -422,7 +446,8 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title='QC Scan Weld' onPress={_onPressMamageQCWeld} number={spendNumbers.QCWeld} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title='Man-hours Impact' onPress={_onPressManHoursImpact} />
+              {/* <RenderItemBox title='TimeSheet' onPress={_onPressTimeSheet} /> */}
             </View>
           </ScrollView>
           <View style={styles.action}>

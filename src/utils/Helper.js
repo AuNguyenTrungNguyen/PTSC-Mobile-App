@@ -32,6 +32,11 @@ export default class Helper {
     };
   }
 
+  static checkFormatNumber = numer => {
+    const regexNumber = /^\d+(\.\d+)?$/;
+    return regexNumber.test(numer) && numer !== '';
+  };
+
   static openDrawingPDF = (navigation, link, title) => {
     navigation.navigate(
       'PDFView',

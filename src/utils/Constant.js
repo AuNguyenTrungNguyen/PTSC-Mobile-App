@@ -7,6 +7,7 @@ export default class Constant {
   static CODE_WELD = 'Weld';
   static CODE_CUT = 'Cut';
   static CODE_PAINT = 'Paint';
+  static CODE_MAN_HOURS_IMPACT = 'WOFactor';
 
   static PIECE_MARK_ALL = 'ALL';
   static PIECE_MARK_CHECKED = 'CHECKED';
