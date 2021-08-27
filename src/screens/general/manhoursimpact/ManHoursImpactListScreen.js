@@ -78,7 +78,7 @@ const ManHoursImpactListScreen = ({ route, navigation }) => {
 
   const getManHoursImpactList = async () => {
     let token = await Helper.getData('TOKEN');
-    GetManHoursImpactListAPI('GALLAF', userLogin, token)
+    GetManHoursImpactListAPI(projectCode, userLogin, token)
       .then(res => {
         if (res.success) {
           setManHoursImpactList(res.data);

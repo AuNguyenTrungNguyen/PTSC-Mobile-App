@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, TextInput, Keyboard, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -8,16 +8,14 @@ import NetInfo from '@react-native-community/netinfo';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import CheckBox from '@react-native-community/checkbox';
 import Dialog from 'react-native-dialog';
-import Slider from '@react-native-community/slider';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetTimeSheetWorkOrderListAPI, GetTimeSheetWorkerListAPI } from '../../apis/general/GeneralAPI';
+import { GetTimeSheetWorkOrderListAPI, GetTimeSheetWorkerListAPI, UpdateTimeSheetListlAPI } from '../../apis/general/GeneralAPI';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
-import CoreStyle from '../../utils/CoreStyle';
 import Header from '../../components/Header';
-import SelectPopup from '../../components/SelectPopup';
+import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
@@ -68,8 +66,10 @@ const TimeSheetScreen = ({ route, navigation }) => {
     });
   };
 
-  const callAPI = executedAPI => {
-    setIsLoading(true);
+  const callAPI = (executedAPI, isLoading = true) => {
+    if (isLoading) {
+      setIsLoading(true);
+    }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
@@ -83,9 +83,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onPressSubmitToServer = async () => {
     if (timeSheetUpdateList.length) {
-      console.log(timeSheetUpdateList);
-      // setIsUploading(true);
-      // callAPI(updateTimeSheetList, null);
+      callAPI(updateTimeSheetList, false);
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
@@ -106,34 +104,44 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onPressApplyAll = () => {
     let array = [...workerList];
+    let update = [];
     array.map(i => {
       i.WorkOrder = workOrder;
-      i.MHR = timeDisplay;
-      i.Overtime = timeDisplay;
+      i.Date = dateDisplay;
+      i.MHR = hours;
+      i.Overtime = overtime;
+
+      update.push(i);
       return i;
     });
     setWorkerList(array);
+    setTimeSheetUpdateList(update);
   };
 
   const _onPressApplySelected = () => {
-    array = [...workerList];
+    let array = [...workerList];
+    let update = [];
     array.map(i => {
       if (i.Selected) {
         i.WorkOrder = workOrder;
-        i.MHR = timeDisplay;
-        i.Overtime = timeDisplay;
+        i.Date = dateDisplay;
+        i.MHR = hours;
+        i.Overtime = overtime;
+
+        update.push(i);
       }
       return i;
     });
     setWorkerList(array);
+    setTimeSheetUpdateList(update);
   };
 
   const getAllData = async () => {
     let token = await Helper.getData('TOKEN');
     try {
       let arrayPromise = [
-        GetTimeSheetWorkerListAPI('MC000449', token),
-        GetTimeSheetWorkOrderListAPI('GALLAF', 'MC000449', token),
+        GetTimeSheetWorkerListAPI(userLogin, token),
+        GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token),
       ];
       await Promise.all(arrayPromise)
         .then(([wokerResult, workOrderResult]) => {
@@ -162,6 +170,29 @@ const TimeSheetScreen = ({ route, navigation }) => {
     }
   };
 
+  const updateTimeSheetList = async () => {
+    let token = await Helper.getData('TOKEN');
+    setIsUploading(true);
+    timeSheetUpdateList.map(item => {
+      item.ProjectCode = projectCode;
+      item.Code = 'Mobile_Test';
+      return item;
+    });
+    UpdateTimeSheetListlAPI(userLogin, timeSheetUpdateList, token)
+      .then(res => {
+        if (res.success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          setTimeSheetUpdateList([]);
+        } else {
+          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        }
+        setIsUploading(false);
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        setIsUploading(false);
+      });
+  };
+
   const [isShowWorkOrder, setIsShowWorkOrder] = useState(false);
   const [workOrder, setWorkOrder] = useState();
   const _onChangeWorkOrder = data => {
@@ -178,53 +209,37 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setIsShowPicker(false);
   };
 
-  const [isShowDialog, setIsShowDialog] = useState(false);
-  const [timeDisplay, setTimeDisplay] = useState(8);
-  const _onChangeTime = () => {
-    let value = timeDisplay.replace(/,/g, '.');
-    setTimeDisplay(value);
+  const [isShowHours, setIsShowHours] = useState(false);
+  const [hours, setHours] = useState(8);
+  const [hoursDisplay, setHoursDisplay] = useState('8');
+  const _onChangeHours = () => {
+    let value = hoursDisplay.replace(/,/g, '.');
+    setHoursDisplay(value);
     if (!Helper.checkFormatNumber(value)) {
       Toast.show('Please enter hours must be a number.', Toast.SHORT);
       return;
     }
     value = parseFloat(value);
-    setIsShowDialog(false);
+    setHours(value);
+    setIsShowHours(false);
   };
 
-  const [isChecked, setIsChecked] = useState(false);
-  const _onChangeChecked = value => {
-    array = [...workerList];
-    array.map(i => {
-      i.Selected = value;
-      return i;
-    });
-    setWorkerList(array);
-    setIsChecked(value);
-  };
-
-
-  const [indexUpdate, setIndexUpdate] = useState(-1);
-  const [keyUpdate, setKeyUpdate] = useState('');
-  const _onPressShowWorkOrderPopup = (index, key) => {
-    setIndexUpdate(index);
-    setKeyUpdate(key);
-    setIsShowWorkOrder(true);
-  };
-  const _onChangeData = (data) => {
-    let array = [...workerList];
-    array[indexUpdate][keyUpdate] = data;
-    setWorkerList(array);
-
-    array = [...timeSheetUpdateList];
-    let rowIndex = workerList[indexUpdate].RowIndex;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-    if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, [keyUpdate]: data });
-    } else {
-      array[objIndex][keyUpdate] = data;
+  const [isShowOvertime, setIsShowOvertime] = useState(false);
+  const [overtime, setOvertime] = useState(0);
+  const [overtimeDisplay, setOvertimeDisplay] = useState('0');
+  const _onChangeOvertime = () => {
+    let value = overtimeDisplay.replace(/,/g, '.');
+    setOvertimeDisplay(value);
+    if (!Helper.checkFormatNumber(value)) {
+      Toast.show('Please enter overtime must be a number.', Toast.SHORT);
+      return;
     }
-    setTimeSheetUpdateList(array);
+    value = parseFloat(value);
+    setOvertime(value);
+    setIsShowOvertime(false);
   };
+
+
 
 
 
@@ -251,14 +266,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellTitle}>WorkOrder:</Text>
+          <Text style={styles.cellTitleWorkOrder}>WorkOrder: </Text>
           <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>MHR:</Text>
-          <Text style={styles.cellTime}>{Formater.formatEmptyData(item.MHR)}</Text>
-          {/* <Text style={styles.cellTitle}>OverTime:</Text>
-          <Text style={styles.cellOverTime}>{Formater.formatEmptyData(item.Overtime)}</Text> */}
+          <Text style={styles.cellTime}>{item.MHR}</Text>
+          <Text style={styles.cellTitle}>Overtime:</Text>
+          <Text style={styles.cellOverTime}>{item.Overtime}</Text>
         </View>
       </View>
     );
@@ -296,8 +311,15 @@ const TimeSheetScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.headerActionRow}>
               <Text style={styles.headerCellTitle}>Hours:</Text>
-              <TouchableOpacity style={styles.headerActionContainer} onPress={() => setIsShowDialog(true)}>
-                <Text style={styles.textAction}>{Formater.formatEmptyData(timeDisplay)}</Text>
+              <TouchableOpacity style={styles.headerActionContainer} onPress={() => { setHoursDisplay(hours.toString()); setIsShowHours(true); }}>
+                <Text style={styles.textAction}>{hours}</Text>
+                <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.headerActionRow}>
+              <Text style={styles.headerCellTitle}>Overtime:</Text>
+              <TouchableOpacity style={styles.headerActionContainer} onPress={() => { setOvertimeDisplay(overtime.toString()); setIsShowOvertime(true); }}>
+                <Text style={styles.textAction}>{overtime}</Text>
                 <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
               </TouchableOpacity>
             </View>
@@ -313,19 +335,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
               onPress={_onPressApplySelected}>
               <Text style={styles.buttonTitle}>Apply Selected</Text>
             </TouchableOpacity>
-            {/* <CheckBox
-              value={isChecked}
-              onValueChange={newValue => _onChangeChecked(newValue)}
-              style={styles.checkBox}
-              boxType='square'
-              disabled={false}
-              onCheckColor={OPP_COLOR}
-              onFillColor={BASE_COLOR}
-              onTintColor={BASE_COLOR}
-              tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-              animationDuration={0.2}
-              onAnimationType='flat'
-            /> */}
           </View>
           {
             workerList.length
@@ -360,22 +369,33 @@ const TimeSheetScreen = ({ route, navigation }) => {
         onConfirm={_onChangeDate}
         onCancel={() => { setIsShowPicker(false) }}
       />
-      <SelectPopup
+      <SelectPopupTimeSheet
         visible={isShowWorkOrder}
         data={workOrderList}
         onChangeItem={_onChangeWorkOrder}
         onCancel={() => setIsShowWorkOrder(false)}
       />
-      <Dialog.Container visible={isShowDialog}>
+      <Dialog.Container visible={isShowHours}>
         <Dialog.Title>{'Enter hours:'}</Dialog.Title>
         <Dialog.Input
-          value={timeDisplay}
-          onChangeText={(text) => setTimeDisplay(text)}
+          value={hoursDisplay}
+          onChangeText={(text) => setHoursDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialog(false) }} />
-        <Dialog.Button label='OK' onPress={_onChangeTime} />
+        <Dialog.Button label='Cancle' onPress={() => { setIsShowHours(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeHours} />
+      </Dialog.Container>
+      <Dialog.Container visible={isShowOvertime}>
+        <Dialog.Title>{'Enter overtime:'}</Dialog.Title>
+        <Dialog.Input
+          value={overtimeDisplay}
+          onChangeText={(text) => setOvertimeDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+          keyboardType={'numeric'}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsShowOvertime(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeOvertime} />
       </Dialog.Container>
       <AwesomeAlert
         show={isUploading}
@@ -446,6 +466,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 16,
     marginBottom: 4,
+  },
+  cellTitleWorkOrder: {
+    height: '100%'
   },
   cellTitle: {
     flex: 3,

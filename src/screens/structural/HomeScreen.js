@@ -447,7 +447,10 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title='QC Scan Weld' onPress={_onPressMamageQCWeld} number={spendNumbers.QCWeld} />
               <RenderItemBox title='Man-hours Impact' onPress={_onPressManHoursImpact} />
-              {/* <RenderItemBox title='TimeSheet' onPress={_onPressTimeSheet} /> */}
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title='TimeSheet' onPress={_onPressTimeSheet} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
           <View style={styles.action}>

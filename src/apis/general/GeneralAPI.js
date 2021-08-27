@@ -26,6 +26,20 @@ export const GetTimeSheetWorkOrderListAPI = (projectCode, userLogin, token) =>
       }
     }).then(res => res.json());
 
+export const UpdateTimeSheetListlAPI = (userInsert, models, token) =>
+  fetch(
+    Port_Server 
+    + '/api/General/UpdateTimeSheetList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userInsert, models }),
+    }
+  ).then(res => res.json());
+
 export const GetManHoursImpactListAPI = (projectCode, userLogin, token) =>
   fetch(
     Port_Server
@@ -42,7 +56,8 @@ export const GetManHoursImpactListAPI = (projectCode, userLogin, token) =>
 
 export const UpdateManHoursImpactDetailAPI = (userInsert, model, token) =>
   fetch(
-    Port_Server + '/api/General/UpdateManHoursImpactDetail',
+    Port_Server
+    + '/api/General/UpdateManHoursImpactDetail',
     {
       method: 'POST',
       headers: {
@@ -69,7 +84,8 @@ export const GetManHoursImpactImageAPI = (workOrderNo, factorType, date, token) 
 
 export const DeleteManHoursImpactImageAPI = (id, token) =>
   fetch(
-    Port_Server + '/api/General/DeleteManHoursImpactImage',
+    Port_Server
+    + '/api/General/DeleteManHoursImpactImage',
     {
       method: 'POST',
       headers: {
@@ -82,7 +98,8 @@ export const DeleteManHoursImpactImageAPI = (id, token) =>
 
 export const EditManHoursImpactImageAPI = (id, note, token) =>
   fetch(
-    Port_Server + '/api/General/EditManHoursImpactImage',
+    Port_Server
+    + '/api/General/EditManHoursImpactImage',
     {
       method: 'POST',
       headers: {
