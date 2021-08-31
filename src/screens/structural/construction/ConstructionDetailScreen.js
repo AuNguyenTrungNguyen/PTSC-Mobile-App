@@ -140,16 +140,19 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
 
   const _onPressManagePicture = () => {
-    // navigation.navigate(
-    //   'DrawingImage',
-    //   {
-    //     projectCode: projectCode,
-    //     facilityCode: facilityCode,
-    //     drawingNo: drawingNo,
-    //     code: code,
-    //     userLogin: userLogin
-    //   }
-    // );
+    navigation.navigate(
+      Constant.PIPING,
+      {
+        screen: 'DrawingImage',
+        params: {
+          projectCode: projectCode,
+          facilityCode: facilityCode,
+          drawingNo: drawingNo,
+          code: code,
+          userLogin: userLogin
+        }
+      }
+    );
   };
 
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);

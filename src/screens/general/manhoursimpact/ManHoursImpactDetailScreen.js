@@ -91,7 +91,7 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
 
   const getFactorType = async () => {
     let token = await Helper.getData('TOKEN');
-    GetFactorTypeAPI('GALLAF03', token)
+    GetFactorTypeAPI(projectCode, token)
       .then(res => {
         if (res.success) {
           setFactorTypeList(res.factorTypeList);
