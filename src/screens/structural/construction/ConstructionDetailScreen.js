@@ -149,7 +149,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           code: code,
-          userLogin: userLogin
+          teamLeader: userLogin
         }
       }
     );
