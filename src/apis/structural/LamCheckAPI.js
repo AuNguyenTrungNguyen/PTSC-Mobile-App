@@ -56,3 +56,44 @@ export const UpdateLamCheckTodoListAPI = (listItemUpdate, userUpdate, token) =>
       body: JSON.stringify({ listItemUpdate, userUpdate }),
     }
   ).then(res => res.json());
+
+export const GetLamCheckTodoImageAPI = (tableRowIndex, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/LamCheck/GetLamCheckTodoImage'
+    + '?tableRowIndex=' + tableRowIndex,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const DeleteLamCheckTodoImageAPI = (id, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/LamCheck/DeleteLamCheckTodoImage',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    }
+  ).then(res => res.json());
+
+export const EditLamCheckTodoImageAPI = (id, note, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/LamCheck/EditLamCheckTodoImage',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, note }),
+    }
+  ).then(res => res.json());
+

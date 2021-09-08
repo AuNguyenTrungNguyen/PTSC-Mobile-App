@@ -90,19 +90,6 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressManagePicture = () => {
-    // navigation.navigate(
-    //   'DrawingImage',
-    //   {
-    //     projectCode: projectCode,
-    //     facilityCode: facilityCode,
-    //     drawingNo: drawingNo,
-    //     code: code,
-    //     userLogin: userLogin
-    //   }
-    // );
-  };
-
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
   };
@@ -364,10 +351,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
               <RenderList />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
-              <Text style={styles.buttonTitle}>Manage Picture</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
             </TouchableOpacity>
           </View>
@@ -502,14 +486,7 @@ const styles = StyleSheet.create({
     height: 36,
     flexDirection: 'row',
   },
-  buttonLeft: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginRight: 4,
-  },
-  buttonRight: {
+  buttonAction: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

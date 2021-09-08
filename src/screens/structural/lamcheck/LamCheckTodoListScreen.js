@@ -94,19 +94,6 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressManagePicture = () => {
-    // navigation.navigate(
-    //   'DrawingImage',
-    //   {
-    //     projectCode: projectCode,
-    //     facilityCode: facilityCode,
-    //     drawingNo: drawingNo,
-    //     code: code,
-    //     userLogin: userLogin
-    //   }
-    // );
-  };
-
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
   };
@@ -190,7 +177,20 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     setLamCheckUpdateList(array);
   };
 
-
+  const _onPressManagePicture = async (item) => {
+    const dataCode = await Helper.getData('DATACODE');
+    navigation.navigate(
+      'LamCheckImage',
+      {
+        projectCode: projectCode,
+          userLogin: userLogin,
+          dataCode: dataCode,
+          rowIndex: item.RowIndex,
+          drawingNo: item.WeldMapDrawingNo,
+          jointNo: item.JointNo
+      }
+    );
+  };
 
 
 
@@ -276,7 +276,8 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           </View>
           <View style={styles.cellAction}>
             <TouchableOpacity
-              style={styles.buttonImage}>
+              style={styles.buttonImage}
+              onPress={()=> {_onPressManagePicture(item)}}>
               <Text style={styles.labelImage}>Picture</Text>
             </TouchableOpacity>
           </View>
@@ -362,10 +363,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
               <RenderList />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
-              <Text style={styles.buttonTitle}>Manage Picture</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
             </TouchableOpacity>
           </View>
@@ -519,19 +517,11 @@ const styles = StyleSheet.create({
     height: 36,
     flexDirection: 'row',
   },
-  buttonLeft: {
+  buttonAction: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    marginRight: 4,
-  },
-  buttonRight: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginLeft: 4,
   },
   buttonTitle: {
     color: OPP_COLOR,
