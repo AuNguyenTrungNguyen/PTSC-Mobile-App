@@ -366,6 +366,60 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  // QA Observation
+  const _onPressQAObservation = async () => {
+    Alert.alert(
+      '',
+      'Overview: All Observation in Project\n\List: List Observation\n\Create: Create Observation',
+      [
+        { text: 'Overview', onPress: _onPressOverviewListObservation },
+        { text: 'List', onPress: _onPressListObservation },
+        { text: 'Create', onPress: _onPressCreateObservation },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressOverviewListObservation = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'QA',
+      {
+        screen: 'QAObservationOverviewList',
+        params: {
+          projectCode: projectCode,
+          userLogin: userLogin,
+        },
+      }
+    );
+  };
+  const _onPressListObservation = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'QA',
+      {
+        screen: 'QAObservationList',
+        params: {
+          projectCode: projectCode,
+          userLogin: userLogin,
+        },
+      }
+    );
+  };
+  const _onPressCreateObservation = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'QA',
+      {
+        screen: 'QAObservationDetail',
+        params: {
+          projectCode: projectCode,
+          userLogin: userLogin,
+          owner: userLogin
+        },
+      }
+    );
+  };
+
   // ACTION
   const _onPressViewReports = () => {
     // navigation.navigate('Report', {
@@ -450,7 +504,7 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title='TimeSheet' onPress={_onPressTimeSheet} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title='QA Observation' onPress={_onPressQAObservation} />
             </View>
           </ScrollView>
           <View style={styles.action}>

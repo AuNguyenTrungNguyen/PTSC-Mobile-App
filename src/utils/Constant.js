@@ -2,7 +2,9 @@ export default class Constant {
 
   static PIPING = 'PIPING';
   static STRUCTURAL = 'STRUCTURAL';
+  static QA = 'QA';
 
+  // CODE
   static CODE_FITUP = 'FitUp';
   static CODE_WELD = 'Weld';
   static CODE_CUT = 'Cut';
@@ -16,8 +18,22 @@ export default class Constant {
   static EMPTY_VALUE_STRING = 'EMPTY_VALUE';
   static COLUMN_CHANGE = 'ColumnChange';
 
+  //STATUS
+  static STATUS_DRAFT = 'Draft';
+  static STATUS_FINAL = 'Final';
   static STATUS_ACCEPT = 'ACC';
   static STATUS_REJECT = 'REJ';
+
+  //QA Observation
+  static QA_OBSERVATION_DRAFT = 0;
+  static QA_OBSERVATION_FINAL = 1;
+
+  //ID
+  static ID_TBA = 'TBA';
+
+  // OPTION
+  static OPTION_YES = 'Yes';
+  static OPTION_NO = 'No';
 
   //NDT
   static NDT_MT_CODE = 'MT';

@@ -14,6 +14,11 @@ import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHour
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
 import TimeSheetScreen from './screens/general/TimeSheetScreen';
 
+import QAObservationOverviewListScreen from './screens/qa/observation/QAObservationOverviewListScreen';
+import QAObservationListScreen from './screens/qa/observation/QAObservationListScreen';
+import QAObservationDetailScreen from './screens/qa/observation/QAObservationDetailScreen';
+import QAObservationImageScreen from './screens/qa/observation/QAObservationImageScreen';
+
 import HomeScreen from './screens/piping/HomeScreen';
 import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
@@ -49,12 +54,14 @@ import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceM
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
 import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
 import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
+import StructuralLamcheckImageScreen from './screens/structural/lamcheck/LamcheckImageScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
 const StructuralStack = createStackNavigator();
 const NDTStack = createStackNavigator();
 const ReportStack = createStackNavigator();
+const QAStack = createStackNavigator();
 
 let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
 if (Appearance.getColorScheme() === 'dark') {
@@ -337,6 +344,16 @@ const StructuralStackScreens = () => {
           }
         }
       />
+      <StructuralStack.Screen
+        name='LamCheckImage'
+        component={StructuralLamcheckImageScreen}
+        options={
+          {
+            title: 'Lam Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </StructuralStack.Navigator>
   );
 };
@@ -431,6 +448,53 @@ const ReportStackScreens = () => {
   );
 };
 
+const QAStackScreens = () => {
+  return (
+    <QAStack.Navigator screenOptions={optionNavigation}>
+      <QAStack.Screen
+        name='QAObservationOverviewList'
+        component={QAObservationOverviewListScreen}
+        options={
+          {
+            title: 'Observation List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <QAStack.Screen
+        name='QAObservationList'
+        component={QAObservationListScreen}
+        options={
+          {
+            title: 'Observation List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <QAStack.Screen
+        name='QAObservationDetail'
+        component={QAObservationDetailScreen}
+        options={
+          {
+            title: 'Observation Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <QAStack.Screen
+          name='QAObservationImage'
+          component={QAObservationImageScreen}
+          options={
+            {
+              title: 'Observation Pictures',
+              headerBackTitle: 'Back',
+            }
+          }
+        />
+    </QAStack.Navigator>
+  );
+};
+
 export default () => {
   return (
     <NavigationContainer>
@@ -510,6 +574,12 @@ export default () => {
               headerBackTitle: 'Back',
             }
           }
+        />
+
+        <Stack.Screen
+          name={Constant.QA}
+          component={QAStackScreens}
+          options={{ headerShown: false }}
         />
 
       </Stack.Navigator>
