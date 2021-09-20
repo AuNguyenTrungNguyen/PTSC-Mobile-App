@@ -55,6 +55,9 @@ import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/Piec
 import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
 import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
 import StructuralLamcheckImageScreen from './screens/structural/lamcheck/LamcheckImageScreen';
+import StructuralDimCheckListScreen from './screens/structural/dimcheck/DimCheckListScreen';
+import StructuralDimCheckDetailScreen from './screens/structural/dimcheck/DimCheckDetailScreen';
+import StructuralDimCheckImageScreen from './screens/structural/dimcheck/DimCheckImageScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
@@ -278,6 +281,7 @@ const StructuralStackScreens = () => {
           }
         }
       />
+
       <StructuralStack.Screen
         name='ConstructionList'
         component={StructuralConstructionListScreen}
@@ -350,6 +354,37 @@ const StructuralStackScreens = () => {
         options={
           {
             title: 'Lam Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <StructuralStack.Screen
+        name='DimCheckList'
+        component={StructuralDimCheckListScreen}
+        options={
+          {
+            title: 'Dim Check List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralStack.Screen
+        name='DimCheckDetail'
+        component={StructuralDimCheckDetailScreen}
+        options={
+          {
+            title: 'Dim Check Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralStack.Screen
+        name='DimCheckImage'
+        component={StructuralDimCheckImageScreen}
+        options={
+          {
+            title: 'Dim Check Pictures',
             headerBackTitle: 'Back',
           }
         }
@@ -482,15 +517,15 @@ const QAStackScreens = () => {
         }
       />
       <QAStack.Screen
-          name='QAObservationImage'
-          component={QAObservationImageScreen}
-          options={
-            {
-              title: 'Observation Pictures',
-              headerBackTitle: 'Back',
-            }
+        name='QAObservationImage'
+        component={QAObservationImageScreen}
+        options={
+          {
+            title: 'Observation Pictures',
+            headerBackTitle: 'Back',
           }
-        />
+        }
+      />
     </QAStack.Navigator>
   );
 };

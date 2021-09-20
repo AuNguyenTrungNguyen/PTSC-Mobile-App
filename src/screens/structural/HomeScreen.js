@@ -14,7 +14,7 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 const HomeScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCWeld: 0, LamCheckTodo: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCWeld: 0, LamCheckTodo: 0, DimCheckSpending: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -38,19 +38,16 @@ const HomeScreen = ({ route, navigation }) => {
     }, [isFocused]
   );
 
-  const callAPI = executedAPI => {
-    if (isFocused) {
-      setIsLoading(true);
-      NetInfo.fetch().then(state => {
-        if (!state.isConnected) {
-          setIsLoading(false);
-          setIsError(true);
-          MessageAlert('WARNING', 'Network not available!');
-        } else {
-          executedAPI();
-        }
-      });
-    }
+  const callAPI = (executedAPI) => {
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        executedAPI();
+      }
+    });
   };
 
   const getNotifyNumber = async () => {
@@ -420,6 +417,18 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  // DIM CHECK
+  const _onPressDimCheck = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'DimCheckList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+
   // ACTION
   const _onPressViewReports = () => {
     // navigation.navigate('Report', {
@@ -505,6 +514,10 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title='TimeSheet' onPress={_onPressTimeSheet} />
               <RenderItemBox title='QA Observation' onPress={_onPressQAObservation} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title='QC DIM' onPress={_onPressDimCheck} number={spendNumbers.DimCheckSpending} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
           <View style={styles.action}>

@@ -11,7 +11,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import { GetLocationListAPI, GetFittingTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetConstructionDetailAPI, UpdateConstructionDetailAPI, SendDimToQCAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -171,6 +171,40 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
 
   const [isVisibleWPS, setIsVisibleWPS] = useState(false);
   const [wpsList, setWPSList] = useState(null);
+
+  const [isVisibleTimeDimQC, setIsVisibleTimeDimQC] = useState(false);
+  const [modelSendDimToQC, setModelSendDimToQC] = useState({
+    RowIndex: 0,
+    ProjectCode: projectCode,
+    DIMRemark: '',
+    PieceNo1: '',
+    PieceNo2: ''
+  });
+  const _onChangeTimeDimQC = async () => {
+    let token = await Helper.getData('TOKEN');
+    if (!modelSendDimToQC.DIMRemark || !modelSendDimToQC.DIMRemark.trim()) {
+      Toast.show('Please enter time!', Toast.SHORT, ['RCTModalHostViewController']);
+      return;
+    }
+    modelSendDimToQC.DIMRemark = modelSendDimToQC.DIMRemark.trim();
+    SendDimToQCAPI(modelSendDimToQC, token)
+      .then(res => {
+        if (res.success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+        } else {
+          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+      });
+    setIsVisibleTimeDimQC(false);
+  };
+  const _onPressOpenTimeDimQC = item => {
+    modelSendDimToQC.RowIndex = item.RowIndex;
+    modelSendDimToQC.PieceNo1 = item.PieceNo1;
+    modelSendDimToQC.PieceNo2 = item.PieceNo2;
+    setIsVisibleTimeDimQC(true);
+  };
 
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
@@ -423,7 +457,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     array[index][keyPercent] = valueClear;
     if (code === Constant.CODE_FITUP) {
       array[index]['Location'] = valueClear;
-      array[index]['FittingTeam'] = valueClear;
+      array[index]['FitUpRequestByTeam'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
@@ -440,7 +474,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           [keyDate]: valueClear,
           [keyPercent]: valueClear,
           ['Location']: valueClear,
-          ['FittingTeam']: valueClear,
+          ['FitUpRequestByTeam']: valueClear,
         });
       } else {
         array.push({
@@ -456,7 +490,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       array[objIndex][keyPercent] = constructionDetailList[index][keyPercent];
       if (code == Constant.CODE_FITUP) {
         array[objIndex]['Location'] = constructionDetailList[index]['Location'];
-        array[objIndex]['FittingTeam'] = constructionDetailList[index]['FittingTeam'];
+        array[objIndex]['FitUpRequestByTeam'] = constructionDetailList[index]['FitUpRequestByTeam'];
       } else {
         array[objIndex]['WelderID'] = constructionDetailList[index]['WelderID'];
         array[objIndex]['WPSNo'] = constructionDetailList[index]['WPSNo'];
@@ -512,23 +546,20 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     return regexNumber.test(input) && input !== '';
   };
 
+
+
+
+
+  const getStatusRenderList = () => {
+    return constructionDetailList && constructionDetailList.length;
+  };
+
   const RenderConstructionDetail = () => {
     {
       if (constructionDetailList == null) {
         return <ListLoadingData />
       } else if (!constructionDetailList.length) {
         return <ListEmptyData />
-      } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={constructionDetailList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
       }
     }
   };
@@ -619,7 +650,23 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                     }
                   </TouchableOpacity>
                 </View>
-                <View style={styles.cellPercent} />
+                {
+                  isDisableItem
+                    ?
+                    <View style={styles.cellPercentRight}>
+                      <TouchableOpacity style={styles.itemPercentDisable}>
+                        <Text style={styles.textPercentDisabled}>Send DIM</Text>
+                      </TouchableOpacity>
+                    </View>
+                    :
+                    <View style={styles.cellPercentRight}>
+                      <TouchableOpacity
+                        style={styles.itemPercent}
+                        onPress={() => _onPressOpenTimeDimQC(item)}>
+                        <Text style={styles.textPercent}>Send DIM</Text>
+                      </TouchableOpacity>
+                    </View>
+                }
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
@@ -732,8 +779,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemActionIcon}
-                    onPress={() => _onPressShowFittingTeamPopup(index, 'FittingTeam')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FittingTeam)}</Text>
+                    onPress={() => _onPressShowFittingTeamPopup(index, 'FitUpRequestByTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpRequestByTeam)}</Text>
                     {
                       isDisableItem
                         ?
@@ -887,7 +934,22 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             isShowDescription.show &&
             <Header data={headerData} action={headerAction}></Header>
           }
-          <RenderConstructionDetail />
+          {
+            getStatusRenderList()
+              ?
+              <VirtualizedList
+                style={styles.table}
+                data={constructionDetailList}
+                getItemCount={data => data.length}
+                getItem={(data, index) => {
+                  return data[index];
+                }}
+                keyExtractor={(item, index) => index}
+                renderItem={renderItem}
+              />
+              :
+              <RenderConstructionDetail />
+          }
           <View style={styles.actionContainer}>
             <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
               <Text style={styles.buttonTitle}>Manage Picture</Text>
@@ -952,6 +1014,23 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         onClear={_onPressClearWPS}
       >
       </SelectPopup>
+      <Dialog.Container visible={isVisibleTimeDimQC}>
+        <Dialog.Title>{'Enter Time'}</Dialog.Title>
+        <Dialog.Input
+          value={modelSendDimToQC.DIMRemark}
+          onChangeText={(text) => {
+            var model = { ...modelSendDimToQC };
+            model.DIMRemark = text;
+            setModelSendDimToQC(model);
+          }}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => {
+          setIsVisibleTimeDimQC(false);
+          modelSendDimToQC.DIMRemark = '';
+        }} />
+        <Dialog.Button label='Send to QC' onPress={_onChangeTimeDimQC} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 }
