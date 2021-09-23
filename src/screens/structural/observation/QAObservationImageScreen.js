@@ -11,16 +11,19 @@ import ImageView from 'react-native-image-viewing';
 import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../../utils/Core';
-import { GetManHoursImpactImageAPI, DeleteManHoursImpactImageAPI, EditManHoursImpactImageAPI } from '../../../apis/general/GeneralAPI';
+import {
+  GetObservationImageAPI,
+  DeleteObservationImageAPI,
+  EditObservationImageAPI
+} from '../../../apis/qa/QAAPI';
 
 import Helper from '../../../utils/Helper';
-import Formater from '../../../utils/Formater';
-import Constant from '../../../utils/Constant';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import { TextInput } from 'react-native-gesture-handler';
+import Constant from '../../../utils/Constant';
 
-const ManHoursImpactImageScreen = ({ route }) => {
+const QAObservationImageScreen = ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -29,7 +32,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
   const [imageList, setImageList] = useState([]);
   const [imageListUpload, setImageListUpload] = useState([]);
 
-  const { projectCode, facilityCode, companyCode, workOrderNo, userLogin, factorType, date } = route.params;
+  const { projectCode, userLogin, dataCode, id, rowIndex, status } = route.params;
 
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [pictureId, setPictureId] = useState(null);
@@ -59,7 +62,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
 
   const getImage = async () => {
     let token = await Helper.getData('TOKEN');
-    GetManHoursImpactImageAPI(workOrderNo, factorType, date, token)
+    GetObservationImageAPI(rowIndex, token)
       .then(res => {
         if (res.success) {
           setImageList(res.data);
@@ -150,16 +153,12 @@ const ManHoursImpactImageScreen = ({ route }) => {
   const _onPressUploadImage = async () => {
     setIsUploading(true);
     let token = await Helper.getData('TOKEN');
-    ;
     let body = [
-      { name: 'projectCode', data: projectCode },
-      { name: 'facilityCode', data: facilityCode },
-      { name: 'workOrderNo', data: workOrderNo },
-      { name: 'factorType', data: Formater.formatEmptyData(factorType) },
-      { name: 'date', data: Formater.formatDateData(date) },
-      { name: 'code', data: Constant.CODE_MAN_HOURS_IMPACT },
-      { name: 'dataCode', data: companyCode },
+      { name: 'dataCode', data: dataCode },
       { name: 'username', data: userLogin },
+      { name: 'projectCode', data: projectCode },
+      { name: 'rowIndex', data: rowIndex },
+      { name: 'id', data: id },
     ];
 
     addFilesToBody()
@@ -170,7 +169,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
         }
         RNFetchBlob.fetch(
           'POST',
-          Port_Server + '/api/General/UploadManHoursImpactImage',
+          Port_Server + '/api/QA/UploadObservationImage',
           {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'multipart/form-data',
@@ -224,7 +223,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
 
   const deleteImage = async id => {
     let token = await Helper.getData('TOKEN');
-    DeleteManHoursImpactImageAPI(id, token)
+    DeleteObservationImageAPI(id, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
@@ -244,7 +243,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
 
   const _onPressUpdateImage = async () => {
     let token = await Helper.getData('TOKEN');
-    EditManHoursImpactImageAPI(pictureId, pictureNote, token)
+    EditObservationImageAPI(pictureId, pictureNote, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
@@ -383,9 +382,12 @@ const ManHoursImpactImageScreen = ({ route }) => {
           />
         </TouchableOpacity>
         <View style={styles.infoContainer}>
+          <Text style={styles.idText}>{item.PictureID}</Text>
+        </View>
+        <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.username}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase()
+            item.username.toLowerCase() == userLogin.toLowerCase() && status == Constant.QA_OBSERVATION_DRAFT
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -403,7 +405,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase()
+            item.username.toLowerCase() == userLogin.toLowerCase() && status == Constant.QA_OBSERVATION_DRAFT
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -422,6 +424,16 @@ const ManHoursImpactImageScreen = ({ route }) => {
     );
   };
 
+  const RenderStatus = ({ status }) => {
+    if (status == Constant.QA_OBSERVATION_DRAFT) {
+      return (<Text style={styles.infoStatusDraft}>{Constant.STATUS_DRAFT}</Text>);
+    }
+    if (status == Constant.QA_OBSERVATION_FINAL) {
+      return (<Text style={styles.infoStatusFinal}>{Constant.STATUS_FINAL}</Text>);
+    }
+    return (<Text style={styles.infoData}></Text>);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
@@ -431,21 +443,15 @@ const ManHoursImpactImageScreen = ({ route }) => {
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>WorkOrder:</Text>
+              <Text style={styles.infoTitle}>Id:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{workOrderNo}</Text>
+                <Text style={styles.infoData}>{id}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>FactorType:</Text>
+              <Text style={styles.infoTitle}>Status:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{factorType}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Date:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{Formater.formatDateData(date)}</Text>
+                <RenderStatus status={status} />
               </View>
             </View>
           </View>
@@ -470,9 +476,17 @@ const ManHoursImpactImageScreen = ({ route }) => {
               <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
-              <Text style={styles.buttonTitle}>Add Pictures</Text>
-            </TouchableOpacity>
+            {
+              status == Constant.QA_OBSERVATION_DRAFT
+                ?
+                <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
+                  <Text style={styles.buttonTitle}>Add Pictures</Text>
+                </TouchableOpacity>
+                :
+                <TouchableOpacity style={styles.buttonUploadDisabled}>
+                  <Text style={styles.buttonTitle}>Add Pictures</Text>
+                </TouchableOpacity>
+            }
           </View>
         </View>
       }
@@ -603,6 +617,16 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     flexShrink: 1,
   },
+  infoStatusDraft: {
+    color: 'gray',
+    flexShrink: 1,
+    fontWeight: 'bold',
+  },
+  infoStatusFinal: {
+    color: 'green',
+    flexShrink: 1,
+    fontWeight: 'bold',
+  },
 
   table: {
     flexGrow: 0,
@@ -634,6 +658,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  idText: {
+    flex: 1,
+    textAlign: 'center',
+    color: BASE_COLOR,
+    fontWeight: 'bold',
+    marginTop: 4,
   },
   infoText: {
     flex: 1,
@@ -687,6 +718,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
   },
+  buttonUploadDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
+    borderColor: '#999999',
+    borderWidth: 1,
+  },
   buttonLeft: {
     flex: 1,
     justifyContent: 'center',
@@ -726,4 +765,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ManHoursImpactImageScreen;
+export default QAObservationImageScreen;

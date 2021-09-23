@@ -382,17 +382,14 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
     }
     const dataCode = await Helper.getData('DATACODE');
     navigation.navigate(
-      'QA',
+      'QAObservationImage',
       {
-        screen: 'QAObservationImage',
-        params: {
-          projectCode: projectCode,
-          userLogin: userLogin,
-          dataCode: dataCode,
-          id: observationDetail.ObservationID,
-          rowIndex: observationDetail.RowIndex,
-          status: observationDetail.ObservationStatus
-        },
+        projectCode: projectCode,
+        userLogin: userLogin,
+        dataCode: dataCode,
+        id: observationDetail.ObservationID,
+        rowIndex: observationDetail.RowIndex,
+        status: observationDetail.ObservationStatus
       }
     );
   };

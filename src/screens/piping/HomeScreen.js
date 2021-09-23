@@ -4,8 +4,9 @@ import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 
-import Header from '../../components/Header';
 import Helper from '../../utils/Helper';
+import Constant from '../../utils/Constant';
+import Header from '../../components/Header';
 import GetSpendNumbersAPI from '../../apis/qc/GetSpendNumbersAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
@@ -85,7 +86,7 @@ const HomeScreen = ({ route, navigation }) => {
 
   const logout = () => {
     Helper.clearData();
-    navigation.replace('Login');
+    navigation.replace(Constant.ROUTE__LOGIN);
   };
 
   const _onPressConstructionUpdate = () => {

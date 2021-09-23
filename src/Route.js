@@ -14,11 +14,6 @@ import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHour
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
 import TimeSheetScreen from './screens/general/TimeSheetScreen';
 
-import QAObservationOverviewListScreen from './screens/qa/observation/QAObservationOverviewListScreen';
-import QAObservationListScreen from './screens/qa/observation/QAObservationListScreen';
-import QAObservationDetailScreen from './screens/qa/observation/QAObservationDetailScreen';
-import QAObservationImageScreen from './screens/qa/observation/QAObservationImageScreen';
-
 import HomeScreen from './screens/piping/HomeScreen';
 import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
@@ -45,10 +40,12 @@ import ReportDisciplineListScreen from './screens/piping/report/ReportDiscipline
 import ReportHistogramListScreen from './screens/piping/report/ReportHistogramListScreen';
 import ReportDailyManpowerListScreen from './screens/piping/report/ReportDailyManpowerListScreen';
 
-import StructuralHomeScreen from './screens/structural/HomeScreen';
+import StructuralHomeScreenCONS from './screens/structural/home/HomeScreenCONS';
+import StructuralHomeScreenQCDEPT from './screens/structural/home/HomeScreenQCDEPT';
 import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
 import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
 import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
+import StructuralConstructionImageScreen from './screens/structural/construction/ConstructionImageScreen';
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
 import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
@@ -58,13 +55,15 @@ import StructuralLamcheckImageScreen from './screens/structural/lamcheck/Lamchec
 import StructuralDimCheckListScreen from './screens/structural/dimcheck/DimCheckListScreen';
 import StructuralDimCheckDetailScreen from './screens/structural/dimcheck/DimCheckDetailScreen';
 import StructuralDimCheckImageScreen from './screens/structural/dimcheck/DimCheckImageScreen';
+import StructuralQAObservationOverviewListScreen from './screens/structural/observation/QAObservationOverviewListScreen';
+import StructuralQAObservationListScreen from './screens/structural/observation/QAObservationListScreen';
+import StructuralQAObservationDetailScreen from './screens/structural/observation/QAObservationDetailScreen';
+import StructuralQAObservationImageScreen from './screens/structural/observation/QAObservationImageScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
-const StructuralStack = createStackNavigator();
 const NDTStack = createStackNavigator();
 const ReportStack = createStackNavigator();
-const QAStack = createStackNavigator();
 
 let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
 if (Appearance.getColorScheme() === 'dark') {
@@ -259,140 +258,6 @@ const PipingStackScreens = () => {
   );
 };
 
-const StructuralStackScreens = () => {
-  return (
-    <StructuralStack.Navigator screenOptions={optionNavigation}>
-      <StructuralStack.Screen
-        name='Home'
-        component={StructuralHomeScreen}
-        options={
-          {
-            title: 'PTSC M&C',
-          }
-        }
-      />
-      <StructuralStack.Screen
-        name='Camera'
-        component={StructuralCameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <StructuralStack.Screen
-        name='ConstructionList'
-        component={StructuralConstructionListScreen}
-        options={
-          {
-            title: 'Construction List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralStack.Screen
-        name='ConstructionDetail'
-        component={StructuralConstructionDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <StructuralStack.Screen
-        name='ConstructionAddWelder'
-        component={StructuralAddWelderScreen}
-        options={
-          {
-            title: 'Select Welders',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <StructuralStack.Screen
-        name='PieceMarkList'
-        component={StructuralPieceMarkListScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <StructuralStack.Screen
-        name='PieceMarkDetail'
-        component={StructuralPieceMarkDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-
-      <StructuralStack.Screen
-        name='LamCheckSpendingList'
-        component={StructuralLamCheckSpendingListScreen}
-        options={
-          {
-            title: 'Lam Check Spending',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralStack.Screen
-        name='LamCheckTodoList'
-        component={StructuralLamCheckTodoListScreen}
-        options={
-          {
-            title: 'Lam Check Todo',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralStack.Screen
-        name='LamCheckImage'
-        component={StructuralLamcheckImageScreen}
-        options={
-          {
-            title: 'Lam Check Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <StructuralStack.Screen
-        name='DimCheckList'
-        component={StructuralDimCheckListScreen}
-        options={
-          {
-            title: 'Dim Check List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralStack.Screen
-        name='DimCheckDetail'
-        component={StructuralDimCheckDetailScreen}
-        options={
-          {
-            title: 'Dim Check Detail',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralStack.Screen
-        name='DimCheckImage'
-        component={StructuralDimCheckImageScreen}
-        options={
-          {
-            title: 'Dim Check Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-    </StructuralStack.Navigator>
-  );
-};
-
 const NDTStackScreens = () => {
   return (
     <NDTStack.Navigator screenOptions={optionNavigation}>
@@ -483,12 +348,223 @@ const ReportStackScreens = () => {
   );
 };
 
-const QAStackScreens = () => {
+const StructuralCONSStack = createStackNavigator();
+const StructuralCONSStackScreens = () => {
   return (
-    <QAStack.Navigator screenOptions={optionNavigation}>
-      <QAStack.Screen
+    <StructuralCONSStack.Navigator screenOptions={optionNavigation}>
+      <StructuralCONSStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={StructuralHomeScreenCONS}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name={Constant.ROUTE__CAMERA}
+        component={StructuralCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='PieceMarkList'
+        component={StructuralPieceMarkListScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralCONSStack.Screen
+        name='PieceMarkDetail'
+        component={StructuralPieceMarkDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralCONSStack.Screen
+        name='LamCheckSpendingList'
+        component={StructuralLamCheckSpendingListScreen}
+        options={
+          {
+            title: 'Lam Check Request',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='LamCheckImage'
+        component={StructuralLamcheckImageScreen}
+        options={
+          {
+            title: 'Lam Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionList'
+        component={StructuralConstructionListScreen}
+        options={
+          {
+            title: 'Construction List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionDetail'
+        component={StructuralConstructionDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionImage'
+        component={StructuralConstructionImageScreen}
+        options={
+          {
+            title: 'Construction Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionAddWelder'
+        component={StructuralAddWelderScreen}
+        options={
+          {
+            title: 'Select Welders',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ManHoursImpact'
+        component={ManHoursImpactListScreen}
+        options={
+          {
+            title: 'Man-hours Impact',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ManHoursImpactDetail'
+        component={ManHoursImpactDetailScreen}
+        options={
+          {
+            title: 'Create Impact',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ManHoursImpactImage'
+        component={ManHoursImpactImageScreen}
+        options={
+          {
+            title: 'Man-hours Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='TimeSheet'
+        component={TimeSheetScreen}
+        options={
+          {
+            title: 'Company TimeSheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </StructuralCONSStack.Navigator>
+  );
+};
+
+const StructuralQCDEPTStack = createStackNavigator();
+const StructuralQCDEPTStackScreens = () => {
+  return (
+    <StructuralQCDEPTStack.Navigator screenOptions={optionNavigation}>
+      <StructuralQCDEPTStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={StructuralHomeScreenQCDEPT}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
+        name={Constant.ROUTE__CAMERA}
+        component={StructuralCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
+        name='LamCheckTodoList'
+        component={StructuralLamCheckTodoListScreen}
+        options={
+          {
+            title: 'Lam Check Todo',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
+        name='LamCheckImage'
+        component={StructuralLamcheckImageScreen}
+        options={
+          {
+            title: 'Lam Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
+        name='DimCheckList'
+        component={StructuralDimCheckListScreen}
+        options={
+          {
+            title: 'Dim Check List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
+        name='DimCheckDetail'
+        component={StructuralDimCheckDetailScreen}
+        options={
+          {
+            title: 'Dim Check Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
+        name='DimCheckImage'
+        component={StructuralDimCheckImageScreen}
+        options={
+          {
+            title: 'Dim Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCDEPTStack.Screen
         name='QAObservationOverviewList'
-        component={QAObservationOverviewListScreen}
+        component={StructuralQAObservationOverviewListScreen}
         options={
           {
             title: 'Observation List',
@@ -496,9 +572,9 @@ const QAStackScreens = () => {
           }
         }
       />
-      <QAStack.Screen
+      <StructuralQCDEPTStack.Screen
         name='QAObservationList'
-        component={QAObservationListScreen}
+        component={StructuralQAObservationListScreen}
         options={
           {
             title: 'Observation List',
@@ -506,9 +582,9 @@ const QAStackScreens = () => {
           }
         }
       />
-      <QAStack.Screen
+      <StructuralQCDEPTStack.Screen
         name='QAObservationDetail'
-        component={QAObservationDetailScreen}
+        component={StructuralQAObservationDetailScreen}
         options={
           {
             title: 'Observation Detail',
@@ -516,9 +592,9 @@ const QAStackScreens = () => {
           }
         }
       />
-      <QAStack.Screen
+      <StructuralQCDEPTStack.Screen
         name='QAObservationImage'
-        component={QAObservationImageScreen}
+        component={StructuralQAObservationImageScreen}
         options={
           {
             title: 'Observation Pictures',
@@ -526,7 +602,7 @@ const QAStackScreens = () => {
           }
         }
       />
-    </QAStack.Navigator>
+    </StructuralQCDEPTStack.Navigator>
   );
 };
 
@@ -534,87 +610,52 @@ export default () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName='Auth'
+        initialRouteName={Constant.ROUTE__AUTH}
         screenOptions={optionNavigation}>
+
         <Stack.Screen
-          name='Auth'
+          name={Constant.ROUTE__AUTH}
           component={AuthScreen}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name='Login'
+          name={Constant.ROUTE__LOGIN}
           component={LoginScreen}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name={Constant.PIPING}
+          name={Constant.ROUTE__PIPING}
           component={PipingStackScreens}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name={Constant.STRUCTURAL}
-          component={StructuralStackScreens}
+          name={Constant.ROUTE__STR_CONS}
+          component={StructuralCONSStackScreens}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name='PDFView'
+          name={Constant.ROUTE__STR_QCDEPT}
+          component={StructuralQCDEPTStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.ROUTE__STR_QCWS}
+          component={StructuralQCDEPTStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.ROUTE__PDF}
           component={PDFViewScreen}
           options={({ route }) => ({
             title: route.params.title,
             headerBackTitle: 'Back',
           })}
-        />
-
-        <Stack.Screen
-          name='ManHoursImpact'
-          component={ManHoursImpactListScreen}
-          options={
-            {
-              title: 'Man-hours Impact',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-        <Stack.Screen
-          name='ManHoursImpactDetail'
-          component={ManHoursImpactDetailScreen}
-          options={
-            {
-              title: 'Create Impact',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-        <Stack.Screen
-          name='ManHoursImpactImage'
-          component={ManHoursImpactImageScreen}
-          options={
-            {
-              title: 'Man-hours Pictures',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
-          name='TimeSheet'
-          component={TimeSheetScreen}
-          options={
-            {
-              title: 'Company TimeSheet',
-              headerBackTitle: 'Back',
-            }
-          }
-        />
-
-        <Stack.Screen
-          name={Constant.QA}
-          component={QAStackScreens}
-          options={{ headerShown: false }}
         />
 
       </Stack.Navigator>

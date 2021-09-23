@@ -6,11 +6,14 @@ import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
-import GetCurrentConstructionInfoAPI from '../../../apis/structural/ConstructionAPI';
+import Naming from '../../../utils/Naming';
+
+import { GetCurrentPieceMarkInfoAPI } from '../../../apis/structural/PieceMarkAPI';
+import { GetCurrentConstructionInfoAPI } from '../../../apis/structural/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, code } = route.params;
+  const { projectCode, userLogin, code, destination } = route.params;
 
   const [isScanned, setIsScanned] = useState(false);
   const isFocused = useIsFocused();
@@ -22,71 +25,108 @@ const CameraScreen = ({ route, navigation }) => {
         showComfirm('ERROR', 'The drawing not correct format!');
         return;
       }
+
       const result = scanResult.data.split('@');
       let drawingNo = result[0];
       if ((code === Constant.CODE_CUT && !drawingNo.includes('CP'))
         || (code === Constant.CODE_PAINT && !drawingNo.includes('PM'))) {
         setIsScanned(true);
-        showComfirm('ERROR', 'Please scan ' + code + 'drawing type!');
+        showComfirm('ERROR', 'Please scan ' + code + ' drawing type!');
         return;
       }
-      getFacilityCode(drawingNo, result[1], result[2]);
+
+      let route = Constant.ROUTE__HOME;
+      if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST) {
+        route = 'LamCheckSpendingList';
+      } else if (destination === Naming.NAME_STR_LAM_CHECK_TODO) {
+        route = 'LamCheckTodoList';
+      } else if (destination === Naming.NAME_STR_PIECE_MARK) {
+        route = 'PieceMarkDetail';
+      } else if (destination === Naming.NAME_STR_CONSTRUCTION) {
+        route = 'ConstructionDetail';
+      }
+
+      if (!code) { //LAM Check
+        navigation.navigate(route, {
+          projectCode: projectCode,
+          userLogin: userLogin,
+          paramDrawingNo: drawingNo,
+        });
+        setIsScanned(false);
+      } else {
+        getDataAndNavigate(drawingNo, result[1], result[2], route)
+      }
     }
   };
 
-  const getFacilityCode = async (drawingNo, sheet, rev) => {
+  const getDataAndNavigate = async (drawingNo, sheet, rev, route) => {
     setIsScanned(true);
     let token = await Helper.getData('TOKEN');
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         showComfirm('ERROR', 'Network not available!');
       } else {
-        GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
-          .then(res => {
-            const title = code + ' Detail';
-            if (res.success && res.data != null) {
-              // if (source == 'Drawing') {
-              navigation.navigate('DrawingDetail', {
-                projectCode: projectCode,
-                facilityCode: res.data,
-                drawingNo: drawingNo,
-                sheet: sheet,
-                rev: rev,
-                code: code,
-                userLogin: userLogin,
-                title: title,
-                link: res.link,
-              });
-              setIsScanned(false);
-              // } else {
-              //   let codeTitle = code == 'Visual' ? 'Weld' : code;
-              //   let title = 'QC ' + codeTitle + ' Detail';
-              //   navigation.navigate('QCDrawingDetail', {
-              //     projectCode: projectCode,
-              //     facilityCode: res.data,
-              //     drawingNo: drawingNo,
-              //     sheet: sheet,
-              //     rev: rev,
-              //     code: code,
-              //     userLogin: userLogin,
-              //     title: title,
-              //     link: res.link,
-              //   });
-              //   setIsScanned(false);
-              // }
-            } else if (res.data == null) {
-              let message = 'Not find FacilityCode with: \n'
-                + 'ProjectCode: ' + projectCode + '\n'
-                + 'DrawingNo: ' + drawingNo + '\n'
-                + 'Sheet: ' + sheet + '\n'
-                + 'Rev: ' + rev;
-              showComfirm('ERROR', message);
-            } else {
+        if (destination === Naming.NAME_STR_PIECE_MARK) {
+          GetCurrentPieceMarkInfoAPI(projectCode, drawingNo, sheet, rev, code, token)
+            .then(res => {
+              if (res.success && res.data != null) {
+                const title = 'Piece Mark ' + code;
+                navigation.navigate(route, {
+                  projectCode: projectCode,
+                  facilityCode: res.data,
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
+                  code: code,
+                  userLogin: userLogin,
+                  title: title,
+                  link: res.link,
+                });
+                setIsScanned(false);
+              } else if (res.data == null) {
+                let message = 'Not find FacilityCode with: \n'
+                  + 'ProjectCode: ' + projectCode + '\n'
+                  + 'DrawingNo: ' + drawingNo + '\n'
+                  + 'Sheet: ' + sheet + '\n'
+                  + 'Rev: ' + rev;
+                showComfirm('ERROR', message);
+              } else {
+                showComfirm('ERROR', 'Please check that you are using the company network!');
+              }
+            }).catch(() => {
               showComfirm('ERROR', 'Please check that you are using the company network!');
-            }
-          }).catch(() => {
-            showComfirm('ERROR', 'Please check that you are using the company network!');
-          });
+            });
+        } else if (destination === Naming.NAME_STR_CONSTRUCTION) {
+          GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+            .then(res => {
+              if (res.success && res.data != null) {
+                const title = code + ' Detail';
+                navigation.navigate(route, {
+                  projectCode: projectCode,
+                  facilityCode: res.data,
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
+                  code: code,
+                  userLogin: userLogin,
+                  title: title,
+                  link: res.link,
+                });
+                setIsScanned(false);
+              } else if (res.data == null) {
+                let message = 'Not find FacilityCode with: \n'
+                  + 'ProjectCode: ' + projectCode + '\n'
+                  + 'DrawingNo: ' + drawingNo + '\n'
+                  + 'Sheet: ' + sheet + '\n'
+                  + 'Rev: ' + rev;
+                showComfirm('ERROR', message);
+              } else {
+                showComfirm('ERROR', 'Please check that you are using the company network!');
+              }
+            }).catch(() => {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
+            });
+        }
       }
     });
   };

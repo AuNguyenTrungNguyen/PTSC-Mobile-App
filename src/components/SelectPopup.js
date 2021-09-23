@@ -19,9 +19,14 @@ const SelectPopup = props => {
                       ?
                       props.data.map(item => {
                         let code = item.code ? item.code : item;
+                        let name = code;
+                        if (props.multi) {
+                          code = item.Code;
+                          name = item.Name
+                        }
                         return (
                           <TouchableOpacity style={modals.row} key={code} onPress={() => props.onChangeItem(code)}>
-                            <Text style={modals.cell}>{code} </Text>
+                            <Text style={modals.cell}>{name} </Text>
                           </TouchableOpacity>
                         );
                       })

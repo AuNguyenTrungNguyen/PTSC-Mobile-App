@@ -11,28 +11,24 @@ import ImageView from 'react-native-image-viewing';
 import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../../utils/Core';
-import {
-  GetObservationImageAPI,
-  DeleteObservationImageAPI,
-  EditObservationImageAPI
-} from '../../../apis/qa/QAAPI';
-
 import Helper from '../../../utils/Helper';
+import GetDrawingImageAPI from '../../../apis/drawing/GetDrawingImageAPI';
+import DeleteDrawingImageAPI from '../../../apis/drawing/DeleteDrawingImageAPI';
+import EditDrawingImageAPI from '../../../apis/drawing/EditDrawingImageAPI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import { TextInput } from 'react-native-gesture-handler';
-import Constant from '../../../utils/Constant';
 
-const QAObservationImageScreen = ({ route }) => {
+const ConstructionImageScreen = ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [imageList, setImageList] = useState([]);
-  const [imageListUpload, setImageListUpload] = useState([]);
+  const [drawingImageList, setDrawingImageList] = useState([]);
+  const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
 
-  const { projectCode, userLogin, dataCode, id, rowIndex, status } = route.params;
+  const { projectCode, facilityCode, drawingNo, code, teamLeader } = route.params;
 
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [pictureId, setPictureId] = useState(null);
@@ -43,7 +39,7 @@ const QAObservationImageScreen = ({ route }) => {
 
   useEffect(
     () => {
-      callAPI(getImage);
+      callAPI(getDrawingImage);
     }, []
   );
 
@@ -60,13 +56,12 @@ const QAObservationImageScreen = ({ route }) => {
     });
   };
 
-  const getImage = async () => {
+  const getDrawingImage = async () => {
     let token = await Helper.getData('TOKEN');
-    GetObservationImageAPI(rowIndex, token)
+    GetDrawingImageAPI(projectCode, facilityCode, drawingNo, code, token)
       .then(res => {
         if (res.success) {
-          console.log(res.data);
-          setImageList(res.data);
+          setDrawingImageList(res.data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -112,7 +107,7 @@ const QAObservationImageScreen = ({ route }) => {
       images.forEach(image => {
         imagesUpload.push({ uri: image.path });
       });
-      setImageListUpload(imagesUpload);
+      setDrawingImageListUpload(imagesUpload);
       setIsSelecting(true);
     }).catch(() => {
       setIsLoading(false);
@@ -128,7 +123,7 @@ const QAObservationImageScreen = ({ route }) => {
       .then(image => {
         let imagesUpload = [];
         imagesUpload.push({ uri: image.path });
-        setImageListUpload(imagesUpload);
+        setDrawingImageListUpload(imagesUpload);
         setIsSelecting(true);
       }).catch(() => {
         setIsLoading(false);
@@ -137,7 +132,7 @@ const QAObservationImageScreen = ({ route }) => {
   };
 
   const addFilesToBody = () => {
-    const promises = imageListUpload.map(async (image) => {
+    const promises = drawingImageListUpload.map(async (image) => {
       return await ImageResizer.createResizedImage(image.uri, 900, 450, 'PNG', 0)
         .then(res => {
           let file = {
@@ -154,12 +149,16 @@ const QAObservationImageScreen = ({ route }) => {
   const _onPressUploadImage = async () => {
     setIsUploading(true);
     let token = await Helper.getData('TOKEN');
+    let username = await Helper.getData('USERNAME');
+    let dataCode = await Helper.getData('DATACODE');
+
     let body = [
-      { name: 'dataCode', data: dataCode },
-      { name: 'username', data: userLogin },
       { name: 'projectCode', data: projectCode },
-      { name: 'rowIndex', data: rowIndex },
-      { name: 'id', data: id },
+      { name: 'facilityCode', data: facilityCode },
+      { name: 'drawingNo', data: drawingNo },
+      { name: 'code', data: code },
+      { name: 'username', data: username },
+      { name: 'dataCode', data: dataCode },
     ];
 
     addFilesToBody()
@@ -170,7 +169,7 @@ const QAObservationImageScreen = ({ route }) => {
         }
         RNFetchBlob.fetch(
           'POST',
-          Port_Server + '/api/QA/UploadObservationImage',
+          Port_Server + '/api/Drawing/UploadDrawingImage',
           {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'multipart/form-data',
@@ -180,14 +179,14 @@ const QAObservationImageScreen = ({ route }) => {
           .then(res => {
             res = JSON.parse(res.data);
             if (res.success) {
-              setImageListUpload([]);
+              setDrawingImageListUpload([]);
               setIsLoading(false);
               setIsLoading(false);
               setIsSelecting(false);
               setIsUploading(false);
               setPictureNote(null);
               Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-              callAPI(getImage);
+              callAPI(getDrawingImage);
             } else {
               Toast.show('Please check that you are using the company network!', Toast.SHORT);
               setIsLoading(false);
@@ -206,12 +205,12 @@ const QAObservationImageScreen = ({ route }) => {
 
   const _onPressDeleteImage = async id => {
     Alert.alert(
-      'Delete Picture',
+      'Delete Drawing Picture',
       'Are you sure you want to delete this picture',
       [
         {
           text: 'Delete',
-          onPress: () => { deleteImage(id) },
+          onPress: () => { deleteDrawingImage(id) },
         },
         {
           text: 'Cancel',
@@ -222,14 +221,14 @@ const QAObservationImageScreen = ({ route }) => {
     );
   };
 
-  const deleteImage = async id => {
+  const deleteDrawingImage = async id => {
     let token = await Helper.getData('TOKEN');
-    DeleteObservationImageAPI(id, token)
+    DeleteDrawingImageAPI(id, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
-          let array = imageList.filter(image => image.id !== id);
-          setImageList(array);
+          let array = drawingImageList.filter(image => image.id !== id);
+          setDrawingImageList(array);
         }
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT);
@@ -244,14 +243,14 @@ const QAObservationImageScreen = ({ route }) => {
 
   const _onPressUpdateImage = async () => {
     let token = await Helper.getData('TOKEN');
-    EditObservationImageAPI(pictureId, pictureNote, token)
+    EditDrawingImageAPI(pictureId, pictureNote, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
         if (res.success) {
-          let index = imageList.findIndex(image => image.id === pictureId);
-          let array = [...imageList]
+          let index = drawingImageList.findIndex(image => image.id === pictureId);
+          let array = [...drawingImageList]
           array[index]['note'] = pictureNote;
-          setImageList(array);
+          setDrawingImageList(array);
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);
@@ -383,12 +382,9 @@ const QAObservationImageScreen = ({ route }) => {
           />
         </TouchableOpacity>
         <View style={styles.infoContainer}>
-          <Text style={styles.idText}>{item.PictureID}</Text>
-        </View>
-        <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.username}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase() && status == Constant.QA_OBSERVATION_DRAFT
+            item.username.toLowerCase() == teamLeader.toLowerCase()
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -406,7 +402,7 @@ const QAObservationImageScreen = ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase() && status == Constant.QA_OBSERVATION_DRAFT
+            item.username.toLowerCase() == teamLeader.toLowerCase()
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -425,44 +421,34 @@ const QAObservationImageScreen = ({ route }) => {
     );
   };
 
-  const RenderStatus = ({ status }) => {
-    if (status == Constant.QA_OBSERVATION_DRAFT) {
-      return (<Text style={styles.infoStatusDraft}>{Constant.STATUS_DRAFT}</Text>);
-    }
-    if (status == Constant.QA_OBSERVATION_FINAL) {
-      return (<Text style={styles.infoStatusFinal}>{Constant.STATUS_FINAL}</Text>);
-    }
-    return (<Text style={styles.infoData}></Text>);
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getImage)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingImage)} />
         :
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Id:</Text>
+              <Text style={styles.infoTitle}>DrawingNo:</Text>
               <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{id}</Text>
+                <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
               </View>
             </View>
             <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Status:</Text>
+              <Text style={styles.infoTitle}>Type:</Text>
               <View style={styles.infoDataLine}>
-                <RenderStatus status={status} />
+                <Text style={styles.infoData}>{code}</Text>
               </View>
             </View>
           </View>
           {
-            imageList.length
+            drawingImageList.length
               ?
               <View style={styles.safeArea}>
                 <VirtualizedList
                   style={styles.table}
-                  data={imageList}
+                  data={drawingImageList}
                   getItemCount={(data) => data.length}
                   getItem={(data, index) => {
                     return data[index];
@@ -477,17 +463,9 @@ const QAObservationImageScreen = ({ route }) => {
               <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            {
-              status == Constant.QA_OBSERVATION_DRAFT
-                ?
-                <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
-                  <Text style={styles.buttonTitle}>Add Pictures</Text>
-                </TouchableOpacity>
-                :
-                <TouchableOpacity style={styles.buttonUploadDisabled}>
-                  <Text style={styles.buttonTitle}>Add Pictures</Text>
-                </TouchableOpacity>
-            }
+            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
+              <Text style={styles.buttonTitle}>Add Pictures</Text>
+            </TouchableOpacity>
           </View>
         </View>
       }
@@ -497,7 +475,7 @@ const QAObservationImageScreen = ({ route }) => {
             <View style={styles.safeArea}>
               <VirtualizedList
                 style={styles.table}
-                data={imageListUpload}
+                data={drawingImageListUpload}
                 getItemCount={(data) => data.length}
                 getItem={(data, index) => {
                   return data[index];
@@ -618,16 +596,6 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     flexShrink: 1,
   },
-  infoStatusDraft: {
-    color: 'gray',
-    flexShrink: 1,
-    fontWeight: 'bold',
-  },
-  infoStatusFinal: {
-    color: 'green',
-    flexShrink: 1,
-    fontWeight: 'bold',
-  },
 
   table: {
     flexGrow: 0,
@@ -659,13 +627,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  idText: {
-    flex: 1,
-    textAlign: 'center',
-    color: BASE_COLOR,
-    fontWeight: 'bold',
-    marginTop: 4,
   },
   infoText: {
     flex: 1,
@@ -719,14 +680,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
   },
-  buttonUploadDisabled: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#cccccc',
-    borderColor: '#999999',
-    borderWidth: 1,
-  },
   buttonLeft: {
     flex: 1,
     justifyContent: 'center',
@@ -766,4 +719,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QAObservationImageScreen;
+export default ConstructionImageScreen;

@@ -95,15 +95,12 @@ const QAObservationListScreen = ({ route, navigation }) => {
 
   const _onPressViewDetail = item => {
     navigation.navigate(
-      'QA',
+      'QAObservationDetail',
       {
-        screen: 'QAObservationDetail',
-        params: {
-          projectCode: projectCode,
-          userLogin: userLogin,
-          observation: JSON.stringify(item),
-          owner: item.CreatebyUser
-        },
+        projectCode: projectCode,
+        userLogin: userLogin,
+        observation: JSON.stringify(item),
+        owner: item.CreatebyUser
       }
     );
   };

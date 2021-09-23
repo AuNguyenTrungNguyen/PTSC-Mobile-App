@@ -1,8 +1,16 @@
 export default class Constant {
 
-  static PIPING = 'PIPING';
-  static STRUCTURAL = 'STRUCTURAL';
-  static QA = 'QA';
+  static ROUTE__AUTH = 'AUTH';
+  static ROUTE__LOGIN = 'LOGIN';
+  static ROUTE__HOME = 'HOME';
+  static ROUTE__CAMERA = 'CAMERA';
+  static ROUTE__PDF = 'PDF';
+
+  static ROUTE__PIPING = 'PIPING';
+  static ROUTE__STRUCTURAL = 'STRUCTURAL';
+  static ROUTE__STR_CONS = 'STR-CONS';
+  static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
+  static ROUTE__STR_QCWS = 'STR-QCWS';
 
   // CODE
   static CODE_FITUP = 'FitUp';

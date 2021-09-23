@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, TextInput, Keyboard, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -19,7 +19,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
-  const { projectCode } = route.params;
+  const { projectCode, paramDrawingNo } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -52,6 +52,16 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       ),
     });
   }, [navigation, isShowDescription]);
+
+  useEffect(
+    () => {
+      if (paramDrawingNo) {
+        setDrawingNo(paramDrawingNo);
+        setIsSearching(true);
+        callAPI(() => { searchSpendingList(paramDrawingNo, jointNo) }, false);
+      }
+    }, []
+  );
 
   const toggle = () => {
     setIsShowDescription(prevState => {

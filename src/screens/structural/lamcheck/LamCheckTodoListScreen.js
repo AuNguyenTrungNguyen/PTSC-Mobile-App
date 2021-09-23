@@ -17,7 +17,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const LamCheckTodoListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, userLogin, paramDrawingNo } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -53,7 +53,13 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      _onPressSearchTodoList();
+      if (paramDrawingNo) {
+        setDrawingNo(paramDrawingNo);
+        setIsSearching(true);
+        callAPI(() => { searchLamCheckTodoList(paramDrawingNo, jointNo) }, false);
+      } else {
+        _onPressSearchTodoList();
+      }
     }, []
   );
 
@@ -183,11 +189,11 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
       'LamCheckImage',
       {
         projectCode: projectCode,
-          userLogin: userLogin,
-          dataCode: dataCode,
-          rowIndex: item.RowIndex,
-          drawingNo: item.WeldMapDrawingNo,
-          jointNo: item.JointNo
+        userLogin: userLogin,
+        dataCode: dataCode,
+        rowIndex: item.RowIndex,
+        drawingNo: item.WeldMapDrawingNo,
+        jointNo: item.JointNo
       }
     );
   };
@@ -277,7 +283,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           <View style={styles.cellAction}>
             <TouchableOpacity
               style={styles.buttonImage}
-              onPress={()=> {_onPressManagePicture(item)}}>
+              onPress={() => { _onPressManagePicture(item) }}>
               <Text style={styles.labelImage}>Picture</Text>
             </TouchableOpacity>
           </View>

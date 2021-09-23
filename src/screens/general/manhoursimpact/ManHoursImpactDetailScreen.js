@@ -118,10 +118,8 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
-        console.log(res.Message.toString());
         setIsUploading(false);
-      }).catch((e) => {
-        console.log(e);
+      }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);
       });

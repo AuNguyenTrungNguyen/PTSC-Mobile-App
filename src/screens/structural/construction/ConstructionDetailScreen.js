@@ -141,16 +141,13 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
 
   const _onPressManagePicture = () => {
     navigation.navigate(
-      Constant.PIPING,
+      'ConstructionImage',
       {
-        screen: 'DrawingImage',
-        params: {
-          projectCode: projectCode,
-          facilityCode: facilityCode,
-          drawingNo: drawingNo,
-          code: code,
-          teamLeader: userLogin
-        }
+        projectCode: projectCode,
+        facilityCode: facilityCode,
+        drawingNo: drawingNo,
+        code: code,
+        teamLeader: userLogin
       }
     );
   };
