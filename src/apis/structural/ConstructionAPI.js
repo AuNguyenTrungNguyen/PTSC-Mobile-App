@@ -51,7 +51,7 @@ export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, s
 export const UpdateConstructionDetailAPI = (listItemUpdate, token) =>
   fetch(
     Port_Server
-    + '/api/structural/Construction/UpdateConstructionDetail',
+    + '/api/structural/Construction/UpdateConstructionDetailAndSendDIM',
     {
       method: 'POST',
       headers: {

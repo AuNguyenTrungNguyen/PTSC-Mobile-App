@@ -4,7 +4,7 @@ import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 
-import { GetNotifyNumberAPI } from '../../../apis/app/AppAPI';
+import { GetNotifyNumberScopeAPI } from '../../../apis/app/AppAPI';
 
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
@@ -13,7 +13,7 @@ import Header from '../../../components/Header';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const HomeScreenCONS = ({ route, navigation }) => {
+const HomeScreenQC = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
   const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCWeld: 0, LamCheckTodo: 0, DimCheckSpending: 0 });
@@ -53,7 +53,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
   const getNotifyNumber = async () => {
     let token = await Helper.getData('TOKEN');
-    GetNotifyNumberAPI(projectCode, token)
+    GetNotifyNumberScopeAPI(projectCode, token)
       .then(res => {
         if (res.success) {
           setSpendNumbers(res.data);
@@ -386,4 +386,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreenCONS;
+export default HomeScreenQC;

@@ -1,6 +1,7 @@
-
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
+// TODO REMOVE
 export const GetDimCheckListAPI = (projectCode, drawingNo, jointNo, token) =>
   fetch(
     Port_Server
@@ -14,6 +15,23 @@ export const GetDimCheckListAPI = (projectCode, drawingNo, jointNo, token) =>
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+
+export const GetDimCheckListScopeAPI = async (projectCode, drawingNo, jointNo, token) => {
+  let scope = await Helper.getData('QCSCOPE');
+  return fetch(
+    Port_Server
+    + '/api/structural/DimCheck/GetDimCheckListScope'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&jointNo=' + jointNo
+    + '&scope=' + scope,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
 
 export const GetDimCheckDetailAPI = (projectCode, pieceMarkNo01, pieceMarkNo02, token) =>
   fetch(

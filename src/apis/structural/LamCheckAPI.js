@@ -1,5 +1,5 @@
-
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetLamCheckSpendingListAPI = (projectCode, drawingNo, jointNo, token) =>
   fetch(
@@ -29,6 +29,7 @@ export const UpdateLamCheckSpendingListAPI = (listItemUpdate, token) =>
     }
   ).then(res => res.json());
 
+// TODO REMOVE
 export const GetLamCheckTodoListAPI = (projectCode, drawingNo, jointNo, token) =>
   fetch(
     Port_Server
@@ -42,6 +43,22 @@ export const GetLamCheckTodoListAPI = (projectCode, drawingNo, jointNo, token) =
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+export const GetLamCheckTodoListScopeAPI = async (projectCode, drawingNo, jointNo, token) => {
+  let scope = await Helper.getData('QCSCOPE');
+  return fetch(
+    Port_Server
+    + '/api/structural/LamCheck/GetLamCheckTodoListScope'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&jointNo=' + jointNo
+    + '&scope=' + scope,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
 
 export const UpdateLamCheckTodoListAPI = (listItemUpdate, userUpdate, token) =>
   fetch(
@@ -96,4 +113,3 @@ export const EditLamCheckTodoImageAPI = (id, note, token) =>
       body: JSON.stringify({ id, note }),
     }
   ).then(res => res.json());
-

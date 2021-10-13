@@ -6,7 +6,7 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLamCheckTodoListAPI, UpdateLamCheckTodoListAPI } from '../../../apis/structural/LamCheckAPI';
+import { GetLamCheckTodoListScopeAPI, UpdateLamCheckTodoListAPI } from '../../../apis/structural/LamCheckAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -128,7 +128,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetLamCheckTodoListAPI(projectCode, drawingNo, jointNo, token)
+    GetLamCheckTodoListScopeAPI(projectCode, drawingNo, jointNo, token)
       .then(res => {
         if (res.success) {
           setLamCheckTodoList(res.data);

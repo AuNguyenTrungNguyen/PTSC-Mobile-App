@@ -7,6 +7,7 @@ import { LoginAPI, GetProjectListAPI, GetModuleListAPI, GetRoleListAPI } from '.
 
 import Constant from '../../utils/Constant';
 import Helper from '../../utils/Helper';
+import { ENUM_QC_SCOPE } from '../../utils/Enum';
 import MessageAlert from '../../components/MessageAlert';
 import SelectPopup from '../../components/SelectPopup';
 
@@ -186,6 +187,12 @@ const LoginScreen = ({ navigation }) => {
               Helper.storeData('ROLE_CODE', roleCode);
               Helper.storeData('DATACODE', 'PTSCMC');
               if (disciplineCode.toUpperCase() === Constant.ROUTE__STRUCTURAL) {
+                if (roleCode === Constant.ROUTE__STR_QCWS) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
+                }
+                if (roleCode === Constant.ROUTE__STR_QCDEPT) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
+                }
                 navigation.replace(roleCode, {
                   screen: Constant.ROUTE__HOME,
                   params: { projectCode: projectCode, disciplineCode: disciplineCode }

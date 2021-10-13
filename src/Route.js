@@ -41,7 +41,7 @@ import ReportHistogramListScreen from './screens/piping/report/ReportHistogramLi
 import ReportDailyManpowerListScreen from './screens/piping/report/ReportDailyManpowerListScreen';
 
 import StructuralHomeScreenCONS from './screens/structural/home/HomeScreenCONS';
-import StructuralHomeScreenQCDEPT from './screens/structural/home/HomeScreenQCDEPT';
+import StructuralHomeScreenQC from './screens/structural/home/HomeScreenQC';
 import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
 import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
 import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
@@ -489,20 +489,20 @@ const StructuralCONSStackScreens = () => {
   );
 };
 
-const StructuralQCDEPTStack = createStackNavigator();
-const StructuralQCDEPTStackScreens = () => {
+const StructuralQCStack = createStackNavigator();
+const StructuralQCStackScreens = () => {
   return (
-    <StructuralQCDEPTStack.Navigator screenOptions={optionNavigation}>
-      <StructuralQCDEPTStack.Screen
+    <StructuralQCStack.Navigator screenOptions={optionNavigation}>
+      <StructuralQCStack.Screen
         name={Constant.ROUTE__HOME}
-        component={StructuralHomeScreenQCDEPT}
+        component={StructuralHomeScreenQC}
         options={
           {
             title: 'PTSC M&C',
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name={Constant.ROUTE__CAMERA}
         component={StructuralCameraScreen}
         options={
@@ -512,7 +512,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='LamCheckTodoList'
         component={StructuralLamCheckTodoListScreen}
         options={
@@ -522,7 +522,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='LamCheckImage'
         component={StructuralLamcheckImageScreen}
         options={
@@ -532,7 +532,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='DimCheckList'
         component={StructuralDimCheckListScreen}
         options={
@@ -542,7 +542,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='DimCheckDetail'
         component={StructuralDimCheckDetailScreen}
         options={
@@ -552,7 +552,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='DimCheckImage'
         component={StructuralDimCheckImageScreen}
         options={
@@ -562,7 +562,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='QAObservationOverviewList'
         component={StructuralQAObservationOverviewListScreen}
         options={
@@ -572,7 +572,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='QAObservationList'
         component={StructuralQAObservationListScreen}
         options={
@@ -582,7 +582,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='QAObservationDetail'
         component={StructuralQAObservationDetailScreen}
         options={
@@ -592,7 +592,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-      <StructuralQCDEPTStack.Screen
+      <StructuralQCStack.Screen
         name='QAObservationImage'
         component={StructuralQAObservationImageScreen}
         options={
@@ -602,7 +602,7 @@ const StructuralQCDEPTStackScreens = () => {
           }
         }
       />
-    </StructuralQCDEPTStack.Navigator>
+    </StructuralQCStack.Navigator>
   );
 };
 
@@ -639,13 +639,13 @@ export default () => {
 
         <Stack.Screen
           name={Constant.ROUTE__STR_QCDEPT}
-          component={StructuralQCDEPTStackScreens}
+          component={StructuralQCStackScreens}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
           name={Constant.ROUTE__STR_QCWS}
-          component={StructuralQCDEPTStackScreens}
+          component={StructuralQCStackScreens}
           options={{ headerShown: false }}
         />
 

@@ -10,18 +10,20 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListAPI, GetFittingTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI, SendDimToQCAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetLocationListAPI, GetFittingTeamListAPI, GetPieceMarkListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
+import { ENUM_QC_SCOPE, ENUM_QC_DIM_BEFORE_REQUIRED } from '../../../utils/Enum';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
 import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
+import SelectPopupPieceMark from '../../../components/SelectPopupPieceMark';
 
 const ConstructionDetailScreen = ({ route, navigation }) => {
 
@@ -42,6 +44,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       }
       else {
         callAPI(getConstructionDetail);
+        callAPI(getPieceMarkList);
       }
     }, [route.params?.welderSelected, route.params?.index]
   );
@@ -112,10 +115,29 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       });
   };
 
+  const getPieceMarkList = async () => {
+    let token = await Helper.getData('TOKEN');
+    GetPieceMarkListAPI(projectCode, drawingNo, token)
+      .then(res => {
+        if (res.success) {
+          setPieceMarkList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+
   const updateConstructionDetail = async () => {
-    setIsUploading(true);
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(constructionUpdateList);
+    setIsUploading(true);
     UpdateConstructionDetailAPI(listUpdate, token)
       .then(res => {
         if (res.success) {
@@ -160,6 +182,9 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [isVisiblePercent, setIsVisiblePercent] = useState(false);
   const [percentDisplay, setPercentDisplay] = useState('');
 
+  const [isVisiblePieceMark, setIsVisiblePieceMark] = useState(false);
+  const [pieceMarkList, setPieceMarkList] = useState([]);
+
   const [isVisibleLocation, setIsVisibleLocation] = useState(false);
   const [locationList, setLocationList] = useState(null);
 
@@ -170,38 +195,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [wpsList, setWPSList] = useState(null);
 
   const [isVisibleTimeDimQC, setIsVisibleTimeDimQC] = useState(false);
-  const [modelSendDimToQC, setModelSendDimToQC] = useState({
-    RowIndex: 0,
-    ProjectCode: projectCode,
-    DIMRemark: '',
-    PieceNo1: '',
-    PieceNo2: ''
-  });
-  const _onChangeTimeDimQC = async () => {
-    let token = await Helper.getData('TOKEN');
-    if (!modelSendDimToQC.DIMRemark || !modelSendDimToQC.DIMRemark.trim()) {
-      Toast.show('Please enter time!', Toast.SHORT, ['RCTModalHostViewController']);
-      return;
-    }
-    modelSendDimToQC.DIMRemark = modelSendDimToQC.DIMRemark.trim();
-    SendDimToQCAPI(modelSendDimToQC, token)
-      .then(res => {
-        if (res.success) {
-          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-        } else {
-          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        }
-      }).catch(() => {
-        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-      });
-    setIsVisibleTimeDimQC(false);
-  };
-  const _onPressOpenTimeDimQC = item => {
-    modelSendDimToQC.RowIndex = item.RowIndex;
-    modelSendDimToQC.PieceNo1 = item.PieceNo1;
-    modelSendDimToQC.PieceNo2 = item.PieceNo2;
-    setIsVisibleTimeDimQC(true);
-  };
+  const [timeDimQCDisplay, setTimeDimQCDisplay] = useState('');
 
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
@@ -220,7 +214,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
     }
     setConstructionUpdateList(array);
-  }
+  };
 
   const _onPressSelectDate = (value, index, key) => {
     setIndexUpdate(index);
@@ -289,6 +283,44 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       }
       setConstructionUpdateList(array);
     }
+  };
+
+  const _onPressShowPieceMarkNoPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisiblePieceMark(true);
+  };
+  const _onChangePieceMarkNo = data => {
+    if (data.PieceMarkNo == constructionDetailList[indexUpdate][keyUpdate]) {
+      setIsVisiblePieceMark(false);
+      return;
+    }
+    let array = [...constructionDetailList];
+    array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
+    array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
+    array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
+    array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+    setConstructionDetailList(array);
+
+    array = [...constructionUpdateList];
+    let rowIndex = constructionDetailList[indexUpdate].RowIndex;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({
+        RowIndex: rowIndex,
+        'PieceNo2': data.PieceMarkNo,
+        'PieceMarkNo02': data.PieceMarkNo,
+        'PieceDescription2': data.PieceDescription,
+        'HeatNo_TagNo2': data.HeatNo_TagNo,
+      });
+    } else {
+      array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
+      array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
+      array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
+      array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+    }
+    setConstructionUpdateList(array);
+    setIsVisiblePieceMark(false);
   };
 
   const _onPressShowLocationPopup = (index, key) => {
@@ -380,6 +412,29 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const _onChangeFittingTeam = data => {
     _onChangeData(data);
     setIsVisibleFittingTeam(false);
+  };
+
+  const _onPressOpenTimeDimQC = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setTimeDimQCDisplay(value.toString());
+    } else {
+      setTimeDimQCDisplay('');
+    }
+    setIsVisibleTimeDimQC(true);
+  };
+  const _onChangeTimeDimQC = () => {
+    let value = timeDimQCDisplay.trim();
+    setTimeDimQCDisplay(value);
+    if (!timeDimQCDisplay || !timeDimQCDisplay.trim()) {
+      Toast.show('Please enter time!', Toast.SHORT, ['RCTModalHostViewController']);
+      return;
+    }
+    if (constructionDetailList[indexUpdate][keyUpdate] !== value) {
+      _onChangeData(value);
+    }
+    setIsVisibleTimeDimQC(false);
   };
 
   const _onPressShowWPSPopup = (index, key) => {
@@ -560,6 +615,30 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       }
     }
   };
+
+  const RenderQCScope = ({ value }) => {
+    let scope = '';
+    if (value == ENUM_QC_SCOPE.NEW)
+      scope = 'New';
+    if (value == ENUM_QC_SCOPE.QCWS)
+      scope = 'QC Workshop';
+    if (value == ENUM_QC_SCOPE.QCDEPT)
+      scope = 'QC Department';
+    return <Text style={styles.textData}>{scope}</Text>;
+  };
+
+  const RenderDIMBeforeWeldRequired = ({ value }) => {
+    let required = '';
+    let style = styles.textData;
+    if (value == ENUM_QC_DIM_BEFORE_REQUIRED.NO)
+      required = 'None';
+    if (value == ENUM_QC_DIM_BEFORE_REQUIRED.YES) {
+      required = 'Required';
+      style = styles.textDataRequired;
+    }
+    return <Text style={style}>{required}</Text>;
+  };
+
   const renderItem = ({ index, item }) => {
     let itemDate = code == Constant.CODE_FITUP ? item['FitUpDate'] : item['ActualFabWeldDate'];
     let itemPercent = code == Constant.CODE_FITUP ? item['FitUpPercent'] : item['ActualFabWeldPercent'];
@@ -633,7 +712,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellTitle}>
                   <Text>FitUpDate:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
                     onPress={() => _onPressSelectDate(item.FitUpDate, index, 'FitUpDate')}>
@@ -647,23 +726,6 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                     }
                   </TouchableOpacity>
                 </View>
-                {
-                  isDisableItem
-                    ?
-                    <View style={styles.cellPercentRight}>
-                      <TouchableOpacity style={styles.itemPercentDisable}>
-                        <Text style={styles.textPercentDisabled}>Send DIM</Text>
-                      </TouchableOpacity>
-                    </View>
-                    :
-                    <View style={styles.cellPercentRight}>
-                      <TouchableOpacity
-                        style={styles.itemPercent}
-                        onPress={() => _onPressOpenTimeDimQC(item)}>
-                        <Text style={styles.textPercent}>Send DIM</Text>
-                      </TouchableOpacity>
-                    </View>
-                }
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
@@ -686,13 +748,13 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 {
                   isDisableItem
                     ?
-                    <View style={styles.cellPercentRight}>
+                    <View style={styles.cellPercent}>
                       <TouchableOpacity style={styles.itemPercentDisable}>
                         <Text style={styles.textPercentDisabled}>50%</Text>
                       </TouchableOpacity>
                     </View>
                     :
-                    <View style={styles.cellPercentRight}>
+                    <View style={styles.cellPercent}>
                       <TouchableOpacity
                         style={styles.itemPercent}
                         onPress={() => _onPressChangePercent(50, index, 'FitUpPercent')}>
@@ -730,7 +792,18 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                   <Text>PieceNo2:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowPieceMarkNoPopup(index, 'PieceNo2')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
                 </View>
               </View>
               <View style={styles.row}>
@@ -753,7 +826,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellTitle}>
                   <Text>Location:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
                     onPress={() => _onPressShowLocationPopup(index, 'Location')}>
@@ -767,7 +840,6 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                     }
                   </TouchableOpacity>
                 </View>
-                <View style={styles.cellPercent} />
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
@@ -788,6 +860,41 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>QCScope:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <RenderQCScope value={item.QCScope} />
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>{'DIM\nBeforeWeld:'}</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <RenderDIMBeforeWeldRequired value={item.DIMBeforeWeldRequired} />
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>Time:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressOpenTimeDimQC(item.DIMRemark, index, 'DIMRemark')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
             </>
             :
             <>
@@ -795,7 +902,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellTitle}>
                   <Text>WeldDate:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
                     onPress={() => _onPressSelectDate(item.ActualFabWeldDate, index, 'ActualFabWeldDate')}>
@@ -809,7 +916,6 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                     }
                   </TouchableOpacity>
                 </View>
-                <View style={styles.cellPercent} />
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
@@ -982,11 +1088,21 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         showProgress={true}
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
-      />
+      >
+      </AwesomeAlert>
       <HelpModal
         visible={isVisibleHelp}
         code={code}
-        onClose={() => setIsVisibleHelp(false)} />
+        onClose={() => setIsVisibleHelp(false)}
+      >
+      </HelpModal>
+      <SelectPopupPieceMark
+        visible={isVisiblePieceMark}
+        data={pieceMarkList}
+        onChangeItem={_onChangePieceMarkNo}
+        onCancel={() => setIsVisiblePieceMark(false)}
+      >
+      </SelectPopupPieceMark>
       <SelectPopup
         visible={isVisibleLocation}
         data={locationList}
@@ -1014,19 +1130,12 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       <Dialog.Container visible={isVisibleTimeDimQC}>
         <Dialog.Title>{'Enter Time'}</Dialog.Title>
         <Dialog.Input
-          value={modelSendDimToQC.DIMRemark}
-          onChangeText={(text) => {
-            var model = { ...modelSendDimToQC };
-            model.DIMRemark = text;
-            setModelSendDimToQC(model);
-          }}
+          value={timeDimQCDisplay}
+          onChangeText={(text) => setTimeDimQCDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
-          setIsVisibleTimeDimQC(false);
-          modelSendDimToQC.DIMRemark = '';
-        }} />
-        <Dialog.Button label='Send to QC' onPress={_onChangeTimeDimQC} />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTimeDimQC(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeTimeDimQC} />
       </Dialog.Container>
     </SafeAreaView>
   );
@@ -1100,12 +1209,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  checkBox: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-    width: 20,
-    height: 20,
-  },
   itemDone: {
     borderColor: BASE_COLOR,
     borderWidth: 1,
@@ -1152,11 +1255,6 @@ const styles = StyleSheet.create({
   },
   cellPercent: {
     flex: 1.2,
-    justifyContent: 'space-around',
-    flexDirection: 'row',
-  },
-  cellPercentRight: {
-    flex: 1.2,
     justifyContent: 'flex-end',
     flexDirection: 'row',
   },
@@ -1171,6 +1269,11 @@ const styles = StyleSheet.create({
     minWidth: 80,
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textDataRequired: {
+    minWidth: 80,
+    fontWeight: 'bold',
+    color: 'red',
   },
   itemAction: {
     flexDirection: 'row',

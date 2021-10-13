@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
-import { GetDimCheckListAPI } from '../../../apis/structural/DimCheckAPI';
+import { GetDimCheckListScopeAPI } from '../../../apis/structural/DimCheckAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -126,7 +126,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetDimCheckListAPI(projectCode, drawingNo, jointNo, token)
+    GetDimCheckListScopeAPI(projectCode, drawingNo, jointNo, token)
       .then(res => {
         if (res.success) {
           setDimCheckList(res.data);

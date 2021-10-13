@@ -1,5 +1,6 @@
 export default class Constant {
 
+  //ROUTE
   static ROUTE__AUTH = 'AUTH';
   static ROUTE__LOGIN = 'LOGIN';
   static ROUTE__HOME = 'HOME';
@@ -39,7 +40,7 @@ export default class Constant {
   //ID
   static ID_TBA = 'TBA';
 
-  // OPTION
+  //OPTION
   static OPTION_YES = 'Yes';
   static OPTION_NO = 'No';
 
