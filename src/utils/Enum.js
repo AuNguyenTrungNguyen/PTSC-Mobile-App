@@ -8,6 +8,6 @@ export const ENUM_QC_SCOPE = {
 }
 
 export const ENUM_QC_DIM_BEFORE_REQUIRED = {
-	NO: 0,
-	YES: 1,
+	NO: 'NO',
+	YES: 'YES',
 }

@@ -20,13 +20,13 @@ const CameraScreen = ({ route, navigation }) => {
 
   const _onQRCodeRead = scanResult => {
     if (scanResult.data !== null && !isScanned && isFocused) {
-      if (scanResult.data.split('@').length != 3) {
+      if (scanResult.data.split('_').length != 3) {
         setIsScanned(true);
         showComfirm('ERROR', 'The drawing not correct format!');
         return;
       }
 
-      const result = scanResult.data.split('@');
+      const result = scanResult.data.split('_');
       let drawingNo = result[0];
       if ((code === Constant.CODE_CUT && !drawingNo.includes('CP'))
         || (code === Constant.CODE_PAINT && !drawingNo.includes('PM'))) {

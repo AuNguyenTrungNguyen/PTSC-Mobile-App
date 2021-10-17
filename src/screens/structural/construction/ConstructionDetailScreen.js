@@ -617,9 +617,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
 
   const RenderQCScope = ({ value }) => {
-    let scope = '';
-    if (value == ENUM_QC_SCOPE.NEW)
-      scope = 'New';
+    let scope = 'New';
     if (value == ENUM_QC_SCOPE.QCWS)
       scope = 'QC Workshop';
     if (value == ENUM_QC_SCOPE.QCDEPT)
@@ -628,11 +626,14 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
 
   const RenderDIMBeforeWeldRequired = ({ value }) => {
-    let required = '';
     let style = styles.textData;
-    if (value == ENUM_QC_DIM_BEFORE_REQUIRED.NO)
+    let required = '';
+    if (!value) {
+      return <Text style={style}>{required}</Text>;
+    }
+    if (value.toString().toUpperCase() == ENUM_QC_DIM_BEFORE_REQUIRED.NO)
       required = 'None';
-    if (value == ENUM_QC_DIM_BEFORE_REQUIRED.YES) {
+    if (value.toString().toUpperCase() == ENUM_QC_DIM_BEFORE_REQUIRED.YES) {
       required = 'Required';
       style = styles.textDataRequired;
     }
