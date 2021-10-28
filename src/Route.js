@@ -55,6 +55,8 @@ import StructuralLamcheckImageScreen from './screens/structural/lamcheck/Lamchec
 import StructuralDimCheckListScreen from './screens/structural/dimcheck/DimCheckListScreen';
 import StructuralDimCheckDetailScreen from './screens/structural/dimcheck/DimCheckDetailScreen';
 import StructuralDimCheckImageScreen from './screens/structural/dimcheck/DimCheckImageScreen';
+import StructuralQCSpendListScreen from './screens/structural/qc/QCSpendListScreen';
+import StructuralQCImageScreen from './screens/structural/qc/QCImageScreen';
 import StructuralQAObservationOverviewListScreen from './screens/structural/observation/QAObservationOverviewListScreen';
 import StructuralQAObservationListScreen from './screens/structural/observation/QAObservationListScreen';
 import StructuralQAObservationDetailScreen from './screens/structural/observation/QAObservationDetailScreen';
@@ -558,6 +560,24 @@ const StructuralQCStackScreens = () => {
         options={
           {
             title: 'Dim Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCStack.Screen
+        name='QCSpendList'
+        component={StructuralQCSpendListScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralQCStack.Screen
+        name='QCImage'
+        component={StructuralQCImageScreen}
+        options={
+          {
+            title: 'QC Pictures',
             headerBackTitle: 'Back',
           }
         }

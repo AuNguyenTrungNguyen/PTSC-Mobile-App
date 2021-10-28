@@ -28,6 +28,8 @@ const CameraScreen = ({ route, navigation }) => {
 
       const result = scanResult.data.split('_');
       let drawingNo = result[0];
+      let sheet = result[1];
+      let rev = result[2];
       if ((code === Constant.CODE_CUT && !drawingNo.includes('CP'))
         || (code === Constant.CODE_PAINT && !drawingNo.includes('PM'))) {
         setIsScanned(true);
@@ -44,17 +46,34 @@ const CameraScreen = ({ route, navigation }) => {
         route = 'PieceMarkDetail';
       } else if (destination === Naming.NAME_STR_CONSTRUCTION) {
         route = 'ConstructionDetail';
+      } else if (destination === Naming.NAME_STR_QC) {
+        route = 'QCSpendList';
       }
 
-      if (!code) { //LAM Check
+      if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST || destination === Naming.NAME_STR_LAM_CHECK_TODO) {
         navigation.navigate(route, {
           projectCode: projectCode,
           userLogin: userLogin,
           paramDrawingNo: drawingNo,
         });
         setIsScanned(false);
-      } else {
-        getDataAndNavigate(drawingNo, result[1], result[2], route)
+      }
+      else if (destination === Naming.NAME_STR_QC) {
+        let title = 'QC Spend ' + code;
+        navigation.navigate(route, {
+          projectCode: projectCode,
+          userLogin: userLogin,
+          sheet: sheet,
+          rev: rev,
+          code: code,
+          userLogin: userLogin,
+          paramDrawingNo: drawingNo,
+          title: title,
+        });
+        setIsScanned(false);
+      }
+      else {
+        getDataAndNavigate(drawingNo, sheet, rev, route);
       }
     }
   };

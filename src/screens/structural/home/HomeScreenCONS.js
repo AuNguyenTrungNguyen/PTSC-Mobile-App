@@ -189,26 +189,6 @@ const HomeScreenCONS = ({ route, navigation }) => {
     );
   };
 
-  // ACTION
-  const _onPressViewReports = () => {
-    // navigation.navigate('Report', {
-    //   screen: 'ReportManager',
-    //   params: { projectCode: projectCode },
-    // });
-  };
-  const _onPressConstructionUpdate = () => {
-    // navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
-  };
-  const _onPressQCUpdate = () => {
-    // navigation.navigate('QCDrawingList', { projectCode: projectCode });
-  };
-  const _onPressNDTUpdate = () => {
-    // navigation.navigate('NDT', {
-    //   screen: 'NDTManager',
-    //   params: { projectCode: projectCode },
-    // });
-  };
-
 
 
 
@@ -264,22 +244,6 @@ const HomeScreenCONS = ({ route, navigation }) => {
             <RenderItemBox disable={true} />
           </View>
         </ScrollView>
-        <View style={styles.action}>
-          <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewReports}>
-            <Text style={styles.buttonTitle}>View Reports</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressConstructionUpdate}>
-            <Text style={styles.buttonTitle}>Construction Update</Text>
-          </TouchableOpacity>
-          <View style={styles.containerMultiButtons}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQCUpdate}>
-              <Text style={styles.buttonTitle}>QC Update</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressNDTUpdate}>
-              <Text style={styles.buttonTitle}>NDT Update</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -347,46 +311,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: OPP_COLOR,
     fontWeight: 'bold'
-  },
-
-  action: {
-    marginTop: 12,
-  },
-  buttonContainer: {
-    height: Dimensions.get('window').height > 700 ? 40 : 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-  },
-  buttonContainerPadding: {
-    height: Dimensions.get('window').height > 700 ? 40 : 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginTop: 12,
-  },
-  buttonTitle: {
-    color: OPP_COLOR,
-    fontSize: Dimensions.get('window').height > 700 ? 16 : 14,
-  },
-  containerMultiButtons: {
-    height: Dimensions.get('window').height > 700 ? 40 : 36,
-    marginTop: 12,
-    flexDirection: 'row',
-  },
-  buttonLeft: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginRight: 4,
-  },
-  buttonRight: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginLeft: 4,
   },
 });
 

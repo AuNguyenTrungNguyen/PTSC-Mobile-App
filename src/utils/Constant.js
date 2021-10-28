@@ -13,11 +13,19 @@ export default class Constant {
   static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
   static ROUTE__STR_QCWS = 'STR-QCWS';
 
-  // CODE
+  // CODE FILTER
+  static FILTER_ALL = 'ALL';
+  static FILTER_NOT_YET = 'NOT_YET';
+  static FILTER_ALREADY = 'ALREADY';
+
+  // CODE TYPE
   static CODE_FITUP = 'FitUp';
   static CODE_WELD = 'Weld';
+  static CODE_VISUAL = 'Visual';
   static CODE_CUT = 'Cut';
   static CODE_PAINT = 'Paint';
+
+  // CODE IMAGE
   static CODE_MAN_HOURS_IMPACT = 'WOFactor';
 
   static PIECE_MARK_ALL = 'ALL';

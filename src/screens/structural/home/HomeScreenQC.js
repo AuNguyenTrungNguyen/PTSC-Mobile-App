@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 const HomeScreenQC = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCWeld: 0, LamCheckTodo: 0, DimCheckSpending: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCVisual: 0, LamCheckTodo: 0, DimCheckSpending: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -119,6 +119,55 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
 
+  // QC
+  const _onPressMamageQCFitUp = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code FitUp Drawing\n\nSpend List: Spend FitUp Request List',
+      [
+        { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_FITUP) } },
+        { text: 'Spend List', onPress: () => { _onPressSpendList(Constant.CODE_FITUP) } },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressMamageQCVisual = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code Visual Drawing\n\nSpend List: Spend Visual Request List',
+      [
+        { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_VISUAL) } },
+        { text: 'Spend List', onPress: () => { _onPressSpendList(Constant.CODE_VISUAL) } },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeQC = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+        destination: Naming.NAME_STR_QC
+      }
+    );
+  };
+  const _onPressSpendList = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    let title = 'QC Spend ' + code;
+    navigation.navigate(
+      'QCSpendList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+        title: title,
+      }
+    );
+  };
+
   // DIM Check
   const _onPressDimCheck = async () => {
     let userLogin = await Helper.getData('USERNAME');
@@ -178,52 +227,32 @@ const HomeScreenQC = ({ route, navigation }) => {
 
 
 
-  // ACTION
-  const _onPressViewReports = () => {
-    // navigation.navigate('Report', {
-    //   screen: 'ReportManager',
-    //   params: { projectCode: projectCode },
-    // });
-  };
-  const _onPressConstructionUpdate = () => {
-    // navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
-  };
-  const _onPressQCUpdate = () => {
-    // navigation.navigate('QCDrawingList', { projectCode: projectCode });
-  };
-  const _onPressNDTUpdate = () => {
-    // navigation.navigate('NDT', {
-    //   screen: 'NDTManager',
-    //   params: { projectCode: projectCode },
-    // });
-  };
-
-
-
 
 
   const RenderItemBox = props => {
     return (
-      <View style={styles.cell}>
-        {
-          !props.disable &&
-          <>
-            <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
-              <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-              <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-            </TouchableOpacity>
-            {
-              props.number
-                ?
-                <View style={styles.badgeContainer}>
-                  <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
-                </View>
-                :
-                null
-            }
-          </>
-        }
-      </View>
+      <>
+        <View style={styles.line} />
+        <View style={styles.cell}>
+          {
+            !props.disable &&
+            <>
+              <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
+                <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
+                <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+              </TouchableOpacity>
+              {
+                props.number
+                  ?
+                  <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
+                  </View>
+                  :
+                  null
+              }
+            </>
+          }
+        </View></>
     );
   };
 
@@ -248,30 +277,14 @@ const HomeScreenQC = ({ route, navigation }) => {
               <RenderItemBox title={'QC DIM\n'} onPress={_onPressDimCheck} number={spendNumbers.DimCheckSpending} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC FitUp\n'} />
-              <RenderItemBox title={'QC Weld\n'} />
+              <RenderItemBox title={'QC FitUp\n'} onPress={_onPressMamageQCFitUp} number={spendNumbers.QCFitUp} />
+              <RenderItemBox title={'QC Visual\n'} onPress={_onPressMamageQCVisual} number={spendNumbers.QCVisual} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
               <RenderItemBox disable={true} />
             </View>
           </ScrollView>
-          <View style={styles.action}>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewReports}>
-              <Text style={styles.buttonTitle}>View Reports</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressConstructionUpdate}>
-              <Text style={styles.buttonTitle}>Construction Update</Text>
-            </TouchableOpacity>
-            <View style={styles.containerMultiButtons}>
-              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQCUpdate}>
-                <Text style={styles.buttonTitle}>QC Update</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressNDTUpdate}>
-                <Text style={styles.buttonTitle}>NDT Update</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
       }
     </SafeAreaView>
@@ -305,7 +318,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   itemContainer: {
     width: '90%',
@@ -343,46 +356,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: OPP_COLOR,
     fontWeight: 'bold'
-  },
-
-  action: {
-    marginTop: 12,
-  },
-  buttonContainer: {
-    height: Dimensions.get('window').height > 700 ? 40 : 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-  },
-  buttonContainerPadding: {
-    height: Dimensions.get('window').height > 700 ? 40 : 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginTop: 12,
-  },
-  buttonTitle: {
-    color: OPP_COLOR,
-    fontSize: Dimensions.get('window').height > 700 ? 16 : 14,
-  },
-  containerMultiButtons: {
-    height: Dimensions.get('window').height > 700 ? 40 : 36,
-    marginTop: 12,
-    flexDirection: 'row',
-  },
-  buttonLeft: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginRight: 4,
-  },
-  buttonRight: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginLeft: 4,
   },
 });
 
