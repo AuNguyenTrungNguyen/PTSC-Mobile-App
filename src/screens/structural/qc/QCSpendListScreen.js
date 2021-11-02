@@ -168,7 +168,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
       });
   };
 
-
   const _onChangeWeldNo = no => {
     setWeldNo(no);
     if (!no) {

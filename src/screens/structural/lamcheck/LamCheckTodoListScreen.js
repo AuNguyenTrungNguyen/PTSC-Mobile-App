@@ -6,7 +6,7 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLamCheckTodoListScopeAPI, UpdateLamCheckTodoListAPI } from '../../../apis/structural/LamCheckAPI';
+import { GetLamCheckTodoListQRCodeAPI, UpdateLamCheckTodoListAPI } from '../../../apis/structural/LamCheckAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -17,7 +17,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const LamCheckTodoListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, paramDrawingNo } = route.params;
+  const { projectCode, userLogin, paramDrawingNo, sheet, rev } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -28,6 +28,8 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
   const [oldDrawingNo, setOldDrawingNo] = useState(null);
   const [jointNo, setJointNo] = useState('');
   const [oldJointNo, setOldJointNo] = useState(null);
+
+  const [isQR, setIsQR] = useState(true);
 
   const [lamCheckTodoList, setLamCheckTodoList] = useState(null);
   const [lamCheckUpdateList, setLamCheckUpdateList] = useState([]);
@@ -102,6 +104,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
 
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
+    setIsQR(false);
   };
 
   const _onChangeJointNo = no => {
@@ -123,12 +126,14 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     }
   };
 
-  const searchLamCheckTodoList = async (drawingNo, jointNo) => {
+  const searchLamCheckTodoList = async (drawingNo, jointNo, sheet, rev) => {
     Keyboard.dismiss();
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetLamCheckTodoListScopeAPI(projectCode, drawingNo, jointNo, token)
+    sheet = (sheet != null && isQR) ? sheet : '';
+    rev = (rev != null && isQR) ? rev : '';
+    GetLamCheckTodoListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, token)
       .then(res => {
         if (res.success) {
           setLamCheckTodoList(res.data);
@@ -250,6 +255,10 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Description2:</Text>
           <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceDescription2)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Team:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.LaminationTestRequestByTeam)}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Result:</Text>

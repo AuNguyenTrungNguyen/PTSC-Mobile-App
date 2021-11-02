@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 const HomeScreenQC = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ QCFitUp: 0, QCVisual: 0, LamCheckTodo: 0, DimCheckSpending: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -266,19 +266,19 @@ const HomeScreenQC = ({ route, navigation }) => {
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             {
-              (spendNumbers.LamcheckTodo || spendNumbers.DimCheckSpending)
+              (spendNumbers.LamCheck || spendNumbers.DimCheck)
                 ?
                 <View style={styles.line} />
                 :
                 null
             }
             <View style={styles.row}>
-              <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressMamageLamCheckTodo} number={spendNumbers.LamcheckTodo} />
-              <RenderItemBox title={'QC DIM\n'} onPress={_onPressDimCheck} number={spendNumbers.DimCheckSpending} />
+              <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressMamageLamCheckTodo} number={spendNumbers.LamCheck} />
+              <RenderItemBox title={'QC DIM\n'} onPress={_onPressDimCheck} number={spendNumbers.DimCheck} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC FitUp\n'} onPress={_onPressMamageQCFitUp} number={spendNumbers.QCFitUp} />
-              <RenderItemBox title={'QC Visual\n'} onPress={_onPressMamageQCVisual} number={spendNumbers.QCVisual} />
+              <RenderItemBox title={'QC FitUp\n'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
+              <RenderItemBox title={'QC Visual\n'} onPress={_onPressMamageQCVisual} number={spendNumbers.Visual} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />

@@ -4,6 +4,9 @@ import Helper from '../../utils/Helper';
 
 export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, location, type, code, token) => {
   let scope = await Helper.getData('QCSCOPE');
+  if (scope == null){
+    scope = '';
+  }
   return fetch(
     Port_Server
     + '/api/structural/QC/GetQCSpendList'
@@ -24,6 +27,9 @@ export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, locatio
 
 export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, token) => {
   let scope = await Helper.getData('QCSCOPE');
+  if (scope == null){
+    scope = '';
+  }
   return fetch(
     Port_Server
     + '/api/structural/QC/GetQCSpendListQRCode'

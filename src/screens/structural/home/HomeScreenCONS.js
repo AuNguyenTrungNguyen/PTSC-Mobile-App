@@ -1,15 +1,27 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import NetInfo from '@react-native-community/netinfo';
+
+import { GetNotifyNumberScopeAPI } from '../../../apis/app/AppAPI';
 
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import Naming from '../../../utils/Naming';
 import Header from '../../../components/Header';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const HomeScreenCONS = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0 });
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const isFocused = useIsFocused();
 
   let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -21,6 +33,42 @@ const HomeScreenCONS = ({ route, navigation }) => {
       ),
     });
   }, [navigation]);
+
+  useEffect(
+    () => {
+      callAPI(getNotifyNumber);
+    }, [isFocused]
+  );
+
+  const callAPI = executedAPI => {
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        executedAPI();
+      }
+    });
+  };
+  const getNotifyNumber = async () => {
+    let token = await Helper.getData('TOKEN');
+    GetNotifyNumberScopeAPI(projectCode, token)
+      .then(res => {
+        if (res.success) {
+          setSpendNumbers(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
 
   const _onPressLogout = () => {
     Alert.alert(
@@ -220,31 +268,43 @@ const HomeScreenCONS = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
-        <ScrollView style={styles.table}>
-          <View style={styles.row}>
-            <RenderItemBox title={'QC Check\nStatus'} />
-            <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressMamagePieceMarkCut} />
-          </View>
-          <View style={styles.row}>
-            <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressMamagePieceMarkPaint} />
-            <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressMamageLamCheckSpending} />
-          </View>
-          <View style={styles.row}>
-            <RenderItemBox title={'Construciton\nFitUp'} onPress={_onPressMamageFitUp} />
-            <RenderItemBox title={'Construciton\nWeld'} onPress={_onPressMamageWeld} />
-          </View>
-          <View style={styles.row}>
-            <RenderItemBox title={'TimeSheet\n'} onPress={_onPressTimeSheet} />
-            <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
-          </View>
-          <View style={styles.row}>
-            <RenderItemBox title={'Manpower\n'} />
-            <RenderItemBox disable={true} />
-          </View>
-        </ScrollView>
-      </View>
+      {isLoading || isError
+        ?
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumber)} />
+        :
+        <View style={styles.container}>
+          <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+          <ScrollView style={styles.table}>
+            {
+              (spendNumbers.LamCheck || spendNumbers.DimCheck)
+                ?
+                <View style={styles.line} />
+                :
+                null
+            }
+            <View style={styles.row}>
+              <RenderItemBox title={'QC Check\nStatus'} />
+              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressMamagePieceMarkCut} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressMamagePieceMarkPaint} />
+              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressMamageLamCheckSpending}  number={spendNumbers.LamCheck}/>
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Construciton\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/>
+              <RenderItemBox title={'Construciton\nWeld'} onPress={_onPressMamageWeld} number={spendNumbers.Visual}/>
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressTimeSheet} />
+              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Manpower\n'} />
+              <RenderItemBox disable={true} />
+            </View>
+          </ScrollView>
+        </View>
+      }
     </SafeAreaView>
   );
 };
@@ -265,6 +325,9 @@ const styles = StyleSheet.create({
   table: {
     flexGrow: 1,
   },
+  line: {
+    height: 18,
+  },
   row: {
     flex: 1,
     flexDirection: 'row',
@@ -273,7 +336,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   itemContainer: {
     width: '90%',

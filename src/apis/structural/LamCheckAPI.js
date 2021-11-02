@@ -1,13 +1,15 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetLamCheckSpendingListAPI = (projectCode, drawingNo, jointNo, token) =>
+export const GetLamCheckSpendingListQRCodeAPI = (projectCode, drawingNo, jointNo, sheet, rev, token) =>
   fetch(
     Port_Server
-    + '/api/structural/LamCheck/GetLamCheckSpendingList'
+    + '/api/structural/LamCheck/GetLamCheckSpendingListQRCode'
     + '?projectCode=' + projectCode
     + '&drawingNo=' + drawingNo
-    + '&jointNo=' + jointNo,
+    + '&jointNo=' + jointNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -29,28 +31,16 @@ export const UpdateLamCheckSpendingListAPI = (listItemUpdate, token) =>
     }
   ).then(res => res.json());
 
-// TODO REMOVE
-export const GetLamCheckTodoListAPI = (projectCode, drawingNo, jointNo, token) =>
-  fetch(
-    Port_Server
-    + '/api/structural/LamCheck/GetLamCheckTodoList'
-    + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
-    + '&jointNo=' + jointNo,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
-export const GetLamCheckTodoListScopeAPI = async (projectCode, drawingNo, jointNo, token) => {
+export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, token) => {
   let scope = await Helper.getData('QCSCOPE');
   return fetch(
     Port_Server
-    + '/api/structural/LamCheck/GetLamCheckTodoListScope'
+    + '/api/structural/LamCheck/GetLamCheckTodoListQRCode'
     + '?projectCode=' + projectCode
     + '&drawingNo=' + drawingNo
     + '&jointNo=' + jointNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev
     + '&scope=' + scope,
     {
       headers: {

@@ -54,6 +54,8 @@ const CameraScreen = ({ route, navigation }) => {
         navigation.navigate(route, {
           projectCode: projectCode,
           userLogin: userLogin,
+          sheet: sheet,
+          rev: rev,
           paramDrawingNo: drawingNo,
         });
         setIsScanned(false);

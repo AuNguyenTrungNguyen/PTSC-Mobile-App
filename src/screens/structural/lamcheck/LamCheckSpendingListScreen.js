@@ -7,7 +7,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import { GetFittingTeamListAPI } from '../../../apis/app/AppAPI';
-import { GetLamCheckSpendingListAPI, UpdateLamCheckSpendingListAPI } from '../../../apis/structural/LamCheckAPI';
+import { GetLamCheckSpendingListQRCodeAPI, UpdateLamCheckSpendingListAPI } from '../../../apis/structural/LamCheckAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -19,7 +19,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
-  const { projectCode, paramDrawingNo } = route.params;
+  const { projectCode, paramDrawingNo, sheet, rev } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -30,6 +30,8 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
   const [oldDrawingNo, setOldDrawingNo] = useState(null);
   const [jointNo, setJointNo] = useState('');
   const [oldJointNo, setOldJointNo] = useState(null);
+
+  const [isQR, setIsQR] = useState(true);
 
   const [lamCheckSpendingList, setLamCheckSpendingList] = useState(null);
   const [lamCheckUpdateList, setLamCheckUpdateList] = useState([]);
@@ -58,7 +60,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       if (paramDrawingNo) {
         setDrawingNo(paramDrawingNo);
         setIsSearching(true);
-        callAPI(() => { searchSpendingList(paramDrawingNo, jointNo) }, false);
+        callAPI(() => { searchSpendingList(paramDrawingNo, jointNo, sheet, rev) }, false);
       }
     }, []
   );
@@ -102,6 +104,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
+    setIsQR(false);
   };
 
   const _onChangeJointNo = no => {
@@ -123,12 +126,14 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
     }
   };
 
-  const searchSpendingList = async (drawingNo, jointNo) => {
+  const searchSpendingList = async (drawingNo, jointNo, sheet, rev) => {
     Keyboard.dismiss();
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetLamCheckSpendingListAPI(projectCode, drawingNo, jointNo, token)
+    sheet = (sheet != null && isQR) ? sheet : '';
+    rev = (rev != null && isQR) ? rev : '';
+    GetLamCheckSpendingListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, token)
       .then(res => {
         if (res.success) {
           setLamCheckSpendingList(res.data);

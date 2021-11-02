@@ -94,18 +94,11 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
       }
     }).then(res => res.json());
 
-// TODO REMOVE
-export const GetNotifyNumberAPI = (projectCode, token) =>
-  fetch(
-    Port_Server + '/api/App/GetNotifyNumber?projectCode=' + projectCode,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
 export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
   let scope = await Helper.getData('QCSCOPE');
+  if (scope == null){
+    scope = '';
+  }
   return fetch(
     Port_Server
     + '/api/App/GetNotifyNumberScope'
