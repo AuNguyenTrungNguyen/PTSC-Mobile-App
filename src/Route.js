@@ -46,10 +46,12 @@ import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
 import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
 import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
 import StructuralConstructionImageScreen from './screens/structural/construction/ConstructionImageScreen';
+import StructuralConstructionQCStatusScreen from './screens/structural/construction/ConstructionQCStatusScreen';
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
 import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
 import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
+import StructuralLamCheckQCStatusScreen from './screens/structural/lamcheck/LamCheckQCStatusScreen';
 import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
 import StructuralLamcheckImageScreen from './screens/structural/lamcheck/LamcheckImageScreen';
 import StructuralDimCheckListScreen from './screens/structural/dimcheck/DimCheckListScreen';
@@ -400,6 +402,16 @@ const StructuralCONSStackScreens = () => {
         }
       />
       <StructuralCONSStack.Screen
+        name='LamCheckQCStatus'
+        component={StructuralLamCheckQCStatusScreen}
+        options={
+          {
+            title: 'Lam Check QC Status',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
         name='LamCheckImage'
         component={StructuralLamcheckImageScreen}
         options={
@@ -422,6 +434,14 @@ const StructuralCONSStackScreens = () => {
       <StructuralCONSStack.Screen
         name='ConstructionDetail'
         component={StructuralConstructionDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+       <StructuralCONSStack.Screen
+        name='ConstructionQCStatus'
+        component={StructuralConstructionQCStatusScreen}
         options={({ route }) => ({
           title: route.params.title,
           headerBackTitle: 'Back',

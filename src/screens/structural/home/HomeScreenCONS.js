@@ -98,17 +98,17 @@ const HomeScreenCONS = ({ route, navigation }) => {
       ],
     );
   };
-  const _onPressMamagePieceMarkPaint = async () => {
-    Alert.alert(
-      '',
-      'Scan: Scan QRCode Piece Mark Paint\n\nSearch: Search Piece Mark Paint',
-      [
-        { text: 'Scan', onPress: () => { _onPressQRCodePieceMark(Constant.CODE_PAINT) } },
-        { text: 'Search', onPress: () => { _onPressSearchPieceMark(Constant.CODE_PAINT) } },
-        { text: 'Cancel', style: 'cancel' }
-      ],
-    );
-  };
+  // const _onPressMamagePieceMarkPaint = async () => {
+  //   Alert.alert(
+  //     '',
+  //     'Scan: Scan QRCode Piece Mark Paint\n\nSearch: Search Piece Mark Paint',
+  //     [
+  //       { text: 'Scan', onPress: () => { _onPressQRCodePieceMark(Constant.CODE_PAINT) } },
+  //       { text: 'Search', onPress: () => { _onPressSearchPieceMark(Constant.CODE_PAINT) } },
+  //       { text: 'Cancel', style: 'cancel' }
+  //     ],
+  //   );
+  // };
   const _onPressQRCodePieceMark = async code => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
@@ -139,12 +139,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPressMamageLamCheckSpending = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode Lam Check Request\n\nSearch: Search Lam Check Request',
+      'Scan: Scan QRCode Lam Check Request\n\nSearch: Search Lam Check Request\n\nQC Status: QC Status Lam Check Request',
       [
         { text: 'Scan', onPress: _onPressQRCodeLamCheckSpending },
         { text: 'Search', onPress: _onPressSearchLamCheckSpending },
+        { text: 'QC Status', onPress: _onPressQCStatusLamCheckSpending },
         { text: 'Cancel', style: 'cancel' }
       ],
+      {
+        cancelable: true,
+      }
     );
   };
   const _onPressQRCodeLamCheckSpending = async () => {
@@ -166,26 +170,39 @@ const HomeScreenCONS = ({ route, navigation }) => {
       }
     );
   };
+  const _onPressQCStatusLamCheckSpending = async () => {
+    navigation.navigate(
+      'LamCheckQCStatus',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
 
   // FitUp & Weld
   const _onPressMamageFitUp = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode Construction FitUp\n\nSearch: Search Construction FitUp',
+      'Scan: Scan QRCode Construction FitUp\n\nSearch: Search Construction FitUp\n\nQC Status: QC Status Construction FitUp',
       [
         { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_FITUP) } },
         { text: 'Search', onPress: _onPressSearchConstruction },
+        { text: 'QC Status', onPress: () => { _onPressSpendingConstruction(Constant.CODE_FITUP) } },
         { text: 'Cancel', style: 'cancel' }
       ],
+      {
+        cancelable: true,
+      }
     );
   };
   const _onPressMamageWeld = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld',
+      'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld\n\nQC Status: QC Status Construction Visual',
       [
         { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_WELD) } },
         { text: 'Search', onPress: _onPressSearchConstruction },
+        { text: 'QC Status', onPress: () => { _onPressSpendingConstruction(Constant.CODE_VISUAL) } },
         { text: 'Cancel', style: 'cancel' }
       ],
     );
@@ -209,6 +226,19 @@ const HomeScreenCONS = ({ route, navigation }) => {
       {
         projectCode: projectCode,
         userLogin: userLogin,
+      }
+    );
+  };
+  const _onPressSpendingConstruction = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    let title = 'QC Status ' + code;
+    navigation.navigate(
+      'ConstructionQCStatus',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+        title: title,
       }
     );
   };
@@ -287,21 +317,23 @@ const HomeScreenCONS = ({ route, navigation }) => {
               <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressMamagePieceMarkCut} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressMamagePieceMarkPaint} />
+              {/* <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressMamagePieceMarkPaint} /> */}
               <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressMamageLamCheckSpending}  number={spendNumbers.LamCheck}/>
-            </View>
-            <View style={styles.row}>
               <RenderItemBox title={'Construciton\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/>
+            </View>
+            <View style={styles.row}>
+              {/* <RenderItemBox title={'Construciton\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/> */}
               <RenderItemBox title={'Construciton\nWeld'} onPress={_onPressMamageWeld} number={spendNumbers.Visual}/>
-            </View>
-            <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressTimeSheet} />
-              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
+              <RenderItemBox title={'Manpower\n'} />
+            </View>
+            {/* <View style={styles.row}>
               <RenderItemBox title={'Manpower\n'} />
               <RenderItemBox disable={true} />
-            </View>
+            </View> */}
           </ScrollView>
         </View>
       }

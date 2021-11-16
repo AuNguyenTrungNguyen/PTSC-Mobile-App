@@ -191,6 +191,9 @@ const HomeScreenQC = ({ route, navigation }) => {
         { text: 'Create', onPress: _onPressCreateObservation },
         { text: 'Cancel', style: 'cancel' }
       ],
+      {
+        cancelable: true,
+      }
     );
   };
   const _onPressOverviewListObservation = async () => {

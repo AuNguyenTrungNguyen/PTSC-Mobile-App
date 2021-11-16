@@ -263,7 +263,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
             <View style={styles.cellValue}>
               <Text style={styles.textValue}>{item.WMRev}</Text>
             </View>
-            <View style={styles.cellProgress}>
+            {/* <View style={styles.cellProgress}>
               {
                 item.progess
                   ?
@@ -276,7 +276,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
                     <Text style={styles.textAction}>Complete Percent</Text>
                   </TouchableOpacity>
               }
-            </View>
+            </View> */}
           </View>
         </View>
         <View style={styles.rowAction}>

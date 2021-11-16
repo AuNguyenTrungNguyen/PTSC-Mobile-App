@@ -4,7 +4,7 @@ import Helper from '../../utils/Helper';
 
 export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, location, type, code, token) => {
   let scope = await Helper.getData('QCSCOPE');
-  if (scope == null){
+  if (scope == null) {
     scope = '';
   }
   return fetch(
@@ -27,7 +27,7 @@ export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, locatio
 
 export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, token) => {
   let scope = await Helper.getData('QCSCOPE');
-  if (scope == null){
+  if (scope == null) {
     scope = '';
   }
   return fetch(

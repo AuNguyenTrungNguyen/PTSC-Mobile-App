@@ -33,6 +33,9 @@ export const UpdateLamCheckSpendingListAPI = (listItemUpdate, token) =>
 
 export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, token) => {
   let scope = await Helper.getData('QCSCOPE');
+  if (scope == null) {
+    scope = '';
+  }
   return fetch(
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckTodoListQRCode'
@@ -103,3 +106,18 @@ export const EditLamCheckTodoImageAPI = (id, note, token) =>
       body: JSON.stringify({ id, note }),
     }
   ).then(res => res.json());
+
+export const GetLamCheckQCStatusListAPI = (projectCode, drawingNo, jointNo, type, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/LamCheck/GetLamCheckQCStatusList'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&jointNo=' + jointNo
+    + '&type=' + type,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());

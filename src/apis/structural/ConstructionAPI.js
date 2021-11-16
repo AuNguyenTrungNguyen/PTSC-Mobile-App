@@ -1,4 +1,3 @@
-
 import { Port_Server } from '../../utils/Core';
 
 export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
@@ -75,3 +74,20 @@ export const SendDimToQCAPI = (model, token) =>
       body: JSON.stringify({ model }),
     }
   ).then(res => res.json());
+
+export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, location, type, code, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/Construction/GetConstructionQCStatusList'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&jointNo=' + jointNo
+    + '&location=' + location
+    + '&type=' + type
+    + '&code=' + code,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());

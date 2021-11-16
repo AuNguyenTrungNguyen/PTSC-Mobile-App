@@ -12,6 +12,7 @@ import { GetLamCheckSpendingListQRCodeAPI, UpdateLamCheckSpendingListAPI } from 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
+import CoreStyle from '../../../utils/CoreStyle';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';

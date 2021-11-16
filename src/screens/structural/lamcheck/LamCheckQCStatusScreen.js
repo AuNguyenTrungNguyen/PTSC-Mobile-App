@@ -2,11 +2,9 @@ import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, TextInput, Keyboard, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
-import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLamCheckTodoListQRCodeAPI, UpdateLamCheckTodoListAPI } from '../../../apis/structural/LamCheckAPI';
+import { GetLamCheckQCStatusListAPI } from '../../../apis/structural/LamCheckAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -15,25 +13,25 @@ import CoreStyle from '../../../utils/CoreStyle';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
+import SelectPopup from '../../../components/SelectPopup';
 
-const LamCheckTodoListScreen = ({ route, navigation }) => {
+const LamCheckQCStatusScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, paramDrawingNo, sheet, rev } = route.params;
+  const { projectCode, userLogin } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   const [drawingNo, setDrawingNo] = useState('');
   const [oldDrawingNo, setOldDrawingNo] = useState(null);
   const [jointNo, setJointNo] = useState('');
   const [oldJointNo, setOldJointNo] = useState(null);
 
-  const [isQR, setIsQR] = useState(true);
+  const [isVisibleType, setIsVisibleType] = useState(false);
+  const [type, setType] = useState(Constant.STATUS_NOT_YET);
 
-  const [lamCheckTodoList, setLamCheckTodoList] = useState(null);
-  const [lamCheckUpdateList, setLamCheckUpdateList] = useState([]);
+  const [lamCheckQCStatusList, setLamCheckQCStatusList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
@@ -42,6 +40,13 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleType(true) }}>
+            <Ionicons
+              size={24}
+              name={'md-ellipsis-vertical-circle'} color={iconColor} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -56,13 +61,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      if (paramDrawingNo) {
-        setDrawingNo(paramDrawingNo);
-        setIsSearching(true);
-        callAPI(() => { searchLamCheckTodoList(paramDrawingNo, jointNo, sheet, rev) }, false);
-      } else {
-        _onPressSearchTodoList();
-      }
+      callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, false);
     }, []
   );
 
@@ -76,12 +75,10 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
   };
 
   const callAPI = (executedAPI, loading = true) => {
-    if (!loading === null) {
-      if (loading) {
-        setIsLoading(true);
-      } else {
-        setIsSearching(true);
-      }
+    if (loading) {
+      setIsLoading(true);
+    } else {
+      setIsSearching(true);
     }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
@@ -95,24 +92,23 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     });
   };
 
-  const _onPressSubmitToServer = async () => {
-    if (lamCheckUpdateList.length) {
-      callAPI(updateLamCheckTodoList, null);
-    } else {
-      Toast.show('No any data changes!', Toast.SHORT);
-    }
-  };
-
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
-    setIsQR(false);
   };
 
   const _onChangeJointNo = no => {
     setJointNo(no);
   };
 
-  const _onPressSearchTodoList = () => {
+  const _onChangeType = status => {
+    if (status != type) {
+      setType(status);
+      callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, status) }, false);
+    }
+    setIsVisibleType(false);
+  };
+
+  const _onPressSearchLamCheckQCStatusList = () => {
     let isSearch = false;
     if (drawingNo !== oldDrawingNo) {
       setOldDrawingNo(drawingNo);
@@ -123,21 +119,19 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
       isSearch = true;
     }
     if (isSearch) {
-      callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo) }, false);
+      callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, false);
     }
   };
 
-  const searchLamCheckTodoList = async (drawingNo, jointNo, sheet, rev) => {
+  const searchLamCheckQCStatusList = async (drawingNo, jointNo, type) => {
     Keyboard.dismiss();
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    sheet = (sheet != null && isQR) ? sheet : '';
-    rev = (rev != null && isQR) ? rev : '';
-    GetLamCheckTodoListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, token)
+    GetLamCheckQCStatusListAPI(projectCode, drawingNo, jointNo, type, token)
       .then(res => {
         if (res.success) {
-          setLamCheckTodoList(res.data);
+          setLamCheckQCStatusList(res.data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -151,42 +145,6 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
         setIsError(true);
         setIsSearching(false);
       });
-  };
-
-  const updateLamCheckTodoList = async () => {
-    setIsUploading(true);
-    let token = await Helper.getData('TOKEN');
-    let listUpdate = Helper.handleListUpdate(lamCheckUpdateList);
-    UpdateLamCheckTodoListAPI(listUpdate, userLogin, token)
-      .then(res => {
-        if (res.success) {
-          setLamCheckUpdateList([]);
-          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-        } else {
-          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        }
-        setIsUploading(false);
-        callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo) }, false);
-      }).catch(() => {
-        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        setIsUploading(false);
-      });
-  };
-
-  const _onPressChangeValue = (data, index, key) => {
-    let array = [...lamCheckTodoList];
-    array[index][key] = data;
-    setLamCheckTodoList(array);
-
-    array = [...lamCheckUpdateList];
-    let rowIndex = lamCheckTodoList[index].RowIndex;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-    if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, [key]: data });
-    } else {
-      array[objIndex][key] = data;
-    }
-    setLamCheckUpdateList(array);
   };
 
   const _onPressManagePicture = async (item) => {
@@ -207,24 +165,22 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
 
 
   const getStatusRenderList = () => {
-    return !isSearching && lamCheckTodoList && lamCheckTodoList.length;
+    return !isSearching && lamCheckQCStatusList && lamCheckQCStatusList.length;
   };
 
   const RenderList = () => {
     if (isSearching) {
       return <ListLoadingData />
-    } else if (lamCheckTodoList == null) {
+    } else if (lamCheckQCStatusList == null) {
       return <ListSelectData title={'Enter DrawingNo or JointNo'} />
-    } else if (!lamCheckTodoList.length) {
+    } else if (!lamCheckQCStatusList.length) {
       return <ListEmptyData />
     }
   };
 
   const renderItem = ({ index, item }) => {
-    let keyUpdate = 'LaminationTestResult';
     return (
-      <View
-        style={styles.box}>
+      <TouchableOpacity style={styles.box} onPress={() => { _onPressManagePicture(item) }}>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>DrawingNo:</Text>
           {
@@ -275,30 +231,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
               <Text style={styles.cellData}>{Formater.formatEmptyData(item.LaminationTestResult)}</Text>
           }
         </View>
-        <View style={styles.row}>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonAccept}
-              onPress={() => _onPressChangeValue(Constant.STATUS_ACCEPT, index, keyUpdate)}>
-              <Text style={styles.labelAccept}>Accept</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonReject}
-              onPress={() => _onPressChangeValue(Constant.STATUS_REJECT, index, keyUpdate)}>
-              <Text style={styles.labelReject}>Reject</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonImage}
-              onPress={() => { _onPressManagePicture(item) }}>
-              <Text style={styles.labelImage}>Picture</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -306,7 +239,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo) }) }} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, true) }} />
         :
         <View style={styles.container}>
           {
@@ -353,9 +286,9 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
                   <Text style={styles.infoTitle} />
                   <TouchableOpacity
                     style={styles.searchButton}
-                    onPress={_onPressSearchTodoList}
+                    onPress={_onPressSearchLamCheckQCStatusList}
                     disabled={isSearching}>
-                    <Text style={styles.buttonTitle}>Search TodoList</Text>
+                    <Text style={styles.buttonTitle}>Search</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -365,32 +298,30 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           {
             getStatusRenderList()
               ?
-              <VirtualizedList
-                style={styles.table}
-                data={lamCheckTodoList}
-                getItemCount={data => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(item, index) => index}
-                renderItem={renderItem}
-              />
+              <>
+                <Text style={CoreStyle.textNote}>* Click an item to view image</Text>
+                <VirtualizedList
+                  style={styles.table}
+                  data={lamCheckQCStatusList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+              </>
               :
               <RenderList />
           }
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
-              <Text style={styles.buttonTitle}>Submit to Server</Text>
-            </TouchableOpacity>
-          </View>
+          <SelectPopup
+            visible={isVisibleType}
+            data={[Constant.STATUS_NOT_YET, Constant.STATUS_ACCEPT, Constant.STATUS_REJECT]}
+            onCancel={() => setIsVisibleType(false)}
+            onChangeItem={_onChangeType}>
+          </SelectPopup>
         </View>
       }
-      <AwesomeAlert
-        show={isUploading}
-        showProgress={true}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-      />
     </SafeAreaView>
   );
 };
@@ -544,4 +475,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LamCheckTodoListScreen;
+export default LamCheckQCStatusScreen;
