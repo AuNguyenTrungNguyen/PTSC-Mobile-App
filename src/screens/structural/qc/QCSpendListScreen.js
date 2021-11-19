@@ -154,7 +154,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const updateSpendListData = async () => {
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(updateSpendList);
-    UpdateQCSpendListAPI(userLogin, listUpdate, token)
+    UpdateQCSpendListAPI(userLogin, listUpdate, code, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -420,8 +420,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <Text>FittingDate:</Text>
                 </View>
-                <View style={styles.cellTwoUnit}>
+                <View style={styles.cellThreeUnit}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.FitUpDate)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>Time:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity
@@ -524,6 +532,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellTwoUnit}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.ActualFabWeldDate)}</Text>
+                </View>
+                <View style={styles.cellOneUnit} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>Time:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity

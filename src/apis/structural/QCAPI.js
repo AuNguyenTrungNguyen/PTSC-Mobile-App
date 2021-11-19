@@ -50,8 +50,10 @@ export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev
     }).then(res => res.json());
 };
 
-export const UpdateQCSpendListAPI = (userUpdate, listItemUpdate, token) =>
-  fetch(
+export const UpdateQCSpendListAPI = async (userUpdate, listItemUpdate, code, token) => {
+  let projectCode = await Helper.getData('PROJECT_CODE');
+  let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+  return fetch(
     Port_Server
     + '/api/structural/QC//UpdateQCSpendList',
     {
@@ -60,9 +62,10 @@ export const UpdateQCSpendListAPI = (userUpdate, listItemUpdate, token) =>
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userUpdate, listItemUpdate }),
+      body: JSON.stringify({ listItemUpdate, userUpdate, projectCode, disciplineCode, code }),
     }
   ).then(res => res.json());
+};
 
 export const GetQCImageAPI = (tableRowIndex, code, token) =>
   fetch(

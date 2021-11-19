@@ -1008,6 +1008,25 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>Time:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressOpenTimeDimQC(item.QCVisualRemark, index, 'QCVisualRemark')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
             </>
         }
       </View>

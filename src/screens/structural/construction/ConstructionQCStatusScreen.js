@@ -105,9 +105,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     GetConstructionQCStatusListAPI(projectCode, drawing, weld, locate, filterType, code, token)
       .then(res => {
-        console.log(res);
         if (res.success) {
-          console.log(res);
           setQCStatusList(res.data);
           setTotalList(res.total);
           setIsLoading(false);

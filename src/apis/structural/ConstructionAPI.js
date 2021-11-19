@@ -61,20 +61,6 @@ export const UpdateConstructionDetailAPI = (listItemUpdate, token) =>
     }
   ).then(res => res.json());
 
-export const SendDimToQCAPI = (model, token) =>
-  fetch(
-    Port_Server
-    + '/api/structural/Construction/SendDimToQC',
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ model }),
-    }
-  ).then(res => res.json());
-
 export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, location, type, code, token) =>
   fetch(
     Port_Server

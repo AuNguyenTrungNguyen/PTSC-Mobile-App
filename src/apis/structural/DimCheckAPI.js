@@ -1,21 +1,6 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-// TODO REMOVE
-export const GetDimCheckListAPI = (projectCode, drawingNo, jointNo, token) =>
-  fetch(
-    Port_Server
-    + '/api/structural/DimCheck/GetDimCheckList'
-    + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
-    + '&jointNo=' + jointNo,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
-
 export const GetDimCheckListScopeAPI = async (projectCode, drawingNo, jointNo, token) => {
   let scope = await Helper.getData('QCSCOPE');
   return fetch(
@@ -47,8 +32,9 @@ export const GetDimCheckDetailAPI = (projectCode, pieceMarkNo01, pieceMarkNo02, 
       },
     }).then(res => res.json());
 
-export const UpdateDimCheckDetailAPI = (weldMap, pieceMark01, pieceMark02, userUpdate, token) =>
-  fetch(
+export const UpdateDimCheckDetailAPI = async (weldMap, pieceMark01, pieceMark02, userUpdate, token) => {
+  let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+  return fetch(
     Port_Server
     + '/api/structural/DimCheck/UpdateDimCheckDetail',
     {
@@ -57,9 +43,10 @@ export const UpdateDimCheckDetailAPI = (weldMap, pieceMark01, pieceMark02, userU
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ weldMap, pieceMark01, pieceMark02, userUpdate }),
+      body: JSON.stringify({ weldMap, pieceMark01, pieceMark02, userUpdate, disciplineCode }),
     }
   ).then(res => res.json());
+};
 
 export const GetDimCheckImageAPI = (tableRowIndex, token) =>
   fetch(
