@@ -1,10 +1,12 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, TextInput, Keyboard, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import Dialog from "react-native-dialog";
 
 import { GetFittingTeamListAPI } from '../../../apis/app/AppAPI';
 import { GetLamCheckSpendingListQRCodeAPI, UpdateLamCheckSpendingListAPI } from '../../../apis/structural/LamCheckAPI';
@@ -32,7 +34,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
   const [jointNo, setJointNo] = useState('');
   const [oldJointNo, setOldJointNo] = useState(null);
 
-  const [isQR, setIsQR] = useState(true);
+  // const [isQR, setIsQR] = useState(true);
 
   const [lamCheckSpendingList, setLamCheckSpendingList] = useState(null);
   const [lamCheckUpdateList, setLamCheckUpdateList] = useState([]);
@@ -61,7 +63,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       if (paramDrawingNo) {
         setDrawingNo(paramDrawingNo);
         setIsSearching(true);
-        callAPI(() => { searchSpendingList(paramDrawingNo, jointNo, sheet, rev) }, false);
+        callAPI(() => { searchSpendingList(paramDrawingNo, jointNo) }, false);
       }
     }, []
   );
@@ -105,7 +107,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
-    setIsQR(false);
+    // setIsQR(false);
   };
 
   const _onChangeJointNo = no => {
@@ -127,14 +129,16 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
     }
   };
 
-  const searchSpendingList = async (drawingNo, jointNo, sheet, rev) => {
+  const searchSpendingList = async (drawingNo, jointNo) => {
     Keyboard.dismiss();
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    sheet = (sheet != null && isQR) ? sheet : '';
-    rev = (rev != null && isQR) ? rev : '';
-    GetLamCheckSpendingListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, token)
+    // sheet = (sheet != null && isQR) ? sheet : '';
+    // rev = (rev != null && isQR) ? rev : '';
+    let sheetParam = !sheet ? '' : sheet;
+    let revParam = !rev ? '' : rev;
+    GetLamCheckSpendingListQRCodeAPI(projectCode, drawingNo, jointNo, sheetParam, revParam, token)
       .then(res => {
         if (res.success) {
           setLamCheckSpendingList(res.data);
@@ -173,10 +177,11 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       });
   };
 
-  const [isVisibleFittingTeam, setIsVisibleFittingTeam] = useState(false);
-  const [fittingTeamList, setFittingTeamList] = useState(null);
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
+
+  const [isVisibleFittingTeam, setIsVisibleFittingTeam] = useState(false);
+  const [fittingTeamList, setFittingTeamList] = useState(null);
   const _onPressShowFittingTeamPopup = (index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
@@ -217,6 +222,28 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
     _onChangeData(data);
     setIsVisibleFittingTeam(false);
   };
+
+  const [isVisibleRemark, setIsVisibleRemark] = useState(false);
+  const [remark, setRemark] = useState('');
+  const _onPressOpenRemark = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setRemark(value.toString());
+    } else {
+      setRemark('');
+    }
+    setIsVisibleRemark(true);
+  };
+  const _onSubmitRemark = () => {
+    let value = remark.trim();
+    setRemark(value);
+    if (lamCheckSpendingList[indexUpdate][keyUpdate] !== value) {
+      _onChangeData(value);
+    }
+    setIsVisibleRemark(false);
+  };
+
   const _onChangeData = data => {
     let array = [...lamCheckSpendingList];
     array[indexUpdate][keyUpdate] = data;
@@ -283,6 +310,19 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
               onPress={() => _onPressShowFittingTeamPopup(index, 'LaminationTestRequestByTeam')}>
               <Text style={styles.textAction}>{Formater.formatEmptyData(item.LaminationTestRequestByTeam)}</Text>
               <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text>Remark:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <TouchableOpacity
+              style={styles.itemActionIcon}
+              onPress={() => _onPressOpenRemark(item.LamRemark, index, 'LamRemark')}>
+              <Text style={styles.textAction}>{Formater.formatEmptyData(item.LamRemark)}</Text>
+              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
             </TouchableOpacity>
           </View>
         </View>
@@ -377,9 +417,17 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
         visible={isVisibleFittingTeam}
         data={fittingTeamList}
         onChangeItem={_onChangeFittingTeam}
-        onCancel={() => setIsVisibleFittingTeam(false)}
-      >
-      </SelectPopup>
+        onCancel={() => setIsVisibleFittingTeam(false)} />
+      <Dialog.Container visible={isVisibleRemark}>
+        <Dialog.Title>{'Enter Remark'}</Dialog.Title>
+        <Dialog.Input
+          value={remark}
+          onChangeText={(text) => setRemark(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleRemark(false) }} />
+        <Dialog.Button label='OK' onPress={_onSubmitRemark} />
+      </Dialog.Container>
       <AwesomeAlert
         show={isUploading}
         showProgress={true}
@@ -388,7 +436,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       />
     </SafeAreaView>
   );
-}
+};
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';

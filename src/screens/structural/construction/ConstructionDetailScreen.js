@@ -194,8 +194,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [isVisibleWPS, setIsVisibleWPS] = useState(false);
   const [wpsList, setWPSList] = useState(null);
 
-  const [isVisibleTimeDimQC, setIsVisibleTimeDimQC] = useState(false);
-  const [timeDimQCDisplay, setTimeDimQCDisplay] = useState('');
+  const [isVisibleTime, setIsVisibleTime] = useState(false);
+  const [timeDisplay, setTimeDisplay] = useState('');
 
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
@@ -414,27 +414,27 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     setIsVisibleFittingTeam(false);
   };
 
-  const _onPressOpenTimeDimQC = (value, index, key) => {
+  const _onPressOpenTime = (value, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
     if (value) {
-      setTimeDimQCDisplay(value.toString());
+      setTimeDisplay(value.toString());
     } else {
-      setTimeDimQCDisplay('');
+      setTimeDisplay('');
     }
-    setIsVisibleTimeDimQC(true);
+    setIsVisibleTime(true);
   };
-  const _onChangeTimeDimQC = () => {
-    let value = timeDimQCDisplay.trim();
-    setTimeDimQCDisplay(value);
-    if (!timeDimQCDisplay || !timeDimQCDisplay.trim()) {
+  const _onChangeTime = () => {
+    let value = timeDisplay.trim();
+    setTimeDisplay(value);
+    if (!timeDisplay || !timeDisplay.trim()) {
       Toast.show('Please enter time!', Toast.SHORT, ['RCTModalHostViewController']);
       return;
     }
     if (constructionDetailList[indexUpdate][keyUpdate] !== value) {
       _onChangeData(value);
     }
-    setIsVisibleTimeDimQC(false);
+    setIsVisibleTime(false);
   };
 
   const _onPressShowWPSPopup = (index, key) => {
@@ -884,7 +884,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
-                    onPress={() => _onPressOpenTimeDimQC(item.DIMRemark, index, 'DIMRemark')}>
+                    onPress={() => _onPressOpenTime(item.DIMRemark, index, 'DIMRemark')}>
                     <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
                     {
                       isDisableItem
@@ -1015,7 +1015,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
-                    onPress={() => _onPressOpenTimeDimQC(item.QCVisualRemark, index, 'QCVisualRemark')}>
+                    onPress={() => _onPressOpenTime(item.QCVisualRemark, index, 'QCVisualRemark')}>
                     <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
                     {
                       isDisableItem
@@ -1147,15 +1147,15 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         onClear={_onPressClearWPS}
       >
       </SelectPopup>
-      <Dialog.Container visible={isVisibleTimeDimQC}>
+      <Dialog.Container visible={isVisibleTime}>
         <Dialog.Title>{'Enter Time'}</Dialog.Title>
         <Dialog.Input
-          value={timeDimQCDisplay}
-          onChangeText={(text) => setTimeDimQCDisplay(text)}
+          value={timeDisplay}
+          onChangeText={(text) => setTimeDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTimeDimQC(false) }} />
-        <Dialog.Button label='OK' onPress={_onChangeTimeDimQC} />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTime(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeTime} />
       </Dialog.Container>
     </SafeAreaView>
   );

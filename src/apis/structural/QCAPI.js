@@ -25,10 +25,19 @@ export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, locatio
     }).then(res => res.json());
 };
 
-export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, token) => {
+export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, isSpending, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
+  }
+  if (!sheet) {
+    sheet = '';
+  }
+  if (!rev) {
+    rev = '';
+  }
+  if(!isSpending){
+    isSpending = false;
   }
   return fetch(
     Port_Server
@@ -41,7 +50,8 @@ export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev
     + '&location=' + location
     + '&type=' + type
     + '&code=' + code
-    + '&scope=' + scope,
+    + '&scope=' + scope
+    + '&isSpending=' + isSpending,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

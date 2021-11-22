@@ -89,12 +89,29 @@ const HomeScreenQC = ({ route, navigation }) => {
   const _onPressMamageLamCheckTodo = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode Lam Check Todo\n\nSearch: Search Lam Check Todo',
+      'Spend List: Spend Lam Check Todo List\n\nScan: Scan QRCode Lam Check Todo\n\nSearch: Search Lam Check Todo',
       [
+        { text: 'Spend List', onPress: _onPressSpendListLamCheckTodo },
         { text: 'Scan', onPress: _onPressQRCodeLamCheckTodo },
         { text: 'Search', onPress: _onPressSearchLamCheckTodo },
         { text: 'Cancel', style: 'cancel' }
       ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressSpendListLamCheckTodo = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'Lam Check Todo Spend';
+    navigation.navigate(
+      'LamCheckTodoList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        title: title,
+        isSpending: true,
+      }
     );
   };
   const _onPressQRCodeLamCheckTodo = async () => {
@@ -109,11 +126,13 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
   const _onPressSearchLamCheckTodo = async () => {
-    let userLogin = await Helper.getData('USERNAME');
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'Lam Check Todo';
     navigation.navigate(
       'LamCheckTodoList',
       {
         projectCode: projectCode,
+        title: title,
         userLogin: userLogin,
       }
     );
@@ -123,23 +142,45 @@ const HomeScreenQC = ({ route, navigation }) => {
   const _onPressMamageQCFitUp = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QR Code FitUp Drawing\n\nSpend List: Spend FitUp Request List',
+      'Spend List: Spend FitUp Request List\n\nScan: Scan QR Code FitUp Request\n\nSearch: Search FitUp Request List',
       [
-        { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_FITUP) } },
         { text: 'Spend List', onPress: () => { _onPressSpendList(Constant.CODE_FITUP) } },
+        { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_FITUP) } },
+        { text: 'Search', onPress: () => { _onPressSearchList(Constant.CODE_FITUP) } },
         { text: 'Cancel', style: 'cancel' }
       ],
+      {
+        cancelable: true,
+      }
     );
   };
   const _onPressMamageQCVisual = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QR Code Visual Drawing\n\nSpend List: Spend Visual Request List',
+      'Spend List: Spend Visual Request List\n\nScan: Scan QR Code Visual Request\n\nSearch: Search Visual Request List',
       [
-        { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_VISUAL) } },
         { text: 'Spend List', onPress: () => { _onPressSpendList(Constant.CODE_VISUAL) } },
+        { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_VISUAL) } },
+        { text: 'Search', onPress: () => { _onPressSearchList(Constant.CODE_VISUAL) } },
         { text: 'Cancel', style: 'cancel' }
       ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressSpendList = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    let title = 'QC Spend ' + code;
+    navigation.navigate(
+      'QCSpendList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+        title: title,
+        isSpending: true,
+      }
     );
   };
   const _onPressQRCodeQC = async code => {
@@ -154,9 +195,9 @@ const HomeScreenQC = ({ route, navigation }) => {
       }
     );
   };
-  const _onPressSpendList = async code => {
+  const _onPressSearchList = async code => {
     const userLogin = await Helper.getData('USERNAME');
-    let title = 'QC Spend ' + code;
+    let title = 'QC ' + code;
     navigation.navigate(
       'QCSpendList',
       {
@@ -169,12 +210,53 @@ const HomeScreenQC = ({ route, navigation }) => {
   };
 
   // DIM Check
-  const _onPressDimCheck = async () => {
-    let userLogin = await Helper.getData('USERNAME');
+  const _onPressMamageDimCheck = async () => {
+    Alert.alert(
+      '',
+      'Spend List: Spend Dim Check List\n\nScan: Scan QRCode Dim Check\n\nSearch: Search Dim Check',
+      [
+        { text: 'Spend List', onPress: _onPressSpendListDimCheck },
+        { text: 'Scan', onPress: _onPressQRCodeDimCheck },
+        { text: 'Search', onPress: _onPressSearchDimCheck },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressSpendListDimCheck = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'Dim Check Spend';
     navigation.navigate(
       'DimCheckList',
       {
         projectCode: projectCode,
+        userLogin: userLogin,
+        title: title,
+        isSpending: true,
+      }
+    );
+  };
+  const _onPressQRCodeDimCheck = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        destination: Naming.NAME_STR_DIM_CHECK
+      }
+    );
+  };
+  const _onPressSearchDimCheck = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'Dim Check';
+    navigation.navigate(
+      'DimCheckList',
+      {
+        projectCode: projectCode,
+        title: title,
         userLogin: userLogin,
       }
     );
@@ -277,7 +359,7 @@ const HomeScreenQC = ({ route, navigation }) => {
             }
             <View style={styles.row}>
               <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressMamageLamCheckTodo} number={spendNumbers.LamCheck} />
-              <RenderItemBox title={'QC DIM\n'} onPress={_onPressDimCheck} number={spendNumbers.DimCheck} />
+              <RenderItemBox title={'QC DIM\n'} onPress={_onPressMamageDimCheck} number={spendNumbers.DimCheck} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC FitUp\n'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />

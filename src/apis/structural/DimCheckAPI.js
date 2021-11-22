@@ -1,15 +1,30 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetDimCheckListScopeAPI = async (projectCode, drawingNo, jointNo, token) => {
+export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, isSpending, token) => {
   let scope = await Helper.getData('QCSCOPE');
+  if (scope == null) {
+    scope = '';
+  }
+  if (!sheet) {
+    sheet = '';
+  }
+  if (!rev) {
+    rev = '';
+  }
+  if (!isSpending) {
+    isSpending = false;
+  }
   return fetch(
     Port_Server
-    + '/api/structural/DimCheck/GetDimCheckListScope'
+    + '/api/structural/DimCheck/GetDimCheckListQRCode'
     + '?projectCode=' + projectCode
     + '&drawingNo=' + drawingNo
     + '&jointNo=' + jointNo
-    + '&scope=' + scope,
+    + '&sheet=' + sheet
+    + '&rev=' + rev
+    + '&scope=' + scope
+    + '&isSpending=' + isSpending,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

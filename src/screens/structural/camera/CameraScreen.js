@@ -38,37 +38,46 @@ const CameraScreen = ({ route, navigation }) => {
       }
 
       let route = Constant.ROUTE__HOME;
+      let title = '';
       if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST) {
         route = 'LamCheckSpendingList';
       } else if (destination === Naming.NAME_STR_LAM_CHECK_TODO) {
         route = 'LamCheckTodoList';
+        title = 'Lam Check Todo';
+      } else if (destination === Naming.NAME_STR_DIM_CHECK) {
+        route = 'DimCheckList';
+        title = 'Dim Check';
       } else if (destination === Naming.NAME_STR_PIECE_MARK) {
         route = 'PieceMarkDetail';
+        title = 'Piece Mark ' + code;
       } else if (destination === Naming.NAME_STR_CONSTRUCTION) {
+        title = code + ' Detail';
         route = 'ConstructionDetail';
       } else if (destination === Naming.NAME_STR_QC) {
+        title = 'QC ' + code;
         route = 'QCSpendList';
       }
 
-      if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST || destination === Naming.NAME_STR_LAM_CHECK_TODO) {
+      if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST
+        || destination === Naming.NAME_STR_LAM_CHECK_TODO
+        || destination === Naming.NAME_STR_DIM_CHECK) {
         navigation.navigate(route, {
           projectCode: projectCode,
           userLogin: userLogin,
           sheet: sheet,
           rev: rev,
           paramDrawingNo: drawingNo,
+          title: title,
         });
         setIsScanned(false);
       }
       else if (destination === Naming.NAME_STR_QC) {
-        let title = 'QC Spend ' + code;
         navigation.navigate(route, {
           projectCode: projectCode,
           userLogin: userLogin,
           sheet: sheet,
           rev: rev,
           code: code,
-          userLogin: userLogin,
           paramDrawingNo: drawingNo,
           title: title,
         });
@@ -91,7 +100,6 @@ const CameraScreen = ({ route, navigation }) => {
           GetCurrentPieceMarkInfoAPI(projectCode, drawingNo, sheet, rev, code, token)
             .then(res => {
               if (res.success && res.data != null) {
-                const title = 'Piece Mark ' + code;
                 navigation.navigate(route, {
                   projectCode: projectCode,
                   facilityCode: res.data,
@@ -121,7 +129,6 @@ const CameraScreen = ({ route, navigation }) => {
           GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
             .then(res => {
               if (res.success && res.data != null) {
-                const title = code + ' Detail';
                 navigation.navigate(route, {
                   projectCode: projectCode,
                   facilityCode: res.data,

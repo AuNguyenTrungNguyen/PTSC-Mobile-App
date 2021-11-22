@@ -31,10 +31,19 @@ export const UpdateLamCheckSpendingListAPI = (listItemUpdate, token) =>
     }
   ).then(res => res.json());
 
-export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, token) => {
+export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, isSpending, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
+  }
+  if (!sheet) {
+    sheet = '';
+  }
+  if (!rev) {
+    rev = '';
+  }
+  if (!isSpending) {
+    isSpending = false;
   }
   return fetch(
     Port_Server
@@ -44,7 +53,8 @@ export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, joint
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev
-    + '&scope=' + scope,
+    + '&scope=' + scope
+    + '&isSpending=' + isSpending,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

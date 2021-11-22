@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
-import { GetDimCheckListScopeAPI } from '../../../apis/structural/DimCheckAPI';
+import { GetDimCheckListQRCodeAPI } from '../../../apis/structural/DimCheckAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -17,7 +17,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DimCheckListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, sheet, rev, userLogin, paramDrawingNo, isSpending } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -51,7 +51,13 @@ const DimCheckListScreen = ({ route, navigation }) => {
   const isFocused = useIsFocused();
   useEffect(
     () => {
-      callAPI(() => { searchDimCheckList(drawingNo, jointNo) }, false);
+      
+      if (paramDrawingNo) {
+        setDrawingNo(paramDrawingNo);
+        callAPI(() => { searchDimCheckList(paramDrawingNo, jointNo) }, false);
+      } else {
+        callAPI(() => { searchDimCheckList(drawingNo, jointNo) }, false);
+      }
     }, [isFocused]
   );
 
@@ -126,7 +132,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetDimCheckListScopeAPI(projectCode, drawingNo, jointNo, token)
+    GetDimCheckListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, isSpending, token)
       .then(res => {
         if (res.success) {
           setDimCheckList(res.data);
@@ -236,6 +242,10 @@ const DimCheckListScreen = ({ route, navigation }) => {
                 :
                 <Text style={styles.cellData}>{Formater.formatEmptyData(item.DIM_BeforeWeldResult_PM2)}</Text>
             }
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>InspectName:</Text>
+            <Text style={styles.cellData}>{Formater.formatEmptyData(item.DIM_BeforeWeldInspectName)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.cellTitle}>Team:</Text>

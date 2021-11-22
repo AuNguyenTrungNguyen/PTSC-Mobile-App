@@ -5,5 +5,6 @@ export default class Naming {
   static NAME_STR_QC= 'STR_QC';
   static NAME_STR_LAM_CHECK_REQUEST = 'STR_LAM_CHECK_REQUEST';
   static NAME_STR_LAM_CHECK_TODO = 'STR_LAM_CHECK_TODO';
+  static NAME_STR_DIM_CHECK = 'STR_DIM_CHECK';
 
 };

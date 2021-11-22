@@ -439,7 +439,7 @@ const StructuralCONSStackScreens = () => {
           headerBackTitle: 'Back',
         })}
       />
-       <StructuralCONSStack.Screen
+      <StructuralCONSStack.Screen
         name='ConstructionQCStatus'
         component={StructuralConstructionQCStatusScreen}
         options={({ route }) => ({
@@ -537,12 +537,10 @@ const StructuralQCStackScreens = () => {
       <StructuralQCStack.Screen
         name='LamCheckTodoList'
         component={StructuralLamCheckTodoListScreen}
-        options={
-          {
-            title: 'Lam Check Todo',
-            headerBackTitle: 'Back',
-          }
-        }
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
       <StructuralQCStack.Screen
         name='LamCheckImage'
@@ -557,12 +555,10 @@ const StructuralQCStackScreens = () => {
       <StructuralQCStack.Screen
         name='DimCheckList'
         component={StructuralDimCheckListScreen}
-        options={
-          {
-            title: 'Dim Check List',
-            headerBackTitle: 'Back',
-          }
-        }
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
       <StructuralQCStack.Screen
         name='DimCheckDetail'

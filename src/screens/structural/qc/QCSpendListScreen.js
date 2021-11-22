@@ -11,7 +11,7 @@ import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import CoreStyle from '../../../utils/CoreStyle';
-import { GetQCSpendListAPI, GetQCSpendListQRCodeAPI, UpdateQCSpendListAPI } from '../../../apis/structural/QCAPI';
+import { GetQCSpendListQRCodeAPI, UpdateQCSpendListAPI } from '../../../apis/structural/QCAPI';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -33,12 +33,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const [isVisibleTotal, setIsVisibleTotal] = useState(false);
   const [totalList, setTotalList] = useState([]);
 
-  const { projectCode, sheet, rev, code, userLogin, paramDrawingNo } = route.params;
+  const { projectCode, sheet, rev, code, userLogin, paramDrawingNo, isSpending } = route.params;
 
   const [weldNo, setWeldNo] = useState('');
   const [drawingNo, setDrawingNo] = useState('');
   const [location, setLocation] = useState('');
-  const [isQR, setIsQR] = useState(false);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -46,13 +45,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { setIsVisibleType(true) }}>
-            <Ionicons
-              size={24}
-              name={'md-ellipsis-vertical-circle'} color={iconColor} />
-          </TouchableOpacity>
+          {
+            !isSpending &&
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => { setIsVisibleType(true) }}>
+              <Ionicons
+                size={24}
+                name={'md-ellipsis-vertical-circle'} color={iconColor} />
+            </TouchableOpacity>
+          }
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleTotal(true) }}>
@@ -84,7 +86,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
     () => {
       if (paramDrawingNo) {
         setDrawingNo(paramDrawingNo);
-        callAPI(() => { getSpendListData(paramDrawingNo, weldNo, location, type, true) });
+        callAPI(() => { getSpendListData(paramDrawingNo, weldNo, location, type) });
       } else {
         callAPI(getSpendListData);
       }
@@ -105,50 +107,27 @@ const QCSpendListScreen = ({ route, navigation }) => {
     });
   };
 
-  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type, isQRCode = false) => {
+  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type) => {
     let token = await Helper.getData('TOKEN');
-    setIsQR(isQRCode);
-    if (isQRCode) {
-      GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, token)
-        .then(res => {
-          if (res.success) {
-            setSpendList(res.data);
-            setTotalList(res.total);
-            setIsLoading(false);
-            setIsError(false);
-            setIsSearching(false);
-          } else {
-            setIsLoading(false);
-            setIsError(true);
-            setIsSearching(false);
-          }
-        })
-        .catch(() => {
+    GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending, token)
+      .then(res => {
+        if (res.success) {
+          setSpendList(res.data);
+          setTotalList(res.total);
+          setIsLoading(false);
+          setIsError(false);
+          setIsSearching(false);
+        } else {
           setIsLoading(false);
           setIsError(true);
           setIsSearching(false);
-        });
-    } else {
-      GetQCSpendListAPI(projectCode, drawing, weld, locate, filterType, code, token)
-        .then(res => {
-          if (res.success) {
-            setSpendList(res.data);
-            setTotalList(res.total);
-            setIsLoading(false);
-            setIsError(false);
-            setIsSearching(false);
-          } else {
-            setIsLoading(false);
-            setIsError(true);
-            setIsSearching(false);
-          }
-        })
-        .catch(() => {
-          setIsLoading(false);
-          setIsError(true);
-          setIsSearching(false);
-        });
-    }
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsSearching(false);
+      });
   };
 
   const updateSpendListData = async () => {
@@ -162,7 +141,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
-        callAPI(() => { getSpendListData(drawingNo, weldNo, location, type, isQR) });
+        callAPI(() => { getSpendListData(drawingNo, weldNo, location, type) });
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
       });
@@ -171,7 +150,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onChangeWeldNo = no => {
     setWeldNo(no);
     if (!no) {
-      callAPI(() => { getSpendListData(drawingNo, no, location, type, isQR) });
+      callAPI(() => { getSpendListData(drawingNo, no, location, type) });
     }
   };
 
@@ -184,7 +163,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
 
   const _onPressSearchDrawing = () => {
     Keyboard.dismiss();
-    callAPI(() => { getSpendListData(drawingNo, weldNo, location, type, isQR) });
+    callAPI(() => { getSpendListData(drawingNo, weldNo, location, type) });
   };
 
   const _onPressSubmitToServer = async () => {
@@ -252,7 +231,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onPressChangeLocation = loc => {
     if (loc != location) {
       setLocation(loc);
-      callAPI(() => { getSpendListData(drawingNo, weldNo, loc, type, isQR) });
+      callAPI(() => { getSpendListData(drawingNo, weldNo, loc, type) });
     }
     setIsVisibleTotal(false);
   };
@@ -265,7 +244,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onChangeType = data => {
     if (data != type) {
       setType(data);
-      callAPI(() => { getSpendListData(drawingNo, weldNo, location, data, isQR) });
+      callAPI(() => { getSpendListData(drawingNo, weldNo, location, data) });
     }
     setIsVisibleType(false);
   };
@@ -699,7 +678,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(() => { getSpendListData(drawingNo, weldNo, location, type, isQR) })} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(() => { getSpendListData(drawingNo, weldNo, location, type) })} />
         :
         <View style={styles.container}>
           {
