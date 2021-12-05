@@ -186,7 +186,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'Scan: Scan QRCode Construction FitUp\n\nSearch: Search Construction FitUp\n\nQC Status: QC Status Construction FitUp',
       [
         { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_FITUP) } },
-        { text: 'Search', onPress: _onPressSearchConstruction },
+        { text: 'Search', onPress: () => { _onPressSearchConstruction(Constant.CODE_FITUP) } },
         { text: 'QC Status', onPress: () => { _onPressSpendingConstruction(Constant.CODE_FITUP) } },
         { text: 'Cancel', style: 'cancel' }
       ],
@@ -198,10 +198,10 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPressMamageWeld = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld\n\nQC Status: QC Status Construction Visual',
+      'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld\n\nQC Status: QC Status Construction Weld',
       [
         { text: 'Scan', onPress: () => { _onPressQRCodeConstruction(Constant.CODE_WELD) } },
-        { text: 'Search', onPress: _onPressSearchConstruction },
+        { text: 'Search', onPress: () => { _onPressSearchConstruction(Constant.CODE_WELD) } },
         { text: 'QC Status', onPress: () => { _onPressSpendingConstruction(Constant.CODE_VISUAL) } },
         { text: 'Cancel', style: 'cancel' }
       ],
@@ -219,13 +219,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
       }
     );
   };
-  const _onPressSearchConstruction = async () => {
+  const _onPressSearchConstruction = async code => {
     let userLogin = await Helper.getData('USERNAME');
+    let title = 'Construction ' + code;
     navigation.navigate(
       'ConstructionList',
       {
         projectCode: projectCode,
         userLogin: userLogin,
+        code: code,
+        title: title,
       }
     );
   };

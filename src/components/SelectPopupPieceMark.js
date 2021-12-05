@@ -20,7 +20,7 @@ const SelectPopupPieceMark = props => {
                       ?
                       props.data.map(item => {
                         return (
-                          <TouchableOpacity style={styles.box} key={item.WorkOrder} onPress={() => props.onChangeItem(item)}>
+                          <TouchableOpacity style={styles.box} key={item.HeatNo_TagNo} onPress={() => props.onChangeItem(item)}>
                             <View style={styles.row}>
                               <Text style={styles.cellTitle}>{Formater.formatEmptyData(item.PieceMarkNo)}</Text>
                             </View>

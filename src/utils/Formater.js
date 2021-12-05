@@ -10,6 +10,10 @@ export default class Formater {
     return data ? Moment(data).format("DD-MMM-YY") : '';
   };
 
+  static formatDateDataTime = data => {
+    return data ? Moment(data).format("DD-MMM-YY HH:mm") : '';
+  };
+
   static formatTwoDigits = number => {
     try {
       return number.toFixed(2);

@@ -3,8 +3,10 @@ import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
+import CheckBox from '@react-native-community/checkbox';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MCIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
@@ -25,7 +27,7 @@ import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
 import SelectPopupPieceMark from '../../../components/SelectPopupPieceMark';
 
-const ConstructionDetailScreen = ({ route, navigation }) => {
+const ConstructionMultiDetailScreen = ({ route, navigation }) => {
 
   const { projectCode, facilityCode, drawingNo, sheet, rev, code, userLogin, link } = route.params;
 
@@ -36,6 +38,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [constructionUpdateList, setConstructionUpdateList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
+  const [isCheckAllName, setIsCheckAllName] = useState('checkbox-marked-outline');
 
   useEffect(
     () => {
@@ -56,14 +59,21 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={checkAllList}>
+            <MCIcons
+              size={24}
+              name={isCheckAllName} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleHelp(true) }}>
             <Ionicons
               size={24}
               name={'help-circle-outline'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -72,7 +82,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription, isVisibleHelp]);
+  }, [navigation, isShowDescription, isVisibleHelp, isCheckAllName, constructionDetailList]);
 
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -81,6 +91,31 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
       }
     });
+  };
+
+  const checkAllList = () => {
+    let isCheckAll = isCheckAllName === 'checkbox-blank-outline';
+    if (isCheckAll) {
+      if (constructionDetailList) {
+        let array = [...constructionDetailList];
+        array.map(i => {
+          i.Selected = false;
+          return i;
+        });
+        setConstructionDetailList(array);
+      }
+      setIsCheckAllName('checkbox-marked-outline');
+    } else {
+      if (constructionDetailList) {
+        let array = [...constructionDetailList];
+        array.map(i => {
+          i.Selected = true;
+          return i;
+        });
+        setConstructionDetailList(array);
+      }
+      setIsCheckAllName('checkbox-blank-outline');
+    }
   };
 
   const callAPI = executedAPI => {
@@ -173,6 +208,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       }
     );
   };
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+  const [keyUpdate, setKeyUpdate] = useState('');
 
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
 
@@ -200,23 +237,59 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [isVisibleTime, setIsVisibleTime] = useState(false);
   const [timeDisplay, setTimeDisplay] = useState('');
 
-  const [indexUpdate, setIndexUpdate] = useState(-1);
-  const [keyUpdate, setKeyUpdate] = useState('');
+  const _onChangeData = (data, index, key) => {
+    let indexParam = indexUpdate;
+    if (index > -1) {
+      indexParam = index;
+    }
 
-  const _onChangeData = data => {
+    let keyParam = keyUpdate;
+    if (key) {
+      keyParam = key;
+    }
+
+    // Normal
     let array = [...constructionDetailList];
-    array[indexUpdate][keyUpdate] = data;
+    array[indexParam][keyParam] = data;
     setConstructionDetailList(array);
-
     array = [...constructionUpdateList];
-    let rowIndex = constructionDetailList[indexUpdate].RowIndex;
+    let rowIndex = constructionDetailList[indexParam].RowIndex;
     let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, [keyUpdate]: data });
+      array.push({ RowIndex: rowIndex, [keyParam]: data });
     } else {
-      array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
+      array[objIndex][keyParam] = data;
     }
     setConstructionUpdateList(array);
+
+    // Multiple
+    let cloneUI = [...constructionDetailList];
+    let cloneUpdate = [...array];
+    constructionDetailList.map(i => {
+      if (i.Selected) {
+
+        // List UI
+        let objIndex = cloneUI.findIndex(obj => obj.RowIndex == i.RowIndex);
+        cloneUI[objIndex][keyParam] = data;
+
+        // List update
+        objIndex = cloneUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+        if (objIndex < 0) {
+          cloneUpdate.push({ RowIndex: i.RowIndex, [keyParam]: data });
+        } else {
+          cloneUpdate[objIndex][keyParam] = data;
+        }
+      }
+      return i;
+    });
+    setConstructionDetailList(cloneUI);
+    setConstructionUpdateList(cloneUpdate);
+  };
+
+  const _onChangeCheckbox = (value, index) => {
+    let array = [...constructionDetailList];
+    array[index]['Selected'] = value;
+    setConstructionDetailList(array);
   };
 
   const _onPressSelectDate = (value, index, key) => {
@@ -231,19 +304,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
-      let array = [...constructionDetailList];
-      array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD");
-      setConstructionDetailList(array);
-
-      array = [...constructionUpdateList];
-      let rowIndex = constructionDetailList[indexUpdate].RowIndex;
-      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-      if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, [keyUpdate]: Moment(selectedDate).format("YYYY-MM-DD") });
-      } else {
-        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
-      }
-      setConstructionUpdateList(array);
+      let value = Moment(selectedDate).format("YYYY-MM-DD");
+      _onChangeData(value);
     }
     setIsVisibleDate(false);
   };
@@ -272,19 +334,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     }
     setIsVisiblePercent(false);
     if (constructionDetailList[indexUpdate][keyUpdate] !== value) {
-      let array = [...constructionDetailList];
-      array[indexUpdate][keyUpdate] = value;
-      setConstructionDetailList(array);
-
-      array = [...constructionUpdateList];
-      let rowIndex = constructionDetailList[indexUpdate].RowIndex;
-      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-      if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, [keyUpdate]: value });
-      } else {
-        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
-      }
-      setConstructionUpdateList(array);
+      _onChangeData(value);
     }
   };
 
@@ -298,6 +348,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       setIsVisiblePieceMark(false);
       return;
     }
+
+    // Normal
     let array = [...constructionDetailList];
     array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
     array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
@@ -323,6 +375,42 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
     }
     setConstructionUpdateList(array);
+
+    // Multiple
+    let cloneUI = [...constructionDetailList];
+    let cloneUpdate = [...array];
+    constructionDetailList.map(i => {
+      if (i.Selected) {
+
+        // List UI
+        let objIndex = cloneUI.findIndex(obj => obj.RowIndex == i.RowIndex);
+        cloneUI[objIndex]['PieceNo2'] = data.PieceMarkNo;
+        cloneUI[objIndex]['PieceMarkNo02'] = data.PieceMarkNo;
+        cloneUI[objIndex]['PieceDescription2'] = data.PieceDescription;
+        cloneUI[objIndex]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+
+        // List update
+        objIndex = cloneUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+        if (objIndex < 0) {
+          cloneUpdate.push({
+            RowIndex: i.RowIndex,
+            'PieceNo2': data.PieceMarkNo,
+            'PieceMarkNo02': data.PieceMarkNo,
+            'PieceDescription2': data.PieceDescription,
+            'HeatNo_TagNo2': data.HeatNo_TagNo,
+          });
+        } else {
+          cloneUpdate[objIndex]['PieceNo2'] = data.PieceMarkNo;
+          cloneUpdate[objIndex]['PieceMarkNo02'] = data.PieceMarkNo;
+          cloneUpdate[objIndex]['PieceDescription2'] = data.PieceDescription;
+          cloneUpdate[objIndex]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+        }
+      }
+      return i;
+    });
+    setConstructionDetailList(cloneUI);
+    setConstructionUpdateList(cloneUpdate);
+
     setIsVisiblePieceMark(false);
   };
 
@@ -498,19 +586,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
   const _onChangeCompleteDate = (selectedDate) => {
     if (selectedDate != undefined) {
-      let array = [...constructionDetailList];
-      array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD HH:mm:00");
-      setConstructionDetailList(array);
-
-      array = [...constructionUpdateList];
-      let rowIndex = constructionDetailList[indexUpdate].RowIndex;
-      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-      if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, [keyUpdate]: Moment(selectedDate).format("YYYY-MM-DD HH:mm:00") });
-      } else {
-        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
-      }
-      setConstructionUpdateList(array);
+      let value = Moment(selectedDate).format("YYYY-MM-DD HH:mm:00");
+      _onChangeData(value);
     }
     setIsVisibleCompleteDate(false);
   };
@@ -524,6 +601,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         projectCode: projectCode,
         welders: value,
         index: index,
+        isMultiple: true,
       }
     );
   };
@@ -536,18 +614,20 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     let keyPercent = code == Constant.CODE_FITUP ? 'FitUpPercent' : 'ActualFabWeldPercent';
     let valueClear = null;
 
+    // Normal
     let array = [...constructionDetailList];
     array[index][keyDate] = valueClear;
     array[index][keyPercent] = valueClear;
     if (code === Constant.CODE_FITUP) {
       array[index]['Location'] = valueClear;
       array[index]['FitUpRequestByTeam'] = valueClear;
+      array[index]['DIMRemark'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
+      array[index]['QCVisualRemark'] = valueClear;
     }
     setConstructionDetailList(array);
-
     array = [...constructionUpdateList];
     let rowIndex = constructionDetailList[index].RowIndex;
     let objIndex = array.findIndex(obj => obj.RowIndex === rowIndex);
@@ -559,6 +639,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           [keyPercent]: valueClear,
           ['Location']: valueClear,
           ['FitUpRequestByTeam']: valueClear,
+          ['DIMRemark']: valueClear,
         });
       } else {
         array.push({
@@ -566,21 +647,85 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           [keyDate]: valueClear,
           [keyPercent]: valueClear,
           ['WelderID']: valueClear,
-          ['WPSNo']: valueClear
+          ['WPSNo']: valueClear,
+          ['QCVisualRemark']: valueClear,
         });
       }
     } else {
-      array[objIndex][keyDate] = constructionDetailList[index][keyDate];
-      array[objIndex][keyPercent] = constructionDetailList[index][keyPercent];
+      array[objIndex][keyDate] = valueClear;
+      array[objIndex][keyPercent] = valueClear;
       if (code == Constant.CODE_FITUP) {
-        array[objIndex]['Location'] = constructionDetailList[index]['Location'];
-        array[objIndex]['FitUpRequestByTeam'] = constructionDetailList[index]['FitUpRequestByTeam'];
+        array[objIndex]['Location'] = valueClear;
+        array[objIndex]['FitUpRequestByTeam'] = valueClear;
+        array[objIndex]['DIMRemark'] = valueClear;
       } else {
-        array[objIndex]['WelderID'] = constructionDetailList[index]['WelderID'];
-        array[objIndex]['WPSNo'] = constructionDetailList[index]['WPSNo'];
+        array[objIndex]['WelderID'] = valueClear;
+        array[objIndex]['WPSNo'] = valueClear;
+        array[objIndex]['QCVisualRemark'] = valueClear;
       }
     }
     setConstructionUpdateList(array);
+
+    // Multiple
+    let cloneUI = [...constructionDetailList];
+    let cloneUpdate = [...array];
+    constructionDetailList.map(i => {
+      if (i.Selected) {
+
+        // List UI
+        let objIndex = cloneUI.findIndex(obj => obj.RowIndex == i.RowIndex);
+        cloneUI[objIndex][keyDate] = valueClear;
+        cloneUI[objIndex][keyPercent] = valueClear;
+        if (code === Constant.CODE_FITUP) {
+          cloneUI[objIndex]['Location'] = valueClear;
+          cloneUI[objIndex]['FitUpRequestByTeam'] = valueClear;
+          cloneUI[objIndex]['DIMRemark'] = valueClear;
+        } else {
+          cloneUI[objIndex]['WelderID'] = valueClear;
+          cloneUI[objIndex]['WPSNo'] = valueClear;
+          cloneUI[objIndex]['QCVisualRemark'] = valueClear;
+        }
+
+        // List update
+        objIndex = cloneUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+        if (objIndex < 0) {
+          if (code == Constant.CODE_FITUP) {
+            cloneUpdate.push({
+              RowIndex: i.RowIndex,
+              [keyDate]: valueClear,
+              [keyPercent]: valueClear,
+              ['Location']: valueClear,
+              ['FitUpRequestByTeam']: valueClear,
+              ['DIMRemark']: valueClear
+            });
+          } else {
+            cloneUpdate.push({
+              RowIndex: i.RowIndex,
+              [keyDate]: valueClear,
+              [keyPercent]: valueClear,
+              ['WelderID']: valueClear,
+              ['WPSNo']: valueClear,
+              ['QCVisualRemark']: valueClear
+            });
+          }
+        } else {
+          cloneUpdate[objIndex][keyDate] = valueClear;
+          cloneUpdate[objIndex][keyPercent] = valueClear;
+          if (code == Constant.CODE_FITUP) {
+            cloneUpdate[objIndex]['Location'] = valueClear;
+            cloneUpdate[objIndex]['FitUpRequestByTeam'] = valueClear;
+            cloneUpdate[objIndex]['DIMRemark'] = valueClear;
+          } else {
+            cloneUpdate[objIndex]['WelderID'] = valueClear;
+            cloneUpdate[objIndex]['WPSNo'] = valueClear;
+            cloneUpdate[objIndex]['QCVisualRemark'] = valueClear;
+          }
+        }
+      }
+      return i;
+    });
+    setConstructionDetailList(cloneUI);
+    setConstructionUpdateList(cloneUpdate);
   };
 
   const _onPressDoneNow = index => {
@@ -589,6 +734,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     let valueDate = Moment(new Date()).format("YYYY-MM-DD");
     let valuePercent = 100;
 
+    // Normal
     let array = [...constructionDetailList];
     array[index][keyDate] = valueDate;
     array[index][keyPercent] = valuePercent;
@@ -600,28 +746,42 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     if (objIndex < 0) {
       array.push({ RowIndex: rowIndex, [keyDate]: valueDate, [keyPercent]: valuePercent });
     } else {
-      array[objIndex][keyDate] = constructionDetailList[index][keyDate];
-      array[objIndex][keyPercent] = constructionDetailList[index][keyPercent];
+      array[objIndex][keyDate] = valueDate;
+      array[objIndex][keyPercent] = valuePercent;
     }
     setConstructionUpdateList(array);
+
+    // Multiple
+    let cloneUI = [...constructionDetailList];
+    let cloneUpdate = [...array];
+    constructionDetailList.map(i => {
+      if (i.Selected) {
+
+        // List UI
+        let objIndex = cloneUI.findIndex(obj => obj.RowIndex == i.RowIndex);
+        cloneUI[objIndex][keyDate] = valueDate;
+        cloneUI[objIndex][keyPercent] = valuePercent;
+
+        // List update
+        objIndex = cloneUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+        if (objIndex < 0) {
+          cloneUpdate.push({ RowIndex: i.RowIndex, [keyDate]: valueDate, [keyPercent]: valuePercent });
+        } else {
+          cloneUpdate[objIndex][keyDate] = valueDate;
+          cloneUpdate[objIndex][keyPercent] = valueDate;
+        }
+      }
+      return i;
+    });
+    setConstructionDetailList(cloneUI);
+    setConstructionUpdateList(cloneUpdate);
   };
 
   const _onPressChangePercent = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
     if (constructionDetailList[index][key] !== value) {
-      let array = [...constructionDetailList];
-      array[index][key] = value;
-      setConstructionDetailList(array);
-
-      array = [...constructionUpdateList];
-      let rowIndex = constructionDetailList[index].RowIndex;
-      let weldNo = constructionDetailList[index].JointNo;
-      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-      if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, ['FitUpPercent']: value });
-      } else {
-        array[objIndex]['FitUpPercent'] = constructionDetailList[index][key];
-      }
-      setConstructionUpdateList(array);
+      _onChangeData(value, index, key);
     }
   };
 
@@ -697,6 +857,19 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 </Text>
                 :
                 <>
+                  <CheckBox
+                    value={!!item.Selected}
+                    onValueChange={value => _onChangeCheckbox(value, index)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
                   <Text>JointNo: </Text>
                   <Text style={styles.textMeta}>{Formater.formatEmptyData(item.JointNo)}</Text>
                   <Text> - WeldType: </Text>
@@ -1218,7 +1391,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       </Dialog.Container>
     </SafeAreaView>
   );
-}
+};
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
@@ -1337,6 +1510,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     flexDirection: 'row',
   },
+  checkBox: {
+    color: BASE_COLOR,
+  },
   textMeta: {
     fontWeight: 'bold',
     color: BASE_COLOR,
@@ -1424,4 +1600,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ConstructionDetailScreen;
+export default ConstructionMultiDetailScreen;

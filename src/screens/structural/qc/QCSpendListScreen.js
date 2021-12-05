@@ -507,6 +507,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
+                  <Text>{'Completed\nDate'}:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatDateDataTime(item.WeldingCompletedDate)}</Text>
+                </View>
+                <View style={styles.cellOneUnit} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
                   <Text>WeldDate:</Text>
                 </View>
                 <View style={styles.cellTwoUnit}>

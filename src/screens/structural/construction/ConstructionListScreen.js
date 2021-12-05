@@ -9,7 +9,6 @@ import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
 import { GetConstructionListAPI, GetCurrentConstructionInfoAPI } from '../../../apis/structural/ConstructionAPI';
-// import GetDrawingCompletePercentAPI from '../../../apis/drawing/GetDrawingCompletePercentAPI';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
 import MessageAlert from '../../../components/MessageAlert';
@@ -17,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const ConstructionListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, userLogin, code } = route.params;
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -197,22 +196,49 @@ const ConstructionListScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressCompletePercent = async (drawingNo, sheet, rev) => {
-    // Keyboard.dismiss();
-    // let index = constructionList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
-    // let token = await Helper.getData('TOKEN');
-    // GetDrawingCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
-    //   .then(res => {
-    //     if (res.success) {
-    //       let array = [...constructionList];
-    //       array[index]['progess'] = res.data;
-    //       setConstructionList(array);
-    //     } else {
-    //       Toast.show('Please check that you are using the company network!', Toast.SHORT);
-    //     }
-    //   }).catch(() => {
-    //     Toast.show('Please check that you are using the company network!', Toast.SHORT);
-    //   });
+  const _onPressViewMultiDetail = async (drawingNo, sheet, rev, link, code) => {
+    Keyboard.dismiss();
+    const title = code + ' Multi Detail';
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      navigation.navigate(
+        'ConstructionMultiDetail',
+        {
+          projectCode: projectCode,
+          facilityCode: facilityCode,
+          drawingNo: drawingNo,
+          sheet: sheet,
+          rev: rev,
+          code: code,
+          userLogin: userLogin,
+          link: link,
+          title: title,
+        }
+      );
+    } else {
+      let token = await Helper.getData('TOKEN');
+      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+        .then(res => {
+          if (res.success) {
+            navigation.navigate('ConstructionMultiDetail', {
+              projectCode: projectCode,
+              facilityCode: res.data,
+              drawingNo: drawingNo,
+              sheet: sheet,
+              rev: rev,
+              code: code,
+              userLogin: userLogin,
+              link: res.link,
+              title: title,
+            });
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        }).catch(() => {
+          setIsLoading(false);
+          setIsError(true);
+        });
+    }
   };
 
   const RenderConstructionList = () => {
@@ -263,34 +289,33 @@ const ConstructionListScreen = ({ route, navigation }) => {
             <View style={styles.cellValue}>
               <Text style={styles.textValue}>{item.WMRev}</Text>
             </View>
-            {/* <View style={styles.cellProgress}>
-              {
-                item.progess
-                  ?
-                  <>
-                    <Text style={styles.cellAction}>{item.progess.FitUp}%</Text>
-                    <Text style={styles.cellAction}>{item.progess.Weld}%</Text>
-                  </>
-                  :
-                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(item.WeldMapDrawingNo, item.WMSheet, item.WMRev) }}>
-                    <Text style={styles.textAction}>Complete Percent</Text>
-                  </TouchableOpacity>
-              }
-            </View> */}
           </View>
         </View>
         <View style={styles.rowAction}>
           <View style={styles.cellTitle} />
           <View style={styles.cellData}>
             <View style={styles.cellValue} />
-            <View style={styles.cellProgress}>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewDetail(item.WeldMapDrawingNo, item.WMSheet, item.WMRev, item.WebLink, Constant.CODE_FITUP) }}>
-                <Text style={styles.textAction}>View FitUp</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewDetail(item.WeldMapDrawingNo, item.WMSheet, item.WMRev, item.WebLink, Constant.CODE_WELD) }}>
-                <Text style={styles.textAction}>View Weld</Text>
-              </TouchableOpacity>
-            </View>
+            {
+              code == Constant.CODE_FITUP
+                ?
+                <View style={styles.cellProgress}>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewDetail(item.WeldMapDrawingNo, item.WMSheet, item.WMRev, item.WebLink, Constant.CODE_FITUP) }}>
+                    <Text style={styles.textAction}>View FitUp</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewMultiDetail(item.WeldMapDrawingNo, item.WMSheet, item.WMRev, item.WebLink, Constant.CODE_FITUP) }}>
+                    <Text style={styles.textAction}>Multi FitUp</Text>
+                  </TouchableOpacity>
+                </View>
+                :
+                <View style={styles.cellProgress}>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewDetail(item.WeldMapDrawingNo, item.WMSheet, item.WMRev, item.WebLink, Constant.CODE_WELD) }}>
+                    <Text style={styles.textAction}>View Weld</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewMultiDetail(item.WeldMapDrawingNo, item.WMSheet, item.WMRev, item.WebLink, Constant.CODE_WELD) }}>
+                    <Text style={styles.textAction}>Multi Weld</Text>
+                  </TouchableOpacity>
+                </View>
+            }
           </View>
         </View>
       </View>

@@ -45,6 +45,7 @@ import StructuralHomeScreenQC from './screens/structural/home/HomeScreenQC';
 import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
 import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
 import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
+import StructuralConstructionMultiDetailScreen from './screens/structural/construction/ConstructionMultiDetailScreen';
 import StructuralConstructionImageScreen from './screens/structural/construction/ConstructionImageScreen';
 import StructuralConstructionQCStatusScreen from './screens/structural/construction/ConstructionQCStatusScreen';
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
@@ -424,16 +425,22 @@ const StructuralCONSStackScreens = () => {
       <StructuralCONSStack.Screen
         name='ConstructionList'
         component={StructuralConstructionListScreen}
-        options={
-          {
-            title: 'Construction List',
-            headerBackTitle: 'Back',
-          }
-        }
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
       <StructuralCONSStack.Screen
         name='ConstructionDetail'
         component={StructuralConstructionDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionMultiDetail'
+        component={StructuralConstructionMultiDetailScreen}
         options={({ route }) => ({
           title: route.params.title,
           headerBackTitle: 'Back',
