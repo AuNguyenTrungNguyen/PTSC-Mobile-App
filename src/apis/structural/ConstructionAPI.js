@@ -47,17 +47,17 @@ export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, s
       },
     }).then(res => res.json());
 
-export const UpdateConstructionDetailAPI = (listItemUpdate, token) =>
+export const UpdateConstructionDetailAPI = (projectCode, facilityCode, userUpdate, code, listItemUpdate, token) =>
   fetch(
     Port_Server
-    + '/api/structural/Construction/UpdateConstructionDetailAndSendDIM',
+    + '/api/structural/Construction/UpdateConstructionDetail',
     {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ listItemUpdate }),
+      body: JSON.stringify({ projectCode, facilityCode, userUpdate, code, listItemUpdate }),
     }
   ).then(res => res.json());
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Platform, Appearance } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -173,7 +173,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(constructionUpdateList);
     setIsUploading(true);
-    UpdateConstructionDetailAPI(listUpdate, token)
+    UpdateConstructionDetailAPI(projectCode, facilityCode, userLogin, code, listUpdate, token)
       .then(res => {
         if (res.success) {
           setConstructionUpdateList([]);
@@ -842,6 +842,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     let isDisableItem = isDateValid && isPercentValid;
     let isEnableClear = itemDate || itemPercent;
 
+    var styleCheckBox = Platform.OS === 'ios'? styles.checkBoxiOS : styles.checkBox;
+
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
         <View style={styles.row}>
@@ -860,7 +862,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                   <CheckBox
                     value={!!item.Selected}
                     onValueChange={value => _onChangeCheckbox(value, index)}
-                    style={styles.checkBox}
+                    style={styleCheckBox}
                     boxType='square'
                     disabled={false}
                     onCheckColor={OPP_COLOR}
@@ -1512,6 +1514,12 @@ const styles = StyleSheet.create({
   },
   checkBox: {
     color: BASE_COLOR,
+  },
+  checkBoxiOS: {
+    color: BASE_COLOR,
+    width: 20,
+    height: 20,
+    marginRight: 4
   },
   textMeta: {
     fontWeight: 'bold',

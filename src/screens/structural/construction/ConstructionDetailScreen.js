@@ -138,7 +138,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(constructionUpdateList);
     setIsUploading(true);
-    UpdateConstructionDetailAPI(listUpdate, token)
+    UpdateConstructionDetailAPI(projectCode, facilityCode, userLogin, code, listUpdate, token)
       .then(res => {
         if (res.success) {
           setConstructionUpdateList([]);
