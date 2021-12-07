@@ -15,6 +15,7 @@ import CoreStyle from '../../../utils/CoreStyle';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
+import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckTodoListScreen = ({ route, navigation }) => {
 
@@ -34,14 +35,35 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
   const [lamCheckUpdateList, setLamCheckUpdateList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
-
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
+
+  // Filter Type
+  const [isVisibleType, setIsVisibleType] = useState(false);
+  const [type, setType] = useState(Constant.FILTER_ALL);
+  const _onChangeType = data => {
+    if (data != type) {
+      setType(data);
+      callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo, data) });
+    }
+    setIsVisibleType(false);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          {
+            !isSpending &&
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => { setIsVisibleType(true) }}>
+              <Ionicons
+                size={24}
+                name={'md-ellipsis-vertical-circle'} color={iconColor} />
+            </TouchableOpacity>
+          }
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -57,7 +79,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
       if (paramDrawingNo) {
         setDrawingNo(paramDrawingNo);
         setIsSearching(true);
-        callAPI(() => { searchLamCheckTodoList(paramDrawingNo, jointNo) }, false);
+        callAPI(() => { searchLamCheckTodoList(paramDrawingNo, jointNo, type) }, false);
       } else {
         _onPressSearchTodoList();
       }
@@ -120,16 +142,16 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
       isSearch = true;
     }
     if (isSearch) {
-      callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo) }, false);
+      callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo, type) }, false);
     }
   };
 
-  const searchLamCheckTodoList = async (drawingNo, jointNo) => {
+  const searchLamCheckTodoList = async (drawingNo, jointNo, filterType) => {
     Keyboard.dismiss();
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetLamCheckTodoListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, isSpending, token)
+    GetLamCheckTodoListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, token)
       .then(res => {
         if (res.success) {
           setLamCheckTodoList(res.data);
@@ -161,7 +183,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
         setIsUploading(false);
-        callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo) }, false);
+        callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo, type) }, false);
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);
@@ -261,6 +283,10 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           <Text style={styles.cellData}>{Formater.formatEmptyData(item.LamRemark)}</Text>
         </View>
         <View style={styles.row}>
+          <Text style={styles.cellTitle}>InspectName:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.LaminationTestInspectName)}</Text>
+        </View>
+        <View style={styles.row}>
           <Text style={styles.cellTitle}>Result:</Text>
           {
             item.LaminationTestResult
@@ -305,7 +331,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo) }) }} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchLamCheckTodoList(drawingNo, jointNo, type) }) }} />
         :
         <View style={styles.container}>
           {
@@ -384,6 +410,12 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           </View>
         </View>
       }
+      <SelectPopup
+        visible={isVisibleType}
+        data={[Constant.FILTER_ALL, Constant.FILTER_NOT_YET, Constant.FILTER_ALREADY]}
+        onCancel={() => setIsVisibleType(false)}
+        onChangeItem={_onChangeType}>
+      </SelectPopup>
       <AwesomeAlert
         show={isUploading}
         showProgress={true}

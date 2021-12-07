@@ -14,6 +14,7 @@ import CoreStyle from '../../../utils/CoreStyle';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
+import SelectPopup from '../../../components/SelectPopup';
 
 const DimCheckListScreen = ({ route, navigation }) => {
 
@@ -32,12 +33,34 @@ const DimCheckListScreen = ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
+
+  // Filter Type
+  const [isVisibleType, setIsVisibleType] = useState(false);
+  const [type, setType] = useState(Constant.FILTER_ALL);
+  const _onChangeType = data => {
+    if (data != type) {
+      setType(data);
+      callAPI(() => { searchDimCheckList(drawingNo, jointNo, data) });
+    }
+    setIsVisibleType(false);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          {
+            !isSpending &&
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => { setIsVisibleType(true) }}>
+              <Ionicons
+                size={24}
+                name={'md-ellipsis-vertical-circle'} color={iconColor} />
+            </TouchableOpacity>
+          }
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -51,12 +74,12 @@ const DimCheckListScreen = ({ route, navigation }) => {
   const isFocused = useIsFocused();
   useEffect(
     () => {
-      
+
       if (paramDrawingNo) {
         setDrawingNo(paramDrawingNo);
-        callAPI(() => { searchDimCheckList(paramDrawingNo, jointNo) }, false);
+        callAPI(() => { searchDimCheckList(paramDrawingNo, jointNo, type) }, false);
       } else {
-        callAPI(() => { searchDimCheckList(drawingNo, jointNo) }, false);
+        callAPI(() => { searchDimCheckList(drawingNo, jointNo, type) }, false);
       }
     }, [isFocused]
   );
@@ -99,7 +122,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
   const _onClearDrawingNo = () => {
     setDrawingNo('');
     setOldDrawingNo(null);
-    callAPI(() => { searchDimCheckList('', jointNo) }, false);
+    callAPI(() => { searchDimCheckList('', jointNo, type) }, false);
   };
 
   const _onChangeJointNo = no => {
@@ -109,7 +132,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
   const _onClearJointNo = () => {
     setJointNo('');
     setOldJointNo(null);
-    callAPI(() => { searchDimCheckList(drawingNo, '') }, false);
+    callAPI(() => { searchDimCheckList(drawingNo, '', type) }, false);
   };
 
   const _onPressSearchList = () => {
@@ -123,16 +146,16 @@ const DimCheckListScreen = ({ route, navigation }) => {
       isSearch = true;
     }
     if (isSearch) {
-      callAPI(() => { searchDimCheckList(drawingNo, jointNo) }, false);
+      callAPI(() => { searchDimCheckList(drawingNo, jointNo, type) }, false);
     }
   };
 
-  const searchDimCheckList = async (drawingNo, jointNo) => {
+  const searchDimCheckList = async (drawingNo, jointNo, filterType) => {
     Keyboard.dismiss();
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetDimCheckListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, isSpending, token)
+    GetDimCheckListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, token)
       .then(res => {
         if (res.success) {
           setDimCheckList(res.data);
@@ -272,7 +295,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchDimCheckList(drawingNo, jointNo) }) }} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchDimCheckList(drawingNo, jointNo, type) }) }} />
         :
         <View style={styles.container}>
           {
@@ -349,6 +372,12 @@ const DimCheckListScreen = ({ route, navigation }) => {
           }
         </View>
       }
+      <SelectPopup
+        visible={isVisibleType}
+        data={[Constant.FILTER_ALL, Constant.FILTER_NOT_YET, Constant.FILTER_ALREADY]}
+        onCancel={() => setIsVisibleType(false)}
+        onChangeItem={_onChangeType}>
+      </SelectPopup>
     </SafeAreaView>
   );
 };

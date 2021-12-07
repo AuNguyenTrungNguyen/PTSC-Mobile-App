@@ -1,7 +1,7 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, isSpending, token) => {
+export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, type, isSpending, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
@@ -23,6 +23,7 @@ export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, 
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev
+    + '&type=' + type
     + '&scope=' + scope
     + '&isSpending=' + isSpending,
     {
@@ -48,6 +49,7 @@ export const GetDimCheckDetailAPI = (projectCode, pieceMarkNo01, pieceMarkNo02, 
     }).then(res => res.json());
 
 export const UpdateDimCheckDetailAPI = async (weldMap, pieceMark01, pieceMark02, userUpdate, token) => {
+  let projectCode = await Helper.getData('PROJECT_CODE');
   let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
   return fetch(
     Port_Server
@@ -58,7 +60,7 @@ export const UpdateDimCheckDetailAPI = async (weldMap, pieceMark01, pieceMark02,
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ weldMap, pieceMark01, pieceMark02, userUpdate, disciplineCode }),
+      body: JSON.stringify({ weldMap, pieceMark01, pieceMark02, userUpdate, disciplineCode, projectCode }),
     }
   ).then(res => res.json());
 };
