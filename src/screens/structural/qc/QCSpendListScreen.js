@@ -397,6 +397,14 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
+                  <Text>FitUpTeam:</Text>
+                </View>
+                <View style={styles.cellThreeUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpRequestByTeam)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
                   <Text>FittingDate:</Text>
                 </View>
                 <View style={styles.cellThreeUnit}>
@@ -502,6 +510,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellTwoUnit}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
+                </View>
+                <View style={styles.cellOneUnit} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>VisualTeam:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualRequestByTeam)}</Text>
                 </View>
                 <View style={styles.cellOneUnit} />
               </View>

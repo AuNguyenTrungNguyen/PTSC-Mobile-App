@@ -41,10 +41,10 @@ export const GetLocationListAPI = (projectCode, disciplineCode, token) =>
       }
     }).then(res => res.json());
 
-export const GetFittingTeamListAPI = (projectCode, filterType, token) =>
+export const GetTeamListAPI = (projectCode, filterType, token) =>
   fetch(
     Port_Server
-    + '/api/App/GetFittingTeamList'
+    + '/api/App/GetTeamList'
     + '?projectCode=' + projectCode
     + '&filterType=' + filterType,
     {

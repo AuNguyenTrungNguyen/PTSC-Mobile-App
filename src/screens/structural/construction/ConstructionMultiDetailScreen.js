@@ -12,7 +12,7 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListAPI, GetFittingTeamListAPI, GetPieceMarkListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListAPI, GetTeamListAPI, GetPieceMarkListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
@@ -225,8 +225,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   const [isVisibleLocation, setIsVisibleLocation] = useState(false);
   const [locationList, setLocationList] = useState(null);
 
-  const [isVisibleFittingTeam, setIsVisibleFittingTeam] = useState(false);
-  const [fittingTeamList, setFittingTeamList] = useState(null);
+  const [isVisibleTeam, setIsVisibleTeam] = useState(false);
+  const [teamList, setTeamList] = useState(null);
 
   const [isVisibleWPS, setIsVisibleWPS] = useState(false);
   const [wpsList, setWPSList] = useState(null);
@@ -460,49 +460,49 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     setIsVisibleLocation(false);
   };
 
-  const _onPressShowFittingTeamPopup = (index, key) => {
+  const _onPressShowTeamPopup = (index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
-    setIsVisibleFittingTeam(true);
+    setIsVisibleTeam(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
-        getFittingTeamList();
+        getTeamList();
       }
     });
   };
-  const getFittingTeamList = async () => {
-    if (fittingTeamList == null) {
+  const getTeamList = async () => {
+    if (teamList == null) {
       let token = await Helper.getData('TOKEN');
-      GetFittingTeamListAPI(projectCode, code, token)
+      GetTeamListAPI(projectCode, code, token)
         .then(res => {
           if (res.success) {
-            setFittingTeamList(res.data);
+            setTeamList(res.data);
             setIsLoading(false);
             setIsError(false);
           } else {
             setIsLoading(false);
             setIsError(true);
-            setIsVisibleFittingTeam(false);
+            setIsVisibleTeam(false);
           }
         })
         .catch(() => {
           setIsLoading(false);
           setIsError(true);
-          setIsVisibleFittingTeam(false);
+          setIsVisibleTeam(false);
         });
     }
   };
-  const _onPressClearFittingTeam = () => {
-    _onChangeFittingTeam(null);
-    setIsVisibleFittingTeam(false);
+  const _onPressClearTeam = () => {
+    _onChangeTeam(null);
+    setIsVisibleTeam(false);
   };
-  const _onChangeFittingTeam = data => {
+  const _onChangeTeam = data => {
     _onChangeData(data);
-    setIsVisibleFittingTeam(false);
+    setIsVisibleTeam(false);
   };
 
   const _onPressOpenTime = (value, index, key) => {
@@ -625,6 +625,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
+      array[index]['VisualRequestByTeam'] = valueClear;
+      array[index]['WeldingCompletedDate'] = valueClear;
       array[index]['QCVisualRemark'] = valueClear;
     }
     setConstructionDetailList(array);
@@ -648,6 +650,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           [keyPercent]: valueClear,
           ['WelderID']: valueClear,
           ['WPSNo']: valueClear,
+          ['VisualRequestByTeam']: valueClear,
+          ['WeldingCompletedDate']: valueClear,
           ['QCVisualRemark']: valueClear,
         });
       }
@@ -661,6 +665,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       } else {
         array[objIndex]['WelderID'] = valueClear;
         array[objIndex]['WPSNo'] = valueClear;
+        array[objIndex]['VisualRequestByTeam'] = valueClear;
+        array[objIndex]['WeldingCompletedDate'] = valueClear;
         array[objIndex]['QCVisualRemark'] = valueClear;
       }
     }
@@ -683,6 +689,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         } else {
           cloneUI[objIndex]['WelderID'] = valueClear;
           cloneUI[objIndex]['WPSNo'] = valueClear;
+          cloneUI[objIndex]['VisualRequestByTeam'] = valueClear;
+          cloneUI[objIndex]['WeldingCompletedDate'] = valueClear;
           cloneUI[objIndex]['QCVisualRemark'] = valueClear;
         }
 
@@ -705,7 +713,9 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               [keyPercent]: valueClear,
               ['WelderID']: valueClear,
               ['WPSNo']: valueClear,
-              ['QCVisualRemark']: valueClear
+              ['VisualRequestByTeam']: valueClear,
+              ['WeldingCompletedDate']: valueClear,
+              ['QCVisualRemark']: valueClear,
             });
           }
         } else {
@@ -718,6 +728,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           } else {
             cloneUpdate[objIndex]['WelderID'] = valueClear;
             cloneUpdate[objIndex]['WPSNo'] = valueClear;
+            cloneUpdate[objIndex]['VisualRequestByTeam'] = valueClear;
+            cloneUpdate[objIndex]['WeldingCompletedDate'] = valueClear;
             cloneUpdate[objIndex]['QCVisualRemark'] = valueClear;
           }
         }
@@ -835,14 +847,9 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   const renderItem = ({ index, item }) => {
     let itemDate = code == Constant.CODE_FITUP ? item['FitUpDate'] : item['ActualFabWeldDate'];
     let itemPercent = code == Constant.CODE_FITUP ? item['FitUpPercent'] : item['ActualFabWeldPercent'];
-
-    let isDateValid = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
-    let isPercentValid = itemPercent != null && itemPercent == 100;
-
-    let isDisableItem = isDateValid && isPercentValid;
+    let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
     let isEnableClear = itemDate || itemPercent;
-
-    var styleCheckBox = Platform.OS === 'ios'? styles.checkBoxiOS : styles.checkBox;
+    let styleCheckBox = Platform.OS === 'ios' ? styles.checkBoxiOS : styles.checkBox;
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
@@ -1051,12 +1058,12 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FittingTeam:</Text>
+                  <Text>Team:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemActionIcon}
-                    onPress={() => _onPressShowFittingTeamPopup(index, 'FitUpRequestByTeam')}>
+                    onPress={() => _onPressShowTeamPopup(index, 'FitUpRequestByTeam')}>
                     <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpRequestByTeam)}</Text>
                     {
                       isDisableItem
@@ -1217,6 +1224,25 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
+                  <Text>Team:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowTeamPopup(index, 'VisualRequestByTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualRequestByTeam)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
                   <Text>{'Completed\nDate'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
@@ -1366,11 +1392,11 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       >
       </SelectPopup>
       <SelectPopup
-        visible={isVisibleFittingTeam}
-        data={fittingTeamList}
-        onChangeItem={_onChangeFittingTeam}
-        onCancel={() => setIsVisibleFittingTeam(false)}
-        onClear={_onPressClearFittingTeam}
+        visible={isVisibleTeam}
+        data={teamList}
+        onChangeItem={_onChangeTeam}
+        onCancel={() => setIsVisibleTeam(false)}
+        onClear={_onPressClearTeam}
       >
       </SelectPopup>
       <SelectPopup

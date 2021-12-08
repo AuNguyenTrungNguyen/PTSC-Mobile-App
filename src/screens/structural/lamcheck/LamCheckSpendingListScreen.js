@@ -8,7 +8,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Dialog from "react-native-dialog";
 
-import { GetFittingTeamListAPI } from '../../../apis/app/AppAPI';
+import { GetTeamListAPI } from '../../../apis/app/AppAPI';
 import { GetLamCheckSpendingListQRCodeAPI, UpdateLamCheckSpendingListAPI } from '../../../apis/structural/LamCheckAPI';
 
 import Helper from '../../../utils/Helper';
@@ -199,7 +199,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
   const getFittingTeamList = async () => {
     if (fittingTeamList == null) {
       let token = await Helper.getData('TOKEN');
-      GetFittingTeamListAPI(projectCode, Constant.CODE_FITUP, token)
+      GetTeamListAPI(projectCode, Constant.CODE_FITUP, token)
         .then(res => {
           if (res.success) {
             setFittingTeamList(res.data);
