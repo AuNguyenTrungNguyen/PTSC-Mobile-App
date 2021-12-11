@@ -84,12 +84,12 @@ const CameraScreen = ({ route, navigation }) => {
         setIsScanned(false);
       }
       else {
-        getDataAndNavigate(drawingNo, sheet, rev, route);
+        getDataAndNavigate(drawingNo, sheet, rev, route, title);
       }
     }
   };
 
-  const getDataAndNavigate = async (drawingNo, sheet, rev, route) => {
+  const getDataAndNavigate = async (drawingNo, sheet, rev, route, title) => {
     setIsScanned(true);
     let token = await Helper.getData('TOKEN');
     NetInfo.fetch().then(state => {

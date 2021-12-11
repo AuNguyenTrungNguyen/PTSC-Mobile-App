@@ -169,6 +169,88 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       });
   };
 
+  // Submit to Server
+  const checkConstructionDetail = () => {
+    let messages = [];
+    if (code == Constant.CODE_FITUP) {
+      constructionUpdateList.map(item => {
+        let date = item['FitUpDate'];
+        let percent = item['FitUpPercent'];
+        let location = item['Location'];
+        let team = item['FitUpRequestByTeam'];
+        let time = item['DIMRemark'];
+
+        if ((date && percent && location && team && time) || (!date && !percent && !location && !team && !time)) {
+          return item;
+        }
+
+        let keys = Object.keys(item);
+        let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id'));
+        let objIndex = constructionDetailList.findIndex(obj => obj.RowIndex == item.RowIndex);
+        let oldItem = constructionDetailList[objIndex];
+        if ((column.indexOf('FitUpDate') >= 0 && !date) || (column.indexOf('FitUpDate') < 0 && !oldItem['FitUpDate'])) {
+          messages.push('Date');
+        }
+        if ((column.indexOf('FitUpPercent') >= 0 && !percent) || (column.indexOf('FitUpPercent') < 0 && !oldItem['FitUpPercent'])) {
+          messages.push('Percent');
+        }
+        if ((column.indexOf('Location') >= 0 && !location) || (column.indexOf('Location') < 0 && !oldItem['Location'])) {
+          messages.push('Location');
+        }
+        if ((column.indexOf('FitUpRequestByTeam') >= 0 && !team) || (column.indexOf('FitUpRequestByTeam') < 0 && !oldItem['FitUpRequestByTeam'])) {
+          messages.push('Team');
+        }
+        if ((column.indexOf('DIMRemark') >= 0 && !time) || (column.indexOf('DIMRemark') < 0 && !oldItem['DIMRemark'])) {
+          messages.push('Time');
+        }
+        return item;
+      });
+    }
+    else {
+      constructionUpdateList.map(item => {
+        let date = item['ActualFabWeldDate'];
+        let percent = item['ActualFabWeldPercent'];
+        let welderId = item['WelderID'];
+        let wspNo = item['WPSNo'];
+        let team = item['VisualRequestByTeam'];
+        let completeDate = item['WeldingCompletedDate'];
+        let time = item['QCVisualRemark'];
+
+        if ((date && percent && welderId && wspNo && team && completeDate && time)
+          || (!date && !percent && !welderId && !wspNo && !team && !completeDate && !time)) {
+          return item;
+        }
+
+        let keys = Object.keys(item);
+        let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id'));
+        let objIndex = constructionDetailList.findIndex(obj => obj.RowIndex == item.RowIndex);
+        let oldItem = constructionDetailList[objIndex];
+        if ((column.indexOf('ActualFabWeldDate') >= 0 && !date) || (column.indexOf('ActualFabWeldDate') < 0 && !oldItem['ActualFabWeldDate'])) {
+          messages.push('Date');
+        }
+        if ((column.indexOf('ActualFabWeldPercent') >= 0 && !percent) || (column.indexOf('ActualFabWeldPercent') < 0 && !oldItem['ActualFabWeldPercent'])) {
+          messages.push('Percent');
+        }
+        if ((column.indexOf('WelderID') >= 0 && !welderId) || (column.indexOf('WelderID') < 0 && !oldItem['WelderID'])) {
+          messages.push('WelderID');
+        }
+        if ((column.indexOf('WPSNo') >= 0 && !wspNo) || (column.indexOf('WPSNo') < 0 && !oldItem['WPSNo'])) {
+          messages.push('WPSNo');
+        }
+        if ((column.indexOf('VisualRequestByTeam') >= 0 && !team) || (column.indexOf('VisualRequestByTeam') < 0 && !oldItem['VisualRequestByTeam'])) {
+          messages.push('Team');
+        }
+        if ((column.indexOf('WeldingCompletedDate') >= 0 && !completeDate) || (column.indexOf('WeldingCompletedDate') < 0 && !oldItem['WeldingCompletedDate'])) {
+          messages.push('CompletedDate');
+        }
+        if ((column.indexOf('QCVisualRemark') >= 0 && !time) || (column.indexOf('QCVisualRemark') < 0 && !oldItem['QCVisualRemark'])) {
+          messages.push('Time');
+        }
+        return item;
+      });
+    }
+    return messages;
+  };
   const updateConstructionDetail = async () => {
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(constructionUpdateList);
@@ -187,10 +269,15 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
-
   const _onPressSubmitToServer = async () => {
     if (constructionUpdateList.length) {
-      callAPI(updateConstructionDetail);
+      let error = checkConstructionDetail();
+      if (error.length) {
+        let uniqueError = [...new Set(error)];
+        MessageAlert('ERROR', '\nPlesase enter: ' + uniqueError.join(', '));
+      } else {
+        callAPI(updateConstructionDetail);
+      }
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
@@ -477,7 +564,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   const getTeamList = async () => {
     if (teamList == null) {
       let token = await Helper.getData('TOKEN');
-      GetTeamListAPI(projectCode, code, token)
+      let filterType = code == Constant.CODE_FITUP ? Constant.CODE_FITUP : Constant.CODE_VISUAL;
+      GetTeamListAPI(projectCode, filterType, token)
         .then(res => {
           if (res.success) {
             setTeamList(res.data);
@@ -925,7 +1013,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FitUpDate:</Text>
+                  <Text style={styles.redText}>Date:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -944,7 +1032,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FitUpPercent:</Text>
+                  <Text style={styles.redText}>Percent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -977,6 +1065,63 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                       </TouchableOpacity>
                     </View>
                 }
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Location:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressShowLocationPopup(index, 'Location')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Team:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowTeamPopup(index, 'FitUpRequestByTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpRequestByTeam)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Time:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressOpenTime(item.DIMRemark, index, 'DIMRemark')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
@@ -1039,83 +1184,26 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>Location:</Text>
-                </View>
-                <View style={styles.cellDataLine}>
-                  <TouchableOpacity
-                    style={styles.itemAction}
-                    onPress={() => _onPressShowLocationPopup(index, 'Location')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={'#a3a3a3'} />
-                        :
-                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>Team:</Text>
-                </View>
-                <View style={styles.cellDataLine}>
-                  <TouchableOpacity
-                    style={styles.itemActionIcon}
-                    onPress={() => _onPressShowTeamPopup(index, 'FitUpRequestByTeam')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpRequestByTeam)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
-                        :
-                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellTitle}>
                   <Text>QCScope:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <RenderQCScope value={item.QCScope} />
                 </View>
               </View>
-              <View style={styles.row}>
+              {/* <View style={styles.row}>
                 <View style={styles.cellTitle}>
                   <Text>{'DIM\nBeforeWeld:'}</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <RenderDIMBeforeWeldRequired value={item.DIMBeforeWeldRequired} />
                 </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>Time:</Text>
-                </View>
-                <View style={styles.cellDataLine}>
-                  <TouchableOpacity
-                    style={styles.itemAction}
-                    onPress={() => _onPressOpenTime(item.DIMRemark, index, 'DIMRemark')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
-                        :
-                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
-                </View>
-              </View>
+              </View> */}
             </>
             :
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldDate:</Text>
+                  <Text style={styles.redText}>Date:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1134,7 +1222,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldPercent:</Text>
+                  <Text style={styles.redText}>Percent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -1186,7 +1274,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WelderIDs:</Text>
+                  <Text style={styles.redText}>WelderID:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1205,7 +1293,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WPSNo:</Text>
+                  <Text style={styles.redText}>WPSNo:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1224,7 +1312,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>Team:</Text>
+                  <Text style={styles.redText}>Team:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1243,7 +1331,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>{'Completed\nDate'}:</Text>
+                  <Text style={styles.redText}>{'Completed\nDate'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1262,7 +1350,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>Time:</Text>
+                  <Text style={styles.redText}>Time:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1553,6 +1641,9 @@ const styles = StyleSheet.create({
   },
   greenText: {
     color: 'green',
+  },
+  redText: {
+    color: 'red',
   },
   textData: {
     minWidth: 80,
