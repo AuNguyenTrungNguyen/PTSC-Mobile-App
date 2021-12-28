@@ -5,6 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import Dialog from "react-native-dialog";
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 import { GetLamCheckTodoListQRCodeAPI, UpdateLamCheckTodoListAPI } from '../../../apis/structural/LamCheckAPI';
 
@@ -190,6 +192,60 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
       });
   };
 
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+  const [keyUpdate, setKeyUpdate] = useState('');
+  const _onChangeData = (data, index, key) => {
+    let indexParam = indexUpdate;
+    if (index > -1) {
+      indexParam = index;
+    }
+
+    let keyParam = keyUpdate;
+    if (key) {
+      keyParam = key;
+    }
+
+    let array = [...lamCheckTodoList];
+    array[indexParam][keyParam] = data;
+    setLamCheckTodoList(array);
+
+    array = [...lamCheckUpdateList];
+    let rowIndex = lamCheckTodoList[indexParam].RowIndex;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, [keyParam]: data });
+    } else {
+      array[objIndex][keyParam] = data;
+    }
+    setLamCheckUpdateList(array);
+  };
+
+  const [isVisibleThickness, setIsVisibleThickness] = useState(false);
+  const [thicknessDisplay, setThicknessDisplay] = useState('');
+  const _onPressSelectThickness = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setThicknessDisplay(value.toString());
+    } else {
+      setThicknessDisplay('');
+    }
+    setIsVisibleThickness(true);
+  };
+  const _onChangeThickness = () => {
+    let value = thicknessDisplay.replace(/,/g, '.');
+    setThicknessDisplay(value);
+    if (!Helper.checkFormatNumber(value)) {
+      Toast.show('Please enter a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    setIsVisibleThickness(false);
+    if (lamCheckTodoList[indexUpdate][keyUpdate] !== value) {
+      _onChangeData(value);
+    }
+  };
+
   const _onPressChangeValue = (data, index, key) => {
     let array = [...lamCheckTodoList];
     array[index][key] = data;
@@ -238,7 +294,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
   };
 
   const renderItem = ({ index, item }) => {
-    let keyUpdate = 'LaminationTestResult';
+    let keyUpdateResult = 'LaminationTestResult';
     return (
       <View
         style={styles.box}>
@@ -255,24 +311,39 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           }
         </View>
         <View style={styles.row}>
+          <Text style={styles.cellTitle}>WMSheet:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.WMSheet)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>WMRev:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.WMRev)}</Text>
+        </View>
+        <View style={styles.row}>
           <Text style={styles.cellTitle}>JointNo:</Text>
           <Text style={styles.cellData}>{item.JointNo}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellTitle}>PieceNo1:</Text>
-          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceNo1)}</Text>
+          <Text style={styles.cellTitle}>WeldType:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.WeldType)}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellTitle}>Description1:</Text>
-          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceDescription1)}</Text>
+          <Text style={styles.cellTitle}>LengthWeld:</Text>
+          <Text style={styles.cellData}>{Formater.formatTwoDigits(item.LengthWeld)}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellTitle}>PieceNo2:</Text>
-          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+          <Text style={styles.cellTitle}>ThickWeld:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.ThicknessWeld)}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.cellTitle}>Description2:</Text>
-          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceDescription2)}</Text>
+          <Text style={styles.cellTitle}>ThickLam:</Text>
+          <View style={styles.cellDataAction}>
+            <TouchableOpacity
+              style={styles.itemAction}
+              onPress={() => _onPressSelectThickness(item.LamThickness_mm, index, 'LamThickness_mm')}>
+              <Text style={styles.textData}>{Formater.formatTwoDigits(item.LamThickness_mm)}</Text>
+              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Team:</Text>
@@ -304,14 +375,14 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           <View style={styles.cellAction}>
             <TouchableOpacity
               style={styles.buttonAccept}
-              onPress={() => _onPressChangeValue(Constant.STATUS_ACCEPT, index, keyUpdate)}>
+              onPress={() => _onPressChangeValue(Constant.STATUS_ACCEPT, index, keyUpdateResult)}>
               <Text style={styles.labelAccept}>Accept</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.cellAction}>
             <TouchableOpacity
               style={styles.buttonReject}
-              onPress={() => _onPressChangeValue(Constant.STATUS_REJECT, index, keyUpdate)}>
+              onPress={() => _onPressChangeValue(Constant.STATUS_REJECT, index, keyUpdateResult)}>
               <Text style={styles.labelReject}>Reject</Text>
             </TouchableOpacity>
           </View>
@@ -422,6 +493,18 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
       />
+      <Dialog.Container visible={isVisibleThickness}>
+        <Dialog.Title>{'Update ThickLam:'}</Dialog.Title>
+        <Dialog.Input
+          value={thicknessDisplay}
+          placeholder={'Enter ThickLam'}
+          onChangeText={(text) => setThicknessDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+          keyboardType={'numeric'}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleThickness(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeThickness} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };
@@ -514,6 +597,24 @@ const styles = StyleSheet.create({
   },
   cellData: {
     flex: 7,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  cellDataAction: {
+    flex: 7,
+    justifyContent: 'center',
+  },
+  itemAction: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+  },
+  iconAction: {
+    marginLeft: 4,
+    width: 20,
+    height: 20,
+  },
+  textData: {
+    minWidth: 80,
     fontWeight: 'bold',
     color: BASE_COLOR,
   },

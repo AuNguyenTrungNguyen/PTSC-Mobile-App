@@ -17,7 +17,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckQCStatusScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, userLogin, paramDrawingNo } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -48,7 +48,7 @@ const LamCheckQCStatusScreen = ({ route, navigation }) => {
               name={'md-ellipsis-vertical-circle'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -61,7 +61,13 @@ const LamCheckQCStatusScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, false);
+      if (paramDrawingNo) {
+        setDrawingNo(paramDrawingNo);
+        setIsSearching(true);
+        callAPI(() => { searchLamCheckQCStatusList(paramDrawingNo, jointNo, '') }, false);
+      } else {
+        callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, false);
+      }
     }, []
   );
 

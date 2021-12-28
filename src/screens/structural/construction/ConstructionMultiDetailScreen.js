@@ -938,6 +938,11 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
     let isEnableClear = itemDate || itemPercent;
     let styleCheckBox = Platform.OS === 'ios' ? styles.checkBoxiOS : styles.checkBox;
+    if (code == Constant.CODE_FITUP) {
+      isDisableItem = isDisableItem || (item['UTLAMPercent'] == 1 && item['LaminationTestResult'] != Constant.STATUS_ACCEPT);
+    } else {
+      isDisableItem = isDisableItem || item['FitUpResult'] != Constant.STATUS_ACCEPT;
+    }
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
@@ -1190,14 +1195,22 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                   <RenderQCScope value={item.QCScope} />
                 </View>
               </View>
-              {/* <View style={styles.row}>
+              <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>{'DIM\nBeforeWeld:'}</Text>
+                  <Text>LAMPercent:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <RenderDIMBeforeWeldRequired value={item.DIMBeforeWeldRequired} />
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.UTLAMPercent)}</Text>
                 </View>
-              </View> */}
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>LAMResult:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.LaminationTestResult)}</Text>
+                </View>
+              </View>
             </>
             :
             <>
@@ -1367,6 +1380,14 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>FitUpResult:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
+                </View>
+              </View>
             </>
         }
       </View>
@@ -1400,16 +1421,25 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           {
             getStatusRenderList()
               ?
-              <VirtualizedList
-                style={styles.table}
-                data={constructionDetailList}
-                getItemCount={data => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(item, index) => index}
-                renderItem={renderItem}
-              />
+              <>
+                {
+                  code == Constant.CODE_FITUP
+                    ?
+                    <Text style={styles.textDataRequired}>Required LAMPercent and LAMResult accepted to submit FitUp request!</Text>
+                    :
+                    <Text style={styles.textDataRequired}>Required FitUpResult accepted to submit Visual request!</Text>
+                }
+                <VirtualizedList
+                  style={styles.table}
+                  data={constructionDetailList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+              </>
               :
               <RenderConstructionDetail />
           }
@@ -1651,9 +1681,10 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
   textDataRequired: {
-    minWidth: 80,
     fontWeight: 'bold',
     color: 'red',
+    fontStyle: 'italic',
+    marginBottom: 4,
   },
   itemAction: {
     flexDirection: 'row',

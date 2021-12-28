@@ -34,10 +34,9 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
   const [jointNo, setJointNo] = useState('');
   const [oldJointNo, setOldJointNo] = useState(null);
 
-  // const [isQR, setIsQR] = useState(true);
-
   const [lamCheckSpendingList, setLamCheckSpendingList] = useState(null);
   const [lamCheckUpdateList, setLamCheckUpdateList] = useState([]);
+  const [lamCheckErrorList, setLamCheckErrorList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
@@ -47,7 +46,14 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { _onPressViewAllStatus('') }}>
+            <Ionicons
+              size={24}
+              name={'md-reorder-four'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -56,7 +62,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription]);
+  }, [navigation, isShowDescription, drawingNo]);
 
   useEffect(
     () => {
@@ -75,6 +81,24 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
         name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
       }
     });
+  };
+
+  const _onPressViewAllStatus = no => {
+    let data = no;
+    if (!no) {
+      data = drawingNo;
+    }
+    if (!data) {
+      Toast.show('Please enter DrawingNo!', Toast.SHORT);
+      return;
+    }
+    navigation.navigate(
+      'LamCheckQCStatus',
+      {
+        projectCode: projectCode,
+        paramDrawingNo: data
+      }
+    );
   };
 
   const callAPI = (executedAPI, loading = true) => {
@@ -99,7 +123,24 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
   const _onPressSubmitToServer = async () => {
     if (lamCheckUpdateList.length) {
-      callAPI(updateSpendingList, null);
+      let errors = [];
+      lamCheckUpdateList.map(item => {
+        let keys = Object.keys(item);
+        let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id' && i !== 'LamThickness_mm'));
+        if (column != null && !column.length) {
+          let objIndex = lamCheckSpendingList.findIndex((obj => obj.RowIndex == item.RowIndex));
+          if(lamCheckSpendingList[objIndex] != null 
+            && (!lamCheckSpendingList[objIndex].LaminationTestRequestByTeam 
+              && !lamCheckSpendingList[objIndex].LamRemark)){
+                errors.push(item.RowIndex);
+          }
+        }
+        return item;
+      });
+      setLamCheckErrorList(errors);
+      if (!errors.length) {
+        callAPI(updateSpendingList, null);
+      }
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
@@ -107,7 +148,6 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
-    // setIsQR(false);
   };
 
   const _onChangeJointNo = no => {
@@ -134,8 +174,6 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    // sheet = (sheet != null && isQR) ? sheet : '';
-    // rev = (rev != null && isQR) ? rev : '';
     let sheetParam = !sheet ? '' : sheet;
     let revParam = !rev ? '' : rev;
     GetLamCheckSpendingListQRCodeAPI(projectCode, drawingNo, jointNo, sheetParam, revParam, token)
@@ -244,6 +282,47 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
     setIsVisibleRemark(false);
   };
 
+  const [isVisibleThickness, setIsVisibleThickness] = useState(false);
+  const [thicknessDisplay, setThicknessDisplay] = useState('');
+  const _onPressSelectThickness = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setThicknessDisplay(value.toString());
+    } else {
+      setThicknessDisplay('');
+    }
+    setIsVisibleThickness(true);
+  };
+  const _onChangeThickness = () => {
+    let value = thicknessDisplay.replace(/,/g, '.');
+    setThicknessDisplay(value);
+    if (!Helper.checkFormatNumber(value)) {
+      Toast.show('Please enter a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    setIsVisibleThickness(false);
+    if (lamCheckSpendingList[indexUpdate][keyUpdate] !== value) {
+      _onChangeData(value);
+    }
+  };
+  const _onSelectThickness = (value, index, key) => {
+    let array = [...lamCheckSpendingList];
+    array[index][key] = value;
+    setLamCheckSpendingList(array);
+
+    array = [...lamCheckUpdateList];
+    let rowIndex = lamCheckSpendingList[index].RowIndex;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, [key]: value });
+    } else {
+      array[objIndex][key] = value;
+    }
+    setLamCheckUpdateList(array);
+  };
+
   const _onChangeData = data => {
     let array = [...lamCheckSpendingList];
     array[indexUpdate][keyUpdate] = data;
@@ -281,9 +360,10 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
   };
 
   const renderItem = ({ index, item }) => {
+    let isError = lamCheckErrorList.includes(item.RowIndex);
+    let boxStyle = isError ? styles.errorBox : styles.box;
     return (
-      <View
-        style={styles.box}>
+      <TouchableOpacity style={boxStyle} onPress={() => { _onPressViewAllStatus(item.WeldMapDrawingNo) }}>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>DrawingNo:</Text>
           {
@@ -302,7 +382,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
-            <Text>FittingTeam:</Text>
+            <Text>Team:</Text>
           </View>
           <View style={styles.cellData}>
             <TouchableOpacity
@@ -326,7 +406,32 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text>ThickLam:</Text>
+          </View>
+          <View style={styles.cellThickness}>
+            <TouchableOpacity
+              style={styles.itemActionIcon}
+              onPress={() => _onPressSelectThickness(item.LamThickness_mm, index, 'LamThickness_mm')}>
+              <Text style={styles.textAction}>{Formater.formatTwoDigits(item.LamThickness_mm)}</Text>
+              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.cellPMThick}>
+            <TouchableOpacity
+              style={styles.itemPMThick}
+              onPress={() => _onSelectThickness(item.Thickness_mm1, index, 'LamThickness_mm')}>
+              <Text style={styles.textPMThick}>{Formater.formatTwoDigits(item.Thickness_mm1)}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.itemPMThick}
+              onPress={() => _onSelectThickness(item.Thickness_mm2, index, 'LamThickness_mm')}>
+              <Text style={styles.textPMThick}>{Formater.formatTwoDigits(item.Thickness_mm2)}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -393,16 +498,20 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
           {
             getStatusRenderList()
               ?
-              <VirtualizedList
-                style={styles.table}
-                data={lamCheckSpendingList}
-                getItemCount={data => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(item, index) => index}
-                renderItem={renderItem}
-              />
+              <>
+                <Text style={CoreStyle.textNote}>* Must input Team or Remark to send to QC</Text>
+                <Text style={CoreStyle.textNote}>* Click an item to view all LAM joints</Text>
+                <VirtualizedList
+                  style={styles.table}
+                  data={lamCheckSpendingList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+              </>
               :
               <RenderList />
           }
@@ -427,6 +536,18 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
         />
         <Dialog.Button label='Cancle' onPress={() => { setIsVisibleRemark(false) }} />
         <Dialog.Button label='OK' onPress={_onSubmitRemark} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleThickness}>
+        <Dialog.Title>{'Update ThickLam:'}</Dialog.Title>
+        <Dialog.Input
+          value={thicknessDisplay}
+          placeholder={'Enter ThickLam'}
+          onChangeText={(text) => setThicknessDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+          keyboardType={'numeric'}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleThickness(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeThickness} />
       </Dialog.Container>
       <AwesomeAlert
         show={isUploading}
@@ -506,6 +627,15 @@ const styles = StyleSheet.create({
   table: {
     flexGrow: 1,
   },
+  errorBox: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: 'red',
+    borderWidth: 2,
+    borderRadius: 4,
+    padding: 4,
+    marginBottom: 8,
+  },
   box: {
     flexDirection: 'column',
     width: '100%',
@@ -529,6 +659,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
     flexDirection: 'row',
+  },
+  cellThickness: {
+    flex: 4,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    flexDirection: 'row',
+  },
+  cellPMThick: {
+    flex: 3,
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  itemPMThick: {
+    flex: 1,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    marginLeft: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  textPMThick: {
+    color: BASE_COLOR,
   },
   itemActionIcon: {
     flexDirection: 'row',
