@@ -49,6 +49,7 @@ import StructuralConstructionMultiDetailScreen from './screens/structural/constr
 import StructuralConstructionImageScreen from './screens/structural/construction/ConstructionImageScreen';
 import StructuralConstructionQCStatusScreen from './screens/structural/construction/ConstructionQCStatusScreen';
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
+import StructuralAddPieceMarkNoScreen from './screens/structural/construction/ConstructionAddPieceMarkNoScreen';
 import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
 import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
@@ -473,7 +474,16 @@ const StructuralCONSStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
-      />
+      /><StructuralCONSStack.Screen
+      name='ConstructionAddPieceMarkNo'
+      component={StructuralAddPieceMarkNoScreen}
+      options={
+        {
+          title: 'Select Piece Mark No',
+          headerBackTitle: 'Back',
+        }
+      }
+    />
       <StructuralCONSStack.Screen
         name='ManHoursImpact'
         component={ManHoursImpactListScreen}

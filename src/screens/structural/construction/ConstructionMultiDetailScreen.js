@@ -12,20 +12,19 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListAPI, GetTeamListAPI, GetPieceMarkListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListAPI, GetTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
-import { ENUM_QC_SCOPE, ENUM_QC_DIM_BEFORE_REQUIRED } from '../../../utils/Enum';
+import { ENUM_QC_SCOPE } from '../../../utils/Enum';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
 import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
-import SelectPopupPieceMark from '../../../components/SelectPopupPieceMark';
 
 const ConstructionMultiDetailScreen = ({ route, navigation }) => {
 
@@ -44,12 +43,13 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     () => {
       if (route.params?.welderSelected) {
         _onChangeWelders(route.params?.welderSelected);
+      } else if (route.params?.pieceMarkNoSelected) {
+        _onChangePieceMarkNo(route.params?.pieceMarkNoSelected);
       }
       else {
         callAPI(getConstructionDetail);
-        callAPI(getPieceMarkList);
       }
-    }, [route.params?.welderSelected, route.params?.index]
+    }, [route.params?.welderSelected, route.params?.pieceMarkNoSelected, route.params?.index]
   );
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -137,25 +137,6 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.success) {
           setConstructionDetailList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
-  };
-
-  const getPieceMarkList = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetPieceMarkListAPI(projectCode, drawingNo, token)
-      .then(res => {
-        if (res.success) {
-          setPieceMarkList(res.data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -306,9 +287,6 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   const [isVisiblePercent, setIsVisiblePercent] = useState(false);
   const [percentDisplay, setPercentDisplay] = useState('');
 
-  const [isVisiblePieceMark, setIsVisiblePieceMark] = useState(false);
-  const [pieceMarkList, setPieceMarkList] = useState([]);
-
   const [isVisibleLocation, setIsVisibleLocation] = useState(false);
   const [locationList, setLocationList] = useState(null);
 
@@ -425,17 +403,21 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressShowPieceMarkNoPopup = (index, key) => {
+  const _onPressSelectPieceMarkNo = (item, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
-    setIsVisiblePieceMark(true);
+    navigation.navigate(
+      'ConstructionAddPieceMarkNo',
+      {
+        projectCode: projectCode,
+        facilityCode: facilityCode,
+        index: index,
+        isMultiple: true,
+        data: { PieceMarkNo: item.PieceNo2, PieceDescription: item.PieceDescription2, HeatNo_TagNo: item.HeatNo_TagNo2},
+      }
+    );
   };
   const _onChangePieceMarkNo = data => {
-    if (data.PieceMarkNo == constructionDetailList[indexUpdate][keyUpdate]) {
-      setIsVisiblePieceMark(false);
-      return;
-    }
-
     // Normal
     let array = [...constructionDetailList];
     array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
@@ -497,8 +479,6 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     });
     setConstructionDetailList(cloneUI);
     setConstructionUpdateList(cloneUpdate);
-
-    setIsVisiblePieceMark(false);
   };
 
   const _onPressShowLocationPopup = (index, key) => {
@@ -917,21 +897,6 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     return <Text style={styles.textData}>{scope}</Text>;
   };
 
-  const RenderDIMBeforeWeldRequired = ({ value }) => {
-    let style = styles.textData;
-    let required = '';
-    if (!value) {
-      return <Text style={style}>{required}</Text>;
-    }
-    if (value.toString().toUpperCase() == ENUM_QC_DIM_BEFORE_REQUIRED.NO)
-      required = 'None';
-    if (value.toString().toUpperCase() == ENUM_QC_DIM_BEFORE_REQUIRED.YES) {
-      required = 'Required';
-      style = styles.textDataRequired;
-    }
-    return <Text style={style}>{required}</Text>;
-  };
-
   const renderItem = ({ index, item }) => {
     let itemDate = code == Constant.CODE_FITUP ? item['FitUpDate'] : item['ActualFabWeldDate'];
     let itemPercent = code == Constant.CODE_FITUP ? item['FitUpPercent'] : item['ActualFabWeldPercent'];
@@ -1159,7 +1124,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemActionIcon}
-                    onPress={() => _onPressShowPieceMarkNoPopup(index, 'PieceNo2')}>
+                    onPress={() => _onPressSelectPieceMarkNo(item, index, 'PieceNo2')}>
                     <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
                     {
                       isDisableItem
@@ -1494,13 +1459,6 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         onClose={() => setIsVisibleHelp(false)}
       >
       </HelpModal>
-      <SelectPopupPieceMark
-        visible={isVisiblePieceMark}
-        data={pieceMarkList}
-        onChangeItem={_onChangePieceMarkNo}
-        onCancel={() => setIsVisiblePieceMark(false)}
-      >
-      </SelectPopupPieceMark>
       <SelectPopup
         visible={isVisibleLocation}
         data={locationList}

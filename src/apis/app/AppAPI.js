@@ -54,12 +54,13 @@ export const GetTeamListAPI = (projectCode, filterType, token) =>
       },
     }).then(res => res.json());
 
-export const GetPieceMarkListAPI = (projectCode, drawingNo, token) =>
+export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, token) =>
   fetch(
     Port_Server
-    + '/api/App/GetPieceMarkList'
+    + '/api/App/GetPieceMarkNoList'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo,
+    + '&facilityCode=' + facilityCode
+    + '&pieceMarkNo=' + pieceMarkNo,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -96,7 +97,7 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
 
 export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
   let scope = await Helper.getData('QCSCOPE');
-  if (scope == null){
+  if (scope == null) {
     scope = '';
   }
   return fetch(
@@ -117,6 +118,20 @@ export const GetFactorTypeAPI = (projectCode, token) =>
     Port_Server
     + '/api/App/GetFactorType'
     + '?projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/CheckDrawingRev'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

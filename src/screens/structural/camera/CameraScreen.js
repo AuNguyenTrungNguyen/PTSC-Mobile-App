@@ -8,6 +8,7 @@ import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import Naming from '../../../utils/Naming';
 
+import { CheckDrawingRevAPI } from '../../../apis/app/AppAPI';
 import { GetCurrentPieceMarkInfoAPI } from '../../../apis/structural/PieceMarkAPI';
 import { GetCurrentConstructionInfoAPI } from '../../../apis/structural/ConstructionAPI';
 
@@ -58,34 +59,82 @@ const CameraScreen = ({ route, navigation }) => {
         route = 'QCSpendList';
       }
 
-      if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST
-        || destination === Naming.NAME_STR_LAM_CHECK_TODO
-        || destination === Naming.NAME_STR_DIM_CHECK) {
-        navigation.navigate(route, {
-          projectCode: projectCode,
-          userLogin: userLogin,
-          sheet: sheet,
-          rev: rev,
-          paramDrawingNo: drawingNo,
-          title: title,
-        });
-        setIsScanned(false);
+      checkDrawingRev(drawingNo, sheet, rev, route, title);
+
+    }
+  };
+
+  const checkDrawingRev = async (drawingNo, sheet, rev, route, title) => {
+    let token = await Helper.getData('TOKEN');
+    setIsScanned(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        showComfirm('ERROR', 'Network not available!');
+      } else {
+        CheckDrawingRevAPI(projectCode, drawingNo, sheet, token)
+          .then(res => {
+            if (res.success) {
+              if (res.data != null && rev != res.data) {
+                Alert.alert(
+                  'WARNING',
+                  'DrawingNo: ' + drawingNo + '\nSheet: ' + sheet + '\nhas latest Rev: ' + res.data,
+                  [
+                    {
+                      text: 'Back',
+                      onPress: () => {
+                        navigation.goBack();
+                      },
+                      style: 'cancel'
+                    },
+                    {
+                      text: 'Skip',
+                      onPress: () => { skipDrawingRev(drawingNo, sheet, rev, route, title) }
+                    }
+                  ],
+                  { cancelable: false },
+                );
+              } else {
+                skipDrawingRev(drawingNo, sheet, rev, route, title);
+              }
+            }
+            else {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
+            }
+          }).catch(() => {
+            showComfirm('ERROR', 'Please check that you are using the company network!');
+          });
       }
-      else if (destination === Naming.NAME_STR_QC) {
-        navigation.navigate(route, {
-          projectCode: projectCode,
-          userLogin: userLogin,
-          sheet: sheet,
-          rev: rev,
-          code: code,
-          paramDrawingNo: drawingNo,
-          title: title,
-        });
-        setIsScanned(false);
-      }
-      else {
-        getDataAndNavigate(drawingNo, sheet, rev, route, title);
-      }
+    });
+  };
+
+  const skipDrawingRev = (drawingNo, sheet, rev, route, title) => {
+    if (destination === Naming.NAME_STR_LAM_CHECK_REQUEST
+      || destination === Naming.NAME_STR_LAM_CHECK_TODO
+      || destination === Naming.NAME_STR_DIM_CHECK) {
+      navigation.navigate(route, {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        sheet: sheet,
+        rev: rev,
+        paramDrawingNo: drawingNo,
+        title: title,
+      });
+      setIsScanned(false);
+    }
+    else if (destination === Naming.NAME_STR_QC) {
+      navigation.navigate(route, {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        sheet: sheet,
+        rev: rev,
+        code: code,
+        paramDrawingNo: drawingNo,
+        title: title,
+      });
+      setIsScanned(false);
+    }
+    else {
+      getDataAndNavigate(drawingNo, sheet, rev, route, title);
     }
   };
 
