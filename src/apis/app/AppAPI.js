@@ -138,3 +138,17 @@ export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, token) =>
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+
+export const CreateTempDrawingNoAPI = (url, userLogin, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/CreateTempDrawingNo',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url, userLogin }),
+    }
+  ).then(res => res.json());
