@@ -17,6 +17,8 @@ export default class Constant {
   static FILTER_ALL = 'ALL';
   static FILTER_NOT_YET = 'NOT_YET';
   static FILTER_ALREADY = 'ALREADY';
+  static FILTER_MY = 'MY';
+  static FILTER_THEIR = 'THEIR';
 
   // CODE TYPE
   static CODE_FITUP = 'FitUp';

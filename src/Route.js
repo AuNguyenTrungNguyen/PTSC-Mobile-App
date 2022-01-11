@@ -12,7 +12,9 @@ import PDFViewScreen from './screens/pdf/PDFViewScreen';
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
 import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHoursImpactDetailScreen';
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
-import TimeSheetScreen from './screens/general/TimeSheetScreen';
+
+import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
+import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
 
 import HomeScreen from './screens/piping/HomeScreen';
 import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
@@ -520,6 +522,16 @@ const StructuralCONSStackScreens = () => {
         options={
           {
             title: 'Company TimeSheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='TimeSheetManagerWorker'
+        component={TimeSheetManageWorkerScreen}
+        options={
+          {
+            title: 'Manage Workers',
             headerBackTitle: 'Back',
           }
         }

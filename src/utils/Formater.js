@@ -22,4 +22,8 @@ export default class Formater {
     }
   }
 
+  static formatDateSQL = data => {
+    return Moment(data).format("YYYY-MM-DD HH:mm:ss");
+  };
+
 };
