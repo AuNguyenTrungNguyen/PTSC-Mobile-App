@@ -362,7 +362,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         projectCode: projectCode,
         facilityCode: facilityCode,
         index: index,
-        data: { PieceMarkNo: item.PieceNo2, PieceDescription: item.PieceDescription2, HeatNo_TagNo: item.HeatNo_TagNo2},
+        data: { PieceMarkNo: item.PieceNo2, PieceDescription: item.PieceDescription2, HeatNo_TagNo: item.HeatNo_TagNo2, TraceNo: item.TraceNo2},
       }
     );
   };
@@ -372,6 +372,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
     array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
     array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+    array[indexUpdate]['TraceNo2'] = data.TraceNo;
     setConstructionDetailList(array);
 
     array = [...constructionUpdateList];
@@ -947,6 +948,14 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
+                  <Text>TraceNo1:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo1)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
                   <Text>PieceNo2:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
@@ -978,6 +987,14 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellDataLine}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.HeatNo_TagNo2)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>TraceNo2:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo2)}</Text>
                 </View>
               </View>
               <View style={styles.row}>

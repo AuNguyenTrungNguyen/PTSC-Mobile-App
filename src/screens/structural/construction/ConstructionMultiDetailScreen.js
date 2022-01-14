@@ -413,7 +413,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         facilityCode: facilityCode,
         index: index,
         isMultiple: true,
-        data: { PieceMarkNo: item.PieceNo2, PieceDescription: item.PieceDescription2, HeatNo_TagNo: item.HeatNo_TagNo2},
+        data: { PieceMarkNo: item.PieceNo2, PieceDescription: item.PieceDescription2, HeatNo_TagNo: item.HeatNo_TagNo2, TraceNo: item.TraceNo2 },
       }
     );
   };
@@ -424,6 +424,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
     array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
     array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+    array[indexUpdate]['TraceNo2'] = data.TraceNo;
     setConstructionDetailList(array);
 
     array = [...constructionUpdateList];
@@ -457,6 +458,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         cloneUI[objIndex]['PieceMarkNo02'] = data.PieceMarkNo;
         cloneUI[objIndex]['PieceDescription2'] = data.PieceDescription;
         cloneUI[objIndex]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+        cloneUI[objIndex]['TraceNo2'] = data.TraceNo;
 
         // List update
         objIndex = cloneUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
@@ -907,7 +909,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       isDisableItem = isDisableItem || (item['UTLAMPercent'] == 1 && item['LaminationTestResult'] != Constant.STATUS_ACCEPT);
     } else {
       isDisableItem = isDisableItem || item['FitUpResult'] != Constant.STATUS_ACCEPT;
-      if(item.JointNo.includes('#')) isDisableItem = false;
+      if (item.JointNo.includes('#')) isDisableItem = false;
     }
 
     return (
@@ -1120,6 +1122,14 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
+                  <Text>TraceNo1:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo1)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
                   <Text>PieceNo2:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
@@ -1151,6 +1161,14 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellDataLine}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.HeatNo_TagNo2)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>TraceNo2:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo2)}</Text>
                 </View>
               </View>
               <View style={styles.row}>

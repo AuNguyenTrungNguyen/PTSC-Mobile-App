@@ -128,6 +128,12 @@ const ConstructionAddPieceMarkNoScreen = ({ route, navigation }) => {
             <Text style={styles.textData}>{Formater.formatEmptyData(item.HeatNo_TagNo)}</Text>
           </View>
         </View>
+        <View style={styles.row}>
+          <View style={styles.cell}>
+            <Text style={styles.textTitle}>TraceNo: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo)}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -168,10 +174,13 @@ const ConstructionAddPieceMarkNoScreen = ({ route, navigation }) => {
                   <Text style={styles.buttonTitle}>Search Piece Mark</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.rowInfoPieceMark}>
-                <Text style={styles.infoTitle}>Selected:</Text>
-                <Text style={styles.infoData}>{data.PieceMarkNo}{'\n'}{data.PieceDescription}{'\n'}{data.HeatNo_TagNo}</Text>
-              </View>
+              {
+                !isMultiple &&
+                <View style={styles.rowInfoPieceMark}>
+                  <Text style={styles.infoTitle}>Selected:</Text>
+                  <Text style={styles.infoData}>{data.PieceMarkNo}{'\n'}{data.PieceDescription}{'\n'}{data.HeatNo_TagNo}{'\n'}{data.TraceNo}</Text>
+                </View>
+              }
             </View>
             <RenderPieceMarkNoList />
             <View style={styles.actionContainer}>
@@ -202,7 +211,6 @@ const ConstructionAddPieceMarkNoScreen = ({ route, navigation }) => {
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
-const SELECT_COLOR = '#adb6bb';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -301,20 +309,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
-  boxSelected: {
-    flexDirection: 'column',
-    width: '100%',
-    borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 8,
-    backgroundColor: SELECT_COLOR,
-  },
   row: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     margin: 4,
-    minHeight: 20,
+    minHeight: 16,
   },
   cell: {
     flexDirection: 'row',
@@ -334,6 +334,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     marginTop: 8,
     height: 36,
+    minHeight: 36,
     flexDirection: 'row',
   },
   buttonUpload: {
