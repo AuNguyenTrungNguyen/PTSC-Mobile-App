@@ -47,10 +47,10 @@ export const GetCurrentPieceMarkInfoAPI = (projectCode, drawingNo, sheet, rev, c
       },
     }).then(res => res.json());
 
-export const GetPieceMarkDetailAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, pieceMarkNo, type, token) =>
+export const GetPieceMarkDetailAndDIMAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, pieceMarkNo, type, token) =>
   fetch(
     Port_Server
-    + '/api/structural/PieceMark/GetPieceMarkDetail'
+    + '/api/structural/PieceMark/GetPieceMarkDetailAndDIM'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
@@ -66,16 +66,16 @@ export const GetPieceMarkDetailAPI = (projectCode, facilityCode, drawingNo, shee
       },
     }).then(res => res.json());
 
-export const UpdatePieceMarkDetailAPI = (listItemUpdate, token) =>
+export const UpdatePieceMarkDetailAndDIMAPI = (userUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server
-    + '/api/structural/PieceMark/UpdatePieceMarkDetail',
+    + '/api/structural/PieceMark/UpdatePieceMarkDetailAndDIM',
     {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ listItemUpdate }),
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
     }
   ).then(res => res.json());

@@ -54,8 +54,11 @@ import StructuralAddWelderScreen from './screens/structural/construction/Constru
 import StructuralAddPieceMarkNoScreen from './screens/structural/construction/ConstructionAddPieceMarkNoScreen';
 import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
+import StructuralDimForCuttingQCStatusScreen from './screens/structural/dimcheck/DimForCuttingQCStatusScreen';
 import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
 import StructuralLamCheckQCStatusScreen from './screens/structural/lamcheck/LamCheckQCStatusScreen';
+
+import StructuralDimForCuttingListScreen from './screens/structural/dimcheck/DimForCuttingListScreen';
 import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
 import StructuralLamcheckImageScreen from './screens/structural/lamcheck/LamcheckImageScreen';
 import StructuralDimCheckListScreen from './screens/structural/dimcheck/DimCheckListScreen';
@@ -396,6 +399,26 @@ const StructuralCONSStackScreens = () => {
         })}
       />
       <StructuralCONSStack.Screen
+        name='DimForCutting'
+        component={StructuralDimForCuttingQCStatusScreen}
+        options={
+          {
+            title: 'Dim For Cutting',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='DimForCuttingImage'
+        component={StructuralDimCheckImageScreen}
+        options={
+          {
+            title: 'Dim Check Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
         name='LamCheckSpendingList'
         component={StructuralLamCheckSpendingListScreen}
         options={
@@ -476,16 +499,17 @@ const StructuralCONSStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
-      /><StructuralCONSStack.Screen
-      name='ConstructionAddPieceMarkNo'
-      component={StructuralAddPieceMarkNoScreen}
-      options={
-        {
-          title: 'Select Piece Mark No',
-          headerBackTitle: 'Back',
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionAddPieceMarkNo'
+        component={StructuralAddPieceMarkNoScreen}
+        options={
+          {
+            title: 'Select Piece Mark No',
+            headerBackTitle: 'Back',
+          }
         }
-      }
-    />
+      />
       <StructuralCONSStack.Screen
         name='ManHoursImpact'
         component={ManHoursImpactListScreen}
@@ -562,6 +586,14 @@ const StructuralQCStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+      <StructuralQCStack.Screen
+        name='DimForCuttingList'
+        component={StructuralDimForCuttingListScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
       <StructuralQCStack.Screen
         name='LamCheckTodoList'

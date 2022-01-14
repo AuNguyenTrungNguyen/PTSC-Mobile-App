@@ -6,8 +6,12 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import Dialog from "react-native-dialog";
 
-import { GetPieceMarkDetailAPI, UpdatePieceMarkDetailAPI } from '../../../apis/structural/PieceMarkAPI';
+import {
+  GetPieceMarkDetailAndDIMAPI,
+  UpdatePieceMarkDetailAndDIMAPI
+} from '../../../apis/structural/PieceMarkAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -34,6 +38,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
   const [filterType, setFilterType] = useState(Constant.PIECE_MARK_ALL);
   const [isVisibleFilterType, setIsVisibleFilterType] = useState(false);
 
+  const [isVisibleHelp, setIsVisibleHelp] = useState(false);
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
   useEffect(
@@ -48,7 +53,14 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleHelp(true) }}>
+            <Ionicons
+              size={24}
+              name={'help-circle-outline'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -57,7 +69,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription]);
+  }, [navigation, isShowDescription, isVisibleHelp]);
 
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -90,11 +102,11 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
 
   const getPieceMarkDetail = async (no = filterPieceMarkNo, type = filterType, reset = false) => {
     let token = await Helper.getData('TOKEN');
-    GetPieceMarkDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, no, type, token)
+    GetPieceMarkDetailAndDIMAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, no, type, token)
       .then(res => {
         if (res.success) {
           setPieceMarkDetailList(res.data);
-          if(reset) {
+          if (reset) {
             setPieceMarkUpdateList([]);
           }
           setIsLoading(false);
@@ -121,7 +133,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
     setIsUploading(true);
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(pieceMarkUpdateList);
-    UpdatePieceMarkDetailAPI(listUpdate, token)
+    UpdatePieceMarkDetailAndDIMAPI(userLogin, listUpdate, token)
       .then(res => {
         if (res.success) {
           setPieceMarkUpdateList([]);
@@ -144,19 +156,6 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressManagePicture = () => {
-    // navigation.navigate(
-    //   'DrawingImage',
-    //   {
-    //     projectCode: projectCode,
-    //     facilityCode: facilityCode,
-    //     drawingNo: drawingNo,
-    //     code: code,
-    //     userLogin: userLogin
-    //   }
-    // );
-  };
-
   const _onChangeCheckbox = (index, rowIndex, data) => {
     if (data) {
       data = new Date();
@@ -174,6 +173,27 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
       array.push({ RowIndex: rowIndex, [keyUpate]: data });
     } else {
       array[objIndex][keyUpate] = pieceMarkDetailList[index][keyUpate];
+    }
+    setPieceMarkUpdateList(array);
+  };
+
+  const _onChangeCheckboxDIM = (index, rowIndex, data) => {
+    if (data) {
+      data = new Date();
+    } else {
+      data = null;
+    }
+    const keyUpate = 'DIM_ForCuttingRequestDate';
+    let array = [...pieceMarkDetailList];
+    array[index][keyUpate] = data;
+    setPieceMarkDetailList(array);
+
+    array = [...pieceMarkUpdateList];
+    let objIndex = array.findIndex(obj => obj.RowIndex == rowIndex);
+    if (objIndex < 0) {
+      array.push({ RowIndex: rowIndex, [keyUpate]: data });
+    } else {
+      array[objIndex][keyUpate] = data;
     }
     setPieceMarkUpdateList(array);
   };
@@ -211,7 +231,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
     const keyUpate = code == Constant.CODE_CUT ? 'ActualFabCutDate' : 'SecondCoat';
     let resultUpdate = [];
     let resultItem = pieceMarkDetailList.map(item => {
-      if (!item[keyUpate]){
+      if (!item[keyUpate]) {
         item[keyUpate] = new Date();
         resultUpdate.push({ RowIndex: item.RowIndex, [keyUpate]: new Date() });
       }
@@ -221,35 +241,20 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
     setPieceMarkUpdateList(resultUpdate);
   };
 
-  const RenderPieceMarkDetail = () => {
-    {
-      if (pieceMarkDetailList == null || isSearching) {
-        return <ListLoadingData />
-      } else if (!pieceMarkDetailList.length) {
-        return <ListEmptyData />
-      } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={pieceMarkDetailList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
-      }
-    }
-  };
+
+
+
 
   const renderItem = ({ index, item }) => {
-    const value = code == Constant.CODE_CUT ? item.ActualFabCutDate : item.SecondCoat;
+    let value = code == Constant.CODE_CUT ? item.ActualFabCutDate : item.SecondCoat;
     const isChecked = !!value;
+    value = item.DIM_ForCuttingRequestDate;
+    const isCheckedDIM = !!value;
     return (
       <View style={styles.box} key={item.RowIndex}>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
-            <Text>PieceMarkNo:</Text>
+            <Text>PieceMark:</Text>
           </View>
           <View style={styles.cellData}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceMarkNo)}</Text>
@@ -265,6 +270,22 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
               onFillColor={BASE_COLOR}
               onTintColor={BASE_COLOR}
               tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+              animationDuration={0.2}
+              onAnimationType='flat'
+            />
+          </View>
+          <View style={styles.cellCheckbox}>
+            <CheckBox
+              value={isCheckedDIM}
+              onValueChange={newValue => _onChangeCheckboxDIM(index, item.RowIndex, newValue)}
+              style={styles.checkBox}
+              boxType='square'
+              disabled={false}
+              onCheckColor={OPP_COLOR}
+              onFillColor={QC_COLOR}
+              tintColor={QC_COLOR}
+              onTintColor={QC_COLOR}
+              tintColors={{ true: QC_COLOR, false: QC_COLOR }}
               animationDuration={0.2}
               onAnimationType='flat'
             />
@@ -296,7 +317,9 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           {
             isShowDescription.show &&
-            <Header data={headerData} action={headerAction}></Header>
+            <>
+              <Header data={headerData} action={headerAction}></Header>
+            </>
           }
           <View>
             <View style={styles.headerActionRow}>
@@ -341,12 +364,28 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <RenderPieceMarkDetail />
+          {
+            (pieceMarkDetailList == null || isSearching)
+              ?
+              <ListLoadingData />
+              :
+              (!pieceMarkDetailList.length)
+                ?
+                <ListEmptyData />
+                :
+                <VirtualizedList
+                  style={styles.table}
+                  data={pieceMarkDetailList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+          }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
-              <Text style={styles.buttonTitle}>Manage Picture</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
             </TouchableOpacity>
           </View>
@@ -364,11 +403,21 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleFilterType(false)}
         onChangeItem={_onChangeFilterType}>
       </SelectPopup>
+      <Dialog.Container visible={isVisibleHelp}>
+        <Dialog.Description style={{ color: BASE_COLOR }}>
+          Checkbox this color for PIECE MARK.
+        </Dialog.Description>
+        <Dialog.Description style={{ color: QC_COLOR }}>
+          Checkbox this color for send DIM CUTTING to QC.
+        </Dialog.Description>
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleHelp(false) }} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 }
 
 const BASE_COLOR = '#344955';
+const QC_COLOR = 'red';
 const OPP_COLOR = 'white';
 const styles = StyleSheet.create({
   safeArea: {
@@ -449,14 +498,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: 8,
   },
-  boxError: {
-    flexDirection: 'column',
-    width: '100%',
-    borderColor: 'red',
-    borderWidth: 2,
-    borderRadius: 4,
-    marginBottom: 8,
-  },
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -468,34 +509,6 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
     width: 24,
     height: 24,
-  },
-  itemDone: {
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
-  },
-  textDone: {
-    color: BASE_COLOR,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-  },
-  itemDisabled: {
-    backgroundColor: '#cccccc',
-    borderColor: '#999999',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
-  },
-  textDisabled: {
-    color: '#666666',
-    fontStyle: 'italic',
   },
   cellTitle: {
     flex: 1,
@@ -514,47 +527,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
-  itemAction: {
-    flexDirection: 'row',
-    alignSelf: 'flex-start',
-  },
-  iconAction: {
-    marginLeft: 4,
-    width: 20,
-    height: 20,
-  },
-  itemPercent: {
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    marginLeft: 4,
-  },
-  textPercent: {
+  textNote: {
     color: BASE_COLOR,
-  },
-  itemPercentDisable: {
-    backgroundColor: '#cccccc',
-    borderColor: '#999999',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    marginLeft: 4,
-  },
-  textPercentDisabled: {
-    color: '#666666',
-  },
-
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    backgroundColor: OPP_COLOR,
-  },
-  noDataTitle: {
-    fontSize: 16,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    marginBottom: 4,
   },
 
   actionContainer: {
@@ -569,12 +546,11 @@ const styles = StyleSheet.create({
     backgroundColor: BASE_COLOR,
     marginRight: 4,
   },
-  buttonRight: {
+  buttonContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    marginLeft: 4,
   },
   buttonTitle: {
     color: OPP_COLOR,

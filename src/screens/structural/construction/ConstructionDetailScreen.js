@@ -747,6 +747,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       isDisableItem = isDisableItem || (item['UTLAMPercent'] == 1 && item['LaminationTestResult'] != Constant.STATUS_ACCEPT);
     } else {
       isDisableItem = isDisableItem || item['FitUpResult'] != Constant.STATUS_ACCEPT;
+      if(item.JointNo.includes('#')) isDisableItem = false;
     }
 
     return (

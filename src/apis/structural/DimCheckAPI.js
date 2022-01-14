@@ -104,3 +104,37 @@ export const EditDimCheckImageAPI = (id, note, token) =>
       body: JSON.stringify({ id, note }),
     }
   ).then(res => res.json());
+
+export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark, type, isSpending, token) => {
+  if (!isSpending) {
+    isSpending = false;
+  }
+  return fetch(
+    Port_Server
+    + '/api/structural/DimCheck/GetDimForCuttingList'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&pieceMarkNo=' + pieceMark
+    + '&type=' + type
+    + '&isSpending=' + isSpending,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
+
+export const UpdateDimForCuttingListAPI = (userUpdate, listItemUpdate, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/DimCheck/UpdateDimForCuttingList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());

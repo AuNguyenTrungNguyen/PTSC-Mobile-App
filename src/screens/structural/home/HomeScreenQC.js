@@ -85,6 +85,47 @@ const HomeScreenQC = ({ route, navigation }) => {
     navigation.replace(Constant.ROUTE__LOGIN);
   };
 
+  // DIM For Cutting
+  const _onPressMamageDimForCutting = async () => {
+    Alert.alert(
+      '',
+      'Spend List: Spend Dim For Cutting List\n\nSearch: Search Dim For Cutting List',
+      [
+        { text: 'Spend List', onPress: _onPressSpendListDimForCutting },
+        { text: 'Search', onPress: _onPressSearchDimForCutting },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressSpendListDimForCutting = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'QC DIM Cutting Spend';
+    navigation.navigate(
+      'DimForCuttingList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        title: title,
+        isSpending: true,
+      }
+    );
+  };
+  const _onPressSearchDimForCutting = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'QC DIM Cutting List';
+    navigation.navigate(
+      'DimForCuttingList',
+      {
+        projectCode: projectCode,
+        title: title,
+        userLogin: userLogin,
+      }
+    );
+  };
+
   // LAM Check Todo
   const _onPressMamageLamCheckTodo = async () => {
     Alert.alert(
@@ -351,23 +392,23 @@ const HomeScreenQC = ({ route, navigation }) => {
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             {
-              (spendNumbers.LamCheck || spendNumbers.DimCheck)
+              (spendNumbers.LamCheck || spendNumbers.DimForCutting)
                 ?
                 <View style={styles.line} />
                 :
                 null
             }
             <View style={styles.row}>
+              <RenderItemBox title={'QC DIM\n Cutting'} onPress={_onPressMamageDimForCutting} number={spendNumbers.DimForCutting} />
               <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressMamageLamCheckTodo} number={spendNumbers.LamCheck} />
-              <RenderItemBox title={'QC DIM\n'} onPress={_onPressMamageDimCheck} number={spendNumbers.DimCheck} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'QC DIM\n Weld'} onPress={_onPressMamageDimCheck} number={spendNumbers.DimCheck} />
               <RenderItemBox title={'QC FitUp\n'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
-              <RenderItemBox title={'QC Visual\n'} onPress={_onPressMamageQCVisual} number={spendNumbers.Visual} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'QC Visual\n'} onPress={_onPressMamageQCVisual} number={spendNumbers.Visual} />
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

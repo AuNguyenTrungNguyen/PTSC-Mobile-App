@@ -31,7 +31,7 @@ const DimCheckImageScreen = ({ route }) => {
   const [imageList, setImageList] = useState([]);
   const [imageListUpload, setImageListUpload] = useState([]);
 
-  const { projectCode, userLogin, dataCode, rowIndex, drawingNo, jointNo, pieceMarkNo } = route.params;
+  const { projectCode, userLogin, dataCode, rowIndex, drawingNo, jointNo, pieceMarkNo, imageCode } = route.params;
 
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [pictureId, setPictureId] = useState(null);
@@ -160,6 +160,10 @@ const DimCheckImageScreen = ({ route }) => {
       { name: 'jointNo', data: jointNo },
       { name: 'rowIndex', data: rowIndex },
     ];
+
+    if (imageCode) {
+      body = body.concat({ name: 'code', data: imageCode });
+    }
 
     addFilesToBody()
       .then(res => {
@@ -435,12 +439,14 @@ const DimCheckImageScreen = ({ route }) => {
                 <Text style={styles.infoData}>{drawingNo}</Text>
               </View>
             </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>JointNo:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{jointNo}</Text>
+            {jointNo &&
+              <View style={styles.rowInfo}>
+                <Text style={styles.infoTitle}>JointNo:</Text>
+                <View style={styles.infoDataLine}>
+                  <Text style={styles.infoData}>{jointNo}</Text>
+                </View>
               </View>
-            </View>
+            }
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>PieceNo:</Text>
               <View style={styles.infoDataLine}>

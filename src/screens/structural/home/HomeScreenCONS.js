@@ -90,10 +90,11 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPressMamagePieceMarkCut = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode Piece Mark Cut\n\nSearch: Search Piece Mark Cut',
+      'Scan: Scan QRCode Piece Mark Cut\n\nSearch: Search Piece Mark Cut\n\nQC Status: QC Status Dim For Cutting Request',
       [
         { text: 'Scan', onPress: () => { _onPressQRCodePieceMark(Constant.CODE_CUT) } },
         { text: 'Search', onPress: () => { _onPressSearchPieceMark(Constant.CODE_CUT) } },
+        { text: 'QC Status', onPress: _onPressQCStatusDimForCutting },
         { text: 'Cancel', style: 'cancel' }
       ],
     );
@@ -131,6 +132,14 @@ const HomeScreenCONS = ({ route, navigation }) => {
         userLogin: userLogin,
         code: code,
         title: title,
+      }
+    );
+  };
+  const _onPressQCStatusDimForCutting = async () => {
+    navigation.navigate(
+      'DimForCutting',
+      {
+        projectCode: projectCode,
       }
     );
   };
@@ -317,16 +326,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
             }
             <View style={styles.row}>
               <RenderItemBox title={'QC Check\nStatus'} />
-              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressMamagePieceMarkCut} />
+              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressMamagePieceMarkCut} number={spendNumbers.DimForCutting}/>
             </View>
             <View style={styles.row}>
               {/* <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressMamagePieceMarkPaint} /> */}
               <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressMamageLamCheckSpending}  number={spendNumbers.LamCheck}/>
-              <RenderItemBox title={'Construciton\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/>
+              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/>
             </View>
             <View style={styles.row}>
-              {/* <RenderItemBox title={'Construciton\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/> */}
-              <RenderItemBox title={'Construciton\nWeld'} onPress={_onPressMamageWeld} number={spendNumbers.Visual}/>
+              {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/> */}
+              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressMamageWeld} number={spendNumbers.Visual}/>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressTimeSheet} />
             </View>
             <View style={styles.row}>
