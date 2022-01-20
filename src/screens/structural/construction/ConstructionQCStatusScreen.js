@@ -391,10 +391,26 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
-                  <Text>WeldDate:</Text>
+                  <Text>{'VisualRequest\nDate'}:</Text>
                 </View>
                 <View style={styles.cellTwoUnit}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.ActualFabWeldDate)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>{'Welding\nCompleted\nDate'}:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingCompletedDate)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>QCCheckTime:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
                 </View>
               </View>
               <View style={styles.row}>

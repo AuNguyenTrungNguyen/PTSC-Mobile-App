@@ -524,16 +524,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
-                  <Text>{'Completed\nDate'}:</Text>
-                </View>
-                <View style={styles.cellTwoUnit}>
-                  <Text style={styles.textData}>{Formater.formatDateDataTime(item.WeldingCompletedDate)}</Text>
-                </View>
-                <View style={styles.cellOneUnit} />
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellOneUnit}>
-                  <Text>WeldDate:</Text>
+                  <Text>{'Visual\nRequest\nDate'}:</Text>
                 </View>
                 <View style={styles.cellTwoUnit}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.ActualFabWeldDate)}</Text>
@@ -542,7 +533,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
-                  <Text>Time:</Text>
+                  <Text>{'Welding\nCompleted\nDate'}:</Text>
+                </View>
+                <View style={styles.cellTwoUnit}>
+                  <Text style={styles.textData}>{Formater.formatDateDataTime(item.WeldingCompletedDate)}</Text>
+                </View>
+                <View style={styles.cellOneUnit} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>{'QC\nCheckTime'}:</Text>
                 </View>
                 <View style={styles.cellTwoUnit}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>

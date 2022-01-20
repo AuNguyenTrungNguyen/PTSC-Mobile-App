@@ -1026,7 +1026,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>Date:</Text>
+                  <Text style={styles.redText}>{'VisualRequest\nDate'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1154,7 +1154,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>{'Completed\nDate'}:</Text>
+                  <Text style={styles.redText}>{'Welding\nCompleted\nDate'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1173,7 +1173,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>Time:</Text>
+                  <Text style={styles.redText}>QCCheckTime:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
