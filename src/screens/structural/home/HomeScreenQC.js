@@ -86,7 +86,7 @@ const HomeScreenQC = ({ route, navigation }) => {
   };
 
   // DIM For Cutting
-  const _onPressMamageDimForCutting = async () => {
+  const _onPressManageDimForCutting = async () => {
     Alert.alert(
       '',
       'Spend List: Spend Dim For Cutting List\n\nSearch: Search Dim For Cutting List',
@@ -127,7 +127,7 @@ const HomeScreenQC = ({ route, navigation }) => {
   };
 
   // LAM Check Todo
-  const _onPressMamageLamCheckTodo = async () => {
+  const _onPressManageLamCheckTodo = async () => {
     Alert.alert(
       '',
       'Spend List: Spend Lam Check Todo List\n\nScan: Scan QRCode Lam Check Todo\n\nSearch: Search Lam Check Todo',
@@ -180,7 +180,7 @@ const HomeScreenQC = ({ route, navigation }) => {
   };
 
   // QC
-  const _onPressMamageQCFitUp = async () => {
+  const _onPressManageQCFitUp = async () => {
     Alert.alert(
       '',
       'Spend List: Spend FitUp Request List\n\nScan: Scan QR Code FitUp Request\n\nSearch: Search FitUp Request List',
@@ -195,7 +195,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       }
     );
   };
-  const _onPressMamageQCVisual = async () => {
+  const _onPressManageQCVisual = async () => {
     Alert.alert(
       '',
       'Spend List: Spend Visual Request List\n\nScan: Scan QR Code Visual Request\n\nSearch: Search Visual Request List',
@@ -251,7 +251,7 @@ const HomeScreenQC = ({ route, navigation }) => {
   };
 
   // DIM Check
-  const _onPressMamageDimCheck = async () => {
+  const _onPressManageDimCheck = async () => {
     Alert.alert(
       '',
       'Spend List: Spend Dim Check List\n\nScan: Scan QRCode Dim Check\n\nSearch: Search Dim Check',
@@ -399,15 +399,15 @@ const HomeScreenQC = ({ route, navigation }) => {
                 null
             }
             <View style={styles.row}>
-              <RenderItemBox title={'QC DIM\n Cutting'} onPress={_onPressMamageDimForCutting} number={spendNumbers.DimForCutting} />
-              <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressMamageLamCheckTodo} number={spendNumbers.LamCheck} />
+              <RenderItemBox title={'QC DIM\n Cutting'} onPress={_onPressManageDimForCutting} number={spendNumbers.DimForCutting} />
+              <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressManageLamCheckTodo} number={spendNumbers.LamCheck} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC DIM\n Weld'} onPress={_onPressMamageDimCheck} number={spendNumbers.DimCheck} />
-              <RenderItemBox title={'QC FitUp\n'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
+              <RenderItemBox title={'QC DIM\n Weld'} onPress={_onPressManageDimCheck} number={spendNumbers.DimCheck} />
+              <RenderItemBox title={'QC FitUp\n'} onPress={_onPressManageQCFitUp} number={spendNumbers.FitUp} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC Visual\n'} onPress={_onPressMamageQCVisual} number={spendNumbers.Visual} />
+              <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
             </View>
           </ScrollView>
