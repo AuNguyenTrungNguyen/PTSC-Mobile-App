@@ -39,17 +39,47 @@ export const GetTimeSheetWorkerListAPI = (userLogin, token) =>
     }
   ).then(res => res.json());
 
-export const UpdateTimeSheetListAPI = (userUpdate, dateUpdate, listItemUpdate, token) =>
+export const UpdateTimeSheetListAPI = (projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server
-    + '/api/TimeSheet/UpdateTimeSheetList',
+    + '/api/TimeSheet/UpdateTimeSheetListNew',
     {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userUpdate, dateUpdate, listItemUpdate }),
+      body: JSON.stringify({ projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+
+export const GetTimeSheetYesterdayAPI = (projectCode, departmentCode, userLogin, dateUpdate, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/GetTimeSheetYesterday'
+    + '?projectCode=' + projectCode
+    + '&departmentCode=' + departmentCode
+    + '&userLogin=' + userLogin
+    + '&dateUpdate=' + dateUpdate,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+
+export const UpdateTimeSheetYesterdayAPI = (projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/UpdateTimeSheetYesterday',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate }),
     }
   ).then(res => res.json());
 

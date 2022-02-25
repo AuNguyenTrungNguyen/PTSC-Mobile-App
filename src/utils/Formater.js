@@ -26,4 +26,8 @@ export default class Formater {
     return Moment(data).format("YYYY-MM-DD HH:mm:ss");
   };
 
+  static formatDateWithoutTimeSQL = data => {
+    return Moment(data).format("YYYY-MM-DD");
+  };
+
 };

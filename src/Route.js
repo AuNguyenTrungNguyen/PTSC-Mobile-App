@@ -14,6 +14,7 @@ import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHour
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
 
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
+import TimeSheetYesterdayScreen from './screens/timesheet/TimeSheetYesterdayScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
 
 import HomeScreen from './screens/piping/HomeScreen';
@@ -556,6 +557,16 @@ const StructuralCONSStackScreens = () => {
         options={
           {
             title: 'Manage Workers',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='TimeSheetYesterday'
+        component={TimeSheetYesterdayScreen}
+        options={
+          {
+            title: 'Update TimeSheet Yesterday',
             headerBackTitle: 'Back',
           }
         }

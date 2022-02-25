@@ -87,7 +87,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
 
   // PieceMark
-  const _onPressMamagePieceMarkCut = async () => {
+  const _onPressManagePieceMarkCut = async () => {
     Alert.alert(
       '',
       'Scan: Scan QRCode Piece Mark Cut\n\nSearch: Search Piece Mark Cut\n\nQC Status: QC Status Dim For Cutting Request',
@@ -99,7 +99,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       ],
     );
   };
-  // const _onPressMamagePieceMarkPaint = async () => {
+  // const _onPressManagePieceMarkPaint = async () => {
   //   Alert.alert(
   //     '',
   //     'Scan: Scan QRCode Piece Mark Paint\n\nSearch: Search Piece Mark Paint',
@@ -145,7 +145,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
 
   // LAM Check Request
-  const _onPressMamageLamCheckSpending = async () => {
+  const _onPressManageLamCheckSpending = async () => {
     Alert.alert(
       '',
       'Scan: Scan QRCode Lam Check Request\n\nSearch: Search Lam Check Request\n\nQC Status: QC Status Lam Check Request',
@@ -189,7 +189,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
 
   // FitUp & Weld
-  const _onPressMamageFitUp = async () => {
+  const _onPressManageFitUp = async () => {
     Alert.alert(
       '',
       'Scan: Scan QRCode Construction FitUp\n\nSearch: Search Construction FitUp\n\nQC Status: QC Status Construction FitUp',
@@ -204,7 +204,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       }
     );
   };
-  const _onPressMamageWeld = async () => {
+  const _onPressManageWeld = async () => {
     Alert.alert(
       '',
       'Scan: Scan QRCode Construction Weld\n\nSearch: Search Construction Weld\n\nQC Status: QC Status Construction Weld',
@@ -267,11 +267,35 @@ const HomeScreenCONS = ({ route, navigation }) => {
     );
   };
 
-  // TimeSheet
+  //-- TimeSheet
+  const _onPressManageLTimeSheet = async () => {
+    Alert.alert(
+      '',
+      'TimeSheet: Company TimeSheet\n\nOT Yesterday: Update OT Yesterday',
+      [
+        { text: 'TimeSheet', onPress: _onPressTimeSheet },
+        { text: 'OT Yesterday', onPress: _onPressTimeSheetYesterday },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
   const _onPressTimeSheet = async () => {
     let userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
       'TimeSheet',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+  const _onPressTimeSheetYesterday = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'TimeSheetYesterday',
       {
         projectCode: projectCode,
         userLogin: userLogin,
@@ -326,17 +350,17 @@ const HomeScreenCONS = ({ route, navigation }) => {
             }
             <View style={styles.row}>
               <RenderItemBox title={'QC Check\nStatus'} />
-              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressMamagePieceMarkCut} number={spendNumbers.DimForCutting}/>
+              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressManagePieceMarkCut} number={spendNumbers.DimForCutting}/>
             </View>
             <View style={styles.row}>
-              {/* <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressMamagePieceMarkPaint} /> */}
-              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressMamageLamCheckSpending}  number={spendNumbers.LamCheck}/>
-              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/>
+              {/* <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressManagePieceMarkPaint} /> */}
+              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressManageLamCheckSpending}  number={spendNumbers.LamCheck}/>
+              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/>
             </View>
             <View style={styles.row}>
-              {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressMamageFitUp} number={spendNumbers.FitUp}/> */}
-              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressMamageWeld} number={spendNumbers.Visual}/>
-              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressTimeSheet} />
+              {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/> */}
+              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual}/>
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />

@@ -10,34 +10,31 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 
 import {
   GetTimeSheetTeamLeaderInfoAPI,
-  GetTimeSheetWorkOrderListAPI,
-  GetTimeSheetWorkerListAPI,
-  UpdateTimeSheetListAPI
+  GetTimeSheetYesterdayAPI,
+  UpdateTimeSheetYesterdayAPI
 } from '../../apis/timesheet/TimeSheetAPI';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
 import Header from '../../components/Header';
-import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
-import SelectPopup from '../../components/SelectPopup';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-const TimeSheetScreen = ({ route, navigation }) => {
+const TimeSheetYesterdayScreen = ({ route, navigation }) => {
 
   const { projectCode, userLogin } = route.params;
   const [department, setDepartment] = useState('');
   const [fullname, setFullname] = useState('');
-  const currentDate = new Date();
+  let currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - 1);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(true);
 
-  const [workerList, setWorkerList] = useState([]);
-  const [workOrderList, setWorkOrderList] = useState([]);
+  const [yesterdayList, setYesterdayList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
@@ -60,12 +57,8 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      if (route.params?.workerUpdated) {
-        callAPI(getTeamLeaderInfo);
-      } else {
-        callAPI(getTeamLeaderInfo);
-      }
-    }, [route.params?.workerUpdated]
+      callAPI(getTeamLeaderInfo);
+    }, []
   );
 
   const toggle = () => {
@@ -100,7 +93,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           if (Object.keys(res.data).length) {
             setDepartment(res.data[0].DepartmentCode);
             setFullname(res.data[0].Fullname);
-            callAPI(getAllData);
+            callAPI(() => { getAllData(res.data[0].DepartmentCode) });
           }
           else {
             Alert.alert(
@@ -131,38 +124,26 @@ const TimeSheetScreen = ({ route, navigation }) => {
       });
   };
 
-  const getAllData = async () => {
+  const getAllData = async (departmentCode) => {
     let token = await Helper.getData('TOKEN');
-    try {
-      let arrayPromise = [
-        GetTimeSheetWorkerListAPI(userLogin, token),
-        GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token),
-      ];
-      await Promise.all(arrayPromise)
-        .then(([wokerResult, workOrderResult]) => {
-          if (wokerResult.success && workOrderResult.success) {
-            setWorkerList(wokerResult.data);
-            setWorkOrderList(workOrderResult.data);
-            setIsLoading(false);
-            setIsError(false);
-            setIsUploading(false);
-          } else {
-            setIsLoading(false);
-            setIsError(true);
-            setIsUploading(false);
-          }
-        })
-        .catch(() => {
+    GetTimeSheetYesterdayAPI(projectCode, departmentCode, userLogin, Formater.formatDateWithoutTimeSQL(currentDate), token)
+      .then((res) => {
+        if (res.success) {
+          setYesterdayList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+          setIsUploading(false);
+        } else {
           setIsLoading(false);
           setIsError(true);
           setIsUploading(false);
-        });;
-    } catch (error) {
-      setIsLoading(false);
-      setIsError(true);
-      setIsUploading(false);
-      MessageAlert('ERROR', error.toString());
-    }
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsUploading(false);
+      });
   };
 
   const _onPressManageWorker = () => {
@@ -193,62 +174,58 @@ const TimeSheetScreen = ({ route, navigation }) => {
   };
 
   const _onPressApplyAll = () => {
-    if (!workerList.length) {
+    if (!yesterdayList.length) {
       Toast.show('No any data changes!', Toast.SHORT);
       return;
     }
-    let array = [...workerList];
+    let array = [...yesterdayList];
     array.map(i => {
-      i.WorkOrder = workOrder;
-      i.MHR = hours;
+      // i.WorkOrder = workOrder;
+      // i.MHR = hours;
       i.Overtime = overtime;
-      i.Shift = shift;
-      i.Note = note;
       return i;
     });
-    setWorkerList(array);
+    setYesterdayList(array);
     setIsUpdate(true);
   };
 
   const _onPressApplySelected = () => {
-    if (!workerList.length) {
+    if (!yesterdayList.length) {
       Toast.show('No any data changes!', Toast.SHORT);
       return;
     }
-    let array = [...workerList];
+    let array = [...yesterdayList];
     array.map(i => {
       if (i.Selected) {
-        i.WorkOrder = workOrder;
-        i.MHR = hours;
+        // i.WorkOrder = workOrder;
+        // i.MHR = hours;
         i.Overtime = overtime;
-        i.Shift = shift;
-        i.Note = note;
       }
       return i;
     });
-    setWorkerList(array);
+    setYesterdayList(array);
     setIsUpdate(true);
   };
 
   const _onChangeCheckbox = (value, index) => {
-    let array = [...workerList];
+    let array = [...yesterdayList];
     array[index]['Selected'] = value;
-    setWorkerList(array);
+    setYesterdayList(array);
   };
 
   const _onPressClear = () => {
-    if (workerList) {
-      let array = [...workerList];
+    if (yesterdayList) {
+      let array = [...yesterdayList];
       array.map(i => {
         i.Selected = false;
         return i;
       });
-      setWorkerList(array);
+      setYesterdayList(array);
     }
   };
 
   const _onPressSubmitToServer = async () => {
-    if (isUpdate && workerList.length) {
+    if (isUpdate && yesterdayList.length) {
       Alert.alert(
         'WARNING',
         'Are you sure update new data?',
@@ -274,7 +251,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
   const updateTimeSheetList = async () => {
     let token = await Helper.getData('TOKEN');
     setIsUploading(true);
-    UpdateTimeSheetListAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), workerList, token)
+    UpdateTimeSheetYesterdayAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), yesterdayList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -289,27 +266,27 @@ const TimeSheetScreen = ({ route, navigation }) => {
       });
   };
 
-  const [isShowWorkOrder, setIsShowWorkOrder] = useState(false);
-  const [workOrder, setWorkOrder] = useState('');
-  const _onChangeWorkOrder = data => {
-    setWorkOrder(data)
-    setIsShowWorkOrder(false);
-  };
+  // const [isShowWorkOrder, setIsShowWorkOrder] = useState(false);
+  // const [workOrder, setWorkOrder] = useState('');
+  // const _onChangeWorkOrder = data => {
+  //   setWorkOrder(data)
+  //   setIsShowWorkOrder(false);
+  // };
 
-  const [isShowHours, setIsShowHours] = useState(false);
-  const [hours, setHours] = useState(8);
-  const [hoursDisplay, setHoursDisplay] = useState('8');
-  const _onChangeHours = () => {
-    let value = hoursDisplay.replace(/,/g, '.');
-    setHoursDisplay(value);
-    if (!Helper.checkFormatNumber(value)) {
-      Toast.show('Please enter hours must be a number.', Toast.SHORT);
-      return;
-    }
-    value = parseFloat(value);
-    setHours(value);
-    setIsShowHours(false);
-  };
+  // const [isShowHours, setIsShowHours] = useState(false);
+  // const [hours, setHours] = useState(8);
+  // const [hoursDisplay, setHoursDisplay] = useState('8');
+  // const _onChangeHours = () => {
+  //   let value = hoursDisplay.replace(/,/g, '.');
+  //   setHoursDisplay(value);
+  //   if (!Helper.checkFormatNumber(value)) {
+  //     Toast.show('Please enter hours must be a number.', Toast.SHORT);
+  //     return;
+  //   }
+  //   value = parseFloat(value);
+  //   setHours(value);
+  //   setIsShowHours(false);
+  // };
 
   const [isShowOvertime, setIsShowOvertime] = useState(false);
   const [overtime, setOvertime] = useState(0);
@@ -326,20 +303,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setIsShowOvertime(false);
   };
 
-  const [isShowShift, setIsShowShift] = useState(false);
-  const [shift, setShift] = useState('HC');
-  const _onChangShift = data => {
-    setShift(data);
-    setIsShowShift(false);
-  };
-
-  const [isShowNote, setIsShowNote] = useState(false);
-  const [note, setNote] = useState('');
-  const [noteDisplay, setNoteDisplay] = useState('');
-  const _onChangeNote = () => {
-    setNote(noteDisplay);
-    setIsShowNote(false);
-  };
 
 
 
@@ -352,7 +315,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           <Text style={styles.cellData}>{item.ID} - {item.Fullname}</Text>
           <View style={styles.cellCheckbox}>
             <CheckBox
-              value={!!item.Selected}
+              value={item.Selected}
               onValueChange={value => _onChangeCheckbox(value, index)}
               style={styles.checkBox}
               boxType='square'
@@ -405,17 +368,10 @@ const TimeSheetScreen = ({ route, navigation }) => {
             <Header data={headerData}></Header>
           }
           <View>
-            <View style={styles.headerActionRow}>
+            {/* <View style={styles.headerActionRow}>
               <Text style={styles.headerCellTitle}>WorkOrder:</Text>
               <TouchableOpacity style={styles.headerActionContainer} onPress={() => setIsShowWorkOrder(true)}>
                 <Text style={styles.textAction}>{Formater.formatEmptyData(workOrder)}</Text>
-                <Ionicons style={styles.iconAction} name='md-list-outline' size={20} color={BASE_COLOR} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.headerActionRow}>
-              <Text style={styles.headerCellTitle}>WorkingTime:</Text>
-              <TouchableOpacity style={styles.headerActionContainer} onPress={() => setIsShowShift(true)}>
-                <Text style={styles.textAction}>{Formater.formatEmptyData(shift)}</Text>
                 <Ionicons style={styles.iconAction} name='md-list-outline' size={20} color={BASE_COLOR} />
               </TouchableOpacity>
             </View>
@@ -425,18 +381,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
                 <Text style={styles.textAction}>{hours}</Text>
                 <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
               </TouchableOpacity>
-            </View>
+            </View> */}
             <View style={styles.headerActionRow}>
               <Text style={styles.headerCellTitle}>Overtime:</Text>
               <TouchableOpacity style={styles.headerActionContainer} onPress={() => { setOvertimeDisplay(overtime.toString()); setIsShowOvertime(true); }}>
                 <Text style={styles.textActionOvertime}>{overtime}</Text>
-                <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.headerActionRow}>
-              <Text style={styles.headerCellTitle}>Note:</Text>
-              <TouchableOpacity style={styles.headerActionContainer} onPress={() => { setNoteDisplay(note); setIsShowNote(true); }}>
-                <Text style={styles.textAction}>{note}</Text>
                 <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
               </TouchableOpacity>
             </View>
@@ -459,11 +408,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
           {
-            workerList.length
+            yesterdayList.length
               ?
               <VirtualizedList
                 style={styles.table}
-                data={workerList}
+                data={yesterdayList}
                 getItemCount={data => data.length}
                 getItem={(data, index) => {
                   return data[index];
@@ -475,27 +424,22 @@ const TimeSheetScreen = ({ route, navigation }) => {
               <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManageWorker}>
+            {/* <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManageWorker}>
               <Text style={styles.buttonTitle}>Manage Worker</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+            </TouchableOpacity> */}
+            <TouchableOpacity style={styles.button} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
             </TouchableOpacity>
           </View>
         </View>
       }
-      <SelectPopupTimeSheet
+      {/* <SelectPopupTimeSheet
         visible={isShowWorkOrder}
         data={workOrderList}
         onChangeItem={_onChangeWorkOrder}
         onCancel={() => setIsShowWorkOrder(false)}
-      />
-      <SelectPopup
-        visible={isShowShift}
-        data={['HC', 'Ca1', 'Ca2', 'Ca3']}
-        onCancel={() => setIsShowShift(false)}
-        onChangeItem={_onChangShift} />
-      <Dialog.Container visible={isShowHours}>
+      /> */}
+      {/* <Dialog.Container visible={isShowHours}>
         <Dialog.Title>{'Enter hours:'}</Dialog.Title>
         <Dialog.Input
           value={hoursDisplay}
@@ -505,7 +449,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
         />
         <Dialog.Button label='Cancle' onPress={() => { setIsShowHours(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeHours} />
-      </Dialog.Container>
+      </Dialog.Container> */}
       <Dialog.Container visible={isShowOvertime}>
         <Dialog.Title>{'Enter overtime:'}</Dialog.Title>
         <Dialog.Input
@@ -516,16 +460,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
         />
         <Dialog.Button label='Cancle' onPress={() => { setIsShowOvertime(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeOvertime} />
-      </Dialog.Container>
-      <Dialog.Container visible={isShowNote}>
-        <Dialog.Title>{'Enter note:'}</Dialog.Title>
-        <Dialog.Input
-          value={noteDisplay}
-          onChangeText={(text) => setNoteDisplay(text)}
-          underlineColorAndroid={BASE_COLOR}
-        />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowNote(false) }} />
-        <Dialog.Button label='OK' onPress={_onChangeNote} />
       </Dialog.Container>
       <AwesomeAlert
         show={isUploading}
@@ -695,6 +629,12 @@ const styles = StyleSheet.create({
     height: 36,
     flexDirection: 'row',
   },
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+  },
   buttonLeft: {
     flex: 1,
     justifyContent: 'center',
@@ -714,4 +654,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TimeSheetScreen;
+export default TimeSheetYesterdayScreen;
