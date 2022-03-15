@@ -11,7 +11,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import { GetLocationListAPI, GetTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -55,15 +55,22 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+          {/* <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleHelp(true) }}>
             <Ionicons
               size={24}
               name={'help-circle-outline'} color={iconColor} />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleJointNo(true) }}>
+            <Ionicons
+              size={24}
+              name={'search'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -72,7 +79,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription, isVisibleHelp]);
+  }, [navigation, isShowDescription, isVisibleHelp, isVisibleJointNo]);
 
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -96,9 +103,29 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     });
   };
 
-  const getConstructionDetail = async () => {
+  const [isVisibleJointNo, setIsVisibleJointNo] = useState(false);
+  const [jointNo, setJointNo] = useState('');
+  const [oldJointNo, setOldJointNo] = useState('');
+  const _onClearJointNo = () => {
+    if (jointNo != '') {
+      setJointNo('');
+      setOldJointNo('');
+      callAPI(() => getConstructionDetail(''));
+    }
+    setIsVisibleJointNo(false);
+  };
+  const _onSearchJointNo = () => {
+    if (jointNo != oldJointNo) {
+      setOldJointNo(jointNo);
+      callAPI(() => getConstructionDetail(jointNo));
+    }
+    setIsVisibleJointNo(false);
+  };
+
+  const getConstructionDetail = async (joint = '') => {
     let token = await Helper.getData('TOKEN');
-    GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+    joint = joint ? joint : '';
+    GetConstructionDetaiFilterlAPI(projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token)
       .then(res => {
         if (res.success) {
           setConstructionDetailList(res.data);
@@ -127,7 +154,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         let time = item['DIMRemark'];
         let DIMRequestDate = item['DIMRequestDate'];
 
-        if ((date && percent && location && team && time && DIMRequestDate) || (!date && !percent && !location && !team && !time && !DIMRequestDate)) {
+        if ((date && percent && location && team && time && DIMRequestDate)
+          || (!date && !percent && !location && !team && !time && !DIMRequestDate)) {
           return item;
         }
 
@@ -165,9 +193,10 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         let team = item['VisualRequestByTeam'];
         let completeDate = item['WeldingCompletedDate'];
         let time = item['QCVisualRemark'];
+        let lengthWeld = item['LengthWeld'];
 
-        if ((date && percent && welderId && wspNo && team && completeDate && time)
-          || (!date && !percent && !welderId && !wspNo && !team && !completeDate && !time)) {
+        if ((date && percent && welderId && wspNo && team && completeDate && time && lengthWeld)
+          || (!date && !percent && !welderId && !wspNo && !team && !completeDate && !time && !lengthWeld)) {
           return item;
         }
 
@@ -195,6 +224,11 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('QCVisualRemark') >= 0 && !time) || (column.indexOf('QCVisualRemark') < 0 && !oldItem['QCVisualRemark'])) {
           messages.push('Time');
+        }
+        if (oldItem['JointNo'].includes('#')){
+          if ((column.indexOf('LengthWeld') >= 0 && !lengthWeld) || (column.indexOf('LengthWeld') < 0 && !oldItem['LengthWeld'])) {
+            messages.push('LengthWeld');
+          }
         }
         return item;
       });
@@ -695,6 +729,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       array[index]['VisualRequestByTeam'] = valueClear;
       array[index]['WeldingCompletedDate'] = valueClear;
       array[index]['QCVisualRemark'] = valueClear;
+      array[index]['LengthWeld'] = valueClear;
     }
     setConstructionDetailList(array);
 
@@ -722,6 +757,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           ['VisualRequestByTeam']: valueClear,
           ['WeldingCompletedDate']: valueClear,
           ['QCVisualRemark']: valueClear,
+          ['LengthWeld']: valueClear,
         });
       }
     } else {
@@ -738,6 +774,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         array[objIndex]['VisualRequestByTeam'] = valueClear;
         array[objIndex]['WeldingCompletedDate'] = valueClear;
         array[objIndex]['QCVisualRemark'] = valueClear;
+        array[objIndex]['LengthWeld'] = valueClear;
       }
     }
     setConstructionUpdateList(array);
@@ -774,7 +811,6 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
 
       array = [...constructionUpdateList];
       let rowIndex = constructionDetailList[index].RowIndex;
-      let weldNo = constructionDetailList[index].JointNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
         array.push({ RowIndex: rowIndex, ['FitUpPercent']: value });
@@ -1291,7 +1327,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 item.JointNo.includes('#') &&
                 <View style={styles.row}>
                   <View style={styles.cellTitle}>
-                    <Text>LengthWeld:</Text>
+                    <Text style={styles.redText}>LengthWeld:</Text>
                   </View>
                   <View style={styles.cellDataLine}>
                     <TouchableOpacity
@@ -1476,6 +1512,17 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         />
         <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTime(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeTime} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleJointNo}>
+        <Dialog.Title>{'Enter JointNo'}</Dialog.Title>
+        <Dialog.Input
+          value={jointNo}
+          onChangeText={(no) => setJointNo(no)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleJointNo(false) }} />
+        <Dialog.Button label='Clear' onPress={_onClearJointNo} />
+        <Dialog.Button label='OK' onPress={_onSearchJointNo} />
       </Dialog.Container>
     </SafeAreaView>
   );

@@ -47,6 +47,24 @@ export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, s
       },
     }).then(res => res.json());
 
+export const GetConstructionDetaiFilterlAPI = (projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token) =>
+  fetch(
+    Port_Server
+    + '/api/structural/Construction/GetConstructionDetailFilter'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev
+    + '&joint=' + joint
+    + '&code=' + code,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 export const UpdateConstructionDetailAPI = (projectCode, facilityCode, userUpdate, code, listItemUpdate, token) =>
   fetch(
     Port_Server

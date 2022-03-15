@@ -79,7 +79,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(() => { getQCStatusList(drawingNo, weldNo, weldNo, type) }, false);
+      callAPI(() => { getQCStatusList(drawingNo, weldNo, location, type) }, false);
     }, []
   );
 
@@ -134,13 +134,13 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
     if (!no) {
-      callAPI(() => { getQCStatusList(no, weldNo, weldNo, type) }, false);
+      callAPI(() => { getQCStatusList(no, weldNo, location, type) }, false);
     }
   };
 
   const _onPressSearchDrawing = () => {
     Keyboard.dismiss();
-    callAPI(() => { getQCStatusList(drawingNo, weldNo, weldNo, type) }, false);
+    callAPI(() => { getQCStatusList(drawingNo, weldNo, location, type) }, false);
   };
 
   const _onPressManagePicture = item => {
@@ -181,7 +181,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
   const _onChangeType = data => {
     if (data != type) {
       setType(data);
-      callAPI(() => { getQCStatusList(drawingNo, weldNo, weldNo, data) }, false);
+      callAPI(() => { getQCStatusList(drawingNo, weldNo, location, data) }, false);
     }
     setIsVisibleType(false);
   };

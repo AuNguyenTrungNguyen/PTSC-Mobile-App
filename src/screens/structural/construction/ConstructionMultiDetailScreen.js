@@ -13,7 +13,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import { GetLocationListAPI, GetTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -65,12 +65,19 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               size={24}
               name={isCheckAllName} color={iconColor} />
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleHelp(true) }}>
             <Ionicons
               size={24}
               name={'help-circle-outline'} color={iconColor} />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleJointNo(true) }}>
+            <Ionicons
+              size={24}
+              name={'search'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
@@ -82,7 +89,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription, isVisibleHelp, isCheckAllName, constructionDetailList]);
+  }, [navigation, isShowDescription, isVisibleHelp, isCheckAllName, constructionDetailList, isVisibleJointNo]);
 
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -131,9 +138,28 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     });
   };
 
-  const getConstructionDetail = async () => {
+  const [isVisibleJointNo, setIsVisibleJointNo] = useState(false);
+  const [jointNo, setJointNo] = useState('');
+  const [oldJointNo, setOldJointNo] = useState('');
+  const _onClearJointNo = () => {
+    if (jointNo != '') {
+      setJointNo('');
+      setOldJointNo('');
+      callAPI(() => getConstructionDetail(''));
+    }
+    setIsVisibleJointNo(false);
+  };
+  const _onSearchJointNo = () => {
+    if (jointNo != oldJointNo) {
+      setOldJointNo(jointNo);
+      callAPI(() => getConstructionDetail(jointNo));
+    }
+    setIsVisibleJointNo(false);
+  };
+
+  const getConstructionDetail = async (joint = '') => {
     let token = await Helper.getData('TOKEN');
-    GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+    GetConstructionDetaiFilterlAPI(projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token)
       .then(res => {
         if (res.success) {
           setConstructionDetailList(res.data);
@@ -162,7 +188,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         let time = item['DIMRemark'];
         let DIMRequestDate = item['DIMRequestDate'];
 
-        if ((date && percent && location && team && time && DIMRequestDate) || (!date && !percent && !location && !team && !time && !DIMRequestDate)) {
+        if ((date && percent && location && team && time && DIMRequestDate)
+          || (!date && !percent && !location && !team && !time && !DIMRequestDate)) {
           return item;
         }
 
@@ -200,9 +227,10 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         let team = item['VisualRequestByTeam'];
         let completeDate = item['WeldingCompletedDate'];
         let time = item['QCVisualRemark'];
+        let lengthWeld = item['LengthWeld'];
 
-        if ((date && percent && welderId && wspNo && team && completeDate && time)
-          || (!date && !percent && !welderId && !wspNo && !team && !completeDate && !time)) {
+        if ((date && percent && welderId && wspNo && team && completeDate && time && lengthWeld)
+          || (!date && !percent && !welderId && !wspNo && !team && !completeDate && !time && !lengthWeld)) {
           return item;
         }
 
@@ -230,6 +258,11 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('QCVisualRemark') >= 0 && !time) || (column.indexOf('QCVisualRemark') < 0 && !oldItem['QCVisualRemark'])) {
           messages.push('Time');
+        }
+        if (oldItem['JointNo'].includes('#')) {
+          if ((column.indexOf('LengthWeld') >= 0 && !lengthWeld) || (column.indexOf('LengthWeld') < 0 && !oldItem['LengthWeld'])) {
+            messages.push('LengthWeld');
+          }
         }
         return item;
       });
@@ -751,6 +784,9 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       array[index]['VisualRequestByTeam'] = valueClear;
       array[index]['WeldingCompletedDate'] = valueClear;
       array[index]['QCVisualRemark'] = valueClear;
+      if (array[index]['JointNo'].includes('#')) {
+        array[index]['LengthWeld'] = valueClear;
+      }
     }
     setConstructionDetailList(array);
     array = [...constructionUpdateList];
@@ -768,16 +804,31 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           ['DIMRequestDate']: valueClear,
         });
       } else {
-        array.push({
-          RowIndex: rowIndex,
-          [keyDate]: valueClear,
-          [keyPercent]: valueClear,
-          ['WelderID']: valueClear,
-          ['WPSNo']: valueClear,
-          ['VisualRequestByTeam']: valueClear,
-          ['WeldingCompletedDate']: valueClear,
-          ['QCVisualRemark']: valueClear,
-        });
+        if (constructionDetailList[index]['JointNo'].includes('#')) {
+          array.push({
+            RowIndex: rowIndex,
+            [keyDate]: valueClear,
+            [keyPercent]: valueClear,
+            ['WelderID']: valueClear,
+            ['WPSNo']: valueClear,
+            ['VisualRequestByTeam']: valueClear,
+            ['WeldingCompletedDate']: valueClear,
+            ['QCVisualRemark']: valueClear,
+            ['LengthWeld']: valueClear,
+          });
+        }
+        else {
+          array.push({
+            RowIndex: rowIndex,
+            [keyDate]: valueClear,
+            [keyPercent]: valueClear,
+            ['WelderID']: valueClear,
+            ['WPSNo']: valueClear,
+            ['VisualRequestByTeam']: valueClear,
+            ['WeldingCompletedDate']: valueClear,
+            ['QCVisualRemark']: valueClear,
+          });
+        }
       }
     } else {
       array[objIndex][keyDate] = valueClear;
@@ -793,6 +844,9 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         array[objIndex]['VisualRequestByTeam'] = valueClear;
         array[objIndex]['WeldingCompletedDate'] = valueClear;
         array[objIndex]['QCVisualRemark'] = valueClear;
+        if (constructionDetailList[index]['JointNo'].includes('#')) {
+          array[objIndex]['LengthWeld'] = valueClear;
+        }
       }
     }
     setConstructionUpdateList(array);
@@ -818,6 +872,9 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           cloneUI[objIndex]['VisualRequestByTeam'] = valueClear;
           cloneUI[objIndex]['WeldingCompletedDate'] = valueClear;
           cloneUI[objIndex]['QCVisualRemark'] = valueClear;
+          if (i.JointNo.includes('#')) {
+            cloneUI[objIndex]['LengthWeld'] = valueClear;
+          }
         }
 
         // List update
@@ -834,16 +891,30 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               ['DIMRequestDate']: valueClear,
             });
           } else {
-            cloneUpdate.push({
-              RowIndex: i.RowIndex,
-              [keyDate]: valueClear,
-              [keyPercent]: valueClear,
-              ['WelderID']: valueClear,
-              ['WPSNo']: valueClear,
-              ['VisualRequestByTeam']: valueClear,
-              ['WeldingCompletedDate']: valueClear,
-              ['QCVisualRemark']: valueClear,
-            });
+            if (i.JointNo.includes('#')) {
+              cloneUpdate.push({
+                RowIndex: i.RowIndex,
+                [keyDate]: valueClear,
+                [keyPercent]: valueClear,
+                ['WelderID']: valueClear,
+                ['WPSNo']: valueClear,
+                ['VisualRequestByTeam']: valueClear,
+                ['WeldingCompletedDate']: valueClear,
+                ['QCVisualRemark']: valueClear,
+                ['LengthWeld']: valueClear,
+              });
+            } else {
+              cloneUpdate.push({
+                RowIndex: i.RowIndex,
+                [keyDate]: valueClear,
+                [keyPercent]: valueClear,
+                ['WelderID']: valueClear,
+                ['WPSNo']: valueClear,
+                ['VisualRequestByTeam']: valueClear,
+                ['WeldingCompletedDate']: valueClear,
+                ['QCVisualRemark']: valueClear,
+              });
+            }
           }
         } else {
           cloneUpdate[objIndex][keyDate] = valueClear;
@@ -859,6 +930,9 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
             cloneUpdate[objIndex]['VisualRequestByTeam'] = valueClear;
             cloneUpdate[objIndex]['WeldingCompletedDate'] = valueClear;
             cloneUpdate[objIndex]['QCVisualRemark'] = valueClear;
+            if (i.JointNo.includes('#')) {
+              cloneUI[objIndex]['LengthWeld'] = valueClear;
+            }
           }
         }
       }
@@ -1445,7 +1519,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
                 item.JointNo.includes('#') &&
                 <View style={styles.row}>
                   <View style={styles.cellTitle}>
-                    <Text>LengthWeld:</Text>
+                    <Text style={styles.redText}>LengthWeld:</Text>
                   </View>
                   <View style={styles.cellDataLine}>
                     <TouchableOpacity
@@ -1630,6 +1704,17 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         />
         <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTime(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeTime} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleJointNo}>
+        <Dialog.Title>{'Enter JointNo'}</Dialog.Title>
+        <Dialog.Input
+          value={jointNo}
+          onChangeText={(no) => setJointNo(no)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleJointNo(false) }} />
+        <Dialog.Button label='Clear' onPress={_onClearJointNo} />
+        <Dialog.Button label='OK' onPress={_onSearchJointNo} />
       </Dialog.Container>
     </SafeAreaView>
   );

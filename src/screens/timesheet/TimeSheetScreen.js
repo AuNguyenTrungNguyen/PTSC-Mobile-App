@@ -166,17 +166,17 @@ const TimeSheetScreen = ({ route, navigation }) => {
   };
 
   const _onPressManageWorker = () => {
-    Alert.alert(
-      'WARNING',
-      'Make sure to submit all data before the next step!',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel'
-        },
-        {
-          text: 'Next',
-          onPress: () => {
+    // Alert.alert(
+    //   'WARNING',
+    //   'Make sure to submit all data before the next step!',
+    //   [
+    //     {
+    //       text: 'Cancel',
+    //       style: 'cancel'
+    //     },
+    //     {
+    //       text: 'Next',
+    //       onPress: () => {
             navigation.navigate(
               'TimeSheetManagerWorker',
               {
@@ -185,11 +185,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
                 fullname: fullname
               }
             );
-          }
-        }
-      ],
-      { cancelable: false },
-    );
+    //       }
+    //     }
+    //   ],
+    //   { cancelable: false },
+    // );
   };
 
   const _onPressApplyAll = () => {
@@ -249,23 +249,23 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onPressSubmitToServer = async () => {
     if (isUpdate && workerList.length) {
-      Alert.alert(
-        'WARNING',
-        'Are you sure update new data?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel'
-          },
-          {
-            text: 'Submit',
-            onPress: () => {
+      // Alert.alert(
+      //   'WARNING',
+      //   'Are you sure update new data?',
+      //   [
+      //     {
+      //       text: 'Cancel',
+      //       style: 'cancel'
+      //     },
+      //     {
+      //       text: 'Submit',
+      //       onPress: () => {
               callAPI(updateTimeSheetList, false);
-            }
-          }
-        ],
-        { cancelable: false },
-      );
+      //       }
+      //     }
+      //   ],
+      //   { cancelable: false },
+      // );
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }

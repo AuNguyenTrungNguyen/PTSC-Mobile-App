@@ -33,7 +33,7 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [isVisibleType, setIsVisibleType] = useState(false);
-  const [type, setType] = useState(Constant.FILTER_THEIR);
+  const [type, setType] = useState('');
   const _onChangeType = data => {
     if (data != type) {
       setType(data);
@@ -166,21 +166,22 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
 
   const _onPressAddWorker = () => {
     if (workerUpdateList.length) {
-      Alert.alert(
-        'WARNING',
-        'Are you sure move workers selected to your group?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel'
-          },
-          {
-            text: 'Next',
-            onPress: updateTimeSheetWorkerList
-          }
-        ],
-        { cancelable: false },
-      );
+      // Alert.alert(
+      //   'WARNING',
+      //   'Are you sure move workers selected to your group?',
+      //   [
+      //     {
+      //       text: 'Cancel',
+      //       style: 'cancel'
+      //     },
+      //     {
+      //       text: 'Next',
+      //       onPress: updateTimeSheetWorkerList
+      //     }
+      //   ],
+      //   { cancelable: false },
+      // );
+      updateTimeSheetWorkerList();
     } else {
       navigation.navigate('TimeSheet');
     }
