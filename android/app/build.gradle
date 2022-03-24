@@ -133,7 +133,7 @@ android {
         applicationId "com.ptsc_cloud"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 28
+        versionCode 41
         versionName "3.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
@@ -207,6 +207,9 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.4.1"))
+    implementation("com.squareup.okhttp3:okhttp")              // No version!
+    implementation("com.squareup.okhttp3:okhttp-urlconnection") 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'

@@ -10,6 +10,10 @@ export default class Formater {
     return data ? Moment(data).format("DD-MMM-YY") : '';
   };
 
+  static formatDateDataTime = data => {
+    return data ? Moment(data).format("DD-MMM-YY HH:mm") : '';
+  };
+
   static formatTwoDigits = number => {
     try {
       return number.toFixed(2);
@@ -17,5 +21,13 @@ export default class Formater {
       return '0.00';
     }
   }
+
+  static formatDateSQL = data => {
+    return Moment(data).format("YYYY-MM-DD HH:mm:ss");
+  };
+
+  static formatDateWithoutTimeSQL = data => {
+    return Moment(data).format("YYYY-MM-DD");
+  };
 
 };

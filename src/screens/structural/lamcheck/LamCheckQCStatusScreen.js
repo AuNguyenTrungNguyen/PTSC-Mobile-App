@@ -1,0 +1,484 @@
+import React, { useState, useLayoutEffect, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, TextInput, Keyboard, Appearance } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import NetInfo from '@react-native-community/netinfo';
+
+import { GetLamCheckQCStatusListAPI } from '../../../apis/structural/LamCheckAPI';
+
+import Helper from '../../../utils/Helper';
+import Formater from '../../../utils/Formater';
+import Constant from '../../../utils/Constant';
+import CoreStyle from '../../../utils/CoreStyle';
+import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
+import MessageAlert from '../../../components/MessageAlert';
+import LoadingRefresh from '../../../components/LoadingRefresh';
+import SelectPopup from '../../../components/SelectPopup';
+
+const LamCheckQCStatusScreen = ({ route, navigation }) => {
+
+  const { projectCode, userLogin, paramDrawingNo } = route.params;
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const [drawingNo, setDrawingNo] = useState('');
+  const [oldDrawingNo, setOldDrawingNo] = useState(null);
+  const [jointNo, setJointNo] = useState('');
+  const [oldJointNo, setOldJointNo] = useState(null);
+
+  const [isVisibleType, setIsVisibleType] = useState(false);
+  const [type, setType] = useState(Constant.STATUS_NOT_YET);
+
+  const [lamCheckQCStatusList, setLamCheckQCStatusList] = useState(null);
+
+  const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
+
+  const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleType(true) }}>
+            <Ionicons
+              size={24}
+              name={'md-ellipsis-vertical-circle'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={toggle}>
+            <Ionicons
+              size={24}
+              name={isShowDescription.name} color={iconColor} />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation, isShowDescription]);
+
+  useEffect(
+    () => {
+      if (paramDrawingNo) {
+        setDrawingNo(paramDrawingNo);
+        setIsSearching(true);
+        callAPI(() => { searchLamCheckQCStatusList(paramDrawingNo, jointNo, '') }, false);
+      } else {
+        callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, false);
+      }
+    }, []
+  );
+
+  const toggle = () => {
+    setIsShowDescription(prevState => {
+      return {
+        show: !prevState.show,
+        name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
+      }
+    });
+  };
+
+  const callAPI = (executedAPI, loading = true) => {
+    if (loading) {
+      setIsLoading(true);
+    } else {
+      setIsSearching(true);
+    }
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        setIsSearching(false);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        executedAPI();
+      }
+    });
+  };
+
+  const _onChangeDrawingNo = no => {
+    setDrawingNo(no);
+  };
+
+  const _onChangeJointNo = no => {
+    setJointNo(no);
+  };
+
+  const _onChangeType = status => {
+    if (status != type) {
+      setType(status);
+      callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, status) }, false);
+    }
+    setIsVisibleType(false);
+  };
+
+  const _onPressSearchLamCheckQCStatusList = () => {
+    let isSearch = false;
+    if (drawingNo !== oldDrawingNo) {
+      setOldDrawingNo(drawingNo);
+      isSearch = true;
+    }
+    if (jointNo !== oldJointNo) {
+      setOldJointNo(jointNo);
+      isSearch = true;
+    }
+    if (isSearch) {
+      callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, false);
+    }
+  };
+
+  const searchLamCheckQCStatusList = async (drawingNo, jointNo, type) => {
+    Keyboard.dismiss();
+    let token = await Helper.getData('TOKEN');
+    drawingNo = drawingNo != null ? drawingNo : '';
+    jointNo = jointNo != null ? jointNo : '';
+    GetLamCheckQCStatusListAPI(projectCode, drawingNo, jointNo, type, token)
+      .then(res => {
+        if (res.success) {
+          setLamCheckQCStatusList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+          setIsSearching(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsSearching(false);
+        }
+      }).catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsSearching(false);
+      });
+  };
+
+  const _onPressManagePicture = async (item) => {
+    const dataCode = await Helper.getData('DATACODE');
+    navigation.navigate(
+      'LamCheckImage',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        dataCode: dataCode,
+        rowIndex: item.RowIndex,
+        drawingNo: item.WeldMapDrawingNo,
+        jointNo: item.JointNo
+      }
+    );
+  };
+
+
+
+  const getStatusRenderList = () => {
+    return !isSearching && lamCheckQCStatusList && lamCheckQCStatusList.length;
+  };
+
+  const RenderList = () => {
+    if (isSearching) {
+      return <ListLoadingData />
+    } else if (lamCheckQCStatusList == null) {
+      return <ListSelectData title={'Enter DrawingNo or JointNo'} />
+    } else if (!lamCheckQCStatusList.length) {
+      return <ListEmptyData />
+    }
+  };
+
+  const renderItem = ({ index, item }) => {
+    return (
+      <TouchableOpacity style={styles.box} onPress={() => { _onPressManagePicture(item) }}>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>DrawingNo:</Text>
+          {
+            item.WebLink
+              ?
+              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Open Lam Check Drawing')} style={styles.cellData}>
+                <Text style={CoreStyle.textLinkWithLine}>{item.WeldMapDrawingNo}</Text>
+              </TouchableOpacity>
+              :
+              <Text style={styles.cellData}>{item.WeldMapDrawingNo}</Text>
+          }
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>JointNo:</Text>
+          <Text style={styles.cellData}>{item.JointNo}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>PieceNo1:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceNo1)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Description1:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceDescription1)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>PieceNo2:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Description2:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.PieceDescription2)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Team:</Text>
+          <Text style={styles.cellData}>{Formater.formatEmptyData(item.LaminationTestRequestByTeam)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Result:</Text>
+          {
+            item.LaminationTestResult
+              ?
+              item.LaminationTestResult == 'ACC'
+                ?
+                <Text style={[styles.cellData, styles.labelAccept]}>{item.LaminationTestResult}</Text>
+                :
+                <Text style={[styles.cellData, styles.labelReject]}>{item.LaminationTestResult}</Text>
+              :
+              <Text style={styles.cellData}>{Formater.formatEmptyData(item.LaminationTestResult)}</Text>
+          }
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      {isLoading || isError
+        ?
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { callAPI(() => { searchLamCheckQCStatusList(drawingNo, jointNo, type) }, true) }} />
+        :
+        <View style={styles.container}>
+          {
+            isShowDescription.show
+              ?
+              <View style={styles.headerContainer}>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>ProjectCode:</Text>
+                  <Text style={styles.infoData}>{projectCode}</Text>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>DrawingNo:</Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.inputText}
+                      value={drawingNo}
+                      onChangeText={_onChangeDrawingNo}
+                      underlineColorAndroid='transparent'
+                    />
+                    {
+                      drawingNo == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                    }
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle}>JointNo:</Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.inputText}
+                      value={jointNo}
+                      onChangeText={_onChangeJointNo}
+                      underlineColorAndroid='transparent'
+                    />
+                    {
+                      jointNo == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeJointNo('')} style={styles.inputIcon} />
+                    }
+                  </View>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitle} />
+                  <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={_onPressSearchLamCheckQCStatusList}
+                    disabled={isSearching}>
+                    <Text style={styles.buttonTitle}>Search</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              :
+              null
+          }
+          {
+            getStatusRenderList()
+              ?
+              <>
+                <Text style={CoreStyle.textNote}>* Click an item to view image</Text>
+                <VirtualizedList
+                  style={styles.table}
+                  data={lamCheckQCStatusList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+              </>
+              :
+              <RenderList />
+          }
+          <SelectPopup
+            visible={isVisibleType}
+            data={[Constant.STATUS_NOT_YET, Constant.STATUS_ACCEPT, Constant.STATUS_REJECT]}
+            onCancel={() => setIsVisibleType(false)}
+            onChangeItem={_onChangeType}>
+          </SelectPopup>
+        </View>
+      }
+    </SafeAreaView>
+  );
+};
+
+const BASE_COLOR = '#344955';
+const OPP_COLOR = 'white';
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: OPP_COLOR,
+  },
+  container: {
+    padding: 12,
+    flex: 1,
+    backgroundColor: OPP_COLOR,
+  },
+
+  headerContainer: {
+    marginBottom: 8,
+    padding: 4,
+    paddingBottom: 0,
+  },
+  rowInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 36,
+    marginBottom: 4,
+  },
+  infoTitle: {
+    flex: 3,
+  },
+  infoData: {
+    flex: 7,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    borderRadius: 2,
+    alignItems: 'center',
+  },
+  inputText: {
+    flex: 1,
+    height: '100%',
+    color: BASE_COLOR,
+    paddingVertical: 0,
+  },
+  inputIcon: {
+    marginLeft: 4,
+    fontSize: 20,
+    color: BASE_COLOR,
+  },
+  searchButton: {
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    borderRadius: 2,
+  },
+
+  table: {
+    flexGrow: 1,
+  },
+  box: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    marginBottom: 8,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 16,
+    marginBottom: 4,
+  },
+  cellTitle: {
+    flex: 3,
+  },
+  cellData: {
+    flex: 7,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  cellAction: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  buttonAccept: {
+    width: 70,
+    borderColor: 'green',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelAccept: {
+    color: 'green',
+  },
+  buttonReject: {
+    width: 70,
+    borderColor: 'red',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelReject: {
+    color: 'red',
+  },
+  buttonImage: {
+    width: 70,
+    borderColor: 'darkblue',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelImage: {
+    color: 'darkblue',
+  },
+
+  actionContainer: {
+    marginTop: 12,
+    height: 36,
+    flexDirection: 'row',
+  },
+  buttonAction: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+  },
+  buttonTitle: {
+    color: OPP_COLOR,
+  },
+});
+
+export default LamCheckQCStatusScreen;

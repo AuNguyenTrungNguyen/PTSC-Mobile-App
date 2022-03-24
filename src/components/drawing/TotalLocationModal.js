@@ -23,7 +23,7 @@ const TotalLocationModal = props => {
                     ?
                     props.data.map((item) => {
                       return (
-                        <TouchableOpacity style={modals.row} onPress={() => props.onPressChangeLocation(item.Location)}>
+                        <TouchableOpacity style={modals.row} key={new Date()} onPress={() => props.onPressChangeLocation(item.Location)}>
                           <Text style={modals.cellTitle}>{item.Location}</Text>
                           <View style={modals.cellLine} />
                           <Text style={modals.cellData}>{item.Total}</Text>

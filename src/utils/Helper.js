@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import MessageAlert from '../components/MessageAlert';
+import Constant from './Constant';
 
 export default class Helper {
 
@@ -32,9 +33,14 @@ export default class Helper {
     };
   }
 
+  static checkFormatNumber = numer => {
+    const regexNumber = /^\d+(\.\d+)?$/;
+    return regexNumber.test(numer) && numer !== '';
+  };
+
   static openDrawingPDF = (navigation, link, title) => {
     navigation.navigate(
-      'PDFView',
+      Constant.ROUTE__PDF,
       {
         link: link,
         title: title,

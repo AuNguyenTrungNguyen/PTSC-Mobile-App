@@ -10,12 +10,13 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListAPI, GetFittingTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetLocationListAPI, GetTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
+import { ENUM_QC_SCOPE } from '../../../utils/Enum';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -39,11 +40,13 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     () => {
       if (route.params?.welderSelected) {
         _onChangeWelders(route.params?.welderSelected);
+      } else if (route.params?.pieceMarkNoSelected) {
+        _onChangePieceMarkNo(route.params?.pieceMarkNoSelected);
       }
       else {
         callAPI(getConstructionDetail);
       }
-    }, [route.params?.welderSelected, route.params?.index]
+    }, [route.params?.welderSelected, route.params?.pieceMarkNoSelected, route.params?.index]
   );
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -52,15 +55,22 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+          {/* <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleHelp(true) }}>
             <Ionicons
               size={24}
               name={'help-circle-outline'} color={iconColor} />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleJointNo(true) }}>
+            <Ionicons
+              size={24}
+              name={'search'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -69,7 +79,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription, isVisibleHelp]);
+  }, [navigation, isShowDescription, isVisibleHelp, isVisibleJointNo]);
 
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -93,9 +103,29 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     });
   };
 
-  const getConstructionDetail = async () => {
+  const [isVisibleJointNo, setIsVisibleJointNo] = useState(false);
+  const [jointNo, setJointNo] = useState('');
+  const [oldJointNo, setOldJointNo] = useState('');
+  const _onClearJointNo = () => {
+    if (jointNo != '') {
+      setJointNo('');
+      setOldJointNo('');
+      callAPI(() => getConstructionDetail(''));
+    }
+    setIsVisibleJointNo(false);
+  };
+  const _onSearchJointNo = () => {
+    if (jointNo != oldJointNo) {
+      setOldJointNo(jointNo);
+      callAPI(() => getConstructionDetail(jointNo));
+    }
+    setIsVisibleJointNo(false);
+  };
+
+  const getConstructionDetail = async (joint = '') => {
     let token = await Helper.getData('TOKEN');
-    GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+    joint = joint ? joint : '';
+    GetConstructionDetaiFilterlAPI(projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token)
       .then(res => {
         if (res.success) {
           setConstructionDetailList(res.data);
@@ -112,11 +142,104 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       });
   };
 
+  // Submit to Server
+  const checkConstructionDetail = () => {
+    let messages = [];
+    if (code == Constant.CODE_FITUP) {
+      constructionUpdateList.map(item => {
+        let date = item['FitUpDate'];
+        let percent = item['FitUpPercent'];
+        let location = item['Location'];
+        let team = item['FitUpRequestByTeam'];
+        let time = item['DIMRemark'];
+        let DIMRequestDate = item['DIMRequestDate'];
+
+        if ((date && percent && location && team && time && DIMRequestDate)
+          || (!date && !percent && !location && !team && !time && !DIMRequestDate)) {
+          return item;
+        }
+
+        let keys = Object.keys(item);
+        let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id'));
+        let objIndex = constructionDetailList.findIndex(obj => obj.RowIndex == item.RowIndex);
+        let oldItem = constructionDetailList[objIndex];
+        if ((column.indexOf('FitUpDate') >= 0 && !date) || (column.indexOf('FitUpDate') < 0 && !oldItem['FitUpDate'])) {
+          messages.push('Date');
+        }
+        if ((column.indexOf('FitUpPercent') >= 0 && !percent) || (column.indexOf('FitUpPercent') < 0 && !oldItem['FitUpPercent'])) {
+          messages.push('Percent');
+        }
+        if ((column.indexOf('Location') >= 0 && !location) || (column.indexOf('Location') < 0 && !oldItem['Location'])) {
+          messages.push('Location');
+        }
+        if ((column.indexOf('FitUpRequestByTeam') >= 0 && !team) || (column.indexOf('FitUpRequestByTeam') < 0 && !oldItem['FitUpRequestByTeam'])) {
+          messages.push('Team');
+        }
+        if ((column.indexOf('DIMRemark') >= 0 && !time) || (column.indexOf('DIMRemark') < 0 && !oldItem['DIMRemark'])) {
+          messages.push('Time');
+        }
+        if ((column.indexOf('DIMRequestDate') >= 0 && !DIMRequestDate) || (column.indexOf('DIMRequestDate') < 0 && !oldItem['DIMRequestDate'])) {
+          messages.push('DIMRequestDate');
+        }
+        return item;
+      });
+    }
+    else {
+      constructionUpdateList.map(item => {
+        let date = item['ActualFabWeldDate'];
+        let percent = item['ActualFabWeldPercent'];
+        let welderId = item['WelderID'];
+        let wspNo = item['WPSNo'];
+        let team = item['VisualRequestByTeam'];
+        let completeDate = item['WeldingCompletedDate'];
+        let time = item['QCVisualRemark'];
+        let lengthWeld = item['LengthWeld'];
+
+        if ((date && percent && welderId && wspNo && team && completeDate && time && lengthWeld)
+          || (!date && !percent && !welderId && !wspNo && !team && !completeDate && !time && !lengthWeld)) {
+          return item;
+        }
+
+        let keys = Object.keys(item);
+        let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id'));
+        let objIndex = constructionDetailList.findIndex(obj => obj.RowIndex == item.RowIndex);
+        let oldItem = constructionDetailList[objIndex];
+        if ((column.indexOf('ActualFabWeldDate') >= 0 && !date) || (column.indexOf('ActualFabWeldDate') < 0 && !oldItem['ActualFabWeldDate'])) {
+          messages.push('Date');
+        }
+        if ((column.indexOf('ActualFabWeldPercent') >= 0 && !percent) || (column.indexOf('ActualFabWeldPercent') < 0 && !oldItem['ActualFabWeldPercent'])) {
+          messages.push('Percent');
+        }
+        if ((column.indexOf('WelderID') >= 0 && !welderId) || (column.indexOf('WelderID') < 0 && !oldItem['WelderID'])) {
+          messages.push('WelderID');
+        }
+        if ((column.indexOf('WPSNo') >= 0 && !wspNo) || (column.indexOf('WPSNo') < 0 && !oldItem['WPSNo'])) {
+          messages.push('WPSNo');
+        }
+        if ((column.indexOf('VisualRequestByTeam') >= 0 && !team) || (column.indexOf('VisualRequestByTeam') < 0 && !oldItem['VisualRequestByTeam'])) {
+          messages.push('Team');
+        }
+        if ((column.indexOf('WeldingCompletedDate') >= 0 && !completeDate) || (column.indexOf('WeldingCompletedDate') < 0 && !oldItem['WeldingCompletedDate'])) {
+          messages.push('CompletedDate');
+        }
+        if ((column.indexOf('QCVisualRemark') >= 0 && !time) || (column.indexOf('QCVisualRemark') < 0 && !oldItem['QCVisualRemark'])) {
+          messages.push('Time');
+        }
+        if (oldItem['JointNo'].includes('#')){
+          if ((column.indexOf('LengthWeld') >= 0 && !lengthWeld) || (column.indexOf('LengthWeld') < 0 && !oldItem['LengthWeld'])) {
+            messages.push('LengthWeld');
+          }
+        }
+        return item;
+      });
+    }
+    return messages;
+  };
   const updateConstructionDetail = async () => {
-    setIsUploading(true);
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(constructionUpdateList);
-    UpdateConstructionDetailAPI(listUpdate, token)
+    setIsUploading(true);
+    UpdateConstructionDetailAPI(projectCode, facilityCode, userLogin, code, listUpdate, token)
       .then(res => {
         if (res.success) {
           setConstructionUpdateList([]);
@@ -130,26 +253,31 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
-
   const _onPressSubmitToServer = async () => {
     if (constructionUpdateList.length) {
-      callAPI(updateConstructionDetail);
+      let error = checkConstructionDetail();
+      if (error.length) {
+        let uniqueError = [...new Set(error)];
+        MessageAlert('ERROR', '\nPlesase enter: ' + uniqueError.join(', '));
+      } else {
+        callAPI(updateConstructionDetail);
+      }
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
     }
   };
 
   const _onPressManagePicture = () => {
-    // navigation.navigate(
-    //   'DrawingImage',
-    //   {
-    //     projectCode: projectCode,
-    //     facilityCode: facilityCode,
-    //     drawingNo: drawingNo,
-    //     code: code,
-    //     userLogin: userLogin
-    //   }
-    // );
+    navigation.navigate(
+      'ConstructionImage',
+      {
+        projectCode: projectCode,
+        facilityCode: facilityCode,
+        drawingNo: drawingNo,
+        code: code,
+        teamLeader: userLogin
+      }
+    );
   };
 
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
@@ -163,11 +291,23 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [isVisibleLocation, setIsVisibleLocation] = useState(false);
   const [locationList, setLocationList] = useState(null);
 
-  const [isVisibleFittingTeam, setIsVisibleFittingTeam] = useState(false);
-  const [fittingTeamList, setFittingTeamList] = useState(null);
+  const [isVisibleTeam, setIsVisibleTeam] = useState(false);
+  const [teamList, setTeamList] = useState(null);
+
+  const [isVisibleDIMRequestDate, setIsVisibleDIMRequestDate] = useState(false);
+  const [DIMRequestDateDisplay, setDIMRequestDateDisplay] = useState(new Date());
 
   const [isVisibleWPS, setIsVisibleWPS] = useState(false);
   const [wpsList, setWPSList] = useState(null);
+
+  const [isVisibleCompleteDate, setIsVisibleCompleteDate] = useState(false);
+  const [completeDateDisplay, setCompleteDateDisplay] = useState(new Date());
+
+  const [isVisibleTime, setIsVisibleTime] = useState(false);
+  const [timeDisplay, setTimeDisplay] = useState('');
+
+  const [isVisibleLengthWeld, setIsVisibleLengthWeld] = useState(false);
+  const [lengthWeldDisplay, setLengthWeldDisplay] = useState('');
 
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
@@ -186,7 +326,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
     }
     setConstructionUpdateList(array);
-  }
+  };
 
   const _onPressSelectDate = (value, index, key) => {
     setIndexUpdate(index);
@@ -249,12 +389,54 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       let rowIndex = constructionDetailList[indexUpdate].RowIndex;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
-        array.push({ RowIndex: rowIndex, ['FitUpPercent']: value });
+        array.push({ RowIndex: rowIndex, [keyUpdate]: value });
       } else {
-        array[objIndex]['FitUpPercent'] = constructionDetailList[indexUpdate][keyUpdate];
+        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
       }
       setConstructionUpdateList(array);
     }
+  };
+
+  const _onPressSelectPieceMarkNo = (item, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    navigation.navigate(
+      'ConstructionAddPieceMarkNo',
+      {
+        projectCode: projectCode,
+        facilityCode: facilityCode,
+        index: index,
+        data: { PieceMarkNo: item.PieceNo2, PieceDescription: item.PieceDescription2, HeatNo_TagNo: item.HeatNo_TagNo2, TraceNo: item.TraceNo2 },
+      }
+    );
+  };
+  const _onChangePieceMarkNo = data => {
+    let array = [...constructionDetailList];
+    array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
+    array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
+    array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
+    array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+    array[indexUpdate]['TraceNo2'] = data.TraceNo;
+    setConstructionDetailList(array);
+
+    array = [...constructionUpdateList];
+    let rowIndex = constructionDetailList[indexUpdate].RowIndex;
+    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({
+        RowIndex: rowIndex,
+        'PieceNo2': data.PieceMarkNo,
+        'PieceMarkNo02': data.PieceMarkNo,
+        'PieceDescription2': data.PieceDescription,
+        'HeatNo_TagNo2': data.HeatNo_TagNo,
+      });
+    } else {
+      array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
+      array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
+      array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
+      array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+    }
+    setConstructionUpdateList(array);
   };
 
   const _onPressShowLocationPopup = (index, key) => {
@@ -303,49 +485,102 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     setIsVisibleLocation(false);
   };
 
-  const _onPressShowFittingTeamPopup = (index, key) => {
+  const _onPressShowTeamPopup = (index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
-    setIsVisibleFittingTeam(true);
+    setIsVisibleTeam(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
-        getFittingTeamList();
+        getTeamList();
       }
     });
   };
-  const getFittingTeamList = async () => {
-    if (fittingTeamList == null) {
+  const getTeamList = async () => {
+    if (teamList == null) {
       let token = await Helper.getData('TOKEN');
-      GetFittingTeamListAPI(projectCode, code, token)
+      let filterType = code == Constant.CODE_FITUP ? Constant.CODE_FITUP : Constant.CODE_VISUAL;
+      GetTeamListAPI(projectCode, filterType, token)
         .then(res => {
           if (res.success) {
-            setFittingTeamList(res.data);
+            setTeamList(res.data);
             setIsLoading(false);
             setIsError(false);
           } else {
             setIsLoading(false);
             setIsError(true);
-            setIsVisibleFittingTeam(false);
+            setIsVisibleTeam(false);
           }
         })
         .catch(() => {
           setIsLoading(false);
           setIsError(true);
-          setIsVisibleFittingTeam(false);
+          setIsVisibleTeam(false);
         });
     }
   };
-  const _onPressClearFittingTeam = () => {
-    _onChangeFittingTeam(null);
-    setIsVisibleFittingTeam(false);
+  const _onPressClearTeam = () => {
+    _onChangeTeam(null);
+    setIsVisibleTeam(false);
   };
-  const _onChangeFittingTeam = data => {
+  const _onChangeTeam = data => {
     _onChangeData(data);
-    setIsVisibleFittingTeam(false);
+    setIsVisibleTeam(false);
+  };
+
+  const _onPressOpenTime = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setTimeDisplay(value.toString());
+    } else {
+      setTimeDisplay('');
+    }
+    setIsVisibleTime(true);
+  };
+  const _onChangeTime = () => {
+    let value = timeDisplay.trim();
+    setTimeDisplay(value);
+    if (!timeDisplay || !timeDisplay.trim()) {
+      Toast.show('Please enter time!', Toast.SHORT, ['RCTModalHostViewController']);
+      return;
+    }
+    if (constructionDetailList[indexUpdate][keyUpdate] !== value) {
+      _onChangeData(value);
+    }
+    setIsVisibleTime(false);
+  };
+
+  const _onPressSelectDIMRequestDate = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setDIMRequestDateDisplay(new Date(Moment(value).format("YYYY-MM-DDTHH:mm:00.000Z")));
+    } else {
+      setDIMRequestDateDisplay(new Date());
+    }
+    setIsVisibleDIMRequestDate(true);
+  };
+  const _onChangeDIMRequestDate = (selectedDate) => {
+    if (selectedDate != undefined) {
+      let array = [...constructionDetailList];
+      array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD HH:mm:00");
+      setConstructionDetailList(array);
+
+      array = [...constructionUpdateList];
+      let rowIndex = constructionDetailList[indexUpdate].RowIndex;
+      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+      if (objIndex < 0) {
+        array.push({ RowIndex: rowIndex, [keyUpdate]: Moment(selectedDate).format("YYYY-MM-DD HH:mm:00") });
+      } else {
+        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
+      }
+      setConstructionUpdateList(array);
+    }
+    setIsVisibleDIMRequestDate(false);
   };
 
   const _onPressShowWPSPopup = (index, key) => {
@@ -394,6 +629,35 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     setIsVisibleWPS(false);
   };
 
+  const _onPressSelectCompleteDate = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setCompleteDateDisplay(new Date(Moment(value).format("YYYY-MM-DDTHH:mm:00.000Z")));
+    } else {
+      setCompleteDateDisplay(new Date());
+    }
+    setIsVisibleCompleteDate(true);
+  };
+  const _onChangeCompleteDate = (selectedDate) => {
+    if (selectedDate != undefined) {
+      let array = [...constructionDetailList];
+      array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD HH:mm:00");
+      setConstructionDetailList(array);
+
+      array = [...constructionUpdateList];
+      let rowIndex = constructionDetailList[indexUpdate].RowIndex;
+      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+      if (objIndex < 0) {
+        array.push({ RowIndex: rowIndex, [keyUpdate]: Moment(selectedDate).format("YYYY-MM-DD HH:mm:00") });
+      } else {
+        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
+      }
+      setConstructionUpdateList(array);
+    }
+    setIsVisibleCompleteDate(false);
+  };
+
   const _onPressSelectWelder = (value, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
@@ -410,6 +674,42 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     _onChangeData(welderSelected);
   };
 
+  const _onPressSelectLengthWeld = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setLengthWeldDisplay(value.toString());
+    } else {
+      setLengthWeldDisplay('');
+    }
+    setIsVisibleLengthWeld(true);
+  };
+  const _onChangeLengthWeld = () => {
+    let value = lengthWeldDisplay.replace(/,/g, '.');
+    setLengthWeldDisplay(value);
+    if (!checkFormatNumber(value)) {
+      Toast.show('Please enter ' + keyUpdate + ' must be a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    if (constructionDetailList[indexUpdate][keyUpdate] !== value) {
+      let array = [...constructionDetailList];
+      array[indexUpdate][keyUpdate] = value;
+      setConstructionDetailList(array);
+
+      array = [...constructionUpdateList];
+      let rowIndex = constructionDetailList[indexUpdate].RowIndex;
+      let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+      if (objIndex < 0) {
+        array.push({ RowIndex: rowIndex, [keyUpdate]: value });
+      } else {
+        array[objIndex][keyUpdate] = constructionDetailList[indexUpdate][keyUpdate];
+      }
+      setConstructionUpdateList(array);
+    }
+    setIsVisibleLengthWeld(false);
+  };
+
   const _onPressClearNow = index => {
     let keyDate = code == Constant.CODE_FITUP ? 'FitUpDate' : 'ActualFabWeldDate';
     let keyPercent = code == Constant.CODE_FITUP ? 'FitUpPercent' : 'ActualFabWeldPercent';
@@ -420,10 +720,16 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     array[index][keyPercent] = valueClear;
     if (code === Constant.CODE_FITUP) {
       array[index]['Location'] = valueClear;
-      array[index]['FittingTeam'] = valueClear;
+      array[index]['FitUpRequestByTeam'] = valueClear;
+      array[index]['DIMRemark'] = valueClear;
+      array[index]['DIMRequestDate'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
+      array[index]['VisualRequestByTeam'] = valueClear;
+      array[index]['WeldingCompletedDate'] = valueClear;
+      array[index]['QCVisualRemark'] = valueClear;
+      array[index]['LengthWeld'] = valueClear;
     }
     setConstructionDetailList(array);
 
@@ -437,7 +743,9 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           [keyDate]: valueClear,
           [keyPercent]: valueClear,
           ['Location']: valueClear,
-          ['FittingTeam']: valueClear,
+          ['FitUpRequestByTeam']: valueClear,
+          ['DIMRemark']: valueClear,
+          ['DIMRequestDate']: valueClear,
         });
       } else {
         array.push({
@@ -445,18 +753,28 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           [keyDate]: valueClear,
           [keyPercent]: valueClear,
           ['WelderID']: valueClear,
-          ['WPSNo']: valueClear
+          ['WPSNo']: valueClear,
+          ['VisualRequestByTeam']: valueClear,
+          ['WeldingCompletedDate']: valueClear,
+          ['QCVisualRemark']: valueClear,
+          ['LengthWeld']: valueClear,
         });
       }
     } else {
-      array[objIndex][keyDate] = constructionDetailList[index][keyDate];
-      array[objIndex][keyPercent] = constructionDetailList[index][keyPercent];
+      array[objIndex][keyDate] = valueClear;
+      array[objIndex][keyPercent] = valueClear;
       if (code == Constant.CODE_FITUP) {
-        array[objIndex]['Location'] = constructionDetailList[index]['Location'];
-        array[objIndex]['FittingTeam'] = constructionDetailList[index]['FittingTeam'];
+        array[objIndex]['Location'] = valueClear;
+        array[objIndex]['FitUpRequestByTeam'] = valueClear;
+        array[objIndex]['DIMRemark'] = valueClear;
+        array[objIndex]['DIMRequestDate'] = valueClear;
       } else {
-        array[objIndex]['WelderID'] = constructionDetailList[index]['WelderID'];
-        array[objIndex]['WPSNo'] = constructionDetailList[index]['WPSNo'];
+        array[objIndex]['WelderID'] = valueClear;
+        array[objIndex]['WPSNo'] = valueClear;
+        array[objIndex]['VisualRequestByTeam'] = valueClear;
+        array[objIndex]['WeldingCompletedDate'] = valueClear;
+        array[objIndex]['QCVisualRemark'] = valueClear;
+        array[objIndex]['LengthWeld'] = valueClear;
       }
     }
     setConstructionUpdateList(array);
@@ -479,8 +797,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     if (objIndex < 0) {
       array.push({ RowIndex: rowIndex, [keyDate]: valueDate, [keyPercent]: valuePercent });
     } else {
-      array[objIndex][keyDate] = constructionDetailList[index][keyDate];
-      array[objIndex][keyPercent] = constructionDetailList[index][keyPercent];
+      array[objIndex][keyDate] = valueDate;
+      array[objIndex][keyPercent] = valuePercent;
     }
     setConstructionUpdateList(array);
   };
@@ -493,7 +811,6 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
 
       array = [...constructionUpdateList];
       let rowIndex = constructionDetailList[index].RowIndex;
-      let weldNo = constructionDetailList[index].JointNo;
       let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
       if (objIndex < 0) {
         array.push({ RowIndex: rowIndex, ['FitUpPercent']: value });
@@ -509,35 +826,44 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     return regexNumber.test(input) && input !== '';
   };
 
+
+
+
+
+  const getStatusRenderList = () => {
+    return constructionDetailList && constructionDetailList.length;
+  };
+
   const RenderConstructionDetail = () => {
     {
       if (constructionDetailList == null) {
         return <ListLoadingData />
       } else if (!constructionDetailList.length) {
         return <ListEmptyData />
-      } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={constructionDetailList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
       }
     }
   };
+
+  const RenderQCScope = ({ value }) => {
+    let scope = 'New';
+    if (value == ENUM_QC_SCOPE.QCWS)
+      scope = 'QC Workshop';
+    if (value == ENUM_QC_SCOPE.QCDEPT)
+      scope = 'QC Department';
+    return <Text style={styles.textData}>{scope}</Text>;
+  };
+
   const renderItem = ({ index, item }) => {
     let itemDate = code == Constant.CODE_FITUP ? item['FitUpDate'] : item['ActualFabWeldDate'];
     let itemPercent = code == Constant.CODE_FITUP ? item['FitUpPercent'] : item['ActualFabWeldPercent'];
-
-    let isDateValid = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
-    let isPercentValid = itemPercent != null && itemPercent == 100;
-
-    let isDisableItem = isDateValid && isPercentValid;
+    let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
     let isEnableClear = itemDate || itemPercent;
+    if (code == Constant.CODE_FITUP) {
+      isDisableItem = isDisableItem || (item['UTLAMPercent'] == 1 && item['LaminationTestResult'] != Constant.STATUS_ACCEPT);
+    } else {
+      isDisableItem = isDisableItem || item['FitUpResult'] != Constant.STATUS_ACCEPT;
+      if (item.JointNo.includes('#')) isDisableItem = false;
+    }
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
@@ -600,9 +926,9 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FitUpDate:</Text>
+                  <Text style={styles.redText}>Date:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
                     onPress={() => _onPressSelectDate(item.FitUpDate, index, 'FitUpDate')}>
@@ -616,11 +942,10 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                     }
                   </TouchableOpacity>
                 </View>
-                <View style={styles.cellPercent} />
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FitUpPercent:</Text>
+                  <Text style={styles.redText}>Percent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -639,13 +964,13 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                 {
                   isDisableItem
                     ?
-                    <View style={styles.cellPercentRight}>
+                    <View style={styles.cellPercent}>
                       <TouchableOpacity style={styles.itemPercentDisable}>
                         <Text style={styles.textPercentDisabled}>50%</Text>
                       </TouchableOpacity>
                     </View>
                     :
-                    <View style={styles.cellPercentRight}>
+                    <View style={styles.cellPercent}>
                       <TouchableOpacity
                         style={styles.itemPercent}
                         onPress={() => _onPressChangePercent(50, index, 'FitUpPercent')}>
@@ -653,6 +978,82 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                       </TouchableOpacity>
                     </View>
                 }
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Location:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressShowLocationPopup(index, 'Location')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Team:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowTeamPopup(index, 'FitUpRequestByTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpRequestByTeam)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Time:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressOpenTime(item.DIMRemark, index, 'DIMRemark')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>{'DIM\Request\nDate'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressSelectDIMRequestDate(item.DIMRequestDate, index, 'DIMRequestDate')}>
+                    <Text style={styles.textData}>{Formater.formatDateDataTime(item.DIMRequestDate)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
+                        :
+                        <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
@@ -680,10 +1081,29 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
+                  <Text>TraceNo1:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo1)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
                   <Text>PieceNo2:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressSelectPieceMarkNo(item, index, 'PieceNo2')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
                 </View>
               </View>
               <View style={styles.row}>
@@ -704,41 +1124,34 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>Location:</Text>
+                  <Text>TraceNo2:</Text>
                 </View>
-                <View style={styles.cellData}>
-                  <TouchableOpacity
-                    style={styles.itemAction}
-                    onPress={() => _onPressShowLocationPopup(index, 'Location')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={'#a3a3a3'} />
-                        :
-                        <Ionicons style={styles.iconAction} name='md-location' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.TraceNo2)}</Text>
                 </View>
-                <View style={styles.cellPercent} />
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FittingTeam:</Text>
+                  <Text>QCScope:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <TouchableOpacity
-                    style={styles.itemActionIcon}
-                    onPress={() => _onPressShowFittingTeamPopup(index, 'FittingTeam')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FittingTeam)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
-                        :
-                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
+                  <RenderQCScope value={item.QCScope} />
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>LAMPercent:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.UTLAMPercent)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>LAMResult:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.LaminationTestResult)}</Text>
                 </View>
               </View>
             </>
@@ -746,9 +1159,9 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldDate:</Text>
+                  <Text style={styles.redText}>{'VisualRequest\nDate'}:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellDataLine}>
                   <TouchableOpacity
                     style={styles.itemAction}
                     onPress={() => _onPressSelectDate(item.ActualFabWeldDate, index, 'ActualFabWeldDate')}>
@@ -762,11 +1175,10 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                     }
                   </TouchableOpacity>
                 </View>
-                <View style={styles.cellPercent} />
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldPercent:</Text>
+                  <Text style={styles.redText}>Percent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -818,7 +1230,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WelderIDs:</Text>
+                  <Text style={styles.redText}>WelderID:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -837,7 +1249,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WPSNo:</Text>
+                  <Text style={styles.redText}>WPSNo:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -852,6 +1264,93 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
                         <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                     }
                   </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Team:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowTeamPopup(index, 'VisualRequestByTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualRequestByTeam)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>{'Welding\nCompleted\nDate'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressSelectCompleteDate(item.WeldingCompletedDate, index, 'WeldingCompletedDate')}>
+                    <Text style={styles.textData}>{Formater.formatDateDataTime(item.WeldingCompletedDate)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
+                        :
+                        <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>QCCheckTime:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressOpenTime(item.QCVisualRemark, index, 'QCVisualRemark')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {
+                item.JointNo.includes('#') &&
+                <View style={styles.row}>
+                  <View style={styles.cellTitle}>
+                    <Text style={styles.redText}>LengthWeld:</Text>
+                  </View>
+                  <View style={styles.cellDataLine}>
+                    <TouchableOpacity
+                      style={styles.itemAction}
+                      onPress={() => _onPressSelectLengthWeld(item.LengthWeld, index, 'LengthWeld')}>
+                      <Text style={styles.textData}>{Formater.formatEmptyData(item.LengthWeld)}</Text>
+                      {
+                        isDisableItem
+                          ?
+                          <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                          :
+                          <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                      }
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              }
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>FitUpResult:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
                 </View>
               </View>
             </>
@@ -884,7 +1383,31 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             isShowDescription.show &&
             <Header data={headerData} action={headerAction}></Header>
           }
-          <RenderConstructionDetail />
+          {
+            getStatusRenderList()
+              ?
+              <>
+                {/* {
+                  code == Constant.CODE_FITUP
+                    ?
+                    <Text style={styles.textDataRequired}>Required LAMPercent and LAMResult accepted to submit FitUp request!</Text>
+                    :
+                    <Text style={styles.textDataRequired}>Required FitUpResult accepted to submit Visual request!</Text>
+                } */}
+                <VirtualizedList
+                  style={styles.table}
+                  data={constructionDetailList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+              </>
+              :
+              <RenderConstructionDetail />
+          }
           <View style={styles.actionContainer}>
             <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
               <Text style={styles.buttonTitle}>Manage Picture</Text>
@@ -901,6 +1424,22 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             onConfirm={_onChangeDate}
             onCancel={() => { setIsVisibleDate(false) }}
           />
+          <DateTimePickerModal
+            isVisible={isVisibleDIMRequestDate}
+            headerTextIOS={'Update ' + keyUpdate + ':'}
+            date={DIMRequestDateDisplay}
+            mode={'datetime'}
+            onConfirm={_onChangeDIMRequestDate}
+            onCancel={() => { setIsVisibleDIMRequestDate(false) }}
+          />
+          <DateTimePickerModal
+            isVisible={isVisibleCompleteDate}
+            headerTextIOS={'Update ' + keyUpdate + ':'}
+            date={completeDateDisplay}
+            mode={'datetime'}
+            onConfirm={_onChangeCompleteDate}
+            onCancel={() => { setIsVisibleCompleteDate(false) }}
+          />
           <Dialog.Container visible={isVisiblePercent}>
             <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
             <Dialog.Input
@@ -913,6 +1452,18 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
             <Dialog.Button label='Cancle' onPress={() => { setIsVisiblePercent(false) }} />
             <Dialog.Button label='OK' onPress={_onChangePercent} />
           </Dialog.Container>
+          <Dialog.Container visible={isVisibleLengthWeld}>
+            <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+            <Dialog.Input
+              value={lengthWeldDisplay}
+              placeholder={'Enter ' + keyUpdate}
+              onChangeText={(text) => setLengthWeldDisplay(text)}
+              underlineColorAndroid={BASE_COLOR}
+              keyboardType={'numeric'}
+            />
+            <Dialog.Button label='Cancle' onPress={() => { setIsVisibleLengthWeld(false) }} />
+            <Dialog.Button label='OK' onPress={_onChangeLengthWeld} />
+          </Dialog.Container>
         </View>
       }
       <AwesomeAlert
@@ -920,11 +1471,14 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         showProgress={true}
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
-      />
+      >
+      </AwesomeAlert>
       <HelpModal
         visible={isVisibleHelp}
         code={code}
-        onClose={() => setIsVisibleHelp(false)} />
+        onClose={() => setIsVisibleHelp(false)}
+      >
+      </HelpModal>
       <SelectPopup
         visible={isVisibleLocation}
         data={locationList}
@@ -934,11 +1488,11 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       >
       </SelectPopup>
       <SelectPopup
-        visible={isVisibleFittingTeam}
-        data={fittingTeamList}
-        onChangeItem={_onChangeFittingTeam}
-        onCancel={() => setIsVisibleFittingTeam(false)}
-        onClear={_onPressClearFittingTeam}
+        visible={isVisibleTeam}
+        data={teamList}
+        onChangeItem={_onChangeTeam}
+        onCancel={() => setIsVisibleTeam(false)}
+        onClear={_onPressClearTeam}
       >
       </SelectPopup>
       <SelectPopup
@@ -949,9 +1503,30 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         onClear={_onPressClearWPS}
       >
       </SelectPopup>
+      <Dialog.Container visible={isVisibleTime}>
+        <Dialog.Title>{'Enter Time'}</Dialog.Title>
+        <Dialog.Input
+          value={timeDisplay}
+          onChangeText={(text) => setTimeDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTime(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeTime} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleJointNo}>
+        <Dialog.Title>{'Enter JointNo'}</Dialog.Title>
+        <Dialog.Input
+          value={jointNo}
+          onChangeText={(no) => setJointNo(no)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleJointNo(false) }} />
+        <Dialog.Button label='Clear' onPress={_onClearJointNo} />
+        <Dialog.Button label='OK' onPress={_onSearchJointNo} />
+      </Dialog.Container>
     </SafeAreaView>
   );
-}
+};
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
@@ -1021,12 +1596,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  checkBox: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-    width: 20,
-    height: 20,
-  },
   itemDone: {
     borderColor: BASE_COLOR,
     borderWidth: 1,
@@ -1073,11 +1642,6 @@ const styles = StyleSheet.create({
   },
   cellPercent: {
     flex: 1.2,
-    justifyContent: 'space-around',
-    flexDirection: 'row',
-  },
-  cellPercentRight: {
-    flex: 1.2,
     justifyContent: 'flex-end',
     flexDirection: 'row',
   },
@@ -1088,10 +1652,19 @@ const styles = StyleSheet.create({
   greenText: {
     color: 'green',
   },
+  redText: {
+    color: 'red',
+  },
   textData: {
     minWidth: 80,
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textDataRequired: {
+    fontWeight: 'bold',
+    color: 'red',
+    fontStyle: 'italic',
+    marginBottom: 4,
   },
   itemAction: {
     flexDirection: 'row',

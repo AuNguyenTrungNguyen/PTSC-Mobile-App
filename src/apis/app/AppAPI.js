@@ -1,4 +1,5 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetDrawingLinkAPI = (projectCode, drawingNo, sheet, rev, token) =>
   fetch(
@@ -40,12 +41,26 @@ export const GetLocationListAPI = (projectCode, disciplineCode, token) =>
       }
     }).then(res => res.json());
 
-export const GetFittingTeamListAPI = (projectCode, filterType, token) =>
+export const GetTeamListAPI = (projectCode, filterType, token) =>
   fetch(
     Port_Server
-    + '/api/App/GetFittingTeamList'
+    + '/api/App/GetTeamList'
     + '?projectCode=' + projectCode
     + '&filterType=' + filterType,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetPieceMarkNoList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&pieceMarkNo=' + pieceMarkNo,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -79,3 +94,61 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
         'Content-Type': 'application/json',
       }
     }).then(res => res.json());
+
+export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
+  let scope = await Helper.getData('QCSCOPE');
+  if (scope == null) {
+    scope = '';
+  }
+  return fetch(
+    Port_Server
+    + '/api/App/GetNotifyNumberScope'
+    + '?projectCode=' + projectCode
+    + '&scope=' + scope,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
+
+export const GetFactorTypeAPI = (projectCode, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetFactorType'
+    + '?projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/CheckDrawingRev'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const CreateTempDrawingNoAPI = (url, userLogin, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/CreateTempDrawingNo',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url, userLogin }),
+    }
+  ).then(res => res.json());

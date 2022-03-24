@@ -1,13 +1,59 @@
 export default class Constant {
 
-  static PIPING = 'PIPING';
-  static STRUCTURAL = 'STRUCTURAL';
+  //ROUTE
+  static ROUTE__AUTH = 'AUTH';
+  static ROUTE__LOGIN = 'LOGIN';
+  static ROUTE__HOME = 'HOME';
+  static ROUTE__CAMERA = 'CAMERA';
+  static ROUTE__PDF = 'PDF';
 
+  static ROUTE__PIPING = 'PIPING';
+  static ROUTE__STRUCTURAL = 'STRUCTURAL';
+  static ROUTE__STR_CONS = 'STR-CONS';
+  static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
+  static ROUTE__STR_QCWS = 'STR-QCWS';
+
+  // CODE FILTER
+  static FILTER_ALL = 'ALL';
+  static FILTER_NOT_YET = 'NOT_YET';
+  static FILTER_ALREADY = 'ALREADY';
+  static FILTER_MY = 'MY';
+  static FILTER_THEIR = 'THEIR';
+
+  // CODE TYPE
   static CODE_FITUP = 'FitUp';
   static CODE_WELD = 'Weld';
+  static CODE_VISUAL = 'Visual';
+  static CODE_CUT = 'Cut';
+  static CODE_PAINT = 'Paint';
+
+  // CODE IMAGE
+  static CODE_MAN_HOURS_IMPACT = 'WOFactor';
+
+  static PIECE_MARK_ALL = 'ALL';
+  static PIECE_MARK_CHECKED = 'CHECKED';
+  static PIECE_MARK_UNCHECKED = 'UNCHECKED';
 
   static EMPTY_VALUE_STRING = 'EMPTY_VALUE';
   static COLUMN_CHANGE = 'ColumnChange';
+
+  //STATUS
+  static STATUS_DRAFT = 'Draft';
+  static STATUS_FINAL = 'Final';
+  static STATUS_ACCEPT = 'ACC';
+  static STATUS_REJECT = 'REJ';
+  static STATUS_NOT_YET = 'NOT_YET';
+
+  //QA Observation
+  static QA_OBSERVATION_DRAFT = 0;
+  static QA_OBSERVATION_FINAL = 1;
+
+  //ID
+  static ID_TBA = 'TBA';
+
+  //OPTION
+  static OPTION_YES = 'Yes';
+  static OPTION_NO = 'No';
 
   //NDT
   static NDT_MT_CODE = 'MT';

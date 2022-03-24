@@ -14,7 +14,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const AddWelderScreen = ({ route, navigation }) => {
 
-  const { projectCode, welders, index } = route.params;
+  const { projectCode, welders, index, isMultiple } = route.params;
 
   const [welderId, setWelderId] = useState('');
   const [welderName, setWelderName] = useState('');
@@ -96,7 +96,8 @@ const AddWelderScreen = ({ route, navigation }) => {
   };
 
   const _onPressAddWelder = () => {
-    navigation.navigate('ConstructionDetail', { welderSelected: welderSelected, index: index });
+    let route = isMultiple ? 'ConstructionMultiDetail' : 'ConstructionDetail';
+    navigation.navigate(route, { welderSelected: welderSelected, index: index });
   };
 
   const RenderWelderList = () => {

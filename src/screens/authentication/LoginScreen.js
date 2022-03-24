@@ -2,15 +2,16 @@ import React, { useRef, useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacity, ActivityIndicator, Keyboard, Dimensions, Modal, ScrollView, Alert, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
-import AwesomeAlert from 'react-native-awesome-alerts';
+
+import { LoginAPI, GetProjectListAPI, GetModuleListAPI, GetRoleListAPI } from '../../apis/app/LoginAPI';
 
 import Constant from '../../utils/Constant';
 import Helper from '../../utils/Helper';
+import { ENUM_QC_SCOPE } from '../../utils/Enum';
 import MessageAlert from '../../components/MessageAlert';
-import LoginAPI from '../../apis/LoginAPI';
-import GetDataLoginAPI from '../../apis/app/GetDataLoginAPI';
-import GetProjectListAPI from '../../apis/app/GetProjectListAPI';
-export default ({ navigation }) => {
+import SelectPopup from '../../components/SelectPopup';
+
+const LoginScreen = ({ navigation }) => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,19 +19,22 @@ export default ({ navigation }) => {
   const [isLoadingLogin, setIsLoadingLogin] = useState(false);
 
   const PROJECT_CODE_DEFAULT = 'Select Project';
-  const DISCIPLINE_CODE_DEFAULT = 'Select Module';
-
   const [isLoadingProject, setIsLoadingProject] = useState(false);
   const [projectList, setProjectList] = useState([]);
-
-  const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(true);
-  const [disciplineList, setDisciplineList] = useState([]);
-
   const [projectCode, setProjectCode] = useState(PROJECT_CODE_DEFAULT);
   const [isVisibleProject, setIsVisibleProject] = useState(false);
 
+  const DISCIPLINE_CODE_DEFAULT = 'Select Module';
+  const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(false);
+  const [disciplineList, setDisciplineList] = useState([]);
   const [disciplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
   const [isVisibleDiscipline, setIsVisibleDiscipline] = useState(false);
+
+  const ROLE_CODE_DEFAULT = 'Select Role';
+  const [isLoadingRole, setIsLoadingRole] = useState(false);
+  const [roleList, setRoleList] = useState([]);
+  const [roleCode, setRoleCode] = useState(ROLE_CODE_DEFAULT);
+  const [isVisibleRole, setIsVisibleRole] = useState(false);
 
   const nextInput = useRef(null);
   const _onSubmitEditingNextInput = () => {
@@ -38,7 +42,6 @@ export default ({ navigation }) => {
   };
 
   useEffect(() => {
-    callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
     nextInput.current.setNativeProps({
       style: {
         fontFamily: FONT
@@ -51,66 +54,91 @@ export default ({ navigation }) => {
       setIsLoadingProject(true);
     } else if (key === DISCIPLINE_CODE_DEFAULT) {
       setIsLoadingDiscipline(true);
+    } else if (key === ROLE_CODE_DEFAULT) {
+      setIsLoadingRole(true);
     }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoadingProject(false);
-        confirmAlert(key);
+        setIsLoadingDiscipline(false);
+        setIsLoadingRole(false);
+        confirmAlert();
       } else {
         executedAPI();
       }
     });
   };
 
-  const getModuleList = () => {
-    GetDataLoginAPI()
+  const getProjectList = () => {
+    GetProjectListAPI(username)
       .then(res => {
         if (res.success) {
-          setDisciplineList(res.disciplineList);
-          setIsLoadingDiscipline(false);
+          setIsLoadingProject(false);
+          if (!res.data.length) {
+            MessageAlert('ERROR', 'Don\'t have any projects with this account.\nTry entering another account.');
+          } else {
+            setProjectList(res.data);
+            setIsVisibleProject(true);
+          }
         } else {
-          confirmAlert(DISCIPLINE_CODE_DEFAULT);
+          confirmAlert();
         }
       })
       .catch(() => {
-        confirmAlert(DISCIPLINE_CODE_DEFAULT);
+        confirmAlert();
       });
   };
-
-  const confirmAlert = key => {
-    if (key === DISCIPLINE_CODE_DEFAULT) {
-      Alert.alert(
-        'ERROR',
-        'Check that you are using the company network and reload!',
-        [{ text: 'Reload', onPress: () => { callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT); } }],
-        { cancelable: false },
-      );
-    } else if (key === PROJECT_CODE_DEFAULT) {
-      Alert.alert(
-        'ERROR',
-        'Check that you are using the company network and reload!',
-        [{ text: 'Reload', onPress: () => { callAPI(getProjectList, PROJECT_CODE_DEFAULT); } }],
-        { cancelable: false },
-      );
-    }
+  const getModuleList = () => {
+    GetModuleListAPI()
+      .then(res => {
+        if (res.success) {
+          setIsLoadingDiscipline(false);
+          if (!res.data.length) {
+            MessageAlert('ERROR', 'Don\'t have any modules with this account.\nTry entering another account.');
+          } else {
+            setDisciplineList(res.data);
+            setIsVisibleDiscipline(true);
+          }
+        } else {
+          confirmAlert();
+        }
+      })
+      .catch(() => {
+        confirmAlert();
+      });
+  };
+  const getRoleList = () => {
+    GetRoleListAPI(username)
+      .then(res => {
+        if (res.success) {
+          setIsLoadingRole(false);
+          if (!res.data.length) {
+            MessageAlert('ERROR', 'Don\'t have any roles with this account.\nTry entering another account.');
+          } else {
+            setRoleList(res.data);
+            setIsVisibleRole(true);
+          }
+        } else {
+          confirmAlert();
+        }
+      })
+      .catch(() => {
+        confirmAlert();
+      });
   };
 
   const _onChangeUsername = text => {
     setUsername(text);
   };
-
   const _onChangePassword = text => {
     setPassword(text);
   };
-
   const _onPressClearUsername = () => {
     setUsername('');
   };
-
   const _onPressTogglePassword = () => {
     setShowPassord(!showPassord);
   };
-
   const _onPressLogin = () => {
     Keyboard.dismiss();
     setIsLoadingLogin(true);
@@ -134,12 +162,20 @@ export default ({ navigation }) => {
           setIsLoadingLogin(false);
           return;
         }
+        if (roleCode === ROLE_CODE_DEFAULT) {
+          MessageAlert('ERROR', 'Please select a role.');
+          setIsLoadingLogin(false);
+          return;
+        }
         LoginAPI(username, password)
           .then(res => {
             res = JSON.parse(res.data);
             if (res.error) {
               MessageAlert('ERROR', res.error_description);
               setIsLoadingLogin(false);
+              setProjectCode(PROJECT_CODE_DEFAULT);
+              setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
+              setRoleCode(ROLE_CODE_DEFAULT);
               return;
             }
             if (res.access_token) {
@@ -148,72 +184,119 @@ export default ({ navigation }) => {
               Helper.storeData('EXPIRES', res['.expires']);
               Helper.storeData('PROJECT_CODE', projectCode);
               Helper.storeData('DISCIPLINE_CODE', disciplineCode);
+              Helper.storeData('ROLE_CODE', roleCode);
               Helper.storeData('DATACODE', 'PTSCMC');
-              let key;
-              if (disciplineCode.toUpperCase() === Constant.STRUCTURAL) {
-                key = Constant.STRUCTURAL
+              if (disciplineCode.toUpperCase() === Constant.ROUTE__STRUCTURAL) {
+                if (roleCode === Constant.ROUTE__STR_QCWS) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
+                }
+                if (roleCode === Constant.ROUTE__STR_QCDEPT) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
+                }
+                navigation.replace(roleCode, {
+                  screen: Constant.ROUTE__HOME,
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                });
               } else {
-                key = Constant.PIPING
+                navigation.replace(Constant.ROUTE__PIPING, {
+                  screen: 'Home',
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                });
               }
-              navigation.replace(key, {
-                screen: 'Home',
-                params: { projectCode: projectCode, disciplineCode: disciplineCode }
-              });
             }
           })
           .catch(() => {
             MessageAlert('ERROR', 'Please check that you are using the company network!');
             setIsLoadingLogin(false);
+            setProjectCode(PROJECT_CODE_DEFAULT);
+            setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
+            setRoleCode(ROLE_CODE_DEFAULT);
           });
       }
     });
   };
 
+
   const _onPressSelectProject = () => {
     if (username === '' || password === '') {
       MessageAlert('ERROR', 'The user name or password is invalid.');
-    } else {
-      callAPI(getProjectList, PROJECT_CODE_DEFAULT);
+      return;
     }
-  };
-
-  const getProjectList = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetProjectListAPI(username, token)
+    setIsLoadingProject(true);
+    LoginAPI(username, password)
       .then(res => {
-        if (res.success) {
-          setIsLoadingProject(false);
-          if (!res.data.length) {
-            MessageAlert('ERROR', 'Don\'t have any projects with this account.\nTry entering another account.');
-          } else {
-            setProjectList(res.data);
-            setIsVisibleProject(true);
-          }
-        } else {
-          confirmAlert(PROJECT_CODE_DEFAULT);
+        res = JSON.parse(res.data);
+        if (res.access_token) {
+          callAPI(getProjectList, PROJECT_CODE_DEFAULT);
+          return;
         }
+        setIsLoadingProject(false);
+        MessageAlert('ERROR', res.error_description);
       })
       .catch(() => {
-        confirmAlert(PROJECT_CODE_DEFAULT);
+        confirmAlert();
       });
   };
-
   const _onChangeProjectCode = (item) => {
     setProjectCode(item);
     setIsVisibleProject(false);
   };
 
   const _onPressSelectDiscipline = () => {
-    if (!disciplineList.length) {
-      MessageAlert('ERROR', 'No have any module code with this account.');
-    } else {
-      setIsVisibleDiscipline(true);
+    if (username === '' || password === '') {
+      MessageAlert('ERROR', 'The user name or password is invalid.');
+      return;
     }
+    setIsLoadingDiscipline(true);
+    LoginAPI(username, password)
+      .then(res => {
+        res = JSON.parse(res.data);
+        if (res.access_token) {
+          callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
+          return;
+        }
+        setIsLoadingDiscipline(false);
+        MessageAlert('ERROR', res.error_description);
+      })
+      .catch(() => {
+        confirmAlert();
+      });
   };
-
   const _onChangeDisciplineCode = (item) => {
     setDisciplineCode(item);
     setIsVisibleDiscipline(false);
+  };
+
+  const _onPressSelectRole = () => {
+    if (username === '' || password === '') {
+      MessageAlert('ERROR', 'The user name or password is invalid.');
+      return;
+    }
+    setIsLoadingRole(true);
+    LoginAPI(username, password)
+      .then(res => {
+        res = JSON.parse(res.data);
+        if (res.access_token) {
+          callAPI(getRoleList, ROLE_CODE_DEFAULT);
+          return;
+        }
+        setIsLoadingRole(false);
+        MessageAlert('ERROR', res.error_description);
+      })
+      .catch(() => {
+        confirmAlert
+      });
+  };
+  const _onChangeRoleCode = code => {
+    setRoleCode(code);
+    setIsVisibleRole(false);
+  };
+
+  const confirmAlert = () => {
+    setIsLoadingProject(false);
+    setIsLoadingDiscipline(false);
+    setIsLoadingRole(false);
+    MessageAlert('ERROR', 'Please check that you are using the company network!');
   };
 
   return (
@@ -272,11 +355,24 @@ export default ({ navigation }) => {
                   <Text style={styles.selectText}>{projectCode}</Text>
                 </TouchableOpacity>
             }
-            <TouchableOpacity
-              style={styles.selectContainer}
-              onPress={_onPressSelectDiscipline}>
-              <Text style={styles.selectText}>{disciplineCode}</Text>
-            </TouchableOpacity>
+            {
+              isLoadingDiscipline
+                ? <TouchableOpacity style={styles.selectContainer}>
+                  <ActivityIndicator size="large" color={BASE_COLOR} />
+                </TouchableOpacity>
+                : <TouchableOpacity style={styles.selectContainer} onPress={_onPressSelectDiscipline}>
+                  <Text style={styles.selectText}>{disciplineCode}</Text>
+                </TouchableOpacity>
+            }
+            {
+              isLoadingRole
+                ? <TouchableOpacity style={styles.selectContainer}>
+                  <ActivityIndicator size="large" color={BASE_COLOR} />
+                </TouchableOpacity>
+                : <TouchableOpacity style={styles.selectContainer} onPress={_onPressSelectRole}>
+                  <Text style={styles.selectText}>{roleCode}</Text>
+                </TouchableOpacity>
+            }
             {
               isLoadingLogin
                 ? <TouchableOpacity style={styles.buttonContainer}>
@@ -289,66 +385,22 @@ export default ({ navigation }) => {
           </View>
         </View>
       </View>
-      <Modal
-        animationType='fade'
-        transparent={true}
-        visible={isVisibleProject}>
-        <View style={modals.dim}>
-          <SafeAreaView>
-            <View style={modals.container}>
-              <View style={modals.list}>
-                <ScrollView>
-                  {projectList.map((item) => {
-                    return (
-                      <TouchableOpacity style={modals.row} onPress={() => { _onChangeProjectCode(item) }}>
-                        <Text style={modals.cell}>{item}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-              <View style={modals.action}>
-                <TouchableOpacity style={modals.button} onPress={() => { setIsVisibleProject(false) }} >
-                  <Text style={modals.buttonTitle}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      </Modal>
-      <Modal
-        animationType='fade'
-        transparent={true}
-        visible={isVisibleDiscipline}>
-        <View style={modals.dim}>
-          <SafeAreaView>
-            <View style={modals.container}>
-              <View style={modals.list}>
-                <ScrollView>
-                  {disciplineList.map((item) => {
-                    return (
-                      <TouchableOpacity style={modals.row} onPress={() => _onChangeDisciplineCode(item)}>
-                        <Text style={modals.cell}>{item}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-              <View style={modals.action}>
-                <TouchableOpacity style={modals.button} onPress={() => setIsVisibleDiscipline(false)} >
-                  <Text style={modals.buttonTitle}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      </Modal>
-      <AwesomeAlert
-        show={isLoadingDiscipline}
-        showProgress={true}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-      />
+      <SelectPopup
+        visible={isVisibleProject}
+        data={projectList}
+        onChangeItem={_onChangeProjectCode}
+        onCancel={() => setIsVisibleProject(false)} />
+      <SelectPopup
+        visible={isVisibleDiscipline}
+        data={disciplineList}
+        onChangeItem={_onChangeDisciplineCode}
+        onCancel={() => setIsVisibleDiscipline(false)} />
+      <SelectPopup
+        multi={true}
+        visible={isVisibleRole}
+        data={roleList}
+        onChangeItem={_onChangeRoleCode}
+        onCancel={() => setIsVisibleRole(false)} />
     </SafeAreaView>
   );
 };
@@ -358,14 +410,12 @@ const OPP_COLOR = 'white';
 const BP_600 = 600;
 const BP_750 = 750;
 const FONT = Platform.OS === 'android' ? 'roboto-regular' : undefined;
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
   imageContainer: {
-    height: Dimensions.get('window').height * 0.4,
+    height: Dimensions.get('window').height * 0.3,
   },
   image: {
     width: '100%',
@@ -439,57 +489,5 @@ const styles = StyleSheet.create({
     fontFamily: FONT
   },
 });
-const modals = StyleSheet.create({
-  dim: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  container: {
-    backgroundColor: OPP_COLOR,
-    width: windowWidth * 0.85,
-    height: undefined,
-    maxHeight: windowHeight * 0.85,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-  },
-  list: {
-    flexShrink: 1,
-    padding: 16,
-    width: windowWidth * 0.85,
-    height: undefined,
-  },
-  row: {
-    flexDirection: 'row',
-    minHeight: 36,
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  cell: {
-    flex: 5,
-    color: BASE_COLOR,
-    padding: 4,
-  },
-  action: {
-    width: windowWidth * 0.85,
-    height: 36,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginRight: 16,
-    marginBottom: 16,
-  },
-  button: {
-    width: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: BASE_COLOR,
-    padding: 4,
-    marginRight: 8,
-  },
-  buttonTitle: {
-    color: OPP_COLOR,
-  },
-});
+
+export default LoginScreen;

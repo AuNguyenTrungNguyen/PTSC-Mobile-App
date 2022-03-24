@@ -13,7 +13,13 @@ const CoreStyle = StyleSheet.create({
     fontStyle: 'italic',
     textDecorationLine: 'underline',
     color: BASE_COLOR,
-  }
+  },
+  textNote: {
+    color: BASE_COLOR,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    marginBottom: 4,
+  },
 
 });
 
