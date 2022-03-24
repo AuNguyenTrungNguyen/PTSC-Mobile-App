@@ -492,7 +492,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
       />
       <SelectPopup
         visible={isShowShift}
-        data={['HC', 'Ca1', 'Ca2', 'Ca3']}
+        data={['HC', 'Ca1', 'Ca2', 'Ca3', "Ca Lỡ"]}
         onCancel={() => setIsShowShift(false)}
         onChangeItem={_onChangShift} />
       <Dialog.Container visible={isShowHours}>
