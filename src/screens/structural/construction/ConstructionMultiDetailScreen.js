@@ -1049,7 +1049,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             {
-              isDisableItem
+              item['QCStatusMobile'] == Constant.STATUS_ACCEPT
                 ?
                 <Text style={styles.greenText}>
                   <Text>JointNo: </Text>
