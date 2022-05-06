@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import NetInfo from '@react-native-community/netinfo';
 import Dialog from 'react-native-dialog';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
 
@@ -16,7 +17,6 @@ import Header from '../../../components/Header';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import SelectPopup from '../../../components/SelectPopup';
-import { set } from 'react-native-reanimated';
 
 const ManHoursImpactDetailScreen = ({ route, navigation }) => {
 
@@ -54,7 +54,8 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
         ProjectCode: projectCode,
         FacilityCode: facilityCode,
         CompanyCode: companyCode,
-        Description: 'Mobile_Test',
+        // Description: 'Mobile_Test',
+        Description: '',
         WorkOrderNo: workOrder,
         Mhrs: 0,
         Date: new Date(),
@@ -126,12 +127,23 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
   }
 
   const _onPressSubmitToServer = async () => {
-    if (true) {
-      setIsUploading(true);
-      callAPI(updateManHoursImpactDetail, true);
-    } else {
-      Toast.show('No any data changes!', Toast.SHORT);
+    // if (true) {
+    setIsUploading(true);
+    callAPI(updateManHoursImpactDetail, true);
+    // } else {
+    //   Toast.show('No any data changes!', Toast.SHORT);
+    // }
+  };
+
+  const [isVisibleDate, setIsVisibleDate] = useState(false);
+  const [dateDisplay, setDateDisplay] = useState(new Date());
+  const _onChangeDate = (selectedDate) => {
+    if (selectedDate != undefined) {
+      // array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD");
+      setDateDisplay(selectedDate);
+      manHoursImpactDetail.Date = selectedDate;
     }
+    setIsVisibleDate(false);
   };
 
   const [isVisibleMhrs, setIsVisibleMhrs] = useState(false);
@@ -156,9 +168,9 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
     manHoursImpactDetail.FactorType = type;
     const typeNumber = parseInt(type.substring(0, 2));
     const subTypeDisplay = [];
-    subFactorTypeList.map( item => {
+    subFactorTypeList.map(item => {
       const subTypeNumber = parseInt(item.substring(0, item.indexOf('.')));
-      if(typeNumber === subTypeNumber){
+      if (typeNumber === subTypeNumber) {
         subTypeDisplay.push(item);
       }
       return item;
@@ -214,7 +226,12 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Date:</Text>
-                <Text style={styles.cellData}>{Formater.formatDateData(manHoursImpactDetail.Date)}</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleDate(true) }}>
+                    <Text style={styles.textAction}>{Formater.formatDateData(manHoursImpactDetail.Date)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Mhrs:</Text>
@@ -288,6 +305,13 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
           <RenderManHoursImpactDetail />
         </View>
       }
+      <DateTimePickerModal
+        isVisible={isVisibleDate}
+        date={dateDisplay}
+        mode={'date'}
+        onConfirm={_onChangeDate}
+        onCancel={() => { setIsVisibleDate(false) }}
+      />
       <Dialog.Container visible={isVisibleMhrs}>
         <Dialog.Title>{'Enter Mhrs'}</Dialog.Title>
         <Dialog.Input

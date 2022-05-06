@@ -86,10 +86,10 @@ const CameraScreen = ({ route, navigation }) => {
                       },
                       style: 'cancel'
                     },
-                    {
-                      text: 'Skip',
-                      onPress: () => { skipDrawingRev(drawingNo, sheet, rev, route, title) }
-                    }
+                    // {
+                    //   text: 'Skip',
+                    //   onPress: () => { skipDrawingRev(drawingNo, sheet, rev, route, title) }
+                    // }
                   ],
                   { cancelable: false },
                 );

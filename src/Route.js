@@ -71,6 +71,7 @@ import StructuralQAObservationOverviewListScreen from './screens/structural/obse
 import StructuralQAObservationListScreen from './screens/structural/observation/QAObservationListScreen';
 import StructuralQAObservationDetailScreen from './screens/structural/observation/QAObservationDetailScreen';
 import StructuralQAObservationImageScreen from './screens/structural/observation/QAObservationImageScreen';
+import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
@@ -706,6 +707,16 @@ const StructuralQCStackScreens = () => {
         options={
           {
             title: 'Observation Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCStack.Screen
+        name='QCHandBook'
+        component={QCHandBookScreen}
+        options={
+          {
+            title: 'QC Hand Book',
             headerBackTitle: 'Back',
           }
         }
