@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
@@ -231,6 +231,73 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- TimeSheet
+  const _onPressManageLTimeSheet = async () => {
+    Alert.alert(
+      '',
+      'TimeSheet: Company TimeSheet\n\nOT Yesterday: Update OT Yesterday',
+      [
+        { text: 'TimeSheet', onPress: _onPressTimeSheet },
+        { text: 'OT Yesterday', onPress: _onPressTimeSheetYesterday },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressTimeSheet = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+      screen: 'TimeSheet',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressTimeSheetYesterday = async () => {
+    let userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+      screen: 'TimeSheetYesterday',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+
+
+
+  const RenderItemBox = props => {
+    let iconName = 'qr-code-outline';
+    if (props.iconName) {
+      iconName = props.iconName;
+    }
+    return (
+      <View style={styles.cell}>
+        {
+          !props.disable &&
+          <>
+            <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
+              <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
+              <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+            </TouchableOpacity>
+            {
+              props.number
+                ?
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
+                </View>
+                :
+                null
+            }
+          </>
+        }
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
@@ -239,68 +306,24 @@ const HomeScreen = ({ route, navigation }) => {
         :
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
-          <View style={styles.table}>
+          <ScrollView style={styles.table}>
             <View style={styles.row}>
-              <View style={styles.cell}>
-                <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeFitUp} activeOpacity={1}>
-                  <Text style={styles.itemTitle}>Cons Scan FitUp</Text>
-                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.cell}>
-                <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeWeld} activeOpacity={1}>
-                  <Text style={styles.itemTitle}>Cons Scan Weld</Text>
-                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-                </TouchableOpacity>
-              </View>
+              <RenderItemBox title={'Cons Scan\nFitUp'} onPress={_onPressQRCodeFitUp} />
+              <RenderItemBox title={'Cons Scan\nWeld'} onPress={_onPressQRCodeWeld} />
             </View>
             <View style={styles.row}>
-              <View style={styles.cell}>
-                <TouchableOpacity style={styles.itemContainer} onPress={_onPressMamageQCFitUp} activeOpacity={1}>
-                  <Text style={styles.itemTitle}>QC Scan FitUp</Text>
-                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-                </TouchableOpacity>
-                {
-                  spendNumbers.FitUp
-                    ?
-                    <View style={styles.badgeContainer}>
-                      <Text style={styles.badgeText}>{spendNumbers.FitUp < 100 ? spendNumbers.FitUp : '99+'}</Text>
-                    </View>
-                    :
-                    null
-                }
-              </View>
-              <View style={styles.cell}>
-                <TouchableOpacity style={styles.itemContainer} onPress={_onPressMamageQCWeld} activeOpacity={1}>
-                  <Text style={styles.itemTitle}>QC Scan Weld</Text>
-                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-                </TouchableOpacity>
-                {
-                  spendNumbers.Weld
-                    ?
-                    <View style={styles.badgeContainer}>
-                      <Text style={styles.badgeText}>{spendNumbers.Weld < 100 ? spendNumbers.Weld : '99+'}</Text>
-                    </View>
-                    :
-                    null
-                }
-              </View>
+              <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
+              <RenderItemBox title={'QC Scan\nnWeld'} onPress={_onPressMamageQCWeld} number={spendNumbers.Weld} />
             </View>
             <View style={styles.row}>
-              <View style={styles.cell}>
-                <TouchableOpacity style={styles.itemContainer} onPress={_onPressQRCodeAllStatus} activeOpacity={1}>
-                  <Text style={styles.itemTitle}>Scan All Status</Text>
-                  <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.cell}>
-                <TouchableOpacity style={styles.itemContainer} onPress={_onPressSearchAllStatus} activeOpacity={1}>
-                  <Text style={styles.itemTitle}>Search All Status</Text>
-                  <Ionicons name='md-search' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-                </TouchableOpacity>
-              </View>
+              <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
+              <RenderItemBox title={'Search\nAll Status'} onPress={_onPressSearchAllStatus} iconName={'md-search'}/>
             </View>
-          </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
+              <RenderItemBox disable={true} />
+            </View>
+          </ScrollView>
           <View style={styles.action}>
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewReports}>
               <Text style={styles.buttonTitle}>View Reports</Text>
@@ -360,9 +383,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-
   table: {
-    flex: 1,
+    flexGrow: 1,
   },
   row: {
     flex: 1,
@@ -372,24 +394,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
   },
   itemContainer: {
-    height: '90%',
     width: '90%',
-    justifyContent: 'space-around',
     alignItems: 'center',
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 12,
-    padding: Dimensions.get('window').height > 700 ? 12 : 4,
+    padding: Dimensions.get('window').height > 700 ? 8 : 4,
   },
   itemTitle: {
     textAlign: 'center',
     color: BASE_COLOR,
     fontSize: Dimensions.get('window').height > 700 ? 16 : 14,
+    marginVertical: Dimensions.get('window').height > 700 ? 16 : 12,
+    minHeight: 40,
   },
   itemIcon: {
     color: BASE_COLOR,
+    marginBottom: Dimensions.get('window').height > 700 ? 8 : 4,
     height: Dimensions.get('window').height > 700 ? 48 : 36,
     width: Dimensions.get('window').height > 700 ? 48 : 36,
   },
@@ -400,7 +424,7 @@ const styles = StyleSheet.create({
     borderRadius: 36 / 2,
     backgroundColor: '#FF8C00',
     position: 'absolute',
-    top: 0,
+    top: -36 / 2,
     right: 0,
     justifyContent: 'center',
     alignItems: 'center',
@@ -409,7 +433,6 @@ const styles = StyleSheet.create({
     color: OPP_COLOR,
     fontWeight: 'bold'
   },
-
   action: {
     marginTop: 12,
   },

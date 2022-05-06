@@ -532,46 +532,6 @@ const StructuralCONSStackScreens = () => {
           }
         }
       />
-      <StructuralCONSStack.Screen
-        name='ManHoursImpactImage'
-        component={ManHoursImpactImageScreen}
-        options={
-          {
-            title: 'Man-hours Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='TimeSheet'
-        component={TimeSheetScreen}
-        options={
-          {
-            title: 'Company TimeSheet',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='TimeSheetManagerWorker'
-        component={TimeSheetManageWorkerScreen}
-        options={
-          {
-            title: 'Manage Workers',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='TimeSheetYesterday'
-        component={TimeSheetYesterdayScreen}
-        options={
-          {
-            title: 'Update TimeSheet Yesterday',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
     </StructuralCONSStack.Navigator>
   );
 };
@@ -725,6 +685,44 @@ const StructuralQCStackScreens = () => {
   );
 };
 
+const TimeSheetSStack = createStackNavigator();
+const TimeSheetSStackScreens = () => {
+  return (
+    <TimeSheetSStack.Navigator screenOptions={optionNavigation}>
+      <TimeSheetSStack.Screen
+        name='TimeSheet'
+        component={TimeSheetScreen}
+        options={
+          {
+            title: 'Company TimeSheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <TimeSheetSStack.Screen
+        name='TimeSheetManagerWorker'
+        component={TimeSheetManageWorkerScreen}
+        options={
+          {
+            title: 'Manage Workers',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <TimeSheetSStack.Screen
+        name='TimeSheetYesterday'
+        component={TimeSheetYesterdayScreen}
+        options={
+          {
+            title: 'Update TimeSheet Yesterday',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </TimeSheetSStack.Navigator>
+  );
+};
+
 export default () => {
   return (
     <NavigationContainer>
@@ -765,6 +763,12 @@ export default () => {
         <Stack.Screen
           name={Constant.ROUTE__STR_QCWS}
           component={StructuralQCStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.ROUTE__TIMESHEET}
+          component={TimeSheetSStackScreens}
           options={{ headerShown: false }}
         />
 

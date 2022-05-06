@@ -6,6 +6,7 @@ export default class Constant {
   static ROUTE__HOME = 'HOME';
   static ROUTE__CAMERA = 'CAMERA';
   static ROUTE__PDF = 'PDF';
+  static ROUTE__TIMESHEET = 'TIMESHEET_STACK';
 
   static ROUTE__PIPING = 'PIPING';
   static ROUTE__STRUCTURAL = 'STRUCTURAL';

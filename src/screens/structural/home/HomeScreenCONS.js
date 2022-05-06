@@ -284,23 +284,23 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
   const _onPressTimeSheet = async () => {
     let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'TimeSheet',
-      {
+    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+      screen: 'TimeSheet',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
   const _onPressTimeSheetYesterday = async () => {
     let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'TimeSheetYesterday',
-      {
+    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+      screen: 'TimeSheetYesterday',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
 
 
@@ -350,16 +350,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
             }
             <View style={styles.row}>
               <RenderItemBox title={'QC Check\nStatus'} />
-              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressManagePieceMarkCut} number={spendNumbers.DimForCutting}/>
+              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressManagePieceMarkCut} number={spendNumbers.DimForCutting} />
             </View>
             <View style={styles.row}>
               {/* <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressManagePieceMarkPaint} /> */}
-              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressManageLamCheckSpending}  number={spendNumbers.LamCheck}/>
-              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/>
+              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressManageLamCheckSpending} number={spendNumbers.LamCheck} />
+              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp} />
             </View>
             <View style={styles.row}>
               {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/> */}
-              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual}/>
+              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual} />
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
             </View>
             <View style={styles.row}>
