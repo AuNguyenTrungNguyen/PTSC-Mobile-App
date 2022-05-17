@@ -30,4 +30,9 @@ export default class Formater {
     return Moment(data).format("YYYY-MM-DD");
   };
 
+  static checkFormatNumber = input => {
+    const regexNumber = /^\d+(\.\d+)?$/;
+    return regexNumber.test(input) && input !== '';
+  };
+
 };

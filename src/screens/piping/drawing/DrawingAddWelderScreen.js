@@ -4,9 +4,13 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../../utils/Helper';
-import { GetWelderListAPI } from '../../../apis/drawing/ConstructionDrawingAPI';
+import Formater from '../../../utils/Formater';
+
+import { GetWelderListAPI } from '../../../apis/app/AppAPI';
+
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
+import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 
 export default ({ route, navigation }) => {
 
@@ -21,13 +25,16 @@ export default ({ route, navigation }) => {
   const [welderSelected, setWelderSelected] = useState(welders);
   const [welderList, setWelderList] = useState(null);
 
-  const callAPI = (executedAPI, loading = true) => {
+  const callAPI = (executedAPI, loading) => {
     if (loading) {
       setIsLoading(true);
+    } else {
+      setIsSearching(true);
     }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoading(false);
+        setIsSearching(false);
         setIsError(true);
         MessageAlert('WARNING', 'Network not available!');
       } else {
@@ -36,40 +43,18 @@ export default ({ route, navigation }) => {
     });
   };
 
-  const getWelderList = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetWelderListAPI(projectCode, welderId, welderName, token)
-      .then(res => {
-        if (res.success) {
-          setWelderList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
-  };
-
-  const _onChangeWelderID = (id) => {
+  const _onChangeWelderID = id => {
     setWelderId(id);
   };
-
-  const _onChangeWelderName = (name) => {
+  const _onChangeWelderName = name => {
     setWelderName(name);
   };
-
   const _onPressSearchWelder = () => {
     Keyboard.dismiss();
     callAPI(() => { searchWelder(welderId, welderName) }, false);
   };
-
   const searchWelder = async (welderId, welderName) => {
-    let token = await Helper.getData('TOKEN');
+    const token = await Helper.getData('TOKEN');
     GetWelderListAPI(projectCode, welderId, welderName, token)
       .then(res => {
         if (res.success) {
@@ -89,7 +74,7 @@ export default ({ route, navigation }) => {
       });
   };
 
-  const _onPressSelectWelder = (id) => {
+  const _onPressSelectWelder = id => {
     if (welderSelected) {
       if (!welderSelected.includes(id)) {
         let welders = welderSelected + '/' + id;
@@ -99,49 +84,15 @@ export default ({ route, navigation }) => {
       setWelderSelected(id);
     }
   };
-
-  const _onPressUnselectWelder = (id) => {
+  const _onPressUnselectWelder = id => {
     if (welderSelected) {
       const removed = welderSelected.split('/').filter(item => item !== id).join('/');
       setWelderSelected(removed);
     }
   };
-
   const _onPressAddWelder = () => {
-    if (!welderSelected) {
-      navigation.navigate('DrawingDetail', { welderSelected: 'CLEAR_WELDER_ID', index: index });
-    } else {
-      navigation.navigate('DrawingDetail', { welderSelected: welderSelected, index: index });
-    }
+    navigation.navigate('DrawingDetail', { welderSelected: welderSelected, index: index });
   };
-
-  const formatEmptyData = data => {
-    return data != null ? data : '';
-  };
-
-  const formatEmptyWelder = data => {
-    return (!data || data != 'CLEAR_WELDER_ID') ? data : '';
-  };
-
-
-
-  const ListSearchData = () => (
-    <View style={styles.noDataContainer}>
-      <ActivityIndicator size='large' color={BASE_COLOR} />
-    </View>
-  );
-
-  const ListSelectData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>Enter WelderID and WelderName</Text>
-    </View>
-  );
-
-  const ListEmptyData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any data</Text>
-    </View>
-  );
 
   const renderItem = ({ item }) => {
     return (
@@ -151,13 +102,13 @@ export default ({ route, navigation }) => {
           <View style={styles.row}>
             <View style={styles.cell}>
               <Text style={styles.textTitle}>WelderID: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderID)}</Text>
+              <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
             </View>
           </View>
           <View style={styles.row}>
             <View style={styles.cell}>
               <Text style={styles.textTitle}>WelderName: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderName)}</Text>
+              <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderName)}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -166,17 +117,39 @@ export default ({ route, navigation }) => {
           <View style={styles.row}>
             <View style={styles.cell}>
               <Text style={styles.textTitle}>WelderID: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderID)}</Text>
+              <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
             </View>
           </View>
           <View style={styles.row}>
             <View style={styles.cell}>
               <Text style={styles.textTitle}>WelderName: </Text>
-              <Text style={styles.textData}>{formatEmptyData(item.WelderName)}</Text>
+              <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderName)}</Text>
             </View>
           </View>
         </TouchableOpacity>
     );
+  };
+  const RenderWelderList = () => {
+    {
+      if (isSearching) {
+        return <ListLoadingData />
+      } else if (welderList == null) {
+        return <ListSelectData title={'Enter WelderID or WelderName'} />
+      } else if (!welderList.length) {
+        return <ListEmptyData />
+      } else {
+        return <VirtualizedList
+          style={styles.table}
+          data={welderList}
+          getItemCount={data => data.length}
+          getItem={(data, index) => {
+            return data[index];
+          }}
+          keyExtractor={(item, index) => index}
+          renderItem={renderItem}
+        />
+      }
+    }
   };
 
   return (
@@ -184,7 +157,7 @@ export default ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getWelderList)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(() => { searchWelder(welderId, welderName) }, true)} />
           :
           <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -235,37 +208,10 @@ export default ({ route, navigation }) => {
               </View>
               <View style={styles.rowInfoWelders}>
                 <Text style={styles.infoTitle}>Welders:</Text>
-                <Text style={styles.infoData}>{formatEmptyWelder(welderSelected)}</Text>
+                <Text style={styles.infoData}>{welderSelected}</Text>
               </View>
             </View>
-            {
-              isSearching
-                ?
-                <ListSearchData />
-                :
-                (welderList == null
-                  ?
-                  <ListSelectData />
-                  :
-                  (!welderList.length
-                    ?
-                    <ListEmptyData />
-                    :
-                    <VirtualizedList
-                      style={styles.table}
-                      data={welderList}
-                      getItemCount={(data) => data.length}
-                      getItem={(data, index) => {
-                        return data[index];
-                      }}
-                      keyExtractor={(index) => {
-                        return index
-                      }}
-                      renderItem={renderItem}
-                    />
-                  )
-                )
-            }
+            <RenderWelderList />
             <View style={styles.actionContainer}>
               <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddWelder}>
                 <Text style={styles.buttonTitle}>Add Welders</Text>

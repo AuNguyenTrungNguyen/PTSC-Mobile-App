@@ -313,7 +313,7 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
-              <RenderItemBox title={'QC Scan\nnWeld'} onPress={_onPressMamageQCWeld} number={spendNumbers.Weld} />
+              <RenderItemBox title={'QC Scan\nWeld'} onPress={_onPressMamageQCWeld} number={spendNumbers.Weld} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
