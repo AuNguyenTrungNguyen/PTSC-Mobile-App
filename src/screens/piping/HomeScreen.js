@@ -7,14 +7,14 @@ import NetInfo from '@react-native-community/netinfo';
 import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
 import Header from '../../components/Header';
-import GetSpendNumbersAPI from '../../apis/qc/GetSpendNumbersAPI';
+import { GetSpendNumbersAPI } from '../../apis/piping/QCAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
 const HomeScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Weld: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -57,8 +57,8 @@ const HomeScreen = ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     GetSpendNumbersAPI(projectCode, token)
       .then(res => {
-        if (res.success) {
-          setSpendNumbers(res.data);
+        if (res.Success && res.Data) {
+          setSpendNumbers(res.Data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -116,8 +116,8 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate(
       'Camera',
       {
-        code: 'FitUp',
-        source: 'Drawing',
+        code: Constant.CODE_FITUP,
+        source: Constant.CAMERA_PIP_CONS,
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
@@ -129,8 +129,8 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate(
       'Camera',
       {
-        code: 'Weld',
-        source: 'Drawing',
+        code: Constant.CODE_WELD,
+        source: Constant.CAMERA_PIP_CONS,
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
@@ -142,8 +142,8 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate(
       'Camera',
       {
-        code: 'FitUp',
-        source: 'QCDrawing',
+        code: Constant.CODE_FITUP,
+        source: Constant.CAMERA_QC_CONS,
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
@@ -155,8 +155,8 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate(
       'Camera',
       {
-        code: 'Visual',
-        source: 'QCDrawing',
+        code: Constant.CODE_VISUAL,
+        source: Constant.CAMERA_QC_CONS,
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
@@ -168,7 +168,7 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate(
       'QCSpendList',
       {
-        code: 'FitUp',
+        code: Constant.CODE_FITUP,
         projectCode: projectCode,
         userLogin: userLogin,
         title: 'QC Spend FitUp'
@@ -181,10 +181,10 @@ const HomeScreen = ({ route, navigation }) => {
     navigation.navigate(
       'QCSpendList',
       {
-        code: 'Visual',
+        code: Constant.CODE_VISUAL,
         projectCode: projectCode,
         userLogin: userLogin,
-        title: 'QC Spend Weld'
+        title: 'QC Spend Visual'
       }
     );
   };
@@ -219,10 +219,10 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
-  const _onPressMamageQCWeld = () => {
+  const _onPressMamageQCVisual = () => {
     Alert.alert(
       '',
-      'Scan: Scan QR Code Weld Drawing\n\nSpend List: Spend Weld Request List',
+      'Scan: Scan QR Code Visual Drawing\n\nSpend List: Spend Visual Request List',
       [
         { text: 'Scan', onPress: _onPressQRCodeVisualQC },
         { text: 'Spend List', onPress: _onPressQCSpendVisualList },
@@ -313,11 +313,11 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
-              <RenderItemBox title={'QC Scan\nWeld'} onPress={_onPressMamageQCWeld} number={spendNumbers.Weld} />
+              <RenderItemBox title={'QC Scan\nVisual'} onPress={_onPressMamageQCVisual} number={spendNumbers.Visual} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
-              <RenderItemBox title={'Search\nAll Status'} onPress={_onPressSearchAllStatus} iconName={'md-search'}/>
+              <RenderItemBox title={'Search\nAll Status'} onPress={_onPressSearchAllStatus} iconName={'md-search'} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />

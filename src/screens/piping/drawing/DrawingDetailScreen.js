@@ -399,7 +399,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
 
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
   const _onChangeCheckbox = (index, key, value) => {
-    value = value ? 'TW' : Constant.EMPTY_VALUE_STRING;
+    value = value ? 'TW' : null;
     onChangeData(value, index, key);
     // let array = [...detailDrawingList];
     // array[index][key] = value;
