@@ -17,7 +17,6 @@ import Constant from '../../../utils/Constant';
 
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/ConstructionAPI';
 import { GetLocationListAPI, GetHeatNoListAPI, GetTeamListAPI, GetWPSListAPI, } from '../../../apis/app/AppAPI';
-import { GetHeatNoListPopupAPI } from '../../../apis/drawing/ConstructionDrawingAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -25,7 +24,6 @@ import Header from '../../../components/Header';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
-import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DrawingDetailScreen = ({ route, navigation }) => {
 

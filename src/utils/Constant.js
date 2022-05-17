@@ -14,6 +14,10 @@ export default class Constant {
   static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
   static ROUTE__STR_QCWS = 'STR-QCWS';
 
+  //-- CAMERA SOURCE
+  static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
+  static CAMERA_QC_CONS = 'CAMERA_QC_CONS';
+
   // CODE FILTER
   static FILTER_ALL = 'ALL';
   static FILTER_NOT_YET = 'NOT_YET';
