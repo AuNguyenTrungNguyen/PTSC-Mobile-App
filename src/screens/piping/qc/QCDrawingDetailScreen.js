@@ -178,11 +178,14 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
     navigation.navigate(
       'DrawingImage',
       {
+        userLogin: teamLeader,
         projectCode: projectCode,
         facilityCode: facilityCode,
         drawingNo: drawingNo,
-        code: code == 'Visual' ? 'Weld' : code,
-        teamLeader: teamLeader
+        sheet: sheet,
+        jointNo: rev,
+        code: code,
+        role: Constant.IMAGE_ROLE_QC
       }
     );
   };

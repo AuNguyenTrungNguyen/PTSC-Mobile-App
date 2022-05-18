@@ -54,6 +54,20 @@ export const GetTeamListAPI = (projectCode, filterType, token) =>
       },
     }).then(res => res.json());
 
+export const GetTeamListFilterAPI = (projectCode, disciplineCode, filterType, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetTeamListFilter'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&filterType=' + filterType,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, token) =>
   fetch(
     Port_Server

@@ -16,7 +16,7 @@ import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/ConstructionAPI';
-import { GetLocationListAPI, GetHeatNoListAPI, GetTeamListAPI, GetWPSListAPI, } from '../../../apis/app/AppAPI';
+import { GetLocationListAPI, GetHeatNoListAPI, GetTeamListFilterAPI, GetWPSListAPI, } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -370,11 +370,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     navigation.navigate(
       'DrawingImage',
       {
+        userLogin: teamLeader,
         projectCode: projectCode,
         facilityCode: facilityCode,
         drawingNo: drawingNo,
+        sheet: sheet,
+        jointNo: rev,
         code: code,
-        teamLeader: teamLeader
+        role: Constant.IMAGE_ROLE_CONS
       }
     );
   };
@@ -598,11 +601,12 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const getTeamList = async () => {
     if (teamList == null) {
       const token = await Helper.getData('TOKEN');
+      const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
       const filterType = code == Constant.CODE_FITUP ? Constant.CODE_FITUP : Constant.CODE_VISUAL;
-      GetTeamListAPI(projectCode, filterType, token)
+      GetTeamListFilterAPI(projectCode, disciplineCode, filterType, token)
         .then(res => {
-          if (res.success) {
-            setTeamList(res.data);
+          if (res.Success) {
+            setTeamList(res.Data);
             setIsLoading(false);
             setIsError(false);
           } else {

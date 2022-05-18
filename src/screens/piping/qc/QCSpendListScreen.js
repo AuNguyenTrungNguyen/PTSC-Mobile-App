@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, TextInput, Keyboard } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
@@ -142,15 +142,19 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   //-- Manage Picture
-  const _onPressManagePicture = async (facilityCode, drawingNo) => {
+  const _onPressManagePicture = async item => {
     navigation.navigate(
       'DrawingImage',
       {
+        userLogin: userLogin,
         projectCode: projectCode,
-        facilityCode: facilityCode,
-        drawingNo: drawingNo,
-        code: code == 'Visual' ? 'Weld' : code,
-        teamLeader: userLogin
+        facilityCode: item.FacilityCode,
+        drawingNo: item.DrawingNo,
+        sheet: item.Sheet,
+        jointNo: weldNo,
+        rowIndex: item.RowIndex,
+        code: code,
+        role: Constant.IMAGE_ROLE_QC
       }
     );
   };
@@ -241,7 +245,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
-            <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
+            <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
               <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
             </TouchableOpacity>
           </View>

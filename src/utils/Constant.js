@@ -18,6 +18,10 @@ export default class Constant {
   static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
   static CAMERA_QC_CONS = 'CAMERA_QC_CONS';
 
+   //-- IMAGE ROLE
+   static IMAGE_ROLE_CONS = 'CONS';
+   static IMAGE_ROLE_QC = 'QC';
+
   // CODE FILTER
   static FILTER_ALL = 'ALL';
   static FILTER_NOT_YET = 'NOT_YET';
