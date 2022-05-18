@@ -512,26 +512,6 @@ const StructuralCONSStackScreens = () => {
           }
         }
       />
-      <StructuralCONSStack.Screen
-        name='ManHoursImpact'
-        component={ManHoursImpactListScreen}
-        options={
-          {
-            title: 'Man-hours Impact',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='ManHoursImpactDetail'
-        component={ManHoursImpactDetailScreen}
-        options={
-          {
-            title: 'Create Impact',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
     </StructuralCONSStack.Navigator>
   );
 };
@@ -685,11 +665,11 @@ const StructuralQCStackScreens = () => {
   );
 };
 
-const TimeSheetSStack = createStackNavigator();
-const TimeSheetSStackScreens = () => {
+const CommonStack = createStackNavigator();
+const CommonStackScreens = () => {
   return (
-    <TimeSheetSStack.Navigator screenOptions={optionNavigation}>
-      <TimeSheetSStack.Screen
+    <CommonStack.Navigator screenOptions={optionNavigation}>
+      <CommonStack.Screen
         name='TimeSheet'
         component={TimeSheetScreen}
         options={
@@ -699,7 +679,7 @@ const TimeSheetSStackScreens = () => {
           }
         }
       />
-      <TimeSheetSStack.Screen
+      <CommonStack.Screen
         name='TimeSheetManagerWorker'
         component={TimeSheetManageWorkerScreen}
         options={
@@ -709,17 +689,47 @@ const TimeSheetSStackScreens = () => {
           }
         }
       />
-      <TimeSheetSStack.Screen
+      <CommonStack.Screen
         name='TimeSheetYesterday'
         component={TimeSheetYesterdayScreen}
         options={
           {
-            title: 'Update TimeSheet Yesterday',
+            title: 'TimeSheet OT',
             headerBackTitle: 'Back',
           }
         }
       />
-    </TimeSheetSStack.Navigator>
+      <CommonStack.Screen
+        name='ManHoursImpact'
+        component={ManHoursImpactListScreen}
+        options={
+          {
+            title: 'Man-hours Impact',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='ManHoursImpactDetail'
+        component={ManHoursImpactDetailScreen}
+        options={
+          {
+            title: 'Create Man-hours',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='ManHoursImpactImage'
+        component={ManHoursImpactImageScreen}
+        options={
+          {
+            title: 'Man-hours Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </CommonStack.Navigator>
   );
 };
 
@@ -767,8 +777,8 @@ export default () => {
         />
 
         <Stack.Screen
-          name={Constant.ROUTE__TIMESHEET}
-          component={TimeSheetSStackScreens}
+          name={Constant.ROUTE__COMMON}
+          component={CommonStackScreens}
           options={{ headerShown: false }}
         />
 

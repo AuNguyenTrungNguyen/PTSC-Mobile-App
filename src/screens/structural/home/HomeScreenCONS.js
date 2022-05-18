@@ -257,14 +257,14 @@ const HomeScreenCONS = ({ route, navigation }) => {
 
   // ManHours Impact
   const _onPressManHoursImpact = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'ManHoursImpact',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'ManHoursImpact',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
 
   //-- TimeSheet
@@ -283,8 +283,8 @@ const HomeScreenCONS = ({ route, navigation }) => {
     );
   };
   const _onPressTimeSheet = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheet',
       params: {
         projectCode: projectCode,
@@ -293,8 +293,8 @@ const HomeScreenCONS = ({ route, navigation }) => {
     });
   };
   const _onPressTimeSheetYesterday = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheetYesterday',
       params: {
         projectCode: projectCode,

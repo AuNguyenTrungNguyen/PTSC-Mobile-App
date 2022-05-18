@@ -248,7 +248,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
   const _onPressTimeSheet = async () => {
     let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+    navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheet',
       params: {
         projectCode: projectCode,
@@ -258,8 +258,19 @@ const HomeScreen = ({ route, navigation }) => {
   };
   const _onPressTimeSheetYesterday = async () => {
     let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(Constant.ROUTE__TIMESHEET, {
+    navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheetYesterday',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+
+  const _onPressManHoursImpact = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'ManHoursImpact',
       params: {
         projectCode: projectCode,
         userLogin: userLogin,
@@ -321,7 +332,7 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
             </View>
           </ScrollView>
           <View style={styles.action}>
