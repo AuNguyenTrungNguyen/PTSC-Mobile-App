@@ -1,26 +1,76 @@
-import React from 'react';
-import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator, TextInput } from 'react-native';
 import Formater from '../../utils/Formater';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const SelectPopupTimeSheet = props => {
+const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
+
+  const [workOrder, setWorkOrder] = useState('');
+  const [workOrderList, setWorkOrderList] = useState(data);
+
+  useEffect(
+    () => {
+      if (visible) {
+        _onSearchWorkOrder();
+      }
+    }, [visible]
+  );
+
+  const _onSearchWorkOrder = () => {
+    if (workOrder && data) {
+      const result = data.filter(i => i.WorkOrder.includes(workOrder));
+      setWorkOrderList(result);
+    }
+    else {
+      setWorkOrderList(data);
+    }
+  };
+
+  const _onChangeWorkOrder = text => {
+    setWorkOrder(text);
+  };
+
+  const _onClearWorkOrder = () => {
+    setWorkOrder('');
+    setWorkOrderList(data);
+  };
+
   return (
     <Modal
       animationType='fade'
       transparent={true}
-      visible={props.visible}>
+      visible={visible}>
       <View style={modals.dim}>
         <SafeAreaView>
           <View style={modals.container}>
+            <View style={styles.searchContainer}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.inputText}
+                  value={workOrder}
+                  onChangeText={_onChangeWorkOrder}
+                  underlineColorAndroid='transparent'
+                />
+                {
+                  workOrder == ''
+                    ? null
+                    : <Icon name='times-circle' onPress={_onClearWorkOrder} style={styles.inputIcon} />
+                }
+              </View>
+              <TouchableOpacity style={styles.inputButton} onPress={_onSearchWorkOrder}>
+                <Text style={modals.buttonTitle}>Search</Text>
+              </TouchableOpacity>
+            </View>
             <View style={modals.list}>
               <ScrollView>
                 {
-                  props.data != null
+                  workOrderList != null
                     ?
-                    props.data.length
+                    workOrderList.length
                       ?
-                      props.data.map(item => {
+                      workOrderList.map(item => {
                         return (
-                          <TouchableOpacity style={styles.box} key={item.WorkOrder} onPress={() => props.onChangeItem(item.WorkOrder)}>
+                          <TouchableOpacity style={styles.box} key={item.WorkOrder} onPress={() => onChangeItem(item.WorkOrder)}>
                             <View style={styles.row}>
                               <Text style={styles.cellTitle}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
                             </View>
@@ -60,15 +110,9 @@ const SelectPopupTimeSheet = props => {
               </ScrollView>
             </View>
             {
-              props.data != null &&
+              workOrderList != null &&
               <View style={modals.action}>
-                {
-                  !!props.data.length && !!props.onClear &&
-                  <TouchableOpacity style={modals.button} onPress={props.onClear}>
-                    <Text style={modals.buttonTitle}>Clear</Text>
-                  </TouchableOpacity>
-                }
-                <TouchableOpacity style={modals.button} onPress={props.onCancel}>
+                <TouchableOpacity style={modals.button} onPress={onCancel}>
                   <Text style={modals.buttonTitle}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -103,7 +147,7 @@ const modals = StyleSheet.create({
   list: {
     padding: 16,
     width: windowWidth * 0.95,
-    maxHeight: windowHeight * 0.85 - 36 - 16,
+    height: (windowHeight * 0.85) - 32 - 76 - 40,
   },
   row: {
     flexDirection: 'row',
@@ -168,6 +212,42 @@ const styles = StyleSheet.create({
   cellLineData: {
     flex: 2,
     color: BASE_COLOR,
+  },
+
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 36,
+    marginTop: 4,
+    width: windowWidth * 0.85,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    alignItems: 'center',
+    padding: 4,
+  },
+  inputText: {
+    flex: 1,
+    height: '100%',
+    color: BASE_COLOR,
+    paddingVertical: 0,
+  },
+  inputIcon: {
+    marginLeft: 4,
+    fontSize: 20,
+    color: BASE_COLOR,
+  },
+  inputButton: {
+    width: 60,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: BASE_COLOR,
+    padding: 4,
   },
 });
 

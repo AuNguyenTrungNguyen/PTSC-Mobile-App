@@ -674,7 +674,7 @@ const CommonStackScreens = () => {
         component={TimeSheetScreen}
         options={
           {
-            title: 'Company TimeSheet',
+            title: 'TimeSheet',
             headerBackTitle: 'Back',
           }
         }

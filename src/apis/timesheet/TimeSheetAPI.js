@@ -39,10 +39,23 @@ export const GetTimeSheetWorkerListAPI = (userLogin, token) =>
     }
   ).then(res => res.json());
 
+export const GetTimeSheetWorkerListNewAPI = (projectCode, userLogin, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/GetTimeSheetWorkerListNew'
+    + '?projectCode=' + projectCode
+    + '&userLogin=' + userLogin,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      }
+    }).then(res => res.json());
+
 export const UpdateTimeSheetListAPI = (projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server
-    + '/api/TimeSheet/UpdateTimeSheetListNew',
+    + '/api/TimeSheet/UpdateTimeSheetList',
     {
       method: 'POST',
       headers: {
@@ -53,26 +66,10 @@ export const UpdateTimeSheetListAPI = (projectCode, departmentCode, userUpdate, 
     }
   ).then(res => res.json());
 
-export const GetTimeSheetYesterdayAPI = (projectCode, departmentCode, userLogin, dateUpdate, token) =>
+export const UpdateTimeSheetOTAPI = (projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server
-    + '/api/TimeSheet/GetTimeSheetYesterday'
-    + '?projectCode=' + projectCode
-    + '&departmentCode=' + departmentCode
-    + '&userLogin=' + userLogin
-    + '&dateUpdate=' + dateUpdate,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-
-export const UpdateTimeSheetYesterdayAPI = (projectCode, departmentCode, userUpdate, dateUpdate, listItemUpdate, token) =>
-  fetch(
-    Port_Server
-    + '/api/TimeSheet/UpdateTimeSheetYesterday',
+    + '/api/TimeSheet/UpdateTimeSheetOT',
     {
       method: 'POST',
       headers: {
