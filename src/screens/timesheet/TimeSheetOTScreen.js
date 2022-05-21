@@ -12,8 +12,8 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import {
   GetTimeSheetTeamLeaderInfoAPI,
   GetTimeSheetWorkOrderListAPI,
-  GetTimeSheetWorkerListAPI,
-  UpdateTimeSheetListAPI
+  GetTimeSheetWorkerListOTAPI,
+  UpdateTimeSheetOTAPI
 } from '../../apis/timesheet/TimeSheetAPI';
 
 import Helper from '../../utils/Helper';
@@ -23,17 +23,17 @@ import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-const TimeSheetScreen = ({ route, navigation }) => {
+const TimeSheetOTScreen = ({ route, navigation }) => {
 
   const { projectCode, userLogin } = route.params;
 
-  const SPENDING_TEXT = 'Chưa gán công';
-  const UPDATED_TEXT = 'Đã gán công';
-  const currentDate = new Date();
+  const SPENDING_TEXT = 'Chưa gán OT';
+  const UPDATED_TEXT = 'Đã gán OT';
+  let currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - 1);
   const [filter, setFilter] = useState(SPENDING_TEXT);
 
   const [department, setDepartment] = useState('');
-  const [fullname, setFullname] = useState('');
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -50,14 +50,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { setFilter(SPENDING_TEXT) }}>
+            onPress={() => { setFilter(SPENDING_TEXT); }}>
             <Ionicons
               size={24}
               name={'md-ellipse-outline'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { setFilter(UPDATED_TEXT) }}>
+            onPress={() => { setFilter(UPDATED_TEXT); }}>
             <Ionicons
               size={24}
               name={'md-checkmark-circle-outline'} color={iconColor} />
@@ -96,18 +96,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
     }, [navigation]
   );
 
-  //-- Manage Workers
-  const _onPressManageWorker = () => {
-    navigation.navigate(
-      'TimeSheetManagerWorker',
-      {
-        userLogin: userLogin,
-        department: department,
-        fullname: fullname
-      }
-    );
-  };
-
   //-- Get Data
   const getTeamLeaderInfo = async () => {
     const token = await Helper.getData('TOKEN');
@@ -116,7 +104,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
         if (res.success) {
           if (Object.keys(res.data).length) {
             setDepartment(res.data[0].DepartmentCode);
-            setFullname(res.data[0].Fullname);
             callAPI(getAllData);
           }
           else {
@@ -151,7 +138,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     try {
       let arrayPromise = [
-        GetTimeSheetWorkerListAPI(projectCode, userLogin, token),
+        GetTimeSheetWorkerListOTAPI(projectCode, userLogin, Formater.formatDateSQL(currentDate), token),
         GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token),
       ];
       await Promise.all(arrayPromise)
@@ -212,7 +199,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     const resultList = workerUpdatedList.filter(i => i.SUBMITED == false);
     setIsUploading(true);
-    UpdateTimeSheetListAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
+    UpdateTimeSheetOTAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -298,7 +285,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
       return;
     }
 
-    let transferList = workerList.filter(i => i.MHR || i.Overtime);
+    let transferList = workerList.filter(i => i.Overtime);
     if (transferList) {
       let addlist = [];
       transferList.forEach(item => {
@@ -389,7 +376,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     let array = [...data];
     array.map(i => {
       if (i.SELECTED) {
-        i.MHR = value;
+        i.Overtime = value;
         i.SUBMITED = false;
       }
       return i;
@@ -481,8 +468,8 @@ const TimeSheetScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Ca: </Text>
           <Text style={styles.cellData}>{Formater.formatEmptyData(item.Shift)}</Text>
-          <Text style={styles.cellTitle}>Giờ công: </Text>
-          <Text style={styles.cellData}>{item.MHR}</Text>
+          <Text style={styles.cellTitle}>Giờ OT: </Text>
+          <Text style={styles.cellData}>{item.Overtime}</Text>
         </View>
         {
           item.Note
@@ -550,17 +537,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.headerRow}>
               <View style={styles.headerCellShotcut}>
-                {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
+                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
                   <Text style={styles.headerShotcutText}>{'2'}</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('3')}>
+                  <Text style={styles.headerShotcutText}>{'3'}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('4')}>
                   <Text style={styles.headerShotcutText}>{'4'}</Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('6')}>
-                  <Text style={styles.headerShotcutText}>{'6'}</Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('8')}>
-                  <Text style={styles.headerShotcutText}>{'8'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.headerShotcutItem} onPress={() => setIsShowHours(true)}>
                   <Text style={styles.headerShotcutText}>{hours}...</Text>
@@ -655,16 +639,13 @@ const TimeSheetScreen = ({ route, navigation }) => {
                 <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManageWorker}>
-              <Text style={styles.buttonTitle}>QL Công nhân</Text>
-            </TouchableOpacity>
             {
               filter === SPENDING_TEXT
                 ?
-                <TouchableOpacity style={styles.buttonRight} onPress={_onPressTransfer}>
+                <TouchableOpacity style={styles.actionButton} onPress={_onPressTransfer}>
                   <Text style={styles.buttonTitle}>Chuyển</Text>
                 </TouchableOpacity>
-                : <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                : <TouchableOpacity style={styles.actionButton} onPress={_onPressSubmitToServer}>
                   <Text style={styles.buttonTitle}>Gửi Server</Text>
                 </TouchableOpacity>
             }
@@ -845,23 +826,15 @@ const styles = StyleSheet.create({
     height: 36,
     flexDirection: 'row',
   },
-  buttonLeft: {
+  actionButton: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
-    marginRight: 4,
-  },
-  buttonRight: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-    marginLeft: 4,
   },
   buttonTitle: {
     color: OPP_COLOR,
   },
 });
 
-export default TimeSheetScreen;
+export default TimeSheetOTScreen;

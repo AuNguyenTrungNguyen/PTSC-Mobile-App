@@ -26,25 +26,26 @@ export const GetTimeSheetWorkOrderListAPI = (projectCode, userLogin, token) =>
       }
     }).then(res => res.json());
 
-export const GetTimeSheetWorkerListAPI = (userLogin, token) =>
+export const GetTimeSheetWorkerListAPI = (projectCode, userLogin, token) =>
   fetch(
     Port_Server
     + '/api/TimeSheet/GetTimeSheetWorkerList'
-    + '?userLogin=' + userLogin,
+    + '?projectCode=' + projectCode
+    + '&userLogin=' + userLogin,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
+      }
+    }).then(res => res.json());
 
-export const GetTimeSheetWorkerListNewAPI = (projectCode, userLogin, token) =>
+export const GetTimeSheetWorkerListOTAPI = (projectCode, userLogin, date, token) =>
   fetch(
     Port_Server
-    + '/api/TimeSheet/GetTimeSheetWorkerListNew'
+    + '/api/TimeSheet/GetTimeSheetWorkerListOT'
     + '?projectCode=' + projectCode
-    + '&userLogin=' + userLogin,
+    + '&userLogin=' + userLogin
+    + '&date=' + date,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

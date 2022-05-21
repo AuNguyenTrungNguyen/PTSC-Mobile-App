@@ -238,7 +238,7 @@ const HomeScreen = ({ route, navigation }) => {
       'TimeSheet: Company TimeSheet\n\nOT Yesterday: Update OT Yesterday',
       [
         { text: 'TimeSheet', onPress: _onPressTimeSheet },
-        { text: 'OT Yesterday', onPress: _onPressTimeSheetYesterday },
+        { text: 'TimeSheet OT', onPress: _onPressTimeSheetYesterday },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -259,7 +259,7 @@ const HomeScreen = ({ route, navigation }) => {
   const _onPressTimeSheetYesterday = async () => {
     let userLogin = await Helper.getData('USERNAME');
     navigation.navigate(Constant.ROUTE__COMMON, {
-      screen: 'TimeSheetYesterday',
+      screen: 'TimeSheetOT',
       params: {
         projectCode: projectCode,
         userLogin: userLogin,
