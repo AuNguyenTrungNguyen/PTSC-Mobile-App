@@ -29,6 +29,9 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const SPENDING_TEXT = 'Chưa gán công';
   const UPDATED_TEXT = 'Đã gán công';
+  const TEMP_COLOR_SPENDING = 1;
+  const TEMP_COLOR_UPDATED = 2;
+
   const currentDate = new Date();
   const [filter, setFilter] = useState(SPENDING_TEXT);
 
@@ -157,7 +160,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
       await Promise.all(arrayPromise)
         .then(([workerResult, workOrderResult]) => {
           if (workerResult.success && workOrderResult.success) {
-            //-- Worker with filter
 
             let data = [];
             let dataUpdated = [];
@@ -219,6 +221,10 @@ const TimeSheetScreen = ({ route, navigation }) => {
           let baseArray = [...workerUpdatedList];
           workerUpdatedList.map(i => {
             i.SUBMITED = true;
+            i.ColorWorkOrder = null;
+            i.ColorShift = null;
+            i.ColorHours = null;
+            i.ColorNote = null;
             return i;
           });
           setWorkerUpdatedList(baseArray);
@@ -354,6 +360,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     array.map(i => {
       if (i.SELECTED) {
         i.WorkOrder = value;
+        i.ColorWorkOrder = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
       }
       return i;
@@ -372,6 +379,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     array.map(i => {
       if (i.SELECTED) {
         i.Shift = value;
+        i.ColorShift = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
       }
       return i;
@@ -390,6 +398,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     array.map(i => {
       if (i.SELECTED) {
         i.MHR = value;
+        i.ColorHours = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
       }
       return i;
@@ -408,6 +417,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     array.map(i => {
       if (i.SELECTED) {
         i.Note = value;
+        i.ColorNote = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
       }
       return i;
@@ -430,6 +440,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setNote('');
     setIsShowNote(false);
   };
+
 
 
 
@@ -476,20 +487,60 @@ const TimeSheetScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>LSX: </Text>
-          <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
+          {
+            item.ColorWorkOrder
+              ?
+              item.ColorWorkOrder == TEMP_COLOR_SPENDING
+                ?
+                <Text style={styles.cellDataGreen}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
+                :
+                <Text style={styles.cellDataRed}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
+              :
+              <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
+          }
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Ca: </Text>
-          <Text style={styles.cellData}>{Formater.formatEmptyData(item.Shift)}</Text>
+          {
+            item.ColorShift
+              ?
+              item.ColorShift == TEMP_COLOR_SPENDING
+                ?
+                <Text style={styles.cellDataGreen}>{Formater.formatEmptyData(item.Shift)}</Text>
+                :
+                <Text style={styles.cellDataRed}>{Formater.formatEmptyData(item.Shift)}</Text>
+              :
+              <Text style={styles.cellData}>{Formater.formatEmptyData(item.Shift)}</Text>
+          }
           <Text style={styles.cellTitle}>Giờ công: </Text>
-          <Text style={styles.cellData}>{item.MHR}</Text>
+          {
+            item.ColorHours
+              ?
+              item.ColorHours == TEMP_COLOR_SPENDING
+                ?
+                <Text style={styles.cellDataGreen}>{item.MHR}</Text>
+                :
+                <Text style={styles.cellDataRed}>{item.MHR}</Text>
+              :
+              <Text style={styles.cellData}>{item.MHR}</Text>
+          }
         </View>
         {
           item.Note
             ?
             <View style={styles.row}>
               <Text style={styles.cellTitle}>Ghi chú: </Text>
-              <Text style={styles.cellData}>{Formater.formatEmptyData(item.Note)}</Text>
+              {
+                item.ColorNote
+                  ?
+                  item.ColorNote == TEMP_COLOR_SPENDING
+                    ?
+                    <Text style={styles.cellDataGreen}>{Formater.formatEmptyData(item.Note)}</Text>
+                    :
+                    <Text style={styles.cellDataRed}>{Formater.formatEmptyData(item.Note)}</Text>
+                  :
+                  <Text style={styles.cellData}>{Formater.formatEmptyData(item.Note)}</Text>
+              }
             </View>
             :
             null
@@ -827,6 +878,16 @@ const styles = StyleSheet.create({
     flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  cellDataGreen: {
+    flex: 7,
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  cellDataRed: {
+    flex: 7,
+    fontWeight: 'bold',
+    color: 'red',
   },
   cellCheckbox: {
     paddingHorizontal: 12,

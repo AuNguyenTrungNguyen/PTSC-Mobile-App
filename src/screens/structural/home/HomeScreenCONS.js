@@ -271,7 +271,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPressManageLTimeSheet = async () => {
     Alert.alert(
       '',
-      'TimeSheet: Company TimeSheet\n\nOT Yesterday: Update OT Yesterday',
+      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime',
       [
         { text: 'TimeSheet', onPress: _onPressTimeSheet },
         { text: 'TimeSheet OT', onPress: _onPressTimeSheetYesterday },
