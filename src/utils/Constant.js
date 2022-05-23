@@ -6,12 +6,21 @@ export default class Constant {
   static ROUTE__HOME = 'HOME';
   static ROUTE__CAMERA = 'CAMERA';
   static ROUTE__PDF = 'PDF';
+  static ROUTE__COMMON = 'COMMON_STACK';
 
   static ROUTE__PIPING = 'PIPING';
   static ROUTE__STRUCTURAL = 'STRUCTURAL';
   static ROUTE__STR_CONS = 'STR-CONS';
   static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
   static ROUTE__STR_QCWS = 'STR-QCWS';
+
+  //-- CAMERA SOURCE
+  static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
+  static CAMERA_QC_CONS = 'CAMERA_QC_CONS';
+
+   //-- IMAGE ROLE
+   static IMAGE_ROLE_CONS = 'CONS';
+   static IMAGE_ROLE_QC = 'QC';
 
   // CODE FILTER
   static FILTER_ALL = 'ALL';

@@ -14,7 +14,7 @@ import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHour
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
 
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
-import TimeSheetYesterdayScreen from './screens/timesheet/TimeSheetYesterdayScreen';
+import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
 
 import HomeScreen from './screens/piping/HomeScreen';
@@ -71,6 +71,7 @@ import StructuralQAObservationOverviewListScreen from './screens/structural/obse
 import StructuralQAObservationListScreen from './screens/structural/observation/QAObservationListScreen';
 import StructuralQAObservationDetailScreen from './screens/structural/observation/QAObservationDetailScreen';
 import StructuralQAObservationImageScreen from './screens/structural/observation/QAObservationImageScreen';
+import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 
 const Stack = createStackNavigator();
 const PipingStack = createStackNavigator();
@@ -511,66 +512,6 @@ const StructuralCONSStackScreens = () => {
           }
         }
       />
-      <StructuralCONSStack.Screen
-        name='ManHoursImpact'
-        component={ManHoursImpactListScreen}
-        options={
-          {
-            title: 'Man-hours Impact',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='ManHoursImpactDetail'
-        component={ManHoursImpactDetailScreen}
-        options={
-          {
-            title: 'Create Impact',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='ManHoursImpactImage'
-        component={ManHoursImpactImageScreen}
-        options={
-          {
-            title: 'Man-hours Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='TimeSheet'
-        component={TimeSheetScreen}
-        options={
-          {
-            title: 'Company TimeSheet',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='TimeSheetManagerWorker'
-        component={TimeSheetManageWorkerScreen}
-        options={
-          {
-            title: 'Manage Workers',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralCONSStack.Screen
-        name='TimeSheetYesterday'
-        component={TimeSheetYesterdayScreen}
-        options={
-          {
-            title: 'Update TimeSheet Yesterday',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
     </StructuralCONSStack.Navigator>
   );
 };
@@ -710,7 +651,85 @@ const StructuralQCStackScreens = () => {
           }
         }
       />
+      <StructuralQCStack.Screen
+        name='QCHandBook'
+        component={QCHandBookScreen}
+        options={
+          {
+            title: 'QC Hand Book',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </StructuralQCStack.Navigator>
+  );
+};
+
+const CommonStack = createStackNavigator();
+const CommonStackScreens = () => {
+  return (
+    <CommonStack.Navigator screenOptions={optionNavigation}>
+      <CommonStack.Screen
+        name='TimeSheet'
+        component={TimeSheetScreen}
+        options={
+          {
+            title: 'Chấm công',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='TimeSheetOT'
+        component={TimeSheetOTScreen}
+        options={
+          {
+            title: 'Chấm tăng ca',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='TimeSheetManagerWorker'
+        component={TimeSheetManageWorkerScreen}
+        options={
+          {
+            title: 'Manage Workers',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='ManHoursImpact'
+        component={ManHoursImpactListScreen}
+        options={
+          {
+            title: 'Man-hours Impact',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='ManHoursImpactDetail'
+        component={ManHoursImpactDetailScreen}
+        options={
+          {
+            title: 'Create Man-hours',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='ManHoursImpactImage'
+        component={ManHoursImpactImageScreen}
+        options={
+          {
+            title: 'Man-hours Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </CommonStack.Navigator>
   );
 };
 
@@ -754,6 +773,12 @@ export default () => {
         <Stack.Screen
           name={Constant.ROUTE__STR_QCWS}
           component={StructuralQCStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.ROUTE__COMMON}
+          component={CommonStackScreens}
           options={{ headerShown: false }}
         />
 

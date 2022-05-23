@@ -257,24 +257,24 @@ const HomeScreenCONS = ({ route, navigation }) => {
 
   // ManHours Impact
   const _onPressManHoursImpact = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'ManHoursImpact',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'ManHoursImpact',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
 
   //-- TimeSheet
   const _onPressManageLTimeSheet = async () => {
     Alert.alert(
       '',
-      'TimeSheet: Company TimeSheet\n\nOT Yesterday: Update OT Yesterday',
+      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime',
       [
         { text: 'TimeSheet', onPress: _onPressTimeSheet },
-        { text: 'OT Yesterday', onPress: _onPressTimeSheetYesterday },
+        { text: 'TimeSheet OT', onPress: _onPressTimeSheetYesterday },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -283,24 +283,24 @@ const HomeScreenCONS = ({ route, navigation }) => {
     );
   };
   const _onPressTimeSheet = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'TimeSheet',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'TimeSheet',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
   const _onPressTimeSheetYesterday = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'TimeSheetYesterday',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'TimeSheetOT',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
 
 
@@ -350,16 +350,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
             }
             <View style={styles.row}>
               <RenderItemBox title={'QC Check\nStatus'} />
-              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressManagePieceMarkCut} number={spendNumbers.DimForCutting}/>
+              <RenderItemBox title={'Piece Mark\nCut'} onPress={_onPressManagePieceMarkCut} number={spendNumbers.DimForCutting} />
             </View>
             <View style={styles.row}>
               {/* <RenderItemBox title={'Piece Mark\nPaint'} onPress={_onPressManagePieceMarkPaint} /> */}
-              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressManageLamCheckSpending}  number={spendNumbers.LamCheck}/>
-              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/>
+              <RenderItemBox title={'Lam Check\nRequest'} onPress={_onPressManageLamCheckSpending} number={spendNumbers.LamCheck} />
+              <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp} />
             </View>
             <View style={styles.row}>
               {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/> */}
-              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual}/>
+              <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual} />
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
             </View>
             <View style={styles.row}>

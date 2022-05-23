@@ -1,35 +1,40 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView, ActivityIndicator, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import Toast from 'react-native-simple-toast';
 
 import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
-import GetFacilityListAPI from '../../../apis/app/GetFacilityListAPI';
-import GetDrawingListAPI from '../../../apis/qc/GetDrawingListAPI';
-import GetFacilityCodeByDrawingAPI from '../../../apis/drawing/GetTopFacilityCodeAPI';
+
+import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
+import { GetQCListAPI, GetCurrentQCInfoAPI } from '../../../apis/piping/QCAPI';
 import GetQCCompletePercentAPI from '../../../apis/qc/GetQCCompletePercentAPI';
+
+import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
+import SelectPopup from '../../../components/SelectPopup';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const QCDrawingListScreen = ({ route, navigation }) => {
 
+  const { projectCode } = route.params;
+
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
-  const { projectCode } = route.params;
-
   const [isSearching, setIsSearching] = useState(false);
+
   const [drawingList, setDrawingList] = useState([]);
   const [drawingNo, setDrawingNo] = useState('');
-
+  const [oldDrawingNo, setOldDrawingNo] = useState(null);
   const [weldNo, setWeldNo] = useState('');
+  const [oldWeldNo, setOldWeldNo] = useState(null);
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
   const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
 
@@ -58,7 +63,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(getDrawingList);
+      callAPI(getFacilityList);
     }, []
   );
 
@@ -77,69 +82,67 @@ const QCDrawingListScreen = ({ route, navigation }) => {
     });
   };
 
-  const getDrawingList = async () => {
-    let token = await Helper.getData('TOKEN');
-    try {
-      await Promise.all([GetFacilityListAPI(projectCode, token), GetDrawingListAPI(projectCode, '', '', '', token)])
-        .then(([facilityResult, drawingResult]) => {
-          if (facilityResult.success && drawingResult.success) {
-            setFacilityList(facilityResult.data);
-            setDrawingList(drawingResult.data);
-            setIsLoading(false);
-            setIsError(false);
-          } else {
-            setIsLoading(false);
-            setIsError(true);
-          }
-        })
-        .catch(() => {
-          setIsLoading(false);
-          setIsError(true);
-        });;
-    } catch (error) {
-      setIsLoading(false);
-      setIsError(true);
-      MessageAlert('ERROR', error.toString());
-    }
-  };
-
-  const _onChangeDrawingNo = (no) => {
-    setDrawingNo(no);
-    if (no === '') {
-      callAPI(() => { searchDrawing(facilityCode, weldNo, no) }, false);
-    }
-  };
-
-  const _onChangeWeldNo = (no) => {
-    setWeldNo(no);
-    if (no === '') {
-      callAPI(() => { searchDrawing(facilityCode, '', drawingNo) }, false);
-    }
-  };
-
-  const _onChangeFacilityCode = (code) => {
-    if (code !== facilityCode) {
-      setFacilityCode(code);
-      callAPI(() => { searchDrawing(code, weldNo, drawingNo) }, false);
-    }
-    setIsVisible(false);
-  };
-
-  const searchDrawing = async (facilityCode, weldNo, drawingNo) => {
-    if (isSearch === false) {
-      setIsSearch(true);
-    }
-    setIsSearching(true);
-    let token = await Helper.getData('TOKEN');
-    facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    weldNo = weldNo != null ? weldNo : '';
-    drawingNo = drawingNo != null ? drawingNo : '';
-    GetDrawingListAPI(projectCode, facilityCode, weldNo, drawingNo, token)
+  //-- Facility
+  const getFacilityList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetFacilityListAPI(projectCode, token)
       .then(res => {
         if (res.success) {
-          let array = []
-          array = res.data;
-          setDrawingList(array);
+          setFacilityList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+  const _onChangeFacilityCode = code => {
+    if (code !== facilityCode) {
+      setFacilityCode(code);
+      callAPI(() => { searchDrawing(code, drawingNo, weldNo) }, false);
+    }
+    setIsVisibleFacility(false);
+  };
+  const _onPressClearFacilityCode = () => {
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      setFacilityCode(FACILITY_CODE_DEFAULT);
+      callAPI(() => { searchConstruction('', drawingNo, weldNo) }, false);
+    }
+    setIsVisibleFacility(false);
+  };
+
+  //-- DrawingNo & WeldNo
+  const _onChangeDrawingNo = no => {
+    setDrawingNo(no);
+  };
+  const _onChangeWeldNo = no => {
+    setWeldNo(no);
+  };
+
+  //-- Search Action
+  const _onPressSearchDrawing = () => {
+    if (oldDrawingNo !== drawingNo || oldWeldNo !== weldNo) {
+      Keyboard.dismiss();
+      setOldDrawingNo(drawingNo);
+      setOldWeldNo(weldNo);
+      callAPI(() => { searchDrawing(facilityCode, drawingNo, weldNo) }, false);
+    }
+  };
+  const searchDrawing = async (facilityCode, drawingNo, weldNo) => {
+    setIsSearching(true);
+    const token = await Helper.getData('TOKEN');
+    facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
+    drawingNo = drawingNo ? drawingNo : '';
+    weldNo = weldNo ? weldNo : '';
+    GetQCListAPI(projectCode, facilityCode, drawingNo, weldNo, token)
+      .then(res => {
+        if (res.Success) {
+          setDrawingList(res.Data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -155,40 +158,17 @@ const QCDrawingListScreen = ({ route, navigation }) => {
       });
   };
 
-  const _onPressSearchDrawing = () => {
-    Keyboard.dismiss();
-    callAPI(() => { searchDrawing(facilityCode, weldNo, drawingNo) }, false);
-  };
 
-  const _onPressClearModel = () => {
-    if (facilityCode !== FACILITY_CODE_DEFAULT) {
-      setFacilityCode(FACILITY_CODE_DEFAULT);
-      callAPI(() => { searchDrawing('', weldNo, drawingNo) }, false);
-    }
-    setIsVisible(false);
-  };
-
-  const _onPressCancelModel = () => {
-    setIsVisible(false);
-  };
-
-  const _onPressShowModel = () => {
-    if (facilityList.length) {
-      setIsVisible(true);
-    } else {
-      Toast.show('No have Facility to filter', Toast.SHORT);
-    }
-  };
-
+  //-- Item Action
   const _onPressCompletePercent = async (drawingNo, sheet, rev) => {
     Keyboard.dismiss();
     let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
     let token = await Helper.getData('TOKEN');
     GetQCCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
       .then(res => {
-        if (res.success) {
+        if (res.Success) {
           let array = [...drawingList];
-          array[index]['progess'] = res.data;
+          array[index]['progess'] = res.Data;
           setDrawingList(array);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT);
@@ -197,11 +177,11 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT);
       });
   };
-
   const _onPressViewFitUp = async (drawingNo, sheet, rev, link) => {
     Keyboard.dismiss();
-    let teamLeader = await Helper.getData('USERNAME');
-    let code = 'FitUp';
+    const teamLeader = await Helper.getData('USERNAME');
+    const code = Constant.CODE_FITUP;
+    const title = 'QC ' + code + ' Detail';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
         'QCDrawingDetail',
@@ -213,24 +193,24 @@ const QCDrawingListScreen = ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
-          title: 'QC FitUp Detail',
+          title: title,
           link: link,
         }
       );
     } else {
-      let token = await Helper.getData('TOKEN');
-      GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+      const token = await Helper.getData('TOKEN');
+      GetCurrentQCInfoAPI(projectCode, drawingNo, sheet, rev, token)
         .then(res => {
-          if (res.success) {
+          if (res.Success) {
             navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
-              facilityCode: res.data,
+              facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
               rev: rev,
               code: code,
               teamLeader: teamLeader,
-              title: 'QC FitUp Detail',
+              title: title,
               link: link,
             });
           } else {
@@ -243,11 +223,11 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         });
     }
   };
-
   const _onPressViewVisual = async (drawingNo, sheet, rev, link) => {
     Keyboard.dismiss();
-    let teamLeader = await Helper.getData('USERNAME');
-    let code = 'Visual';
+    const teamLeader = await Helper.getData('USERNAME');
+    const code = Constant.CODE_VISUAL;
+    const title = 'QC ' + code + ' Detail';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
         'QCDrawingDetail',
@@ -259,24 +239,24 @@ const QCDrawingListScreen = ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
-          title: 'QC Weld Detail',
+          title: title,
           link: link,
         }
       );
     } else {
       let token = await Helper.getData('TOKEN');
-      GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+      GetCurrentQCInfoAPI(projectCode, drawingNo, sheet, rev, token)
         .then(res => {
-          if (res.success) {
+          if (res.Success) {
             navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
-              facilityCode: res.data,
+              facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
               rev: rev,
               code: code,
               teamLeader: teamLeader,
-              title: 'QC Weld Detail',
+              title: title,
               link: link,
             });
           } else {
@@ -290,6 +270,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
     }
   };
 
+  //-- QRCode
   const _onPressQRCodeFitUp = async () => {
     Keyboard.dismiss();
     let teamLeader = await Helper.getData('USERNAME');
@@ -303,7 +284,6 @@ const QCDrawingListScreen = ({ route, navigation }) => {
       }
     );
   };
-
   const _onPressQRCodeVisual = async () => {
     Keyboard.dismiss();
     let teamLeader = await Helper.getData('USERNAME');
@@ -322,27 +302,6 @@ const QCDrawingListScreen = ({ route, navigation }) => {
 
 
 
-  const ListEmptyData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any data with </Text>
-      <Text style={styles.noDataTitle}>ProjectCode <Text style={styles.noDataText}>{projectCode}</Text></Text>
-    </View>
-  );
-
-  const ListSearchData = () => (
-    <View style={styles.noDataContainer}>
-      <ActivityIndicator size='large' color={BASE_COLOR} />
-    </View>
-  );
-
-  const ListEmptySearchData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have result with </Text>
-      {drawingNo ? <Text style={styles.noDataTitle}>DrawingNo: <Text style={styles.noDataText}>{drawingNo}</Text></Text> : null}
-      {facilityCode && facilityCode != FACILITY_CODE_DEFAULT ? <Text style={styles.noDataTitle}>FacilityCode: <Text style={styles.noDataText}>{facilityCode}</Text></Text> : null}
-    </View>
-  );
-
   const renderItem = ({ item }) => {
     return (
       <View style={styles.box}>
@@ -351,7 +310,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
           {
             item.WebLink
               ?
-              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Open QC Drawing')} style={styles.cellData}>
+              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'PIP CONS Drawing')} style={styles.cellData}>
                 <Text style={CoreStyle.textLinkWithLine}>{item.DrawingNo}</Text>
               </TouchableOpacity>
               :
@@ -401,31 +360,49 @@ const QCDrawingListScreen = ({ route, navigation }) => {
       </View>
     );
   };
+  const RenderList = () => {
+    {
+      if (isSearching) {
+        return <ListLoadingData />
+      } else if (drawingList == null) {
+        return <ListSelectData title={'Enter DrawingNo or FacilityCode'} />
+      } else if (!drawingList.length) {
+        return <ListEmptyData />
+      } else {
+        return <VirtualizedList
+          style={styles.table}
+          data={drawingList}
+          getItemCount={data => data.length}
+          getItem={(data, index) => {
+            return data[index];
+          }}
+          keyExtractor={(item, index) => index}
+          renderItem={renderItem}
+        />
+      }
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingList)} />
-        :
-        (!isSearch && drawingList.length == 0
+      {
+        isLoading || isError
           ?
-          <View style={styles.container}>
-            <ListEmptyData />
-          </View>
+          <LoadingRefresh isLoading={isLoading} isError={isError}
+            _onPressRefresh={() => { callAPI(() => { searchDrawing(facilityCode, drawingNo) }, true) }} />
           :
           <View style={styles.container}>
             {
               isShowDescription.show
                 ?
-                (<View style={styles.headerContainer}>
+                <View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>ProjectCode:</Text>
                     <Text style={styles.infoData}>{projectCode}</Text>
                   </View>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>FacilityCode:</Text>
-                    <TouchableOpacity style={styles.selectInput} onPress={_onPressShowModel}>
+                    <TouchableOpacity style={styles.selectInput} onPress={() => { setIsVisibleFacility(true) }}>
                       <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
                     </TouchableOpacity>
                   </View>
@@ -444,7 +421,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                       }
                     </View>
                   </View>
-                  <View style={styles.rowInfo}>
+                  {/* <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>WeldNo:</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
@@ -458,7 +435,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                         : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
                       }
                     </View>
-                  </View>
+                  </View> */}
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle} />
                     <TouchableOpacity
@@ -468,91 +445,26 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                       <Text style={styles.buttonTitle}>Search Drawing</Text>
                     </TouchableOpacity>
                   </View>
-                </View>)
+                </View>
                 :
                 null
             }
-            {
-              isSearching
-                ?
-                <ListSearchData />
-                :
-                (drawingList.length
-                  ?
-                  <VirtualizedList
-                    style={styles.table}
-                    data={drawingList}
-                    getItemCount={(data) => data.length}
-                    getItem={(data, index) => {
-                      return data[index];
-                    }}
-                    keyExtractor={(index) => {
-                      return index;
-                    }}
-                    renderItem={renderItem}
-                  />
-                  : <ListEmptySearchData />
-                )
-            }
-            <View style={styles.scanContainer}>
-              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQRCodeFitUp}>
-                <Text style={styles.buttonTitle}>Scan FitUp Drawing</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressQRCodeVisual}>
-                <Text style={styles.buttonTitle}>Scan Weld Drawing</Text>
-              </TouchableOpacity>
-            </View>
-          </View>)
+            <RenderList />
+          </View>
       }
-
-      <Modal
-        animationType='fade'
-        transparent={true}
-        visible={isVisible}>
-        <View style={modals.dim}>
-          <SafeAreaView>
-            <View style={modals.container}>
-              <View style={modals.list}>
-                <View style={modals.title}>
-                  <Text style={modals.text}>Current Facility Code: <Text style={modals.code}>{facilityCode}</Text></Text>
-                </View>
-                <View style={modals.row}>
-                  <Text style={modals.cellHeader}>CODE</Text>
-                  <View style={modals.line} />
-                  <Text style={modals.cellHeader}>NAME</Text>
-                </View>
-                <ScrollView>
-                  {facilityList.map((item) => {
-                    return (
-                      <TouchableOpacity style={modals.row} onPress={() => _onChangeFacilityCode(item.code)}>
-                        <Text style={modals.cell}>{item.code}</Text>
-                        <View style={modals.line} />
-                        <Text style={modals.cell}>{item.name}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-              <View style={modals.action}>
-                <TouchableOpacity style={modals.button} onPress={_onPressClearModel}>
-                  <Text style={styles.buttonTitle}>Clear</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={modals.button} onPress={_onPressCancelModel}>
-                  <Text style={styles.buttonTitle}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      </Modal>
+      <SelectPopup
+        visible={isVisibleFacility}
+        data={facilityList}
+        onCancel={() => setIsVisibleFacility(false)}
+        onClear={_onPressClearFacilityCode}
+        onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
     </SafeAreaView >
   );
 };
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -730,78 +642,6 @@ const styles = StyleSheet.create({
   },
   buttonTitleDark: {
     color: BASE_COLOR,
-  },
-});
-const modals = StyleSheet.create({
-  dim: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  container: {
-    backgroundColor: OPP_COLOR,
-    width: windowWidth * 0.85,
-    height: undefined,
-    maxHeight: windowHeight * 0.85,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-  },
-  list: {
-    flexShrink: 1,
-    padding: 16,
-    width: windowWidth * 0.85,
-    height: undefined,
-  },
-  title: {
-    marginBottom: 16,
-  },
-  text: {
-    color: BASE_COLOR,
-  },
-  code: {
-    color: BASE_COLOR,
-    fontWeight: 'bold'
-  },
-  row: {
-    flexDirection: 'row',
-    minHeight: 36,
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  cellHeader: {
-    flex: 5,
-    color: BASE_COLOR,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  cell: {
-    flex: 5,
-    color: BASE_COLOR,
-    padding: 4,
-  },
-  line: {
-    height: '100%',
-    width: 1,
-    backgroundColor: BASE_COLOR,
-  },
-  action: {
-    width: windowWidth * 0.85,
-    height: 36,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginRight: 16,
-    marginBottom: 16,
-  },
-  button: {
-    width: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: BASE_COLOR,
-    padding: 4,
-    marginRight: 8,
   },
 });
 

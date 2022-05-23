@@ -351,6 +351,12 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
 
+  // QC Hand Book
+  const _onPressQCHandBook = () => {
+    navigation.navigate(
+      'QCHandBook'
+    );
+  };
 
 
 
@@ -409,6 +415,10 @@ const HomeScreenQC = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

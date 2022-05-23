@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator } from 'react-native';
 
-const TotalLocationModal = props => {
+const SelectPopupTwoColumns = props => {
   return (
     <Modal
       animationType='fade'
@@ -12,43 +12,52 @@ const TotalLocationModal = props => {
           <View style={modals.container}>
             <View style={modals.list}>
               <View style={modals.row}>
-                <Text style={modals.cellTitleHeader}>Location</Text>
+                <Text style={modals.cellTitleHeader}>{props.leftHeader}</Text>
                 <View style={modals.cellLine} />
-                <Text style={modals.cellDataHeader}>Total</Text>
+                <Text style={modals.cellDataHeader}>{props.rightHeader}</Text>
               </View>
-              {
-                props.data != null
-                  ?
-                  props.data.length
+              <ScrollView>
+                {
+                  props.data != null
                     ?
-                    props.data.map((item) => {
-                      const location = props.site ? item.SiteLocation : item.Location;
-                      return (
-                        <TouchableOpacity style={modals.row} key={new Date()} onPress={() => props.onPressChangeLocation(location)}>
-                          <Text style={modals.cellTitle}>{location}</Text>
-                          <View style={modals.cellLine} />
-                          <Text style={modals.cellData}>{item.Total}</Text>
-                        </TouchableOpacity>
-                      );
-                    })
+                    props.data.length
+                      ?
+                      props.data.map((item, index) => {
+                        const valueLeft = item[props.leftKey] ? item[props.leftKey] : '';
+                        const valueRight = item[props.rightKey] ? item[props.rightKey]: '';
+                        return (
+                          <TouchableOpacity style={modals.row} key={index} onPress={() => props.onChangeItem(valueLeft)}>
+                            <Text style={modals.cellTitle}>{valueLeft}</Text>
+                            <View style={modals.cellLine} />
+                            <Text style={modals.cellData}>{valueRight}</Text>
+                          </TouchableOpacity>
+                        );
+                      })
+                      :
+                      <View>
+                        <Text style={modals.emptyText}>No have any data!</Text>
+                      </View>
                     :
                     <View>
-                      <Text style={modals.emptyText}>No have any data!</Text>
+                      <ActivityIndicator size='large' color={BASE_COLOR} />
                     </View>
-                  :
-                  <View>
-                    <ActivityIndicator size='large' color={BASE_COLOR} />
-                  </View>
-              }
+                }
+              </ScrollView>
             </View>
-            <View style={modals.action}>
-              <TouchableOpacity style={modals.button} onPress={props.onPressClearLocation}>
-                <Text style={modals.buttonTitle}>Clear</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={modals.button} onPress={props.onClose}>
-                <Text style={modals.buttonTitle}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+            {
+              props.data != null &&
+              <View style={modals.action}>
+                {
+                  !!props.data.length && !!props.onClear &&
+                  <TouchableOpacity style={modals.button} onPress={props.onClear}>
+                    <Text style={modals.buttonTitle}>Clear</Text>
+                  </TouchableOpacity>
+                }
+                <TouchableOpacity style={modals.button} onPress={props.onCancel}>
+                  <Text style={modals.buttonTitle}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            }
           </View>
         </SafeAreaView>
       </View>
@@ -146,4 +155,4 @@ const modals = StyleSheet.create({
   },
 });
 
-export default TotalLocationModal;
+export default SelectPopupTwoColumns;

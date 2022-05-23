@@ -12,14 +12,15 @@ import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../../utils/Core';
 import Helper from '../../../utils/Helper';
-import GetDrawingImageAPI from '../../../apis/drawing/GetDrawingImageAPI';
-import DeleteDrawingImageAPI from '../../../apis/drawing/DeleteDrawingImageAPI';
-import EditDrawingImageAPI from '../../../apis/drawing/EditDrawingImageAPI';
+import { GetImageAPI, GetDrawingImageAPI, DeleteImageAPI, EditImageAPI } from '../../../apis/piping/ImageAPI';
+
+import Header from '../../../components/Header';
+import { ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import { TextInput } from 'react-native-gesture-handler';
 
-export default ({ route }) => {
+const DrawingImageScreen = ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -28,7 +29,7 @@ export default ({ route }) => {
   const [drawingImageList, setDrawingImageList] = useState([]);
   const [drawingImageListUpload, setDrawingImageListUpload] = useState([]);
 
-  const { projectCode, facilityCode, drawingNo, code, teamLeader } = route.params;
+  const { userLogin, projectCode, facilityCode, drawingNo, sheet, jointNo, rowIndex, code, role } = route.params;
 
   const [isShowDialog, setIsShowDialog] = useState(false);
   const [pictureId, setPictureId] = useState(null);
@@ -36,12 +37,6 @@ export default ({ route }) => {
 
   const [isOpenImage, setIsOpenImage] = useState(false);
   const [openImage, setOpenImage] = useState([]);
-
-  useEffect(
-    () => {
-      callAPI(getDrawingImage);
-    }, []
-  );
 
   const callAPI = executedAPI => {
     setIsLoading(true);
@@ -55,13 +50,35 @@ export default ({ route }) => {
       }
     });
   };
+  useEffect(
+    () => {
+      callAPI(getDrawingImage);
+    }, []
+  );
 
   const getDrawingImage = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetDrawingImageAPI(projectCode, facilityCode, drawingNo, code, token)
+    const token = await Helper.getData('TOKEN');
+    if (rowIndex) {
+      GetImageAPI(rowIndex, token)
+        .then(res => {
+          if (res.Success) {
+            setDrawingImageList(res.Data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+          setIsError(true);
+        });
+    } else {
+      GetDrawingImageAPI(projectCode, facilityCode, drawingNo, sheet, jointNo, code, role, token)
       .then(res => {
-        if (res.success) {
-          setDrawingImageList(res.data);
+        if (res.Success) {
+          setDrawingImageList(res.Data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -73,6 +90,7 @@ export default ({ route }) => {
         setIsLoading(false);
         setIsError(true);
       });
+    }
   };
 
   const _onPressAddImage = () => {
@@ -96,7 +114,6 @@ export default ({ route }) => {
       { cancelable: false }
     );
   };
-
   const _onPressOpenGallery = () => {
     setIsLoading(true);
     ImagePicker.openPicker({
@@ -114,7 +131,6 @@ export default ({ route }) => {
       setIsSelecting(false);
     });
   };
-
   const _onPressOpenCamera = () => {
     setIsLoading(true);
     ImagePicker.openCamera({
@@ -145,21 +161,24 @@ export default ({ route }) => {
     });
     return Promise.all(promises);
   };
-
   const _onPressUploadImage = async () => {
     setIsUploading(true);
-    let token = await Helper.getData('TOKEN');
-    let username = await Helper.getData('USERNAME');
-    let dataCode = await Helper.getData('DATACODE');
+    const token = await Helper.getData('TOKEN');
+    const username = await Helper.getData('USERNAME');
 
     let body = [
+      { name: 'username', data: username },
       { name: 'projectCode', data: projectCode },
       { name: 'facilityCode', data: facilityCode },
       { name: 'drawingNo', data: drawingNo },
+      { name: 'sheet', data: sheet },
+      { name: 'jointNo', data: jointNo },
       { name: 'code', data: code },
-      { name: 'username', data: username },
-      { name: 'dataCode', data: dataCode },
+      { name: 'role', data: role },
     ];
+    if (rowIndex) {
+      body.push({ name: 'rowIndex', data: rowIndex.toString() });
+    }
 
     addFilesToBody()
       .then(res => {
@@ -169,7 +188,8 @@ export default ({ route }) => {
         }
         RNFetchBlob.fetch(
           'POST',
-          Port_Server + '/api/Drawing/UploadDrawingImage',
+          Port_Server
+          + '/api/piping/UploadImage',
           {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'multipart/form-data',
@@ -178,9 +198,8 @@ export default ({ route }) => {
         )
           .then(res => {
             res = JSON.parse(res.data);
-            if (res.success) {
+            if (res.Success) {
               setDrawingImageListUpload([]);
-              setIsLoading(false);
               setIsLoading(false);
               setIsSelecting(false);
               setIsUploading(false);
@@ -203,10 +222,11 @@ export default ({ route }) => {
       });
   };
 
+  //-- Delete
   const _onPressDeleteImage = async id => {
     Alert.alert(
       'Delete Drawing Picture',
-      'Are you sure you want to delete this picture',
+      'Are you sure you want to delete this picture?',
       [
         {
           text: 'Delete',
@@ -220,13 +240,12 @@ export default ({ route }) => {
       { cancelable: false }
     );
   };
-
   const deleteDrawingImage = async id => {
-    let token = await Helper.getData('TOKEN');
-    DeleteDrawingImageAPI(id, token)
+    const token = await Helper.getData('TOKEN');
+    DeleteImageAPI(id, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
-        if (res.success) {
+        if (res.Success) {
           let array = drawingImageList.filter(image => image.id !== id);
           setDrawingImageList(array);
         }
@@ -242,12 +261,12 @@ export default ({ route }) => {
   };
 
   const _onPressUpdateImage = async () => {
-    let token = await Helper.getData('TOKEN');
-    EditDrawingImageAPI(pictureId, pictureNote, token)
+    const token = await Helper.getData('TOKEN');
+    EditImageAPI(pictureId, pictureNote, token)
       .then(res => {
         Toast.show(res.Message.toString(), Toast.SHORT);
-        if (res.success) {
-          let index = drawingImageList.findIndex(image => image.id === pictureId);
+        if (res.Success) {
+          const index = drawingImageList.findIndex(image => image.id === pictureId);
           let array = [...drawingImageList]
           array[index]['note'] = pictureNote;
           setDrawingImageList(array);
@@ -350,11 +369,6 @@ export default ({ route }) => {
     return status === 'granted';
   };
 
-  const ListEmptyData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any picture</Text>
-    </View>
-  );
 
   const renderItem = ({ item }) => {
     return (
@@ -369,7 +383,6 @@ export default ({ route }) => {
       </View>
     );
   };
-
   const renderItemWithAction = ({ item }) => {
     return (
       <View style={styles.imageContainer}>
@@ -384,7 +397,7 @@ export default ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.username}</Text>
           {
-            item.username.toLowerCase() == teamLeader.toLowerCase()
+            item.username.toLowerCase() == userLogin.toLowerCase()
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -402,7 +415,7 @@ export default ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
           {
-            item.username.toLowerCase() == teamLeader.toLowerCase()
+            item.username.toLowerCase() == userLogin.toLowerCase()
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -421,6 +434,12 @@ export default ({ route }) => {
     );
   };
 
+  const headerData = {
+    'Project': projectCode,
+    'DrawingNo': { 'DrawingNo': drawingNo, 'Link': "" },
+    'Code': code,
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
@@ -428,20 +447,7 @@ export default ({ route }) => {
         <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingImage)} />
         :
         <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>DrawingNo:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{drawingNo.toUpperCase()}</Text>
-              </View>
-            </View>
-            <View style={styles.rowInfo}>
-              <Text style={styles.infoTitle}>Type:</Text>
-              <View style={styles.infoDataLine}>
-                <Text style={styles.infoData}>{code}</Text>
-              </View>
-            </View>
-          </View>
+          <Header data={headerData} />
           {
             drawingImageList.length
               ?
@@ -718,3 +724,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
+
+export default DrawingImageScreen;

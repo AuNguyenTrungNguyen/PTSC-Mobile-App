@@ -1,66 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import NetInfo from '@react-native-community/netinfo';
-import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../../utils/Helper';
-import GetFacilityCodeByDrawingAPI from '../../../apis/drawing/GetTopFacilityCodeAPI';
+import Constant from '../../../utils/Constant';
+
+import { GetCurrentConstructionInfoAPI, CheckDrawingRevAPI } from '../../../apis/piping/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
 
-  const [isScanned, setIsScanned] = useState(false);
-  const isFocused = useIsFocused();
   const { projectCode, teamLeader, code, source } = route.params;
 
+  const [isScanned, setIsScanned] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setIsScanned(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   const _onQRCodeRead = scanResult => {
-    if (scanResult.data !== null && !isScanned && isFocused) {
+    if (!isScanned) {
+      setIsScanned(true);
       var data = scanResult.data.split('_');
-      getFacilityCode(data[0], data[1], data[2]);
+      _checkDrawingRev(data[0], data[1], data[2]);
     }
   };
 
-  const getFacilityCode = async (drawingNo, sheet, rev) => {
-    setIsScanned(true);
-    let token = await Helper.getData('TOKEN');
+  const _checkDrawingRev = async (drawingNo, sheet, rev) => {
+    const token = await Helper.getData('TOKEN');
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         showComfirm('ERROR', 'Network not available!');
       } else {
-        GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+        if (projectCode == 'GALLAF03' && drawingNo && !drawingNo.startsWith("WHP03-PMC2-")) {
+          drawingNo = 'WHP03-PMC2-' + drawingNo
+        }
+        CheckDrawingRevAPI(projectCode, drawingNo, sheet, token)
           .then(res => {
-            if (res.success && res.data != null) {
-              if (source == 'Drawing') {
+            if (res.Success) {
+              if (res.Data != null && rev != res.Data) {
+                Alert.alert(
+                  'WARNING',
+                  'DrawingNo: ' + drawingNo + '\nSheet: ' + sheet + '\nhas latest Rev: ' + res.Data,
+                  [
+                    {
+                      text: 'Back',
+                      onPress: () => {
+                        navigation.goBack();
+                      },
+                      style: 'cancel'
+                    },
+                  ],
+                  { cancelable: false },
+                );
+              } else {
+                _onGoingDetail(drawingNo, sheet, rev);
+              }
+            }
+            else {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
+            }
+          }).catch(() => {
+            showComfirm('ERROR', 'Please check that you are using the company network!');
+          });
+      }
+    });
+  };
+
+  const _onGoingDetail = async (drawingNo, sheet, rev) => {
+    const token = await Helper.getData('TOKEN');
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        showComfirm('ERROR', 'Network not available!');
+      } else {
+        GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+          .then(res => {
+            if (res.Success && res.Data != null) {
+              if (source == Constant.CAMERA_PIP_CONS) {
                 navigation.navigate('DrawingDetail', {
                   projectCode: projectCode,
-                  facilityCode: res.data,
+                  facilityCode: res.Data,
                   drawingNo: drawingNo,
                   sheet: sheet,
                   rev: rev,
                   code: code,
                   teamLeader: teamLeader,
                   title: code + ' Detail',
-                  link: res.link,
+                  link: res.Link,
                 });
-                setIsScanned(false);
               } else {
-                let codeTitle = code == 'Visual' ? 'Weld' : code;
-                let title = 'QC ' + codeTitle + ' Detail';
                 navigation.navigate('QCDrawingDetail', {
                   projectCode: projectCode,
-                  facilityCode: res.data,
+                  facilityCode: res.Data,
                   drawingNo: drawingNo,
                   sheet: sheet,
                   rev: rev,
                   code: code,
                   teamLeader: teamLeader,
-                  title: title,
-                  link: res.link,
+                  title: 'QC ' + code + ' Detail',
+                  link: res.Link,
                 });
-                setIsScanned(false);
               }
-            } else if (res.data == null) {
-              let message = 'Not find FacilityCode with: \n'
+            } else if (res.Data == null) {
+              const message = 'Not find FacilityCode with: \n'
                 + 'ProjectCode: ' + projectCode + '\n'
                 + 'DrawingNo: ' + drawingNo + '\n'
                 + 'Sheet: ' + sheet + '\n'

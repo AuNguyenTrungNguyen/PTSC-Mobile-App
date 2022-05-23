@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance, TextInput, Keyboard } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
@@ -7,16 +7,20 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
 import Dialog from 'react-native-dialog';
 
-import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
-import GetSpendListAPI from '../../../apis/qc/GetSpendListAPI';
-import UpdateSpendListAPI from '../../../apis/qc/UpdateSpendListAPI';
+import Helper from '../../../utils/Helper';
+
+import { GetSpendListAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
+
+import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
 
 const QCSpendListScreen = ({ route, navigation }) => {
+
+  const { projectCode, userLogin, code } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -28,10 +32,8 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const [isVisibleTotal, setIsVisibleTotal] = useState(false);
   const [totalList, setTotalList] = useState([]);
 
-  const { projectCode, userLogin, code } = route.params;
-
-  const [weldNo, setWeldNo] = useState('');
   const [drawingNo, setDrawingNo] = useState('');
+  const [weldNo, setWeldNo] = useState('');
   const [location, setLocation] = useState('');
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
@@ -41,14 +43,14 @@ const QCSpendListScreen = ({ route, navigation }) => {
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleTotal(true) }}>
             <Ionicons
               size={24}
               name={'md-list-circle-outline'} color={iconColor} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -67,12 +69,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
     });
   };
 
-  useEffect(
-    () => {
-      callAPI(getSpendListData);
-    }, []
-  );
-
   const callAPI = executedAPI => {
     setIsSearching(true);
     NetInfo.fetch().then(state => {
@@ -86,14 +82,24 @@ const QCSpendListScreen = ({ route, navigation }) => {
       }
     });
   };
+  useEffect(
+    () => {
+      callAPI(getSpendListData);
+    }, []
+  );
 
-  const getSpendListData = async (weld = weldNo, drawing = drawingNo, locate = location) => {
+  //-- Search Action
+  const _onPressSearchDrawing = () => {
+    Keyboard.dismiss();
+    callAPI(getSpendListData);
+  };
+  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location) => {
     let token = await Helper.getData('TOKEN');
-    GetSpendListAPI(projectCode, weld, drawing, locate, code, token)
+    GetSpendListAPI(projectCode, drawing, weld, locate, code, token)
       .then(res => {
-        if (res.success) {
-          setSpendList(res.data);
-          setTotalList(res.total);
+        if (res.Success && res.Data) {
+          setSpendList(res.Data.List);
+          setTotalList(res.Data.Location);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -110,11 +116,20 @@ const QCSpendListScreen = ({ route, navigation }) => {
       });
   };
 
+  //-- Update Action
+  const _onPressSubmitToServer = async () => {
+    if (updateSpendList.length) {
+      callAPI(updateSpendData);
+    } else {
+      Toast.show('No any data changes!', Toast.SHORT);
+    }
+  };
   const updateSpendData = async () => {
-    let token = await Helper.getData('TOKEN');
-    UpdateSpendListAPI(projectCode, code, userLogin, updateSpendList, token)
+    const token = await Helper.getData('TOKEN');
+    const listUpdate = Helper.handleListUpdate(updateSpendList);
+    UpdateSpendListAPI(projectCode, userLogin, code, listUpdate, token)
       .then(res => {
-        if (res.success) {
+        if (res.Success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setUpdateSpendList([]);
         } else {
@@ -126,176 +141,99 @@ const QCSpendListScreen = ({ route, navigation }) => {
       });
   };
 
-  const _onChangeWeldNo = no => {
-    setWeldNo(no);
-    if (!no) {
-      callAPI(() => { getSpendListData(no, drawingNo, location) });
-    }
-  };
-
-  const _onChangeDrawingNo = (no) => {
-    setDrawingNo(no);
-    if (!no) {
-      callAPI(() => { getSpendListData(weldNo, no, location) });
-    }
-  };
-
-  const _onPressSearchDrawing = () => {
-    Keyboard.dismiss();
-    callAPI(getSpendListData);
-  };
-
-  const _onPressSubmitToServer = async () => {
-    if (updateSpendList.length) {
-      callAPI(updateSpendData);
-    } else {
-      Toast.show('No any data changes!', Toast.SHORT);
-    }
-  };
-
-  const _onPressChangeStatus = (value, index, key) => {
-    let array = [...spendList];
-    array[index][key] = value;
-    setSpendList(array);
-
-    array = [...updateSpendList];
-    let rowIndex = spendList[index].RowIndex;
-    let weldNo = spendList[index].WeldNo;
-    let facilityCode = spendList[index].FacilityCode;
-    let drawingNo = spendList[index].DrawingNo;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-    if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, ['ItemResult']: value });
-    } else {
-      array[objIndex]['ItemResult'] = spendList[index][key];
-    }
-    setUpdateSpendList(array);
-  };
-
-  const _onPressManagePicture = async (facilityCode, drawingNo) => {
+  //-- Manage Picture
+  const _onPressManagePicture = async item => {
     navigation.navigate(
       'DrawingImage',
       {
+        userLogin: userLogin,
         projectCode: projectCode,
-        facilityCode: facilityCode,
-        drawingNo: drawingNo,
-        code: code == 'Visual' ? 'Weld' : code,
-        teamLeader: userLogin
+        facilityCode: item.FacilityCode,
+        drawingNo: item.DrawingNo,
+        sheet: item.Sheet,
+        jointNo: weldNo,
+        rowIndex: item.RowIndex,
+        code: code,
+        role: Constant.IMAGE_ROLE_QC
       }
     );
   };
 
-  const _onChangeCheckbox = (index, key, value) => {
-    value = value ? 'x' : Constant.EMPTY_VALUE_STRING;
-
-    let array = [...spendList];
-    array[index][key] = value;
-    setSpendList(array);
-
-    array = [...updateSpendList];
-    let rowIndex = spendList[index].RowIndex;
-    let weldNo = spendList[index].WeldNo;
-    let facilityCode = spendList[index].FacilityCode;
-    let drawingNo = spendList[index].DrawingNo;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-    if (objIndex < 0) {
-      array.push(
-        { RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, [key]: value });
-    } else {
-      array[objIndex][key] = value;
-    }
-    setUpdateSpendList(array);
+  //-- DrawingNo & WeldNo
+  const _onChangeDrawingNo = no => {
+    setDrawingNo(no);
+  };
+  const _onChangeWeldNo = no => {
+    setWeldNo(no);
   };
 
+  //-- Location
   const _onPressChangeLocation = loc => {
     if (loc != location) {
       setLocation(loc);
-      callAPI(() => { getSpendListData(weldNo, drawingNo, loc) });
+      callAPI(() => { getSpendListData(drawingNo, weldNo, loc) });
     }
     setIsVisibleTotal(false);
   };
-
   const _onPressClearLocation = () => {
     _onPressChangeLocation('');
   };
 
-  // REMARK
-  const [remarkDisplay, setRemarkDisplay] = useState('');
-  const [isShowDialogRemark, setIsShowDialogRemark] = useState(false);
+  //-- Update Data
   const [indexUpdate, setIndexUpdate] = useState(-1);
-
-  const _onPressShowDialogRemark = (index, value) => {
-    setIndexUpdate(index);
-    if (value) {
-      value = value == Constant.EMPTY_VALUE_STRING ? null : value;
-      setRemarkDisplay(value);
-    } else {
-      setRemarkDisplay('');
-    }
-    setIsShowDialogRemark(true);
-  };
-
-  const _onPressSubmitRemark = () => {
-    let keyStatus = code == 'FitUp' ? 'FitUpResult' : 'VisualResult';
-    let keyRemark = code == 'FitUp' ? 'QCFittupRemark' : 'QCVisualRemark';
-    let value = remarkDisplay ? remarkDisplay : Constant.EMPTY_VALUE_STRING;
-
-    setIsShowDialogRemark(false);
-
+  const [keyUpdate, setKeyUpdate] = useState('');
+  const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate) => {
     let array = [...spendList];
-    array[indexUpdate][keyRemark] = value;
-    array[indexUpdate][keyStatus] = 'REJ';
+    array[localIndex][localKey] = data;
     setSpendList(array);
 
     array = [...updateSpendList];
-    let rowIndex = spendList[indexUpdate].RowIndex;
-    let weldNo = spendList[indexUpdate].WeldNo;
-    let facilityCode = spendList[indexUpdate].FacilityCode;
-    let drawingNo = spendList[indexUpdate].DrawingNo;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    const rowIndex = spendList[localIndex].RowIndex;
+    const objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, WeldNo: weldNo, FacilityCode: facilityCode, DrawingNo: drawingNo, ['ItemRemark']: value, ['ItemResult']: 'REJ' });
+      array.push({ RowIndex: rowIndex, [localKey]: data });
     } else {
-      array[objIndex]['ItemResult'] = spendList[indexUpdate][keyStatus];
-      array[objIndex]['ItemRemark'] = value;
+      array[objIndex][localKey] = spendList[localIndex][localKey];
     }
     setUpdateSpendList(array);
   };
 
+  const _onPressChangeStatus = (value, index, key) => {
+    if (spendList[index][key] !== value) {
+      setIndexUpdate(index);
+      setKeyUpdate(key);
+      onChangeData(value, index, key);
+    }
+  };
 
-  const ListSearchData = () => (
-    <View style={styles.noDataContainer}>
-      <ActivityIndicator size='large' color={BASE_COLOR} />
-    </View>
-  );
+  const _onChangeCheckbox = (index, key, value) => {
+    value = value ? 'x' : null;
+    onChangeData(value, index, key);
+  };
 
-  const ListEmptyData = () => (
-    <View style={styles.noDataContainer}>
-      {
-        weldNo || drawingNo
-          ?
-          <Text style={styles.noDataTitle}>No have any data with</Text>
-          :
-          <Text style={styles.noDataTitle}>No have any data</Text>
-      }
-      {
-        weldNo
-          ?
-          <Text style={styles.noDataTitle}>WeldNo: <Text style={styles.noDataText}>{weldNo}</Text></Text>
-          :
-          null
-      }
-      {
-        drawingNo
-          ?
-          <Text style={styles.noDataTitle}>DrawingNo: <Text style={styles.noDataText}>{drawingNo}</Text></Text>
-          :
-          null
-      }
+  const [isVisibleRemark, setIsVisibleRemark] = useState(false);
+  const [remarkDisplay, setRemarkDisplay] = useState('');
+  const _onPressShowRemark = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setRemarkDisplay(value.toString());
+    } else {
+      setRemarkDisplay('');
+    }
+    setIsVisibleRemark(true);
+  };
+  const _onChangeRemark = () => {
+    let value = remarkDisplay;
+    if (!value) {
+      value = null;
+    }
+    setRemarkDisplay(value);
+    onChangeData(value);
+    setIsVisibleRemark(false);
+  };
 
-    </View>
-  );
-
+  //-- Render List
   const renderItem = ({ index, item }) => {
     return (
       <View style={styles.box}>
@@ -307,7 +245,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
-            <TouchableOpacity onPress={() => { _onPressManagePicture(item.FacilityCode, item.DrawingNo) }}>
+            <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
               <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
             </TouchableOpacity>
           </View>
@@ -342,281 +280,303 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <Text style={styles.textData}>{Formater.formatEmptyData(item.Rev)}</Text>
           </View>
         </View>
-        {code == 'FitUp'
-          ?
-          (<>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>HeatNo01:</Text>
+        {
+          code == Constant.CODE_FITUP
+            ?
+            <>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>HeatNo01:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                </View>
+                <View style={styles.cellTitle}>
+                  <Text>HeatNo02:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                </View>
               </View>
-              <View style={styles.cellData}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>FittingDate:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
+                </View>
+                <View style={styles.cellAction}>
+                  <TouchableOpacity
+                    style={styles.buttonAccept}
+                    onPress={() => _onPressChangeStatus('ACC', index, 'FitUpResult')}>
+                    <Text style={styles.labelAccept}>Accept</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.cellTitle}>
-                <Text>HeatNo02:</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>Location:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
+                </View>
+                <View style={styles.cellAction}>
+                  <TouchableOpacity onPress={() => _onPressShowRemark(item.QCFittupRemark, index, 'QCFittupRemark')}>
+                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.buttonReject}
+                    onPress={() => _onPressChangeStatus('REJ', index, 'FitUpResult')}>
+                    <Text style={styles.labelReject}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.cellData}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>FittingDate:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
-              </View>
-              <View style={styles.cellAction}>
-                <TouchableOpacity
-                  style={styles.buttonAccept}
-                  onPress={() => _onPressChangeStatus('ACC', index, 'FitUpResult')}>
-                  <Text style={styles.labelAccept}>Accept</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>Location:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
-              </View>
-              <View style={styles.cellAction}>
-                <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCFittupRemark)}>
-                  <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.buttonReject}
-                  onPress={() => _onPressChangeStatus('REJ', index, 'FitUpResult')}>
-                  <Text style={styles.labelReject}>Reject</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>FitUpStatus:</Text>
-              </View>
-              <View style={styles.cellData}>
-                {
-                  item.FitUpResult
-                    ?
-                    item.FitUpResult == 'ACC'
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>FitUpStatus:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  {
+                    item.FitUpResult
                       ?
-                      <Text style={styles.textAccept}>{item.FitUpResult}</Text>
+                      item.FitUpResult == 'ACC'
+                        ?
+                        <Text style={styles.textAccept}>{item.FitUpResult}</Text>
+                        :
+                        <Text style={styles.textReject}>{item.FitUpResult}</Text>
                       :
-                      <Text style={styles.textReject}>{item.FitUpResult}</Text>
-                    :
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
-                }
+                      <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
+                  }
+                </View>
+                <View style={styles.cellAction}>
+                  <TouchableOpacity
+                    style={styles.buttonClean}
+                    onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
+                    <Text style={styles.labelClean}>Clear</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.cellAction}>
-                <TouchableOpacity
-                  style={styles.buttonClean}
-                  onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
-                  <Text style={styles.labelClean}>Clear</Text>
-                </TouchableOpacity>
+            </>
+            :
+            <>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>WelderIDs:</Text>
+                </View>
+                <View style={styles.cellWelder}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
+                </View>
               </View>
-            </View>
-          </>)
-          :
-          (<>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>WelderIDs:</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>WPSNo:</Text>
+                </View>
+                <View style={styles.cellWelder}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
+                </View>
               </View>
-              <View style={styles.cellWelder}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>WeldingDate:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
+                </View>
+                <View style={styles.cellAction}>
+                  <TouchableOpacity
+                    style={styles.buttonAccept}
+                    onPress={() => _onPressChangeStatus('ACC', index, 'VisualResult')}>
+                    <Text style={styles.labelAccept}>Accept</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>WPSNo:</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>Location:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
+                </View>
+                <View style={styles.cellAction}>
+                  <TouchableOpacity onPress={() => _onPressShowRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
+                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.buttonReject}
+                    onPress={() => _onPressChangeStatus('REJ', index, 'VisualResult')}>
+                    <Text style={styles.labelReject}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.cellWelder}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>WeldingDate:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
-              </View>
-              <View style={styles.cellAction}>
-                <TouchableOpacity
-                  style={styles.buttonAccept}
-                  onPress={() => _onPressChangeStatus('ACC', index, 'VisualResult')}>
-                  <Text style={styles.labelAccept}>Accept</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>Location:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
-              </View>
-              <View style={styles.cellAction}>
-                <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCVisualRemark)}>
-                  <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.buttonReject}
-                  onPress={() => _onPressChangeStatus('REJ', index, 'VisualResult')}>
-                  <Text style={styles.labelReject}>Reject</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>VisualStatus:</Text>
-              </View>
-              <View style={styles.cellData}>
-                {
-                  item.VisualResult
-                    ?
-                    item.VisualResult == 'ACC'
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>VisualStatus:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  {
+                    item.VisualResult
                       ?
-                      <Text style={styles.textAccept}>{item.VisualResult}</Text>
+                      item.VisualResult == 'ACC'
+                        ?
+                        <Text style={styles.textAccept}>{item.VisualResult}</Text>
+                        :
+                        <Text style={styles.textReject}>{item.VisualResult}</Text>
                       :
-                      <Text style={styles.textReject}>{item.VisualResult}</Text>
-                    :
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualResult)}</Text>
-                }
+                      <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualResult)}</Text>
+                  }
+                </View>
+                <View style={styles.cellAction}>
+                  <TouchableOpacity
+                    style={styles.buttonClean}
+                    onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
+                    <Text style={styles.labelClean}>Clear</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.cellAction}>
-                <TouchableOpacity
-                  style={styles.buttonClean}
-                  onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
-                  <Text style={styles.labelClean}>Clear</Text>
-                </TouchableOpacity>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>NDTPercent:</Text>
+                </View>
+                <View style={styles.cellWelder}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.NDTPercent)}</Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>NDTPercent:</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>UT:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <CheckBox
+                    value={item.UT && item.UT !== null}
+                    onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
+                </View>
+                <View style={styles.cellTitle}>
+                  <Text>RT:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <CheckBox
+                    value={item.RT && item.RT !== null}
+                    onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
+                </View>
+                <View style={styles.cellTitle}>
+                  <Text>MT:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <CheckBox
+                    value={item.MT && item.MT !== null}
+                    onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
+                </View>
               </View>
-              <View style={styles.cellWelder}>
-                <Text style={styles.textData}>{Formater.formatEmptyData(item.NDTPercent)}</Text>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>PT:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <CheckBox
+                    value={item.PT && item.PT !== null}
+                    onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
+                </View>
+                <View style={styles.cellTitle}>
+                  <Text>PMI:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <CheckBox
+                    value={item.PMI && item.PMI !== null}
+                    onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
+                </View>
+                <View style={styles.cellTitle}>
+                  <Text>PAUT:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <CheckBox
+                    value={item.PAUT && item.PAUT !== null}
+                    onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
+                    style={styles.checkBox}
+                    boxType='square'
+                    disabled={false}
+                    onCheckColor={OPP_COLOR}
+                    onFillColor={BASE_COLOR}
+                    onTintColor={BASE_COLOR}
+                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                    animationDuration={0.2}
+                    onAnimationType='flat'
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>UT:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <CheckBox
-                  value={item.UT && item.UT !== Constant.EMPTY_VALUE_STRING}
-                  onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
-                  style={styles.checkBox}
-                  boxType='square'
-                  disabled={false}
-                  onCheckColor={OPP_COLOR}
-                  onFillColor={BASE_COLOR}
-                  onTintColor={BASE_COLOR}
-                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                  animationDuration={0.2}
-                  onAnimationType='flat'
-                />
-              </View>
-              <View style={styles.cellTitle}>
-                <Text>RT:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <CheckBox
-                  value={item.RT && item.RT !== Constant.EMPTY_VALUE_STRING}
-                  onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
-                  style={styles.checkBox}
-                  boxType='square'
-                  disabled={false}
-                  onCheckColor={OPP_COLOR}
-                  onFillColor={BASE_COLOR}
-                  onTintColor={BASE_COLOR}
-                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                  animationDuration={0.2}
-                  onAnimationType='flat'
-                />
-              </View>
-              <View style={styles.cellTitle}>
-                <Text>MT:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <CheckBox
-                  value={item.MT && item.MT !== Constant.EMPTY_VALUE_STRING}
-                  onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
-                  style={styles.checkBox}
-                  boxType='square'
-                  disabled={false}
-                  onCheckColor={OPP_COLOR}
-                  onFillColor={BASE_COLOR}
-                  onTintColor={BASE_COLOR}
-                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                  animationDuration={0.2}
-                  onAnimationType='flat'
-                />
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.cellTitle}>
-                <Text>PT:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <CheckBox
-                  value={item.PT && item.PT !== Constant.EMPTY_VALUE_STRING}
-                  onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
-                  style={styles.checkBox}
-                  boxType='square'
-                  disabled={false}
-                  onCheckColor={OPP_COLOR}
-                  onFillColor={BASE_COLOR}
-                  onTintColor={BASE_COLOR}
-                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                  animationDuration={0.2}
-                  onAnimationType='flat'
-                />
-              </View>
-              <View style={styles.cellTitle}>
-                <Text>PMI:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <CheckBox
-                  value={item.PMI && item.PMI !== Constant.EMPTY_VALUE_STRING}
-                  onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
-                  style={styles.checkBox}
-                  boxType='square'
-                  disabled={false}
-                  onCheckColor={OPP_COLOR}
-                  onFillColor={BASE_COLOR}
-                  onTintColor={BASE_COLOR}
-                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                  animationDuration={0.2}
-                  onAnimationType='flat'
-                />
-              </View>
-              <View style={styles.cellTitle}>
-                <Text>PAUT:</Text>
-              </View>
-              <View style={styles.cellData}>
-                <CheckBox
-                  value={item.PAUT && item.PAUT !== Constant.EMPTY_VALUE_STRING}
-                  onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
-                  style={styles.checkBox}
-                  boxType='square'
-                  disabled={false}
-                  onCheckColor={OPP_COLOR}
-                  onFillColor={BASE_COLOR}
-                  onTintColor={BASE_COLOR}
-                  tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                  animationDuration={0.2}
-                  onAnimationType='flat'
-                />
-              </View>
-            </View>
-          </>)}
+            </>
+        }
       </View>
     );
+  };
+  const RenderList = () => {
+    {
+      if (isSearching) {
+        return <ListLoadingData />
+      } else if (!spendList.length) {
+        return <ListEmptyData />
+      } else {
+        return <VirtualizedList
+          style={styles.table}
+          data={spendList}
+          getItemCount={data => data.length}
+          getItem={(data, index) => {
+            return data[index];
+          }}
+          keyExtractor={(item, index) => index}
+          renderItem={renderItem}
+        />
+      }
+    }
   };
 
   return (
@@ -643,7 +603,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
                       style={styles.inputText}
                       value={drawingNo}
                       onChangeText={_onChangeDrawingNo}
-                      onSubmitEditing={_onPressSearchDrawing}
                       underlineColorAndroid='transparent'
                     />
                     {drawingNo == ''
@@ -659,7 +618,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
                       style={styles.inputText}
                       value={weldNo}
                       onChangeText={_onChangeWeldNo}
-                      onSubmitEditing={_onPressSearchDrawing}
                       underlineColorAndroid='transparent'
                     />
                     {weldNo == ''
@@ -681,27 +639,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
               :
               null
           }
-          {isSearching
-            ?
-            <ListSearchData />
-            :
-            spendList.length
-              ?
-              <VirtualizedList
-                style={styles.table}
-                data={spendList}
-                getItemCount={(data) => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(index) => {
-                  return index;
-                }}
-                renderItem={renderItem}
-              />
-              :
-              <ListEmptyData />
-          }
+          <RenderList />
           <View style={styles.actionContainer}>
             <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
@@ -715,20 +653,21 @@ const QCSpendListScreen = ({ route, navigation }) => {
         onClose={() => setIsVisibleTotal(false)}
         onPressChangeLocation={_onPressChangeLocation}
         onPressClearLocation={_onPressClearLocation}
+        site={true}
       />
-      <Dialog.Container visible={isShowDialogRemark}>
-        <Dialog.Title>{'Enter remark REJECT:'}</Dialog.Title>
+      <Dialog.Container visible={isVisibleRemark}>
+        <Dialog.Title>{'Enter remark:'}</Dialog.Title>
         <Dialog.Input
           value={remarkDisplay}
           onChangeText={(text) => setRemarkDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialogRemark(false) }} />
-        <Dialog.Button label='OK' onPress={_onPressSubmitRemark} />
+        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleRemark(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeRemark} />
       </Dialog.Container>
     </SafeAreaView>
   );
-}
+};
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
