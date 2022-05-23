@@ -427,7 +427,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
     if (value) {
-      setDateDisplay(value);
+      setDateDisplay(new Date(Moment(value).format("YYYY-MM-DDT00:00:00")));
     } else {
       setDateDisplay(new Date());
     }
