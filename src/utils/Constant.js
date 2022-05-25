@@ -15,8 +15,9 @@ export default class Constant {
   static ROUTE__STR_QCWS = 'STR-QCWS';
 
   //-- CAMERA SOURCE
+  static CAMERA_PIP_CONS_DIM = 'CAMERA_PIP_CONS_DIM';
   static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
-  static CAMERA_QC_CONS = 'CAMERA_QC_CONS';
+  static CAMERA_PIP_QC = 'CAMERA_PIP_QC';
 
    //-- IMAGE ROLE
    static IMAGE_ROLE_CONS = 'CONS';
@@ -35,6 +36,7 @@ export default class Constant {
   static CODE_VISUAL = 'Visual';
   static CODE_CUT = 'Cut';
   static CODE_PAINT = 'Paint';
+  static CODE_DIM = 'Dim';
 
   // CODE IMAGE
   static CODE_MAN_HOURS_IMPACT = 'WOFactor';

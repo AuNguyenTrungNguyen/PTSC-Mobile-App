@@ -18,6 +18,8 @@ import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
 
 import HomeScreen from './screens/piping/HomeScreen';
+import PipingDimCuttingListScreen from './screens/piping/dim/DimCuttingListScreen';
+import PipingDimCuttingDetailScreen from './screens/piping/dim/DimCuttingDetailScreen';
 import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
 import AllStatusCameraScreen from './screens/piping/camera/AllStatusCameraScreen';
@@ -92,6 +94,26 @@ const PipingStackScreens = () => {
         options={
           {
             title: 'PTSC M&C',
+          }
+        }
+      />
+      <PipingStack.Screen
+        name='DimCuttingList'
+        component={PipingDimCuttingListScreen}
+        options={
+          {
+            title: 'Dim Cutting List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingStack.Screen
+        name='DimCuttingDetail'
+        component={PipingDimCuttingDetailScreen}
+        options={
+          {
+            title: 'Dim Cutting Detail',
+            headerBackTitle: 'Back',
           }
         }
       />

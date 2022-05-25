@@ -37,7 +37,6 @@ const HomeScreen = ({ route, navigation }) => {
       callAPI(getSpendNumbers);
     }, [isFocused]
   );
-
   const callAPI = executedAPI => {
     if (isFocused) {
       setIsLoading(true);
@@ -52,7 +51,6 @@ const HomeScreen = ({ route, navigation }) => {
       });
     }
   };
-
   const getSpendNumbers = async () => {
     let token = await Helper.getData('TOKEN');
     GetSpendNumbersAPI(projectCode, token)
@@ -72,6 +70,7 @@ const HomeScreen = ({ route, navigation }) => {
       });
   };
 
+  //-- Logout
   const _onPressLogout = () => {
     Alert.alert(
       'Logout',
@@ -83,34 +82,47 @@ const HomeScreen = ({ route, navigation }) => {
       { cancelable: false }
     );
   };
-
   const logout = () => {
     Helper.clearData();
     navigation.replace(Constant.ROUTE__LOGIN);
   };
 
-  const _onPressConstructionUpdate = () => {
-    navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
+
+  //-- Dim Cutting
+  const _onPressManageDimCutting = () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Dim Cuttting\n\nSearch: Search Dim Cutting List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeDimCutting },
+        { text: 'Search', onPress: _onPressSearchDimCutting },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeDimCutting = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        source: Constant.CAMERA_PIP_CONS_DIM,
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+  const _onPressSearchDimCutting = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'DimCuttingList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
   };
 
-  const _onPressQCUpdate = () => {
-    navigation.navigate('QCDrawingList', { projectCode: projectCode });
-  };
-
-  const _onPressNDTUpdate = () => {
-    navigation.navigate('NDT', {
-      screen: 'NDTManager',
-      params: { projectCode: projectCode },
-    });
-  };
-
-  const _onPressViewReports = () => {
-    navigation.navigate('Report', {
-      screen: 'ReportManager',
-      params: { projectCode: projectCode },
-    });
-  };
-
+  //-- CONS FitUp
   const _onPressQRCodeFitUp = async () => {
     let teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
@@ -124,6 +136,7 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- CONS Weld
   const _onPressQRCodeWeld = async () => {
     let teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
@@ -137,32 +150,30 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- QC FitUp
+  const _onPressMamageQCFitUp = () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code FitUp Drawing\n\nSpend List: Spend FitUp Request List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeFitUpQC },
+        { text: 'Spend List', onPress: _onPressQCSpendFitUpList },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
   const _onPressQRCodeFitUpQC = async () => {
     let teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
       'Camera',
       {
         code: Constant.CODE_FITUP,
-        source: Constant.CAMERA_QC_CONS,
+        source: Constant.CAMERA_PIP_QC,
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
     );
   };
-
-  const _onPressQRCodeVisualQC = async () => {
-    let teamLeader = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'Camera',
-      {
-        code: Constant.CODE_VISUAL,
-        source: Constant.CAMERA_QC_CONS,
-        projectCode: projectCode,
-        teamLeader: teamLeader,
-      }
-    );
-  };
-
   const _onPressQCSpendFitUpList = async () => {
     let userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
@@ -176,6 +187,30 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- QC Visual
+  const _onPressMamageQCVisual = () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code Visual Drawing\n\nSpend List: Spend Visual Request List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeVisualQC },
+        { text: 'Spend List', onPress: _onPressQCSpendVisualList },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeVisualQC = async () => {
+    let teamLeader = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        code: Constant.CODE_VISUAL,
+        source: Constant.CAMERA_PIP_QC,
+        projectCode: projectCode,
+        teamLeader: teamLeader,
+      }
+    );
+  };
   const _onPressQCSpendVisualList = async () => {
     let userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
@@ -189,6 +224,7 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- All status
   const _onPressQRCodeAllStatus = () => {
     navigation.navigate(
       'AllStatusCamera',
@@ -197,37 +233,12 @@ const HomeScreen = ({ route, navigation }) => {
       }
     );
   };
-
   const _onPressSearchAllStatus = () => {
     navigation.navigate(
       'DrawingSearch',
       {
         projectCode: projectCode,
       }
-    );
-  };
-
-  const _onPressMamageQCFitUp = () => {
-    Alert.alert(
-      '',
-      'Scan: Scan QR Code FitUp Drawing\n\nSpend List: Spend FitUp Request List',
-      [
-        { text: 'Scan', onPress: _onPressQRCodeFitUpQC },
-        { text: 'Spend List', onPress: _onPressQCSpendFitUpList },
-        { text: 'Cancel', style: 'cancel' }
-      ],
-    );
-  };
-
-  const _onPressMamageQCVisual = () => {
-    Alert.alert(
-      '',
-      'Scan: Scan QR Code Visual Drawing\n\nSpend List: Spend Visual Request List',
-      [
-        { text: 'Scan', onPress: _onPressQRCodeVisualQC },
-        { text: 'Spend List', onPress: _onPressQCSpendVisualList },
-        { text: 'Cancel', style: 'cancel' }
-      ],
     );
   };
 
@@ -267,6 +278,7 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Man-hour Impact
   const _onPressManHoursImpact = async () => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(Constant.ROUTE__COMMON, {
@@ -275,6 +287,26 @@ const HomeScreen = ({ route, navigation }) => {
         projectCode: projectCode,
         userLogin: userLogin,
       }
+    });
+  };
+
+  //-- Buttom Action
+  const _onPressConstructionUpdate = () => {
+    navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
+  };
+  const _onPressQCUpdate = () => {
+    navigation.navigate('QCDrawingList', { projectCode: projectCode });
+  };
+  const _onPressNDTUpdate = () => {
+    navigation.navigate('NDT', {
+      screen: 'NDTManager',
+      params: { projectCode: projectCode },
+    });
+  };
+  const _onPressViewReports = () => {
+    navigation.navigate('Report', {
+      screen: 'ReportManager',
+      params: { projectCode: projectCode },
     });
   };
 
@@ -318,6 +350,10 @@ const HomeScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
+            <View style={styles.row}>
+              <RenderItemBox title={'Cons\nDim Cutting'} onPress={_onPressManageDimCutting} />
+              <RenderItemBox title={'QC\nDim Cutting'} />
+            </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cons Scan\nFitUp'} onPress={_onPressQRCodeFitUp} />
               <RenderItemBox title={'Cons Scan\nWeld'} onPress={_onPressQRCodeWeld} />

@@ -6,6 +6,7 @@ import NetInfo from '@react-native-community/netinfo';
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 
+import { GetCurrentDimCuttingInfoAPI } from '../../../apis/piping/DimAPI';
 import { GetCurrentConstructionInfoAPI, CheckDrawingRevAPI } from '../../../apis/piping/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
@@ -76,47 +77,75 @@ const CameraScreen = ({ route, navigation }) => {
       if (!state.isConnected) {
         showComfirm('ERROR', 'Network not available!');
       } else {
-        GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
-          .then(res => {
-            if (res.Success && res.Data != null) {
-              if (source == Constant.CAMERA_PIP_CONS) {
-                navigation.navigate('DrawingDetail', {
+        if (source === Constant.CAMERA_PIP_CONS_DIM) {
+          GetCurrentDimCuttingInfoAPI(projectCode, drawingNo, sheet, rev, token)
+            .then(res => {
+              if (res.Success && res.Data != null) {
+                navigation.navigate('DimCuttingDetail', {
                   projectCode: projectCode,
-                  facilityCode: res.Data,
-                  drawingNo: drawingNo,
-                  sheet: sheet,
-                  rev: rev,
-                  code: code,
-                  teamLeader: teamLeader,
-                  title: code + ' Detail',
+                  CPName: drawingNo,
+                  CPSheet: sheet,
+                  CPRev: rev,
+                  userLogin: teamLeader,
                   link: res.Link,
                 });
+              } else if (res.Data == null) {
+                const message = 'Not find Data with: \n'
+                  + 'ProjectCode: ' + projectCode + '\n'
+                  + 'CPName: ' + drawingNo + '\n'
+                  + 'CPSheet: ' + sheet + '\n'
+                  + 'CPRev: ' + rev;
+                showComfirm('ERROR', message);
               } else {
-                navigation.navigate('QCDrawingDetail', {
-                  projectCode: projectCode,
-                  facilityCode: res.Data,
-                  drawingNo: drawingNo,
-                  sheet: sheet,
-                  rev: rev,
-                  code: code,
-                  teamLeader: teamLeader,
-                  title: 'QC ' + code + ' Detail',
-                  link: res.Link,
-                });
+                showComfirm('ERROR', 'Please check that you are using the company network!');
               }
-            } else if (res.Data == null) {
-              const message = 'Not find FacilityCode with: \n'
-                + 'ProjectCode: ' + projectCode + '\n'
-                + 'DrawingNo: ' + drawingNo + '\n'
-                + 'Sheet: ' + sheet + '\n'
-                + 'Rev: ' + rev;
-              showComfirm('ERROR', message);
-            } else {
+            }).catch(() => {
               showComfirm('ERROR', 'Please check that you are using the company network!');
-            }
-          }).catch(() => {
-            showComfirm('ERROR', 'Please check that you are using the company network!');
-          });
+            });
+        }
+        else {
+          GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+            .then(res => {
+              if (res.Success && res.Data != null) {
+                if (source == Constant.CAMERA_PIP_CONS) {
+                  navigation.navigate('DrawingDetail', {
+                    projectCode: projectCode,
+                    facilityCode: res.Data,
+                    drawingNo: drawingNo,
+                    sheet: sheet,
+                    rev: rev,
+                    code: code,
+                    teamLeader: teamLeader,
+                    title: code + ' Detail',
+                    link: res.Link,
+                  });
+                } else {
+                  navigation.navigate('QCDrawingDetail', {
+                    projectCode: projectCode,
+                    facilityCode: res.Data,
+                    drawingNo: drawingNo,
+                    sheet: sheet,
+                    rev: rev,
+                    code: code,
+                    teamLeader: teamLeader,
+                    title: 'QC ' + code + ' Detail',
+                    link: res.Link,
+                  });
+                }
+              } else if (res.Data == null) {
+                const message = 'Not find FacilityCode with: \n'
+                  + 'ProjectCode: ' + projectCode + '\n'
+                  + 'DrawingNo: ' + drawingNo + '\n'
+                  + 'Sheet: ' + sheet + '\n'
+                  + 'Rev: ' + rev;
+                showComfirm('ERROR', message);
+              } else {
+                showComfirm('ERROR', 'Please check that you are using the company network!');
+              }
+            }).catch(() => {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
+            });
+        }
       }
     });
   };
