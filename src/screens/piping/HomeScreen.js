@@ -14,7 +14,7 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 const HomeScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -88,7 +88,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
 
-  //-- Dim Cutting
+  //-- CONS Dim Cutting
   const _onPressManageDimCutting = () => {
     Alert.alert(
       '',
@@ -115,6 +115,18 @@ const HomeScreen = ({ route, navigation }) => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
       'DimCuttingList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+
+  //-- QC Dim Cutting
+  const _onPressDimCuttingQCList = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'DimCuttingQCList',
       {
         projectCode: projectCode,
         userLogin: userLogin,
@@ -350,9 +362,16 @@ const HomeScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
+            {
+              (spendNumbers.DimCutting)
+                ?
+                <View style={styles.line} />
+                :
+                null
+            }
             <View style={styles.row}>
               <RenderItemBox title={'Cons\nDim Cutting'} onPress={_onPressManageDimCutting} />
-              <RenderItemBox title={'QC\nDim Cutting'} />
+              <RenderItemBox title={'QC\nDim Cutting'} onPress={_onPressDimCuttingQCList} number={spendNumbers.DimCutting} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cons Scan\nFitUp'} onPress={_onPressQRCodeFitUp} />
@@ -432,6 +451,9 @@ const styles = StyleSheet.create({
 
   table: {
     flexGrow: 1,
+  },
+  line: {
+    height: 18,
   },
   row: {
     flex: 1,

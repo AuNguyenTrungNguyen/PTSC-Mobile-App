@@ -748,9 +748,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       array[index]['Heat02'] = valueClear;
       array[index]['SiteLocation'] = valueClear;
       array[index]['FittingTeam'] = valueClear;
-      // if (array[index]['ConType'] == 'TW') {
-      //   array[index]['QCFittupRemark'] = Constant.EMPTY_VALUE_STRING;
-      // }
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
@@ -879,10 +876,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>
                   <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-                  <Text> - ConType: </Text>
-                  <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.ConType)}</Text>
+                  <Text> - WeldType: </Text>
+                  <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.WeldType)}</Text>
                   {
-                    item.ConType == 'TW' && code == Constant.CODE_FITUP
+                    item.WeldType == 'TW' && code == Constant.CODE_FITUP
                       ?
                       <>
                         <Text>   </Text>
@@ -908,10 +905,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 <>
                   <Text>WeldNo: </Text>
                   <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-                  <Text> - ConType: </Text>
-                  <Text style={styles.textMeta}>{Formater.formatEmptyData(item.ConType)}</Text>
+                  <Text> - WeldType: </Text>
+                  <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
                   {
-                    item.ConType == 'TW' && code == Constant.CODE_FITUP
+                    item.WeldType == 'TW' && code == Constant.CODE_FITUP
                       ?
                       <>
                         <Text>   </Text>

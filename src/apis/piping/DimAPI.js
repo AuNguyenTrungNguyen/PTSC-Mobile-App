@@ -15,7 +15,6 @@ export const GetCurrentDimCuttingInfoAPI = (projectCode, drawingNo, sheet, rev, 
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-
 export const GetDimCuttingListAPI = (projectCode, facilityCode, drawingNo, token) =>
   fetch(
     Port_Server
@@ -29,9 +28,8 @@ export const GetDimCuttingListAPI = (projectCode, facilityCode, drawingNo, token
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-
-export const GetDimCuttingDetailAPI = async (projectCode, drawingNo, sheet, rev, token) => {
-  return fetch(
+export const GetDimCuttingDetailAPI = (projectCode, drawingNo, sheet, rev, token) =>
+  fetch(
     Port_Server
     + '/api/piping/GetDimCuttingDetail'
     + '?projectCode=' + projectCode
@@ -44,8 +42,6 @@ export const GetDimCuttingDetailAPI = async (projectCode, drawingNo, sheet, rev,
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-};
-
 export const UpdateDimCuttingDetailAPI = (userUpdate, listItemUpdate, location, team, token) =>
   fetch(
     Port_Server
@@ -57,5 +53,32 @@ export const UpdateDimCuttingDetailAPI = (userUpdate, listItemUpdate, location, 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ userUpdate, listItemUpdate, location, team }),
+    }
+  ).then(res => res.json());
+
+export const GetDimCuttingQCListAPI = (projectCode, drawingNo, weldNo, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetDimCuttingQCList'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&weldNo=' + weldNo,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+export const UpdateDimCuttingQCListAPI = (projectCode, userUpdate, listItemUpdate, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/UpdateDimCuttingQCList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, userUpdate, listItemUpdate }),
     }
   ).then(res => res.json());

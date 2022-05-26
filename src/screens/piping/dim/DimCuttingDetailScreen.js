@@ -181,6 +181,56 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
       setHeatNo(uniqueHeat.join(', '));
     }
   };
+  const [isAllCONS, setIsAllCONS] = useState(false);
+  const [isAllQC, setIsAllQC] = useState(false);
+  const _onChangeCheckboxFilter = data => {
+    if (data) {
+      data = new Date();
+    } else {
+      data = null;
+    }
+    const keyUpate = 'DateCuttingForCON';
+    let array = [...dimCuttingDetailList];
+    let arrayUpdate = [...dimCuttingUpdateList];
+    array.map(i => {
+      i[keyUpate] = data;
+
+      const objIndex = arrayUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+      if (objIndex < 0) {
+        arrayUpdate.push({ RowIndex: i.RowIndex, [keyUpate]: data });
+      } else {
+        arrayUpdate[objIndex][keyUpate] = data;
+      }
+      return i;
+    });
+    setDimCuttingDetailList(array);
+    setDimCuttingUpdateList(arrayUpdate);
+    setIsAllCONS(!!data);
+  };
+  const _onChangeCheckboxQCFilter = data => {
+    if (data) {
+      data = new Date();
+    } else {
+      data = null;
+    }
+    const keyUpate = 'DIM_ForCuttingDate';
+    let array = [...dimCuttingDetailList];
+    let arrayUpdate = [...dimCuttingUpdateList];
+    array.map(i => {
+      i[keyUpate] = data;
+
+      const objIndex = arrayUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+      if (objIndex < 0) {
+        arrayUpdate.push({ RowIndex: i.RowIndex, [keyUpate]: data });
+      } else {
+        arrayUpdate[objIndex][keyUpate] = data;
+      }
+      return i;
+    });
+    setDimCuttingDetailList(array);
+    setDimCuttingUpdateList(arrayUpdate);
+    setIsAllQC(!!data);
+  };
 
   //-- Data Action
   const [isShowNote, setIsShowNote] = useState(false);
@@ -351,7 +401,6 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
 
 
 
-
   return (
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
@@ -408,6 +457,41 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
             <RenderFilterItem data={'P.03'} />
             <RenderFilterItem data={'P.04'} />
           </View>
+          <View style={styles.dataRow}>
+            <View style={styles.cellData}>
+            </View>
+            <View style={styles.cellCheckbox}>
+              <CheckBox
+                value={isAllCONS}
+                onValueChange={newValue => _onChangeCheckboxFilter(newValue)}
+                style={styles.checkBox}
+                boxType='square'
+                disabled={false}
+                onCheckColor={OPP_COLOR}
+                onFillColor={BASE_COLOR}
+                onTintColor={BASE_COLOR}
+                tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
+                animationDuration={0.2}
+                onAnimationType='flat'
+              />
+            </View>
+            <View style={styles.cellCheckbox}>
+              <CheckBox
+                value={isAllQC}
+                onValueChange={newValue => _onChangeCheckboxQCFilter(newValue)}
+                style={styles.checkBox}
+                boxType='square'
+                disabled={false}
+                onCheckColor={OPP_COLOR}
+                onFillColor={QC_COLOR}
+                tintColor={QC_COLOR}
+                onTintColor={QC_COLOR}
+                tintColors={{ true: QC_COLOR, false: QC_COLOR }}
+                animationDuration={0.2}
+                onAnimationType='flat'
+              />
+            </View>
+          </View>
           {
             dimCuttingDetailList && dimCuttingDetailList.length
               ?
@@ -426,7 +510,6 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
               :
               <RenderList />
           }
-          {/* <RenderList /> */}
           <View style={styles.actionContainer}>
             <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitToServer}>
               <Text style={styles.buttonTitle}>Submit to Server</Text>
@@ -469,6 +552,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
         <Dialog.Button label='OK' onPress={_onChangeNote} />
       </Dialog.Container> */}
       <AwesomeAlert
+        progressColor={BASE_COLOR}
         show={isUploading}
         showProgress={true}
         closeOnTouchOutside={false}
@@ -517,7 +601,12 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-
+  dataRow: {
+    flexDirection: 'row',
+    margin: 4,
+    minHeight: 24,
+    marginBottom: 8
+  },
 
   filterContainer: {
     flexDirection: 'row',

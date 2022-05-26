@@ -20,6 +20,7 @@ import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWork
 import HomeScreen from './screens/piping/HomeScreen';
 import PipingDimCuttingListScreen from './screens/piping/dim/DimCuttingListScreen';
 import PipingDimCuttingDetailScreen from './screens/piping/dim/DimCuttingDetailScreen';
+import PipingDimCuttingQCListScreen from './screens/piping/dim/DimCuttingQCListScreen';
 import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
 import AllStatusCameraScreen from './screens/piping/camera/AllStatusCameraScreen';
@@ -113,6 +114,16 @@ const PipingStackScreens = () => {
         options={
           {
             title: 'Dim Cutting Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingStack.Screen
+        name='DimCuttingQCList'
+        component={PipingDimCuttingQCListScreen}
+        options={
+          {
+            title: 'QC Dim Cutting List',
             headerBackTitle: 'Back',
           }
         }
