@@ -42,7 +42,7 @@ export const GetDimCuttingDetailAPI = (projectCode, drawingNo, sheet, rev, token
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-export const UpdateDimCuttingDetailAPI = (userUpdate, listItemUpdate, location, team, token) =>
+export const UpdateDimCuttingDetailAPI = (projectCode, drawingNo, sheet, rev, userUpdate, listItemUpdate, listSecondUpdate, location, team, token) =>
   fetch(
     Port_Server
     + '/api/piping/UpdateDimCuttingDetail',
@@ -52,17 +52,18 @@ export const UpdateDimCuttingDetailAPI = (userUpdate, listItemUpdate, location, 
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userUpdate, listItemUpdate, location, team }),
+      body: JSON.stringify({ projectCode, drawingNo, sheet, rev, userUpdate, listItemUpdate, listSecondUpdate, location, team }),
     }
   ).then(res => res.json());
 
-export const GetDimCuttingQCListAPI = (projectCode, drawingNo, weldNo, token) =>
+export const GetDimCuttingQCListAPI = (projectCode, drawingNo, weldNo, location, token) =>
   fetch(
     Port_Server
     + '/api/piping/GetDimCuttingQCList'
     + '?projectCode=' + projectCode
     + '&drawingNo=' + drawingNo
-    + '&weldNo=' + weldNo,
+    + '&weldNo=' + weldNo
+    + '&location=' + location,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

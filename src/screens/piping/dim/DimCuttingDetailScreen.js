@@ -13,7 +13,7 @@ import {
   UpdateDimCuttingDetailAPI
 } from '../../../apis/piping/DimAPI';
 
-import { GetLocationListAPI, GetTeamListFilterAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListAPI, GetTeamListFilterAPI, GetSerialNoAndHeatNoListAPI } from '../../../apis/app/AppAPI';
 
 import Constant from '../../../utils/Constant';
 import Helper from '../../../utils/Helper';
@@ -23,6 +23,7 @@ import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
 import SelectPopup from '../../../components/SelectPopup';
+import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DimCuttingDetailScreen = ({ route, navigation }) => {
 
@@ -32,9 +33,11 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  const [isLocalChanged, setIsLocalChanged] = useState(false);
   const [dimCuttingBaseList, setDimCuttingBaseList] = useState([]);
   const [dimCuttingDetailList, setDimCuttingDetailList] = useState(null);
   const [dimCuttingUpdateList, setDimCuttingUpdateList] = useState([]);
+  const [dimCuttingSerialList, setDimCuttingSerialList] = useState([]);
 
   const [filterKey, setFilterKey] = useState('ALL');
   const [isVisibleHelp, setIsVisibleHelp] = useState(false);
@@ -95,20 +98,43 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
       const arrayPromise = [
         GetDimCuttingDetailAPI(projectCode, CPName, CPSheet, CPRev, token),
         GetLocationListAPI(projectCode, disciplineCode, token),
-        GetTeamListFilterAPI(projectCode, disciplineCode, Constant.CODE_FITUP, token)
+        GetTeamListFilterAPI(projectCode, disciplineCode, Constant.CODE_FITUP, token),
       ];
       await Promise.all(arrayPromise)
         .then(([dimDetailResult, locationResult, teamResult]) => {
           if (dimDetailResult.Success && locationResult.success && teamResult.Success) {
             setDimCuttingBaseList(dimDetailResult.Data.List);
             setDimCuttingDetailList(dimDetailResult.Data.List);
+            const keyUpateSerial = 'SerialNo';
+            const keyUpdateHeatNo = 'HeatNo';
+            if (!dimDetailResult.Data.ListSerial) {
+              dimDetailResult.Data.ListSerial = [];
+            }
+            let array = [...dimDetailResult.Data.ListSerial];
+            array.push({ CPItem: 'ALL', [keyUpateSerial]: '', [keyUpdateHeatNo]: '' });
+            setDimCuttingSerialList(array);
 
             setTeam(dimDetailResult.Data.Team);
-
             setLocation(dimDetailResult.Data.Location);
 
             setLocationList(locationResult.data);
-            setTeamList(teamResult.Data)
+            setTeamList(teamResult.Data);
+
+            if (dimDetailResult.Data.ItemCode) {
+              GetSerialNoAndHeatNoListAPI(projectCode, dimDetailResult.Data.ItemCode, token)
+                .then(res => {
+                  if (res.Success) {
+                    setSerialList(res.Data);
+                    setIsLoading(false);
+                    setIsError(false);
+                  } else {
+                    throw null
+                  }
+                })
+                .catch(() => {
+                  throw null
+                });
+            }
             setIsLoading(false);
             setIsError(false);
           } else {
@@ -136,7 +162,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     setIsUploading(true);
     const token = await Helper.getData('TOKEN');
     const listUpdate = Helper.handleListUpdate(dimCuttingUpdateList);
-    UpdateDimCuttingDetailAPI(userLogin, listUpdate, location, team, token)
+    UpdateDimCuttingDetailAPI(projectCode, CPName, CPSheet, CPRev, userLogin, listUpdate, dimCuttingSerialList, location, team, token)
       .then(res => {
         if (res.Success) {
           setDimCuttingUpdateList([]);
@@ -151,7 +177,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
       });
   };
   const _onPressSubmitToServer = async () => {
-    if (dimCuttingUpdateList.length) {
+    if (dimCuttingUpdateList.length || isLocalChanged) {
       callAPI(updateDimCuttingDetail, false);
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
@@ -166,20 +192,15 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     setFilterKey(value);
     if (value === 'ALL') {
       setDimCuttingDetailList(dimCuttingBaseList);
-      setSerialNo('');
-      setHeatNo('');
     } else {
       const array = dimCuttingBaseList.filter(i => i.CPItem === value);
       setDimCuttingDetailList(array);
-
-      const serials = array.map(i => i.SerialNo);
-      const uniqueSerial = [...new Set(serials)];
-      setSerialNo(uniqueSerial.join(', '));
-
-      const heats = array.map(i => i.HeatNo);
-      const uniqueHeat = [...new Set(heats)];
-      setHeatNo(uniqueHeat.join(', '));
     }
+    const arrayData = dimCuttingSerialList.filter(i => i.CPItem === value);
+    const serials = arrayData.map(i => i.SerialNo);
+    setSerialNo(serials);
+    const heats = arrayData.map(i => i.HeatNo);
+    setHeatNo(heats);
   };
   const [isAllCONS, setIsAllCONS] = useState(false);
   const [isAllQC, setIsAllQC] = useState(false);
@@ -193,13 +214,15 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     let array = [...dimCuttingDetailList];
     let arrayUpdate = [...dimCuttingUpdateList];
     array.map(i => {
-      i[keyUpate] = data;
+      if (i.DIM_ForCuttingRequestStatus !== 2) {
+        i[keyUpate] = data;
 
-      const objIndex = arrayUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
-      if (objIndex < 0) {
-        arrayUpdate.push({ RowIndex: i.RowIndex, [keyUpate]: data });
-      } else {
-        arrayUpdate[objIndex][keyUpate] = data;
+        const objIndex = arrayUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+        if (objIndex < 0) {
+          arrayUpdate.push({ RowIndex: i.RowIndex, [keyUpate]: data });
+        } else {
+          arrayUpdate[objIndex][keyUpate] = data;
+        }
       }
       return i;
     });
@@ -217,13 +240,15 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     let array = [...dimCuttingDetailList];
     let arrayUpdate = [...dimCuttingUpdateList];
     array.map(i => {
-      i[keyUpate] = data;
+      if (i.DIM_ForCuttingRequestStatus !== 2) {
+        i[keyUpate] = data;
 
-      const objIndex = arrayUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
-      if (objIndex < 0) {
-        arrayUpdate.push({ RowIndex: i.RowIndex, [keyUpate]: data });
-      } else {
-        arrayUpdate[objIndex][keyUpate] = data;
+        const objIndex = arrayUpdate.findIndex(obj => obj.RowIndex == i.RowIndex);
+        if (objIndex < 0) {
+          arrayUpdate.push({ RowIndex: i.RowIndex, [keyUpate]: data });
+        } else {
+          arrayUpdate[objIndex][keyUpate] = data;
+        }
       }
       return i;
     });
@@ -247,14 +272,48 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     // setIsShowNote(false);
   };
 
+  const [isVisibleSerial, setIsVisibleSerial] = useState(false);
+  const [serialList, setSerialList] = useState([]);
+  const [serialNo, setSerialNo] = useState('');
+  const [heatNo, setHeatNo] = useState('');
+  const _onChangeSerial = data => {
+    setIsLocalChanged(true);
+    const keyUpateSerial = 'SerialNo';
+    const keyUpdateHeatNo = 'HeatNo';
+    if (filterKey === 'ALL') {
+      let arrayALL = [];
+      arrayALL.push({ CPItem: 'ALL', [keyUpateSerial]: data.SeriNo, [keyUpdateHeatNo]: data.HeatNo_TagNo });
+      arrayALL.push({ CPItem: 'P.01', [keyUpateSerial]: data.SeriNo, [keyUpdateHeatNo]: data.HeatNo_TagNo });
+      arrayALL.push({ CPItem: 'P.02', [keyUpateSerial]: data.SeriNo, [keyUpdateHeatNo]: data.HeatNo_TagNo });
+      arrayALL.push({ CPItem: 'P.03', [keyUpateSerial]: data.SeriNo, [keyUpdateHeatNo]: data.HeatNo_TagNo });
+      arrayALL.push({ CPItem: 'P.04', [keyUpateSerial]: data.SeriNo, [keyUpdateHeatNo]: data.HeatNo_TagNo });
+      setDimCuttingSerialList(arrayALL);
+    } else {
+      let array = [...dimCuttingSerialList];
+      const objIndex = array.findIndex(obj => obj.CPItem === filterKey);
+      if (objIndex < 0) {
+        array.push({ CPItem: filterKey, [keyUpateSerial]: data.SeriNo, [keyUpdateHeatNo]: data.HeatNo_TagNo });
+      } else {
+        array[objIndex][keyUpateSerial] = data.SeriNo;
+        array[objIndex][keyUpdateHeatNo] = data.HeatNo_TagNo;
+      }
+      setDimCuttingSerialList(array);
+    }
+    setSerialNo(data.SeriNo);
+    setHeatNo(data.HeatNo_TagNo);
+    setIsVisibleSerial(false);
+  };
+
   const [isVisibleLocation, setIsVisibleLocation] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationList, setLocationList] = useState([]);
   const _onPressClearLocation = () => {
+    setIsLocalChanged(true);
     setLocation(null);
     setIsVisibleLocation(false);
   };
   const _onChangeLocation = data => {
+    setIsLocalChanged(true);
     setLocation(data);
     setIsVisibleLocation(false);
   };
@@ -263,10 +322,12 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
   const [team, setTeam] = useState(null);
   const [teamList, setTeamList] = useState([]);
   const _onPressClearTeam = () => {
+    setIsLocalChanged(true);
     setTeam(null);
     setIsVisibleTeam(false);
   };
   const _onChangeTeam = data => {
+    setIsLocalChanged(true);
     setTeam(data);
     setIsVisibleTeam(false);
   };
@@ -316,8 +377,6 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
 
 
   //-- Render Filter
-  const [serialNo, setSerialNo] = useState('');
-  const [heatNo, setHeatNo] = useState('');
   const RenderFilterItem = ({ data }) => {
     return (
       filterKey === data
@@ -348,11 +407,16 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     let valueQC = item.DIM_ForCuttingDate;
     const isChecked = !!value;
     const isCheckedQC = !!valueQC;
+    const resultStyle = item.DIM_ForCuttingRequestStatus === 2
+      ? styles.textAccept
+      : item.DIM_ForCuttingRequestStatus === 1
+        ? styles.textReject
+        : styles.textData;
     return (
       <View style={styles.box} key={item.RowIndex}>
         <View style={styles.row}>
           <View style={styles.cellData}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.CuttingPlanPiece)}</Text>
+            <Text style={resultStyle}>{Formater.formatEmptyData(item.CuttingPlanPiece)}</Text>
           </View>
           <View style={styles.cellCheckbox}>
             <CheckBox
@@ -360,7 +424,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
               onValueChange={newValue => _onChangeCheckbox(index, item.RowIndex, newValue)}
               style={styles.checkBox}
               boxType='square'
-              disabled={false}
+              disabled={item.DIM_ForCuttingRequestStatus === 2}
               onCheckColor={OPP_COLOR}
               onFillColor={BASE_COLOR}
               onTintColor={BASE_COLOR}
@@ -375,7 +439,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
               onValueChange={newValue => _onChangeCheckboxQC(index, item.RowIndex, newValue)}
               style={styles.checkBox}
               boxType='square'
-              disabled={false}
+              disabled={item.DIM_ForCuttingRequestStatus === 2}
               onCheckColor={OPP_COLOR}
               onFillColor={QC_COLOR}
               tintColor={QC_COLOR}
@@ -443,6 +507,8 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
               <Text style={styles.dataTitle}>Serial:</Text>
               <View style={styles.dataItem}>
                 <Text style={styles.dataText}>{serialNo}</Text>
+                <FontAwesomeIcon onPress={() => { setIsVisibleSerial(true) }}
+                  style={styles.dataIcon} name='pencil' size={24} color={BASE_COLOR} />
               </View>
               <Text style={styles.dataTitle}>Heat:</Text>
               <View style={styles.dataItem}>
@@ -526,6 +592,16 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
         </Dialog.Description>
         <Dialog.Button label='Cancle' onPress={() => { setIsVisibleHelp(false) }} />
       </Dialog.Container>
+      <SelectPopupTwoColumns
+        visible={isVisibleSerial}
+        leftHeader={'SeriNo'}
+        rightHeader={'HeatNo'}
+        leftKey={'SeriNo'}
+        rightKey={'HeatNo_TagNo'}
+        data={serialList}
+        onChangeItem={_onChangeSerial}
+        onCancel={() => setIsVisibleSerial(false)}
+      />
       <SelectPopup
         visible={isVisibleTeam}
         data={teamList}
@@ -675,6 +751,14 @@ const styles = StyleSheet.create({
   textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textAccept: {
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  textReject: {
+    fontWeight: 'bold',
+    color: 'red',
   },
 
   actionContainer: {

@@ -7,10 +7,12 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
+import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetDimCuttingQCListAPI, UpdateDimCuttingQCListAPI } from '../../../apis/piping/DimAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
+import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
@@ -34,6 +36,13 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleLocation(true) }}>
+            <Ionicons
+              size={24}
+              name={'md-list-circle-outline'} color={iconColor} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -78,12 +87,13 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     callAPI(getSpendListData);
   };
-  const getSpendListData = async (drawing = drawingNo, weld = weldNo) => {
+  const getSpendListData = async (drawing = drawingNo, weld = weldNo, loc = location) => {
     const token = await Helper.getData('TOKEN');
-    GetDimCuttingQCListAPI(projectCode, drawing, weld, token)
+    GetDimCuttingQCListAPI(projectCode, drawing, weld, loc, token)
       .then(res => {
         if (res.Success && res.Data) {
           setSpendList(res.Data);
+          setLocationList(res.Second);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -160,6 +170,24 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
     }
   };
 
+  //-- Location
+  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
+  const [locationList, setLocationList] = useState([]);
+  const [location, setLocation] = useState('');
+  const _onPressChangeLocation = loc => {
+    _onChangeLocation(loc);
+  };
+  const _onPressClearLocation = () => {
+    _onChangeLocation('');
+  };
+  const _onChangeLocation = loc => {
+    if (loc != location) {
+      setLocation(loc);
+      callAPI(() => { getSpendListData(drawingNo, weldNo, loc) });
+    }
+    setIsVisibleLocation(false);
+  };
+
 
 
   //-- Render List
@@ -170,12 +198,12 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
           <View style={styles.cellTitle}>
             <Text>CPName:</Text>
           </View>
-          <View style={styles.cellDrawingAction}>
+          <View style={styles.cellTitleLine}>
             {
               item.WebLink
                 ?
-                <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Dim Cutting Drawing')}>
-                  <Text style={styles.textDataOpen}>{Formater.formatEmptyData(item.CuttingPlanName)}</Text>
+                <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Dim Cutting Drawing')} style={styles.textData}>
+                  <Text style={CoreStyle.textLinkWithLine}>{Formater.formatEmptyData(item.CuttingPlanName)}</Text>
                 </TouchableOpacity>
                 :
                 <Text style={styles.textData}>{Formater.formatEmptyData(item.CuttingPlanName)}</Text>
@@ -186,7 +214,7 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
           <View style={styles.cellTitle}>
             <Text>CPPiece:</Text>
           </View>
-          <View style={styles.cellDrawingAction}>
+          <View style={styles.cellTitleLine}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.CuttingPlanPiece)}</Text>
           </View>
         </View>
@@ -206,48 +234,49 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
-            <Text>Team:</Text>
+            <Text>SerialNo:</Text>
           </View>
-          <View style={styles.cellDrawingAction}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.DIM_ForCuttingRequestByTeam)}</Text>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.SerialNo)}</Text>
+          </View>
+          <View style={styles.cellTitle}>
+            <Text>HeatNo:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.HeatNo)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
-            <Text>CuttingDate:</Text>
+            <Text>Length:</Text>
           </View>
           <View style={styles.cellData}>
-            <Text style={styles.textData}>{Formater.formatDateData(item.DIM_ForCuttingDate)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.LENGTH_MM)}</Text>
           </View>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonAccept}
-              onPress={() => _onPressChangeStatus('ACC', index, 'DIM_ForCuttingResult')}>
-              <Text style={styles.labelAccept}>Accept</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.row}>
           <View style={styles.cellTitle}>
             <Text>Location:</Text>
           </View>
           <View style={styles.cellData}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
           </View>
-          <View style={styles.cellAction}>
-            {/* <TouchableOpacity onPress={() => _onPressShowRemark(item.QCFittupRemark, index, 'QCFittupRemark')}>
-              <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
-            </TouchableOpacity> */}
-            <TouchableOpacity
-              style={styles.buttonReject}
-              onPress={() => _onPressChangeStatus('REJ', index, 'DIM_ForCuttingResult')}>
-              <Text style={styles.labelReject}>Reject</Text>
-            </TouchableOpacity>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text>Team:</Text>
+          </View>
+          <View style={styles.cellTitleLine}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.DIM_ForCuttingRequestByTeam)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
-            <Text>FitUpStatus:</Text>
+            <Text>CutDate:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{Formater.formatDateData(item.DIM_ForCuttingDate)}</Text>
+          </View>
+          <View style={styles.cellTitle}>
+            <Text>Status:</Text>
           </View>
           <View style={styles.cellData}>
             {
@@ -261,6 +290,22 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
                 :
                 <Text style={styles.textData}>{Formater.formatEmptyData(item.DIM_ForCuttingResult)}</Text>
             }
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellAction}>
+            <TouchableOpacity
+              style={styles.buttonAccept}
+              onPress={() => _onPressChangeStatus('ACC', index, 'DIM_ForCuttingResult')}>
+              <Text style={styles.labelAccept}>Accept</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.cellAction}>
+            <TouchableOpacity
+              style={styles.buttonReject}
+              onPress={() => _onPressChangeStatus('REJ', index, 'DIM_ForCuttingResult')}>
+              <Text style={styles.labelReject}>Reject</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.cellAction}>
             <TouchableOpacity
@@ -285,88 +330,96 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
-        :
-        <View style={styles.container}>
-          {
-            isShowDescription.show
-              ?
-              (<View style={styles.headerContainer}>
-                <View style={styles.rowInfo}>
-                  <Text>Project: </Text>
-                  <Text style={[styles.infoData]}>{projectCode}</Text>
-                  <Text>   User: </Text>
-                  <Text style={[styles.infoData]}>{userLogin}</Text>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction}>CPName:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={drawingNo}
-                      onChangeText={_onChangeDrawingNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {
-                      drawingNo == ''
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
+          :
+          <View style={styles.container}>
+            {
+              isShowDescription.show
+                ?
+                (<View style={styles.headerContainer}>
+                  <View style={styles.rowInfo}>
+                    <Text>Project: </Text>
+                    <Text style={[styles.infoData]}>{projectCode}</Text>
+                    <Text>   User: </Text>
+                    <Text style={[styles.infoData]}>{userLogin}</Text>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>CPName:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={drawingNo}
+                        onChangeText={_onChangeDrawingNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        drawingNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>CPPiece:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {weldNo == ''
                         ? null
-                        : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
-                    }
+                        : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
                   </View>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction}>CPPiece:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={weldNo}
-                      onChangeText={_onChangeWeldNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {weldNo == ''
-                      ? null
-                      : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
-                    }
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction} />
+                    <TouchableOpacity
+                      style={styles.searchButton}
+                      onPress={_onPressSearchDrawing}
+                      disabled={isSearching}>
+                      <Text style={styles.buttonTitle}>Search Dim Cutting</Text>
+                    </TouchableOpacity>
                   </View>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction} />
-                  <TouchableOpacity
-                    style={styles.searchButton}
-                    onPress={_onPressSearchDrawing}
-                    disabled={isSearching}>
-                    <Text style={styles.buttonTitle}>Search Dim Cutting</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>)
-              :
-              null
-          }
-          {
-            spendList && spendList.length
-              ?
-              <VirtualizedList
-                style={styles.table}
-                data={spendList}
-                getItemCount={data => data.length}
-                getItem={(data, index) => {
-                  return data[index];
-                }}
-                keyExtractor={(item, index) => index}
-                renderItem={renderItem}
-              />
-              :
-              <RenderList />
-          }
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
-              <Text style={styles.buttonTitle}>Submit to Server</Text>
-            </TouchableOpacity>
+                </View>)
+                :
+                null
+            }
+            {
+              spendList && spendList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={spendList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderList />
+            }
+            <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
+                <Text style={styles.buttonTitle}>Submit to Server</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
       }
+      <TotalLocationModal
+        visible={isVisibleLocation}
+        data={locationList}
+        onClose={() => setIsVisibleLocation(false)}
+        onPressChangeLocation={_onPressChangeLocation}
+        onPressClearLocation={_onPressClearLocation}
+      />
     </SafeAreaView>
   );
 };
@@ -461,43 +514,19 @@ const styles = StyleSheet.create({
     padding: 4,
     minHeight: 20,
   },
-  textData: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-  },
-  textDataOpen: {
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    textDecorationLine: 'underline',
-    color: BASE_COLOR,
-  },
   cellTitle: {
     flex: 1,
     justifyContent: 'center',
   },
   cellTitleLine: {
-    flexDirection: 'row',
-    flex: 3,
-    alignItems: 'center',
-  },
-  cellWelder: {
-    flex: 2,
+    flex: 3.5,
     justifyContent: 'center',
   },
   cellData: {
-    flex: 1,
+    flex: 1.25,
     justifyContent: 'center',
   },
-  cellDrawingAction: {
-    flex: 3,
-    justifyContent: 'center',
-  },
-  cellImageAction: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textMeta: {
+  textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
@@ -511,8 +540,7 @@ const styles = StyleSheet.create({
   },
   cellAction: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   buttonAccept: {
@@ -520,7 +548,8 @@ const styles = StyleSheet.create({
     borderColor: 'green',
     borderWidth: 1,
     borderRadius: 4,
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -532,7 +561,8 @@ const styles = StyleSheet.create({
     borderColor: 'red',
     borderWidth: 1,
     borderRadius: 4,
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -544,7 +574,8 @@ const styles = StyleSheet.create({
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 4,
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center'
   },

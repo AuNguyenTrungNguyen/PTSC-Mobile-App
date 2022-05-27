@@ -94,6 +94,19 @@ export const GetHeatNoListAPI = (projectCode, itemCode, token) =>
       },
     }).then(res => res.json());
 
+export const GetSerialNoAndHeatNoListAPI = (projectCode, itemCode, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetSerialNoAndHeatNoList'
+    + '?projectCode=' + projectCode
+    + '&itemCode=' + itemCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 export const GetWelderListAPI = (projectCode, id, name, token) =>
   fetch(
     Port_Server
