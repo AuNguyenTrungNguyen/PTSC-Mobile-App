@@ -30,7 +30,6 @@ import DrawingAllStatusScreen from './screens/piping/drawing/DrawingAllStatusScr
 import DrawingDetailScreen from './screens/piping/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/piping/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/piping/drawing/DrawingAddWelderScreen';
-import DrawingAddHeatNoScreen from './screens/piping/drawing/DrawingAddHeatNoScreen';
 import SpoolMatrixScreen from './screens/piping/spool/SpoolMatrixScreen';
 import SpoolCameraScreen from './screens/piping/spool/SpoolCameraScreen';
 import HydrotestListScreen from './screens/piping/hydrotest/HydrotestListScreen';
@@ -214,16 +213,6 @@ const PipingStackScreens = () => {
         options={
           {
             title: 'Select Welders',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DrawingAddHeatNo'
-        component={DrawingAddHeatNoScreen}
-        options={
-          {
-            title: 'Select HeatNo',
             headerBackTitle: 'Back',
           }
         }

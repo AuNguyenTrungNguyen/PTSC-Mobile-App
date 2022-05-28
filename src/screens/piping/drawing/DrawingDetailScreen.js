@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -16,7 +16,7 @@ import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/ConstructionAPI';
-import { GetLocationListAPI, GetHeatNoListAPI, GetTeamListFilterAPI, GetWPSListAPI, } from '../../../apis/app/AppAPI';
+import { GetLocationListAPI, GetSerialNoAndHeatNoListAPI, GetTeamListFilterAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -24,6 +24,7 @@ import Header from '../../../components/Header';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
+import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DrawingDetailScreen = ({ route, navigation }) => {
 
@@ -34,15 +35,12 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
-  // const [errorList, setErrorList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   useEffect(
     () => {
       if (route.params?.welderSelected) {
         _onChangeWelders(route.params?.welderSelected);
-      } else if (route.params?.heatNoSelected) {
-        _onChangeHeatNo(route.params?.heatNoSelected);
       }
       else {
         callAPI(getConstructionDetail);
@@ -97,6 +95,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Get Data
   const getConstructionDetail = async () => {
     const token = await Helper.getData('TOKEN');
     GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
@@ -116,163 +115,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       });
   };
 
-  // const handleDataUpdateFitup = () => {
-  //   updateDrawingList.forEach(element => {
-  //     const data = detailDrawingList.find(i => i.RowIndex === element['RowIndex'] && i.WeldNo === element['WeldNo']);
-  //     if (!element.hasOwnProperty('ItemDate')) {
-  //       element['ItemDate'] = data['FittingDate'];
-  //     }
-  //     if (!element.hasOwnProperty('ItemPercent')) {
-  //       element['ItemPercent'] = data['FitPercentage'];
-  //     }
-  //     if (!element.hasOwnProperty('Heat01')) {
-  //       element['Heat01'] = data['Heat01'];
-  //     }
-  //     if (!element.hasOwnProperty('Heat02')) {
-  //       element['Heat02'] = data['Heat02'];
-  //     }
-  //     if (!element.hasOwnProperty('Location')) {
-  //       element['Location'] = data['Location'];
-  //     }
-  //     if (!element.hasOwnProperty('FittingTeam')) {
-  //       element['FittingTeam'] = data['FittingTeam'];
-  //     }
-  //     if (!element.hasOwnProperty('QCFittupRemark')) {
-  //       element['QCFittupRemark'] = data['QCFittupRemark'];
-  //     }
 
-  //     // Check CLEAR
-  //     if (!element['ItemDate']
-  //       && !element['ItemPercent']
-  //       && !element['Heat01']
-  //       && !element['Heat02']
-  //       && !element['Location']
-  //       && !element['FittingTeam']
-  //       && (!element['QCFittupRemark'] || element['QCFittupRemark'] == Constant.EMPTY_VALUE_STRING)) {
-  //       element['IsClear'] = true;
-  //     }
-  //   });
-  //   callAPI(updateDrawingDetailFitUp);
-  // };
-  // const updateDrawingDetailFitUp = async () => {
-  //   const token = await Helper.getData('TOKEN');
-  //   let errorListData = [];
-  //   let doneListData = [];
-
-  //   doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Heat01 && i.Heat02 && i.Location && i.FittingTeam) || i.IsClear);
-  //   const doneIds = doneListData.map(i => i.RowIndex);
-  //   errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
-
-  //   if (errorListData.length) {
-  //     const errorIds = errorListData.map(i => i.RowIndex);
-  //     setErrorList(errorIds);
-  //   } else {
-  //     setErrorList([]);
-  //   }
-  //   if (doneListData.length) {
-  //     setIsUploading(true);
-  //     UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, doneListData, token)
-  //       .then(res => {
-  //         if (res.success) {
-  //           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-  //         } else {
-  //           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         }
-  //         if (errorListData.length) {
-  //           setUpdateDrawingList(errorListData);
-  //         } else {
-  //           setUpdateDrawingList([]);
-  //         }
-  //         setIsUploading(false);
-  //       }).catch(() => {
-  //         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         setIsUploading(false);
-  //       });
-  //   }
-  // };
-  // const handleDataUpdateWeld = () => {
-  //   updateDrawingList.forEach(element => {
-  //     const data = detailDrawingList.find(i => i.RowIndex === element['RowIndex'] && i.WeldNo === element['WeldNo']);
-  //     if (!element.hasOwnProperty('ItemDate')) {
-  //       element['ItemDate'] = data['WeldingDate'];
-  //     }
-  //     if (!element.hasOwnProperty('ItemPercent')) {
-  //       element['ItemPercent'] = data['WeldPercentage'];
-  //     }
-  //     if (!element.hasOwnProperty('WelderID')) {
-  //       element['WelderID'] = data['WelderID'];
-  //     }
-  //     if (!element.hasOwnProperty('WPSNo')) {
-  //       element['WPSNo'] = data['WPSNo'];
-  //     }
-  //     // Check CLEAR
-  //     if (!element['ItemDate'] && !element['ItemPercent'] && !element['WelderID'] && !element['WPSNo']) {
-  //       element['IsClear'] = true;
-  //     }
-  //   });
-  //   callAPI(updateDrawingDetailWeld);
-  // };
-  // const updateDrawingDetailWeld = async () => {
-  //   const token = await Helper.getData('TOKEN');
-  //   let errorListData = [];
-  //   let doneListData = [];
-
-  //   doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.WelderID && i.WPSNo) || i.IsClear);
-  //   const doneIds = doneListData.map(i => i.RowIndex);
-  //   errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
-
-  //   if (errorListData.length) {
-  //     const errorIds = errorListData.map(i => i.RowIndex);
-  //     setErrorList(errorIds);
-  //   } else {
-  //     setErrorList([]);
-  //   }
-  //   if (doneListData.length) {
-  //     setIsUploading(true);
-  //     UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, doneListData, token)
-  //       .then(res => {
-  //         if (res.success) {
-  //           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-  //         } else {
-  //           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         }
-  //         if (errorListData.length) {
-  //           setUpdateDrawingList(errorListData);
-  //         } else {
-  //           setUpdateDrawingList([]);
-  //         }
-  //         setIsUploading(false);
-  //       }).catch(() => {
-  //         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         setIsUploading(false);
-  //       });
-  //   }
-  // };
-
-  //-- ABC
-  // const _onPressSubmitToServer = async () => {
-  //   if (updateDrawingList.length) {
-  //     if (code == Constant.CODE_FITUP) {
-  //       handleDataUpdateFitup();
-  //     }
-  //     else {
-  //       handleDataUpdateWeld();
-  //     }
-  //   } else {
-  //     Toast.show('No any data changes!', Toast.SHORT);
-  //   }
-  // };
-
-  // Submit to Server
-
+  // Submit Data
   const checkConstructionDetail = () => {
     let messages = [];
     if (code == Constant.CODE_FITUP) {
       updateDrawingList.map(item => {
         const date = item['FittingDate'];
         const percent = item['FitPercentage'];
-        // const heat01 = item['Heat01'];
-        // const heat02 = item['Heat02'];
         const location = item['SiteLocation'];
         const team = item['FittingTeam'];
 
@@ -305,9 +155,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         const percent = item['WeldPercentage'];
         const welderId = item['WelderID'];
         const wspNo = item['WPSNo'];
+        const team = item['WelderTeam'];
 
-        if ((date && percent && welderId && wspNo)
-          || (!date && !percent && !welderId && !wspNo)) {
+        if ((date && percent && welderId && wspNo && team)
+          || (!date && !percent && !welderId && !wspNo && !team)) {
           return item;
         }
 
@@ -326,6 +177,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('WPSNo') >= 0 && !wspNo) || (column.indexOf('WPSNo') < 0 && !oldItem['WPSNo'])) {
           messages.push('WPSNo');
+        }
+        if ((column.indexOf('WelderTeam') >= 0 && !team) || (column.indexOf('WelderTeam') < 0 && !oldItem['WelderTeam'])) {
+          messages.push('Team');
         }
         return item;
       });
@@ -382,6 +236,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Update Local Data
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
   const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate) => {
@@ -471,20 +326,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       setIndexUpdate(index);
       setKeyUpdate(key);
       onChangeData(value, index, key);
-      // let array = [...detailDrawingList];
-      // array[index][key] = value;
-      // setDetailDrawingList(array);
-
-      // array = [...updateDrawingList];
-      // let rowIndex = detailDrawingList[index].RowIndex;
-      // let weldNo = detailDrawingList[index].WeldNo;
-      // let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-      // if (objIndex < 0) {
-      //   array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemPercent']: value });
-      // } else {
-      //   array[objIndex]['ItemPercent'] = detailDrawingList[index][key];
-      // }
-      // setUpdateDrawingList(array);
     }
   };
 
@@ -506,11 +347,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const getHeatNoList = async value => {
     const token = await Helper.getData('TOKEN');
-    GetHeatNoListAPI(projectCode, value, token)
-    // GetHeatNoListPopupAPI(projectCode, value, token)
+    GetSerialNoAndHeatNoListAPI(projectCode, value, token)
       .then(res => {
-        if (res.success) {
-          setHeatNoList(res.data);
+        if (res.Success) {
+          setHeatNoList(res.Data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -530,7 +370,19 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setIsVisibleHeatNo(false);
   };
   const _onChangeHeatNo = data => {
-    onChangeData(data);
+    let heatNoData = '';
+    let seriNoData = '';
+    if (data) {
+      heatNoData = data.HeatNo_TagNo;
+      seriNoData = data.SeriNo;
+    }
+    if (keyUpdate === 'Heat01') {
+      onChangeData(heatNoData);
+      onChangeData(seriNoData, indexUpdate, 'SerialNo01');
+    } else if (keyUpdate === 'Heat02') {
+      onChangeData(heatNoData);
+      onChangeData(seriNoData, indexUpdate, 'SerialNo02');
+    }
     setIsVisibleHeatNo(false);
   };
 
@@ -695,46 +547,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     onChangeData(welderSelected);
   };
 
-  // const _onPressSelectHeatNo = (value, index, key) => {
-  //   setIndexUpdate(index);
-  //   setKeyUpdate(key);
-  //   navigation.navigate(
-  //     'DrawingAddHeatNo',
-  //     {
-  //       projectCode: projectCode,
-  //       itemCode: value,
-  //       index: index,
-  //     }
-  //   );
-  // };
-  // const _onChangeHeatNo = data => {
-  //   let array = [...detailDrawingList];
-  //   array[indexUpdate][keyUpdate] = !data ? null : data.HeatNo_TagNo;
-  //   setDetailDrawingList(array);
-
-  //   array = [...updateDrawingList];
-  //   let rowIndex = detailDrawingList[indexUpdate].RowIndex;
-  //   let weldNo = detailDrawingList[indexUpdate].WeldNo;
-  //   let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-  //   if (objIndex < 0) {
-  //     if (keyUpdate == 'Heat01') {
-  //       array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo01']: !data ? null : data.SeriNo, ['ItemDescription01']: !data ? null : data.ItemDescription });
-  //     } else {
-  //       array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo02']: !data ? null : data.SeriNo, ['ItemDescription02']: !data ? null : data.ItemDescription });
-  //     }
-  //   } else {
-  //     array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
-  //     if (keyUpdate == 'Heat01') {
-  //       array[objIndex]['SeriNo01'] = !data ? null : data.SeriNo;
-  //       array[objIndex]['ItemDescription01'] = !data ? null : data.ItemDescription;
-  //     } else {
-  //       array[objIndex]['SeriNo02'] = !data ? null : data.SeriNo;
-  //       array[objIndex]['ItemDescription02'] = !data ? null : data.ItemDescription;
-  //     }
-  //   }
-  //   setUpdateDrawingList(array);
-  // };
-
   const _onPressClearNow = (index) => {
     const keyDate = code == Constant.CODE_FITUP ? 'FittingDate' : 'WeldingDate';
     const keyPercent = code == Constant.CODE_FITUP ? 'FitPercentage' : 'WeldPercentage';
@@ -746,11 +558,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     if (code == Constant.CODE_FITUP) {
       array[index]['Heat01'] = valueClear;
       array[index]['Heat02'] = valueClear;
+      array[index]['SerialNo01'] = valueClear;
+      array[index]['SerialNo02'] = valueClear;
       array[index]['SiteLocation'] = valueClear;
       array[index]['FittingTeam'] = valueClear;
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
+      array[index]['WelderTeam'] = valueClear;
     }
     setDetailDrawingList(array);
 
@@ -774,7 +589,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           [keyDate]: valueClear,
           [keyPercent]: valueClear,
           ['WelderID']: valueClear,
-          ['WPSNo']: valueClear
+          ['WPSNo']: valueClear,
+          ['WelderTeam']: valueClear,
         });
       }
     } else {
@@ -788,6 +604,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       } else {
         array[objIndex]['WelderID'] = valueClear;
         array[objIndex]['WPSNo'] = valueClear;
+        array[objIndex]['WelderTeam'] = valueClear;
       }
     }
     setUpdateDrawingList(array);
@@ -815,6 +632,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setUpdateDrawingList(array);
   };
 
+
   //-- Render Header
   const headerData = {
     'Project': projectCode,
@@ -827,6 +645,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const headerAction = () => {
     Helper.openDrawingPDF(navigation, link, 'PIP CONS Drawing')
   };
+
 
   //-- Render Detail
   const RenderConstructionDetail = () => {
@@ -841,30 +660,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const renderItem = ({ index, item }) => {
     const itemDate = code == Constant.CODE_FITUP ? item['FittingDate'] : item['WeldingDate'];
     const itemPercent = code == Constant.CODE_FITUP ? item['FitPercentage'] : item['WeldPercentage'];
-
     const isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
     const isEnableClear = itemDate || itemPercent;
-
-    // let isDateValid = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
-    // let isPercentValid = itemPercent != null && itemPercent == 100;
-    // let isUpdateValid = updateDrawingList.findIndex((obj => obj.RowIndex == item.RowIndex)) < 0;
-
-    // let isDisableItem = isDateValid && isPercentValid && isUpdateValid;
-    // let checkHasData = code == Constant.CODE_FITUP  ? (itemDate || itemPercent) : (itemDate || itemPercent || item['WelderID']);
-    // let isUserError = errorList.indexOf(item.RowIndex) > -1;
-
-    // let isDisableByProject = false;
-    // if (itemDate) {
-    //   let nowString = Moment(new Date()).format("YYYY-MM-DD");
-    //   let now = Moment(nowString, "YYYY-MM-DD");
-    //   let dateString = Moment(itemDate, "YYYY-MM-DD");
-    //   let date = Moment(dateString, "YYYY-MM-DD");
-    //   isDisableByProject = Moment.duration(now.diff(date)).asDays() > 1 ? true : false;
-    // }
-    // isDisableByProject = isUpdateValid && isDisableByProject;
-
-    // const isCompleteText = projectCode === 'DNWHP' ? isDisableByProject : isDisableItem;
-    // isDisableItem = false;
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
@@ -1039,8 +836,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellDataLine}>
                   {
-                    // item.ItemCode01
-                    // ?
                     <TouchableOpacity
                       style={styles.itemActionIcon}
                       onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
@@ -1053,19 +848,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                           <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                       }
                     </TouchableOpacity>
-                    // :
-                    // <TouchableOpacity
-                    //   style={styles.itemActionIcon}
-                    //   onPress={() => _onPressSelectHeatNo(item.ItemCode01, index, 'Heat01')}>
-                    //   <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
-                    //   {
-                    //     isDisableItem
-                    //       ?
-                    //       <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                    //       :
-                    //       <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                    //   }
-                    // </TouchableOpacity>
                   }
                 </View>
               </View>
@@ -1083,8 +865,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellDataLine}>
                   {
-                    // item.ItemCode02
-                    //   ?
                     <TouchableOpacity
                       style={styles.itemActionIcon}
                       onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
@@ -1097,19 +877,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                           <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                       }
                     </TouchableOpacity>
-                    //   :
-                    //   <TouchableOpacity
-                    //     style={styles.itemActionIcon}
-                    //     onPress={() => _onPressSelectHeatNo(item.ItemCode02, index, 'Heat02')}>
-                    //     <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
-                    //     {
-                    //       isDisableItem
-                    //         ?
-                    //         <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                    //         :
-                    //         <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                    //     }
-                    //   </TouchableOpacity>
                   }
                 </View>
               </View>
@@ -1265,11 +1032,31 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>WelderTeam:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowTeamPopup(index, 'WelderTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderTeam)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
             </>
         }
       </View>
     );
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -1341,14 +1128,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         <Dialog.Button label='Cancle' onPress={() => { setIsVisiblePercent(false) }} />
         <Dialog.Button label='OK' onPress={_onChangePercent} />
       </Dialog.Container>
-      <SelectPopup
-        visible={isVisibleHeatNo}
-        data={heatNoList}
-        onChangeItem={_onChangeHeatNo}
-        onCancel={() => setIsVisibleHeatNo(false)}
-        onClear={_onPressClearHeatNo}
-      />
-      {/* <SelectPopupTwoColumns
+      <SelectPopupTwoColumns
         visible={isVisibleHeatNo}
         leftHeader={'HeatNo'}
         rightHeader={'SeriNo'}
@@ -1358,7 +1138,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         onChangeItem={_onChangeHeatNo}
         onCancel={() => setIsVisibleHeatNo(false)}
         onClear={_onPressClearHeatNo}
-      /> */}
+      />
       <SelectPopup
         visible={isVisibleLocation}
         data={locationList}

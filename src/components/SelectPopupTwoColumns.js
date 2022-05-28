@@ -88,7 +88,7 @@ const modals = StyleSheet.create({
   list: {
     padding: 16,
     width: windowWidth * 0.85,
-    height: undefined,
+    maxHeight: windowHeight * 0.85 - 36 - 16,
   },
   row: {
     flexDirection: 'row',
