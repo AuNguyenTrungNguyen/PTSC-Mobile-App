@@ -72,15 +72,17 @@ export const UpdateQCDetailAPI = (projectCode, facilityCode, userUpdate, code, l
     }
   ).then(res => res.json());
 
-export const GetSpendListAPI = (projectCode, drawingNo, weldNo, siteLocaion, code, token) =>
+export const GetSpendListAPI = (projectCode, facilityCode, drawingNo, weldNo, siteLocaion, code, ndtFilter, token) =>
   fetch(
     Port_Server
     + '/api/piping/GetSpendList'
     + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
     + '&weldNo=' + weldNo
     + '&siteLocation=' + siteLocaion
-    + '&code=' + code,
+    + '&code=' + code
+    + '&filterType=' + ndtFilter,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -88,7 +90,7 @@ export const GetSpendListAPI = (projectCode, drawingNo, weldNo, siteLocaion, cod
       },
     }).then(res => res.json());
 
-export const UpdateSpendListAPI = (projectCode, userUpdate, code, listItemUpdate, token)=>
+export const UpdateSpendListAPI = (projectCode, userUpdate, code, listItemUpdate, token) =>
   fetch(
     Port_Server
     + '/api/piping/UpdateSpendList',

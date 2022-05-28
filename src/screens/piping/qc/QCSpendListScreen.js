@@ -11,12 +11,14 @@ import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
 
+import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
 import { GetSpendListAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
+import SelectPopup from '../../../components/SelectPopup';
 
 const QCSpendListScreen = ({ route, navigation }) => {
 
@@ -29,12 +31,8 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const [spendList, setSpendList] = useState([]);
   const [updateSpendList, setUpdateSpendList] = useState([]);
 
-  const [isVisibleTotal, setIsVisibleTotal] = useState(false);
-  const [totalList, setTotalList] = useState([]);
-
   const [drawingNo, setDrawingNo] = useState('');
   const [weldNo, setWeldNo] = useState('');
-  const [location, setLocation] = useState('');
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -42,9 +40,22 @@ const QCSpendListScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          {
+            code === Constant.CODE_VISUAL
+              ?
+              <TouchableOpacity
+                style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+                onPress={() => { setIsVisibleNDTFilter(true) }}>
+                <Ionicons
+                  size={24}
+                  name={'md-ellipsis-vertical-circle'} color={iconColor} />
+              </TouchableOpacity>
+              :
+              null
+          }
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { setIsVisibleTotal(true) }}>
+            onPress={() => { setIsVisibleLocation(true) }}>
             <Ionicons
               size={24}
               name={'md-list-circle-outline'} color={iconColor} />
@@ -84,6 +95,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
   useEffect(
     () => {
+      callAPI(getFacilityList);
       callAPI(getSpendListData);
     }, []
   );
@@ -93,13 +105,22 @@ const QCSpendListScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     callAPI(getSpendListData);
   };
-  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location) => {
-    let token = await Helper.getData('TOKEN');
-    GetSpendListAPI(projectCode, drawing, weld, locate, code, token)
+  const getSpendListData = async (facility = facilityCode, drawing = drawingNo, weld = weldNo, locate = location, filter = NDTFilter) => {
+    const token = await Helper.getData('TOKEN');
+
+    facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
+
+    if (filter === NDT_FILTER_100) {
+      filter = Constant.PIECE_MARK_CHECKED;
+    } else if (filter === NDT_FILTER_OTHERS) {
+      filter = Constant.PIECE_MARK_UNCHECKED;
+    }
+
+    GetSpendListAPI(projectCode, facility, drawing, weld, locate, code, filter, token)
       .then(res => {
         if (res.Success && res.Data) {
-          setSpendList(res.Data.List);
-          setTotalList(res.Data.Location);
+          setSpendList(res.Data);
+          setLocationList(res.Second);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -168,15 +189,76 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   //-- Location
+  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
+  const [locationList, setLocationList] = useState([]);
+  const [location, setLocation] = useState('');
   const _onPressChangeLocation = loc => {
     if (loc != location) {
       setLocation(loc);
-      callAPI(() => { getSpendListData(drawingNo, weldNo, loc) });
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, loc) });
     }
-    setIsVisibleTotal(false);
+    setIsVisibleLocation(false);
   };
   const _onPressClearLocation = () => {
     _onPressChangeLocation('');
+  };
+
+  //-- Facility
+  const FACILITY_CODE_DEFAULT = 'All Facility Code';
+  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
+  const [facilityList, setFacilityList] = useState([]);
+  const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
+  const getFacilityList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetFacilityListAPI(projectCode, token)
+      .then(res => {
+        if (res.success) {
+          setFacilityList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+  const _onChangeFacilityCode = code => {
+    if (code !== facilityCode) {
+      setFacilityCode(code);
+      callAPI(() => { getSpendListData(code) });
+    }
+    setIsVisibleFacility(false);
+  };
+  const _onClearFacilityCode = () => {
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      setFacilityCode(FACILITY_CODE_DEFAULT);
+      callAPI(() => { getSpendListData('') });
+    }
+    setIsVisibleFacility(false);
+  };
+
+  //-- NDT Percent
+  const NDT_FILTER_100 = '100%';
+  const NDT_FILTER_OTHERS = 'Others';
+  const [isVisibleNDTFilter, setIsVisibleNDTFilter] = useState(false);
+  const [NDTFilter, setNDTFilter] = useState('');
+  const _onChangeNDTFilter = filter => {
+    if (filter !== NDTFilter) {
+      setNDTFilter(filter);
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, location, filter) });
+    }
+    setIsVisibleNDTFilter(false);
+  };
+  const _onClearNDTFilter = () => {
+    if (NDTFilter !== '') {
+      setNDTFilter('');
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, location, '') });
+    }
+    setIsVisibleNDTFilter(false);
   };
 
   //-- Update Data
@@ -562,95 +644,120 @@ const QCSpendListScreen = ({ route, navigation }) => {
     {
       if (isSearching) {
         return <ListLoadingData />
-      } else if (!spendList.length) {
-        return <ListEmptyData />
       } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={spendList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
+        return <ListEmptyData />
       }
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
-        :
-        <View style={styles.container}>
-          {
-            isShowDescription.show
-              ?
-              (<View style={styles.headerContainer}>
-                <View style={styles.rowInfo}>
-                  <Text>Project: </Text>
-                  <Text style={[styles.infoData]}>{projectCode.toUpperCase()}</Text>
-                  <Text>   User: </Text>
-                  <Text style={[styles.infoData]}>{userLogin.toUpperCase()}</Text>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction}>DrawingNo:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={drawingNo}
-                      onChangeText={_onChangeDrawingNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {drawingNo == ''
-                      ? null
-                      : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
-                    }
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
+          :
+          <View style={styles.container}>
+            {
+              isShowDescription.show
+                ?
+                (<View style={styles.headerContainer}>
+                  <View style={styles.rowInfo}>
+                    <Text>Project: </Text>
+                    <Text style={[styles.infoData]}>{projectCode.toUpperCase()}</Text>
+                    <Text>   User: </Text>
+                    <Text style={[styles.infoData]}>{userLogin.toUpperCase()}</Text>
                   </View>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction}>WeldNo:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={weldNo}
-                      onChangeText={_onChangeWeldNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {weldNo == ''
-                      ? null
-                      : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
-                    }
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>FacilityCode:</Text>
+                    <TouchableOpacity style={styles.selectInput} onPress={() => { setIsVisibleFacility(true) }}>
+                      <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                    </TouchableOpacity>
                   </View>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction} />
-                  <TouchableOpacity
-                    style={styles.searchButton}
-                    onPress={_onPressSearchDrawing}
-                    disabled={isSearching}>
-                    <Text style={styles.buttonTitle}>Search Drawing</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>)
-              :
-              null
-          }
-          <RenderList />
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
-              <Text style={styles.buttonTitle}>Submit to Server</Text>
-            </TouchableOpacity>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>DrawingNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={drawingNo}
+                        onChangeText={_onChangeDrawingNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {drawingNo == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>WeldNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {weldNo == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction} />
+                    <TouchableOpacity
+                      style={styles.searchButton}
+                      onPress={_onPressSearchDrawing}
+                      disabled={isSearching}>
+                      <Text style={styles.buttonTitle}>Search Drawing</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>)
+                :
+                null
+            }
+            {
+              spendList && spendList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={spendList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderList />
+            }
+            <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
+                <Text style={styles.buttonTitle}>Submit to Server</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
       }
+      <SelectPopup
+        visible={isVisibleFacility}
+        data={facilityList}
+        onCancel={() => setIsVisibleFacility(false)}
+        onClear={_onClearFacilityCode}
+        onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
+      <SelectPopup
+        visible={isVisibleNDTFilter}
+        data={[NDT_FILTER_100, NDT_FILTER_OTHERS]}
+        onCancel={() => setIsVisibleNDTFilter(false)}
+        onClear={_onClearNDTFilter}
+        onChangeItem={_onChangeNDTFilter}>
+      </SelectPopup>
       <TotalLocationModal
-        visible={isVisibleTotal}
-        data={totalList}
-        onClose={() => setIsVisibleTotal(false)}
+        visible={isVisibleLocation}
+        data={locationList}
+        onClose={() => setIsVisibleLocation(false)}
         onPressChangeLocation={_onPressChangeLocation}
         onPressClearLocation={_onPressClearLocation}
         site={true}
@@ -707,6 +814,17 @@ const styles = StyleSheet.create({
   },
   infoTitleAction: {
     flex: 3,
+  },
+  selectInput: {
+    flexDirection: 'row',
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    borderRadius: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
