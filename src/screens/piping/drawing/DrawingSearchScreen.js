@@ -7,7 +7,7 @@ import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
-import GetFacilityListAPI from '../../../apis/app/GetFacilityListAPI';
+import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
 import GetDrawingListAPI from '../../../apis/drawing/GetDrawingListAPI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';

@@ -82,18 +82,6 @@ export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, to
       },
     }).then(res => res.json());
 
-export const GetHeatNoListAPI = (projectCode, itemCode, token) =>
-  fetch(
-    Port_Server
-    + '/api/App/GetHeatNoList?projectCode=' + projectCode
-    + '&itemCode=' + itemCode,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
-
 export const GetSerialNoAndHeatNoListAPI = (projectCode, itemCode, token) =>
   fetch(
     Port_Server
