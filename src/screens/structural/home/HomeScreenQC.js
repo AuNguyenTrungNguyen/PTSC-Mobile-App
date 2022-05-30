@@ -320,35 +320,35 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
   const _onPressOverviewListObservation = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'QAObservationOverviewList',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationOverviewList',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
   const _onPressListObservation = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'QAObservationList',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationList',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
   const _onPressCreateObservation = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'QAObservationDetail',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationDetail',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
         owner: userLogin
-      },
-    );
+      }
+    });
   };
 
   // QC Hand Book
@@ -357,6 +357,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'QCHandBook'
     );
   };
+
 
 
 

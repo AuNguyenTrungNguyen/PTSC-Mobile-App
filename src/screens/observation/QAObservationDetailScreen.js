@@ -16,15 +16,15 @@ import {
   GetObservationRelevantTeamAPI,
   GetObservationRootCauseAPI,
   CreateOrUpdateObservationAPI
-} from '../../../apis/qa/QAAPI';
+} from '../../apis/qa/QAAPI';
 
-import Helper from '../../../utils/Helper';
-import Formater from '../../../utils/Formater';
-import Constant from '../../../utils/Constant';
-import Header from '../../../components/Header';
-import MessageAlert from '../../../components/MessageAlert';
-import LoadingRefresh from '../../../components/LoadingRefresh';
-import SelectPopup from '../../../components/SelectPopup';
+import Helper from '../../utils/Helper';
+import Formater from '../../utils/Formater';
+import Constant from '../../utils/Constant';
+import Header from '../../components/Header';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
+import SelectPopup from '../../components/SelectPopup';
 
 const QAObservationDetailScreen = ({ route, navigation }) => {
 

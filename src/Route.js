@@ -69,10 +69,10 @@ import StructuralDimCheckDetailScreen from './screens/structural/dimcheck/DimChe
 import StructuralDimCheckImageScreen from './screens/structural/dimcheck/DimCheckImageScreen';
 import StructuralQCSpendListScreen from './screens/structural/qc/QCSpendListScreen';
 import StructuralQCImageScreen from './screens/structural/qc/QCImageScreen';
-import StructuralQAObservationOverviewListScreen from './screens/structural/observation/QAObservationOverviewListScreen';
-import StructuralQAObservationListScreen from './screens/structural/observation/QAObservationListScreen';
-import StructuralQAObservationDetailScreen from './screens/structural/observation/QAObservationDetailScreen';
-import StructuralQAObservationImageScreen from './screens/structural/observation/QAObservationImageScreen';
+import QCObservationOverviewListScreen from './screens/observation/QAObservationOverviewListScreen';
+import QCObservationListScreen from './screens/observation/QAObservationListScreen';
+import QCObservationDetailScreen from './screens/observation/QAObservationDetailScreen';
+import QCObservationImageScreen from './screens/observation/QAObservationImageScreen';
 import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 
 const Stack = createStackNavigator();
@@ -634,46 +634,6 @@ const StructuralQCStackScreens = () => {
         }
       />
       <StructuralQCStack.Screen
-        name='QAObservationOverviewList'
-        component={StructuralQAObservationOverviewListScreen}
-        options={
-          {
-            title: 'Observation List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralQCStack.Screen
-        name='QAObservationList'
-        component={StructuralQAObservationListScreen}
-        options={
-          {
-            title: 'Observation List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralQCStack.Screen
-        name='QAObservationDetail'
-        component={StructuralQAObservationDetailScreen}
-        options={
-          {
-            title: 'Observation Detail',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralQCStack.Screen
-        name='QAObservationImage'
-        component={StructuralQAObservationImageScreen}
-        options={
-          {
-            title: 'Observation Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <StructuralQCStack.Screen
         name='QCHandBook'
         component={QCHandBookScreen}
         options={
@@ -747,6 +707,46 @@ const CommonStackScreens = () => {
         options={
           {
             title: 'Man-hours Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QAObservationOverviewList'
+        component={QCObservationOverviewListScreen}
+        options={
+          {
+            title: 'Observation List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QAObservationList'
+        component={QCObservationListScreen}
+        options={
+          {
+            title: 'Observation List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QAObservationDetail'
+        component={QCObservationDetailScreen}
+        options={
+          {
+            title: 'Observation Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QAObservationImage'
+        component={QCObservationImageScreen}
+        options={
+          {
+            title: 'Observation Pictures',
             headerBackTitle: 'Back',
           }
         }

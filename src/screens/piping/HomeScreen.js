@@ -302,6 +302,54 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- QA Observation
+  const _onPressQAObservation = async () => {
+    Alert.alert(
+      '',
+      'Overview: All Observation in Project\n\List: List Observation\n\Create: Create Observation',
+      [
+        { text: 'Overview', onPress: _onPressOverviewListObservation },
+        { text: 'List', onPress: _onPressListObservation },
+        { text: 'Create', onPress: _onPressCreateObservation },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressOverviewListObservation = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationOverviewList',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressListObservation = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationList',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressCreateObservation = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationDetail',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        owner: userLogin
+      }
+    });
+  };
+
   //-- Buttom Action
   const _onPressConstructionUpdate = () => {
     navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
@@ -388,6 +436,10 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
           <View style={styles.action}>

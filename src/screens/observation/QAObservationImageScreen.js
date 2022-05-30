@@ -10,18 +10,18 @@ import Dialog from 'react-native-dialog';
 import ImageView from 'react-native-image-viewing';
 import CameraRoll from '@react-native-community/cameraroll';
 
-import { Port_Server } from '../../../utils/Core';
+import { Port_Server } from '../../utils/Core';
 import {
   GetObservationImageAPI,
   DeleteObservationImageAPI,
   EditObservationImageAPI
-} from '../../../apis/qa/QAAPI';
+} from '../../apis/qa/QAAPI';
 
-import Helper from '../../../utils/Helper';
-import MessageAlert from '../../../components/MessageAlert';
-import LoadingRefresh from '../../../components/LoadingRefresh';
+import Helper from '../../utils/Helper';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
 import { TextInput } from 'react-native-gesture-handler';
-import Constant from '../../../utils/Constant';
+import Constant from '../../utils/Constant';
 
 const QAObservationImageScreen = ({ route }) => {
 

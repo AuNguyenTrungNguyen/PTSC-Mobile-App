@@ -4,16 +4,16 @@ import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 
-import { GetObservationListAPI } from '../../../apis/qa/QAAPI';
+import { GetObservationListAPI } from '../../apis/qa/QAAPI';
 
-import Helper from '../../../utils/Helper';
-import Formater from '../../../utils/Formater';
-import Constant from '../../../utils/Constant';
-import CoreStyle from '../../../utils/CoreStyle';
-import Header from '../../../components/Header';
-import { ListEmptyData } from '../../../components/HelperUI';
-import MessageAlert from '../../../components/MessageAlert';
-import LoadingRefresh from '../../../components/LoadingRefresh';
+import Helper from '../../utils/Helper';
+import Formater from '../../utils/Formater';
+import Constant from '../../utils/Constant';
+import CoreStyle from '../../utils/CoreStyle';
+import Header from '../../components/Header';
+import { ListEmptyData } from '../../components/HelperUI';
+import MessageAlert from '../../components/MessageAlert';
+import LoadingRefresh from '../../components/LoadingRefresh';
 
 const QAObservationListScreen = ({ route, navigation }) => {
 
