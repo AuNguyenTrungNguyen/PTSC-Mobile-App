@@ -122,6 +122,20 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
       }
     }).then(res => res.json());
 
+export const GetInspectorListAPI = (projectCode, disciplineCode, filterType, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetInspectorList'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&filterType=' + encodeURIComponent(filterType),
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {

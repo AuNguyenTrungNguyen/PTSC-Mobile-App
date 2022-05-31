@@ -10,8 +10,9 @@ import Dialog from 'react-native-dialog';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
+import CoreStyle from '../../../utils/CoreStyle';
 
-import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
+import { GetFacilityListAPI, GetInspectorListAPI } from '../../../apis/app/AppAPI';
 import { GetSpendListAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
@@ -96,6 +97,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   useEffect(
     () => {
       callAPI(getFacilityList);
+      callAPI(getInspectorList);
       callAPI(getSpendListData);
     }, []
   );
@@ -134,6 +136,43 @@ const QCSpendListScreen = ({ route, navigation }) => {
         setIsLoading(false);
         setIsError(true);
         setIsSearching(false);
+      });
+  };
+  const getFacilityList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetFacilityListAPI(projectCode, token)
+      .then(res => {
+        if (res.success) {
+          setFacilityList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+  const getInspectorList = async () => {
+    const token = await Helper.getData('TOKEN');
+    const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+    GetInspectorListAPI(projectCode, disciplineCode, 'Piping & Welding Inspector', token)
+      .then(res => {
+        if (res.Success) {
+          setInspectorList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
       });
   };
 
@@ -188,44 +227,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setWeldNo(no);
   };
 
-  //-- Location
-  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
-  const [locationList, setLocationList] = useState([]);
-  const [location, setLocation] = useState('');
-  const _onPressChangeLocation = loc => {
-    if (loc != location) {
-      setLocation(loc);
-      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, loc) });
-    }
-    setIsVisibleLocation(false);
-  };
-  const _onPressClearLocation = () => {
-    _onPressChangeLocation('');
-  };
-
-  //-- Facility
+  //-- FacilityCode filter
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
   const [isVisibleFacility, setIsVisibleFacility] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
   const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
-  const getFacilityList = async () => {
-    const token = await Helper.getData('TOKEN');
-    GetFacilityListAPI(projectCode, token)
-      .then(res => {
-        if (res.success) {
-          setFacilityList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
-  };
   const _onChangeFacilityCode = code => {
     if (code !== facilityCode) {
       setFacilityCode(code);
@@ -241,7 +247,22 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setIsVisibleFacility(false);
   };
 
-  //-- NDT Percent
+  //-- Location filter
+  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
+  const [locationList, setLocationList] = useState([]);
+  const [location, setLocation] = useState('');
+  const _onPressChangeLocation = loc => {
+    if (loc != location) {
+      setLocation(loc);
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, loc) });
+    }
+    setIsVisibleLocation(false);
+  };
+  const _onPressClearLocation = () => {
+    _onPressChangeLocation('');
+  };
+
+  //-- NDTPercent filter
   const NDT_FILTER_100 = '100%';
   const NDT_FILTER_OTHERS = 'Others';
   const [isVisibleNDTFilter, setIsVisibleNDTFilter] = useState(false);
@@ -293,6 +314,22 @@ const QCSpendListScreen = ({ route, navigation }) => {
     onChangeData(value, index, key);
   };
 
+  const [isVisibleInspector, setIsVisibleInspector] = useState(false);
+  const [inspectorList, setInspectorList] = useState([]);
+  const _onPressShowInspector = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleInspector(true);
+  };
+  const _onChangeInspector = data => {
+    onChangeData(data);
+    setIsVisibleInspector(false);
+  };
+  const _onClearInspector = () => {
+    onChangeData(null);
+    setIsVisibleInspector(false);
+  };
+
   const [isVisibleRemark, setIsVisibleRemark] = useState(false);
   const [remarkDisplay, setRemarkDisplay] = useState('');
   const _onPressShowRemark = (value, index, key) => {
@@ -322,9 +359,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
-            <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldNo)}</Text>
             <Text> - WeldType: </Text>
-            <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
             <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
@@ -333,15 +370,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTitle}>
+          <View style={styles.cellOne}>
             <Text>DrawingNo: </Text>
           </View>
-          <View style={styles.cellDrawingAction}>
+          <View style={styles.cellThree}>
             {
               item.WebLink
                 ?
                 <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'View Drawing Spend List')}>
-                  <Text style={styles.textDataOpen}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
+                  <Text style={CoreStyle.textLinkWithLine}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
                 </TouchableOpacity>
                 :
                 <Text style={styles.textData}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
@@ -349,16 +386,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTitle}>
+          <View style={styles.cellOne}>
             <Text>Sheet:</Text>
           </View>
-          <View style={styles.cellData}>
+          <View style={styles.cellOne}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.Sheet)}</Text>
           </View>
-          <View style={styles.cellTitle}>
+          <View style={styles.cellOne}>
             <Text>Rev:</Text>
           </View>
-          <View style={styles.cellData}>
+          <View style={styles.cellOne}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.Rev)}</Text>
           </View>
         </View>
@@ -367,24 +404,35 @@ const QCSpendListScreen = ({ route, navigation }) => {
             ?
             <>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>HeatNo01:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>HeatNo02:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
+                  <Text>Inspection:</Text>
+                </View>
+                <View style={styles.cellThreeAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.QCFittupInspector)}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowInspector(index, 'QCFittupInspector')}>
+                    <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
                   <Text>FittingDate:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
                 </View>
                 <View style={styles.cellAction}>
@@ -396,10 +444,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>Location:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
                 </View>
                 <View style={styles.cellAction}>
@@ -414,10 +462,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>FitUpStatus:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   {
                     item.FitUpResult
                       ?
@@ -442,27 +490,36 @@ const QCSpendListScreen = ({ route, navigation }) => {
             :
             <>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>WelderIDs:</Text>
+                <View style={styles.cellOne}>
+                  <Text>WeldDate:</Text>
                 </View>
-                <View style={styles.cellWelder}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
+                <View style={styles.cellOne}>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text>Location:</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
+                  <Text>Inspection:</Text>
+                </View>
+                <View style={styles.cellThreeAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualInspector)}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowInspector(index, 'QCVisualInspector')}>
+                    <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
                   <Text>WPSNo:</Text>
                 </View>
-                <View style={styles.cellWelder}>
+                <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
-                </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>WeldingDate:</Text>
-                </View>
-                <View style={styles.cellData}>
-                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity
@@ -473,11 +530,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>Location:</Text>
+                <View style={styles.cellOne}>
+                  <Text>WelderID:</Text>
                 </View>
-                <View style={styles.cellData}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
+                <View style={styles.cellTwo}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity onPress={() => _onPressShowRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
@@ -491,10 +548,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>VisualStatus:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   {
                     item.VisualResult
                       ?
@@ -516,18 +573,18 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>NDTPercent:</Text>
                 </View>
-                <View style={styles.cellWelder}>
+                <View style={styles.cellTitleLine}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.NDTPercent)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>UT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.UT && item.UT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
@@ -542,10 +599,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>RT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.RT && item.RT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
@@ -560,10 +617,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>MT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.MT && item.MT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
@@ -580,10 +637,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>PT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.PT && item.PT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
@@ -598,10 +655,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>PMI:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.PMI && item.PMI !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
@@ -616,10 +673,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>PAUT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.PAUT && item.PAUT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
@@ -683,9 +740,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                         onChangeText={_onChangeDrawingNo}
                         underlineColorAndroid='transparent'
                       />
-                      {drawingNo == ''
-                        ? null
-                        : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      {
+                        drawingNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -698,9 +756,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                         onChangeText={_onChangeWeldNo}
                         underlineColorAndroid='transparent'
                       />
-                      {weldNo == ''
-                        ? null
-                        : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      {
+                        weldNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -745,15 +804,19 @@ const QCSpendListScreen = ({ route, navigation }) => {
         data={facilityList}
         onCancel={() => setIsVisibleFacility(false)}
         onClear={_onClearFacilityCode}
-        onChangeItem={_onChangeFacilityCode}>
-      </SelectPopup>
+        onChangeItem={_onChangeFacilityCode} />
       <SelectPopup
         visible={isVisibleNDTFilter}
         data={[NDT_FILTER_100, NDT_FILTER_OTHERS]}
         onCancel={() => setIsVisibleNDTFilter(false)}
         onClear={_onClearNDTFilter}
-        onChangeItem={_onChangeNDTFilter}>
-      </SelectPopup>
+        onChangeItem={_onChangeNDTFilter} />
+      <SelectPopup
+        visible={isVisibleInspector}
+        data={inspectorList}
+        onChangeItem={_onChangeInspector}
+        onClear={_onClearInspector}
+        onCancel={() => setIsVisibleInspector(false)} />
       <TotalLocationModal
         visible={isVisibleLocation}
         data={locationList}
@@ -877,40 +940,31 @@ const styles = StyleSheet.create({
     margin: 4,
     minHeight: 20,
   },
-  textData: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-  },
   checkBox: {
     fontWeight: 'bold',
     color: BASE_COLOR,
     width: 24,
     height: 24,
   },
-  textDataOpen: {
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    textDecorationLine: 'underline',
-    color: BASE_COLOR,
+  cellTitleLine: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  cellTitle: {
+  cellOne: {
     flex: 1,
     justifyContent: 'center',
   },
-  cellTitleLine: {
-    flexDirection: 'row',
+  cellThreeAction: {
     flex: 3,
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  cellWelder: {
+  cellTwo: {
     flex: 2,
     justifyContent: 'center',
   },
-  cellData: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  cellDrawingAction: {
+  cellThree: {
     flex: 3,
     justifyContent: 'center',
   },
@@ -919,7 +973,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  textMeta: {
+  textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
