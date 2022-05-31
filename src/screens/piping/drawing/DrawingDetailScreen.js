@@ -123,10 +123,13 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       updateDrawingList.map(item => {
         const date = item['FittingDate'];
         const percent = item['FitPercentage'];
+        const heat01 = item['Heat01'];
+        const heat02 = item['Heat02'];
         const location = item['SiteLocation'];
         const team = item['FittingTeam'];
 
-        if ((date && percent && location && team) || (!date && !percent && !location && !team)) {
+        if ((date && percent && heat01 && heat02 && location && team)
+          || (!date && !percent && !heat01 && !heat02 && !location && !team)) {
           return item;
         }
 
@@ -139,6 +142,12 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('FitPercentage') >= 0 && !percent) || (column.indexOf('FitPercentage') < 0 && !oldItem['FitPercentage'])) {
           messages.push('Percent');
+        }
+        if ((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) {
+          messages.push('HeatNo01');
+        }
+        if ((column.indexOf('Heat02') >= 0 && !percent) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) {
+          messages.push('Heat02');
         }
         if ((column.indexOf('SiteLocation') >= 0 && !location) || (column.indexOf('SiteLocation') < 0 && !oldItem['SiteLocation'])) {
           messages.push('Location');
@@ -370,19 +379,39 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setIsVisibleHeatNo(false);
   };
   const _onChangeHeatNo = data => {
-    let heatNoData = '';
-    let seriNoData = '';
+    let heatNoData = null;
+    let seriNoData = null;
     if (data) {
       heatNoData = data.HeatNo_TagNo;
       seriNoData = data.SeriNo;
     }
+
+    let array = [...detailDrawingList];
+    let arrayUpdate = [...updateDrawingList];
+
+    const rowIndex = array[indexUpdate].RowIndex;
+    const objIndex = arrayUpdate.findIndex((obj => obj.RowIndex == rowIndex));
+
+    let keyHeatNo = '';
+    let keySerialNo = '';
     if (keyUpdate === 'Heat01') {
-      onChangeData(heatNoData);
-      onChangeData(seriNoData, indexUpdate, 'SerialNo01');
-    } else if (keyUpdate === 'Heat02') {
-      onChangeData(heatNoData);
-      onChangeData(seriNoData, indexUpdate, 'SerialNo02');
+      keyHeatNo = 'Heat01';
+      keySerialNo = 'SerialNo01';
+    } else {
+      keyHeatNo = 'Heat02';
+      keySerialNo = 'SerialNo02';
     }
+
+    array[indexUpdate][keyHeatNo] = heatNoData;
+    array[indexUpdate][keySerialNo] = seriNoData;
+    if (objIndex < 0) {
+      arrayUpdate.push({ RowIndex: rowIndex, [keyHeatNo]: heatNoData, [keySerialNo]: seriNoData });
+    } else {
+      arrayUpdate[objIndex][keyHeatNo] = array[indexUpdate][keyHeatNo];
+      arrayUpdate[objIndex][keySerialNo] = array[indexUpdate][keySerialNo];
+    }
+    setDetailDrawingList(array);
+    setUpdateDrawingList(arrayUpdate);
     setIsVisibleHeatNo(false);
   };
 
@@ -580,6 +609,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           [keyPercent]: valueClear,
           ['Heat01']: valueClear,
           ['Heat02']: valueClear,
+          ['SerialNo01']: valueClear,
+          ['SerialNo02']: valueClear,
           ['SiteLocation']: valueClear,
           ['FittingTeam']: valueClear,
         });
@@ -599,6 +630,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       if (code == Constant.CODE_FITUP) {
         array[objIndex]['Heat01'] = valueClear;
         array[objIndex]['Heat02'] = valueClear;
+        array[objIndex]['SerialNo01'] = valueClear;
+        array[objIndex]['SerialNo02'] = valueClear;
         array[objIndex]['SiteLocation'] = valueClear;
         array[objIndex]['FittingTeam'] = valueClear;
       } else {
@@ -768,7 +801,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FittingDate:</Text>
+                  <Text style={styles.redText}>FittingDate:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -788,7 +821,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FitPercent:</Text>
+                  <Text style={styles.redText}>FitPercent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -827,12 +860,12 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class01:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class1)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>HeatNo01:</Text>
+                  <Text style={styles.redText}>HeatNo01:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   {
@@ -856,12 +889,12 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class02:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Class2)}</Text>
+                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class2)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>HeatNo02:</Text>
+                  <Text style={styles.redText}>HeatNo02:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   {
@@ -882,7 +915,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>Location:</Text>
+                  <Text style={styles.redText}>Location:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -902,7 +935,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FittingTeam:</Text>
+                  <Text style={styles.redText}>FittingTeam:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -924,7 +957,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldingDate:</Text>
+                  <Text style={styles.redText}>WeldingDate:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -944,7 +977,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldPercent:</Text>
+                  <Text style={styles.redText}>WeldPercent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -996,7 +1029,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WelderIDs:</Text>
+                  <Text style={styles.redText}>WelderIDs:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1015,7 +1048,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WPS:</Text>
+                  <Text style={styles.redText}>WPS:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1034,7 +1067,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WelderTeam:</Text>
+                  <Text style={styles.redText}>WelderTeam:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1299,7 +1332,15 @@ const styles = StyleSheet.create({
   greenText: {
     color: 'green',
   },
+  redText: {
+    color: 'red',
+  },
   textData: {
+    minWidth: 80,
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  textBase: {
     minWidth: 80,
     fontWeight: 'bold',
     color: BASE_COLOR,
