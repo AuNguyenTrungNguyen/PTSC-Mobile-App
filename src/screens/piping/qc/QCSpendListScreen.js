@@ -95,10 +95,12 @@ const QCSpendListScreen = ({ route, navigation }) => {
     });
   };
   useEffect(
-    () => {
+    async () => {
       callAPI(getFacilityList);
       callAPI(getInspectorList);
       callAPI(getSpendListData);
+      const inspector = await Helper.getData('QC_INSPECTOR');
+      setGlobalInspector(inspector);
     }, []
   );
 
@@ -302,11 +304,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   const _onPressChangeStatus = (value, index, key) => {
-    if (spendList[index][key] !== value) {
-      setIndexUpdate(index);
-      setKeyUpdate(key);
-      onChangeData(value, index, key);
-    }
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    onChangeData(value, index, key);
+    const keyInspector = code === Constant.CODE_FITUP ? 'QCFittupInspector' : 'QCVisualInspector';
+    onChangeData(globalInspector, index, keyInspector);
   };
 
   const _onChangeCheckbox = (index, key, value) => {
@@ -328,6 +330,19 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onClearInspector = () => {
     onChangeData(null);
     setIsVisibleInspector(false);
+  };
+
+  const [isVisibleGlobalInspector, setIsVisibleGlobalInspector] = useState(false);
+  const [globalInspector, setGlobalInspector] = useState('');
+  const _onPressShowGlobalInspector = () => {
+    setIsVisibleGlobalInspector(true);
+  };
+  const _onChangeGlobalInspector = async data => {
+    setGlobalInspector(data);
+    if (globalInspector !== data) {
+      await Helper.storeData('QC_INSPECTOR', data);
+    }
+    setIsVisibleGlobalInspector(false);
   };
 
   const [isVisibleRemark, setIsVisibleRemark] = useState(false);
@@ -419,7 +434,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>Inspection:</Text>
+                  <Text>Inspector:</Text>
                 </View>
                 <View style={styles.cellThreeAction}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.QCFittupInspector)}</Text>
@@ -505,7 +520,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>Inspection:</Text>
+                  <Text>Inspector:</Text>
                 </View>
                 <View style={styles.cellThreeAction}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualInspector)}</Text>
@@ -720,10 +735,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 ?
                 (<View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
-                    <Text>Project: </Text>
-                    <Text style={[styles.infoData]}>{projectCode.toUpperCase()}</Text>
-                    <Text>   User: </Text>
-                    <Text style={[styles.infoData]}>{userLogin.toUpperCase()}</Text>
+                    <Text>User:   </Text>
+                    <Text style={styles.infoData}>{userLogin}</Text>
+                    <Text>   Inspector:   </Text>
+                    <View style={styles.cellThreeAction}>
+                      <Text style={styles.textData}>{globalInspector}</Text>
+                      <TouchableOpacity onPress={() => _onPressShowGlobalInspector()}>
+                        <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <View style={styles.rowInfoAction}>
                     <Text style={styles.infoTitleAction}>FacilityCode:</Text>
@@ -817,6 +837,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
         onChangeItem={_onChangeInspector}
         onClear={_onClearInspector}
         onCancel={() => setIsVisibleInspector(false)} />
+      <SelectPopup
+        visible={isVisibleGlobalInspector}
+        data={inspectorList}
+        onChangeItem={_onChangeGlobalInspector}
+        onCancel={() => setIsVisibleGlobalInspector(false)} />
       <TotalLocationModal
         visible={isVisibleLocation}
         data={locationList}
@@ -864,10 +889,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoData: {
-    flex: 2,
     fontWeight: 'bold',
     color: BASE_COLOR,
     textAlign: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',
