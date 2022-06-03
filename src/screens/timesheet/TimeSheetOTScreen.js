@@ -99,6 +99,15 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     }, [navigation]
   );
 
+  const [isRefreshWorkOrder, setIsRefreshWorkOrder] = useState(null);
+  useEffect(
+    () => {
+      if (isRefreshWorkOrder) {
+        callAPI(getTimeSheetWorkOrderList, false);
+      }
+    }, [isRefreshWorkOrder]
+  );
+
   //-- Get Data
   const getTeamLeaderInfo = async () => {
     const token = await Helper.getData('TOKEN');
@@ -135,6 +144,24 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         setIsLoading(false);
         setIsError(true);
         setIsUploading(false);
+      });
+  };
+  const getTimeSheetWorkOrderList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token)
+      .then(res => {
+        if (res.success) {
+          setWorkOrderList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
       });
   };
   const getAllData = async () => {
@@ -219,6 +246,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
         setIsUploading(false);
+        setIsRefreshWorkOrder(new Date());
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);

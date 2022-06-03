@@ -74,25 +74,85 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
                             <View style={styles.row}>
                               <Text style={styles.cellTitle}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
                             </View>
+                            {
+                              item.WorkOrderName
+                                ?
+                                <View style={styles.row}>
+                                  <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrderName)}</Text>
+                                </View> :
+                                null
+                            }
                             <View style={styles.row}>
-                              <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrderName)}</Text>
+                              {
+                                item.BudgetMHRS && item.BudgetMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineTitleError}>Budget:</Text>
+                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineTitle}>Budget:</Text>
+                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
+                                  </>
+                              }
+                              {
+                                item.ActualMHRS && item.ActualMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineTitleError}>Actual:</Text>
+                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineTitle}>Actual:</Text>
+                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
+                                  </>
+                              }
                             </View>
                             <View style={styles.row}>
-                              <Text style={styles.cellLine}>Budget:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
-                              <Text style={styles.cellLine}>Actual:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
+                              {
+                                item.EarnMHRS && item.EarnMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineTitleError}>Earn:</Text>
+                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.EarnMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineTitle}>Earn:</Text>
+                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.EarnMHRS)}</Text>
+                                  </>
+                              }
+                              {
+                                item.WasteMHRS && item.WasteMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineTitleError}>Waste:</Text>
+                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineTitle}>Waste:</Text>
+                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                  </>
+                              }
                             </View>
                             <View style={styles.row}>
-                              <Text style={styles.cellLine}>Earn:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.EarnMHRS)}</Text>
-                              <Text style={styles.cellLine}>Waste:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.WasteMHRS)}</Text>
-                            </View>
-                            <View style={styles.row}>
-                              <Text style={styles.cellLine}>Remain:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
-                              <View style={styles.cellLine} />
+                              {
+                                item.RemainMHRS && item.RemainMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineTitleError}>Remain:</Text>
+                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineTitle}>Remain:</Text>
+                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
+                                  </>
+                              }
+                              <View style={styles.cellLineTitle} />
                               <View style={styles.cellLineData} />
                             </View>
                           </TouchableOpacity>
@@ -206,12 +266,20 @@ const styles = StyleSheet.create({
     flex: 1,
     color: BASE_COLOR,
   },
-  cellLine: {
+  cellLineTitle: {
     flex: 1,
   },
   cellLineData: {
-    flex: 2,
+    flex: 1.5,
     color: BASE_COLOR,
+  },
+  cellLineTitleError: {
+    flex: 1,
+    color: 'red',
+  },
+  cellLineDataError: {
+    flex: 1.5,
+    color: 'red',
   },
 
   searchContainer: {
