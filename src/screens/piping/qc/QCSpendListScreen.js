@@ -287,18 +287,28 @@ const QCSpendListScreen = ({ route, navigation }) => {
   //-- Update Data
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
-  const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate) => {
+  const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate, inspectorKey) => {
     let array = [...spendList];
     array[localIndex][localKey] = data;
+    if (inspectorKey) {
+      array[localIndex][inspectorKey] = globalInspector;
+    }
     setSpendList(array);
 
     array = [...updateSpendList];
     const rowIndex = spendList[localIndex].RowIndex;
     const objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, [localKey]: data });
+      if (inspectorKey) {
+        array.push({ RowIndex: rowIndex, [localKey]: data, [inspectorKey]: globalInspector });
+      } else {
+        array.push({ RowIndex: rowIndex, [localKey]: data });
+      }
     } else {
-      array[objIndex][localKey] = spendList[localIndex][localKey];
+      array[objIndex][localKey] = data;
+      if (inspectorKey) {
+        array[objIndex][inspectorKey] = globalInspector;
+      }
     }
     setUpdateSpendList(array);
   };
@@ -306,9 +316,8 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onPressChangeStatus = (value, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
-    onChangeData(value, index, key);
-    const keyInspector = code === Constant.CODE_FITUP ? 'QCFittupInspector' : 'QCVisualInspector';
-    onChangeData(globalInspector, index, keyInspector);
+    const inspectorKey = code === Constant.CODE_FITUP ? 'QCFittupInspector' : 'QCVisualInspector';
+    onChangeData(value, index, key, inspectorKey);
   };
 
   const _onChangeCheckbox = (index, key, value) => {
