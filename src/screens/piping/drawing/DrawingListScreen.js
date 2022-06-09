@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -10,8 +10,7 @@ import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionListAPI, GetCurrentConstructionInfoAPI } from '../../../apis/piping/ConstructionAPI';
-import GetDrawingCompletePercentAPI from '../../../apis/drawing/GetDrawingCompletePercentAPI';
+import { GetConstructionListAPI, GetCurrentConstructionInfoAPI, GetDrawingCompletePercentAPI } from '../../../apis/piping/ConstructionAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
@@ -150,15 +149,14 @@ const DrawingListScreen = ({ route, navigation }) => {
   };
 
   //-- Item Action
-  const _onPressCompletePercent = async (drawingNo, sheet, rev) => {
+  const _onPressCompletePercent = async (index, drawingNo, sheet, rev) => {
     Keyboard.dismiss();
-    let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
-    let token = await Helper.getData('TOKEN');
+    const token = await Helper.getData('TOKEN');
     GetDrawingCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
       .then(res => {
-        if (res.success) {
-          let array = [...drawingList];
-          array[index]['progess'] = res.data;
+        if (res.Success) {
+          const array = [...drawingList];
+          array[index]['percentages'] = res.Data;
           setDrawingList(array);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT);
@@ -292,7 +290,7 @@ const DrawingListScreen = ({ route, navigation }) => {
 
 
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ index, item }) => {
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -319,14 +317,14 @@ const DrawingListScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.cellProgress}>
               {
-                item.progess
+                item.percentages
                   ?
                   <>
-                    <Text style={styles.cellAction}>{item.progess.FitUp}%</Text>
-                    <Text style={styles.cellAction}>{item.progess.Weld}%</Text>
+                    <Text style={styles.cellAction}>{item.percentages.FitUp}%</Text>
+                    <Text style={styles.cellAction}>{item.percentages.Weld}%</Text>
                   </>
                   :
-                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(item.DrawingNo, item.Sheet, item.Rev) }}>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(index, item.DrawingNo, item.Sheet, item.Rev) }}>
                     <Text style={styles.textAction}>Complete Percent</Text>
                   </TouchableOpacity>
               }
@@ -359,16 +357,7 @@ const DrawingListScreen = ({ route, navigation }) => {
       } else if (!drawingList.length) {
         return <ListEmptyData />
       } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={drawingList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
+        return <></>
       }
     }
   };
@@ -424,7 +413,22 @@ const DrawingListScreen = ({ route, navigation }) => {
                 :
                 null
             }
-            <RenderList />
+            {
+              !isSearching && drawingList && drawingList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={drawingList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderList />
+            }
           </View>
       }
       <SelectPopup

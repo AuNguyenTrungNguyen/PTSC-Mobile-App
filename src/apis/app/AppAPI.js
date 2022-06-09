@@ -154,6 +154,16 @@ export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
     }).then(res => res.json());
 };
 
+export const GetPIPNotifyNumberAPI = (projectCode, token) =>
+  fetch(
+    Port_Server + '/api/App/GetPIPNotifyNumber?projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 export const GetFactorTypeAPI = (projectCode, token) =>
   fetch(
     Port_Server

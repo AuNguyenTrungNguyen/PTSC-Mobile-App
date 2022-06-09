@@ -693,7 +693,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const renderItem = ({ index, item }) => {
     const itemDate = code == Constant.CODE_FITUP ? item['FittingDate'] : item['WeldingDate'];
     const itemPercent = code == Constant.CODE_FITUP ? item['FitPercentage'] : item['WeldPercentage'];
-    const isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
+    let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
+    if (code && code !== Constant.CODE_FITUP) {
+      isDisableItem = isDisableItem || (item['FitUpResult'] != Constant.STATUS_ACCEPT);
+    }
     const isEnableClear = itemDate || itemPercent;
 
     return (
@@ -701,7 +704,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             {
-              isDisableItem
+              item['QCStatusMobile'] == Constant.STATUS_ACCEPT
                 ?
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>

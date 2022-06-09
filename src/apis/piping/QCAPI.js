@@ -1,14 +1,20 @@
 import { Port_Server } from '../../utils/Core';
 
-export const GetSpendNumbersAPI = (projectCode, token) =>
+export const GetQCCompletePercentAPI = (projectCode, drawingNo, sheet, rev, token) =>
   fetch(
-    Port_Server + '/api/piping/GetSpendNumbers?projectCode=' + projectCode,
+    Port_Server
+    + '/api/piping/GetQCCompletePercent'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-    }).then(res => res.json());
+    }
+  ).then(res => res.json());
 
 export const GetQCListAPI = (projectCode, facilityCode, drawingNo, weldNo, token) =>
   fetch(

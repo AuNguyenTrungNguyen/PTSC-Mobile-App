@@ -10,8 +10,7 @@ import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetQCListAPI, GetCurrentQCInfoAPI } from '../../../apis/piping/QCAPI';
-import GetQCCompletePercentAPI from '../../../apis/qc/GetQCCompletePercentAPI';
+import { GetQCListAPI, GetCurrentQCInfoAPI, GetQCCompletePercentAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
@@ -160,15 +159,14 @@ const QCDrawingListScreen = ({ route, navigation }) => {
 
 
   //-- Item Action
-  const _onPressCompletePercent = async (drawingNo, sheet, rev) => {
+  const _onPressCompletePercent = async (index, drawingNo, sheet, rev) => {
     Keyboard.dismiss();
-    let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
-    let token = await Helper.getData('TOKEN');
+    const token = await Helper.getData('TOKEN');
     GetQCCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
       .then(res => {
         if (res.Success) {
-          let array = [...drawingList];
-          array[index]['progess'] = res.Data;
+          const array = [...drawingList];
+          array[index]['percentages'] = res.Data;
           setDrawingList(array);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT);
@@ -302,7 +300,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
 
 
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ index, item }) => {
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -329,14 +327,14 @@ const QCDrawingListScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.cellProgress}>
               {
-                item.progess
+                item.percentages
                   ?
                   <>
-                    <Text style={styles.cellAction}>{item.progess.FitUp}%</Text>
-                    <Text style={styles.cellAction}>{item.progess.Weld}%</Text>
+                    <Text style={styles.cellAction}>{item.percentages.FitUp}%</Text>
+                    <Text style={styles.cellAction}>{item.percentages.Weld}%</Text>
                   </>
                   :
-                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(item.DrawingNo, item.Sheet, item.Rev) }}>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(index, item.DrawingNo, item.Sheet, item.Rev) }}>
                     <Text style={styles.textAction}>Complete Percent</Text>
                   </TouchableOpacity>
               }
@@ -369,16 +367,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
       } else if (!drawingList.length) {
         return <ListEmptyData />
       } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={drawingList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
+        return <></>
       }
     }
   };
@@ -415,13 +404,14 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                         onChangeText={_onChangeDrawingNo}
                         underlineColorAndroid='transparent'
                       />
-                      {drawingNo == ''
-                        ? null
-                        : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      {
+                        drawingNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
-                  {/* <View style={styles.rowInfo}>
+                  <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>WeldNo:</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
@@ -430,12 +420,13 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                         onChangeText={_onChangeWeldNo}
                         underlineColorAndroid='transparent'
                       />
-                      {weldNo == ''
-                        ? null
-                        : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      {
+                        weldNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
                       }
                     </View>
-                  </View> */}
+                  </View>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle} />
                     <TouchableOpacity
@@ -449,7 +440,22 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                 :
                 null
             }
-            <RenderList />
+            {
+              !isSearching && drawingList && drawingList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={drawingList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderList />
+            }
           </View>
       }
       <SelectPopup

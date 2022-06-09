@@ -1,5 +1,21 @@
 import { Port_Server } from '../../utils/Core';
 
+export const GetDrawingCompletePercentAPI = (projectCode, drawingNo, sheet, rev, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetDrawingCompletePercent'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+
 export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
   fetch(
     Port_Server
@@ -47,13 +63,15 @@ export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, s
       },
     }).then(res => res.json());
 
-export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, token) =>
+export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, rev, role, token) =>
   fetch(
     Port_Server
     + '/api/piping/CheckDrawingRev'
     + '?projectCode=' + projectCode
     + '&drawingNo=' + drawingNo
-    + '&sheet=' + sheet,
+    + '&sheet=' + sheet
+    + '&rev=' + rev
+    + '&role=' + role,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

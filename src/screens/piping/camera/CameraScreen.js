@@ -39,7 +39,7 @@ const CameraScreen = ({ route, navigation }) => {
         if (projectCode == 'GALLAF03' && drawingNo && !drawingNo.startsWith("WHP03-PMC2-")) {
           drawingNo = 'WHP03-PMC2-' + drawingNo
         }
-        CheckDrawingRevAPI(projectCode, drawingNo, sheet, token)
+        CheckDrawingRevAPI(projectCode, drawingNo, sheet, rev, source, token)
           .then(res => {
             if (res.Success) {
               if (res.Data != null && rev != res.Data) {

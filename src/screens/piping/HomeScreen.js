@@ -7,14 +7,14 @@ import NetInfo from '@react-native-community/netinfo';
 import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
 import Header from '../../components/Header';
-import { GetSpendNumbersAPI } from '../../apis/piping/QCAPI';
+import { GetPIPNotifyNumberAPI } from '../../apis/app/AppAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
 const HomeScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
+  const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -34,7 +34,7 @@ const HomeScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(getSpendNumbers);
+      callAPI(getNotifyNumbers);
     }, [isFocused]
   );
   const callAPI = executedAPI => {
@@ -51,12 +51,12 @@ const HomeScreen = ({ route, navigation }) => {
       });
     }
   };
-  const getSpendNumbers = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetSpendNumbersAPI(projectCode, token)
+  const getNotifyNumbers = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetPIPNotifyNumberAPI(projectCode, token)
       .then(res => {
         if (res.Success && res.Data) {
-          setSpendNumbers(res.Data);
+          setNotifyNumbers(res.Data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -405,13 +405,14 @@ const HomeScreen = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       {isLoading || isError
         ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendNumbers)} />
+        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
         :
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             {
-              (spendNumbers.DimCutting)
+              (
+                notifyNumbers.DimCutting)
                 ?
                 <View style={styles.line} />
                 :
@@ -419,15 +420,15 @@ const HomeScreen = ({ route, navigation }) => {
             }
             <View style={styles.row}>
               <RenderItemBox title={'Cons\nDim Cutting'} onPress={_onPressManageDimCutting} />
-              <RenderItemBox title={'QC\nDim Cutting'} onPress={_onPressDimCuttingQCList} number={spendNumbers.DimCutting} />
+              <RenderItemBox title={'QC\nDim Cutting'} onPress={_onPressDimCuttingQCList} number={notifyNumbers.DimCutting} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cons Scan\nFitUp'} onPress={_onPressQRCodeFitUp} />
               <RenderItemBox title={'Cons Scan\nWeld'} onPress={_onPressQRCodeWeld} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressMamageQCFitUp} number={spendNumbers.FitUp} />
-              <RenderItemBox title={'QC Scan\nVisual'} onPress={_onPressMamageQCVisual} number={spendNumbers.Visual} />
+              <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressMamageQCFitUp} number={notifyNumbers.FitUp} />
+              <RenderItemBox title={'QC Scan\nVisual'} onPress={_onPressMamageQCVisual} number={notifyNumbers.Visual} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
