@@ -127,6 +127,20 @@ export const CreateOrUpdateObservationAPI = (model, token) =>
     }
   ).then(res => res.json());
 
+export const DeleteObservationAPI = (projectCode, id, token) =>
+  fetch(
+    Port_Server
+    + '/api/QA/DeleteObservation',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, id }),
+    }
+  ).then(res => res.json());
+
 export const GetObservationImageAPI = (tableRowIndex, token) =>
   fetch(
     Port_Server

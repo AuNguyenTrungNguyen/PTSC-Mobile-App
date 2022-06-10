@@ -15,7 +15,8 @@ import {
   GetObservationProcessPeriodAPI,
   GetObservationRelevantTeamAPI,
   GetObservationRootCauseAPI,
-  CreateOrUpdateObservationAPI
+  CreateOrUpdateObservationAPI,
+  DeleteObservationAPI
 } from '../../apis/qa/QAAPI';
 
 import Helper from '../../utils/Helper';
@@ -62,7 +63,7 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
         var data = JSON.parse(observation);
         data.ProjectCode = projectCode;
         data.CreatebyUser = userLogin;
-        data.ObservationDate = new Date(data.ObservationDate);
+        data.ObservationDate = new Date(Formater.formatDateWithoutTimeSQL(data.ObservationDate));
         setDescription(data.ObservationDesciption);
         setRemark(data.Remark);
         setObservationDetail(data);
@@ -375,6 +376,7 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
     setIsVisibleRemark(false);
   };
 
+  //-- Manage Image
   const _onPressManageImage = async () => {
     if (observationDetail.ObservationID === Constant.ID_TBA) {
       MessageAlert('ERROR', 'Please save Observation as Draft to continue');
@@ -394,6 +396,7 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Create or Update Observation
   const _onPressSubmitToServer = async status => {
     if (observationDetail.DisciplineCode == '') {
       MessageAlert('ERROR', 'DisciplineCode is required');
@@ -425,7 +428,6 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
     }
     callAPI(() => { createOrUpdateObservation(status) }, true);
   };
-
   const createOrUpdateObservation = async status => {
     let token = await Helper.getData('TOKEN');
     setIsUploading(true);
@@ -434,10 +436,8 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-          if (observationDetail.ObservationID == Constant.ID_TBA) {
-            observationDetail.RowIndex = res.data.RowIndex;
-            observationDetail.ObservationID = res.data.ObservationID;
-          }
+          observationDetail.RowIndex = res.data.RowIndex;
+          observationDetail.ObservationID = res.data.ObservationID;
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
@@ -448,7 +448,24 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
       });
   }
 
-
+  //-- Delete Observation
+  const _onPressDeleteObservation = async () => {
+    callAPI(() => { deleteObservation() }, true);
+  }
+  const deleteObservation = async () => {
+    const token = await Helper.getData('TOKEN');
+    DeleteObservationAPI(projectCode, observationDetail.ObservationID, token)
+      .then(res => {
+        if (res.success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          navigation.goBack();
+        } else {
+          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+      });
+  }
 
 
   const RenderObservationDetail = () => {
@@ -456,138 +473,151 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
     let isDisabled = observationDetail.ObservationStatus == Constant.QA_OBSERVATION_DRAFT && isOwner ? false : true;
     let iconColor = observationDetail.ObservationStatus == Constant.QA_OBSERVATION_DRAFT && isOwner ? BASE_COLOR : DISABLED_COLOR;
     return (
-        <ScrollView style={styles.table} contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.box}>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Id:</Text>
-              <Text style={styles.cellData}>{observationDetail.ObservationID}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Status:</Text>
-              <RenderStatus status={observationDetail.ObservationStatus} />
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Date:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => setIsVisibleDate(true)}>
-                  <Text style={styles.textAction}>{Formater.formatDateData(observationDetail.ObservationDate)}</Text>
-                  <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Discipline:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleDiscipline(true) }}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.DisciplineCode)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Description:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleDescription(true) }}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.ObservationDesciption)}</Text>
-                  <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Category:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleCategory}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.ObservationCategory)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>NonConforming Record:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleNonConformingRecord(true) }}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.NonConformingRecord)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Subjection:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleSubjection}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.SubjectionOfObservation)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Process Period:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleProcessPeriod}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.ProcessPeriod)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View><View style={styles.row}>
-              <Text style={styles.cellTitle}>RelevantTeam:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleRelevantTeam}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.RelevantTeam)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View><View style={styles.row}>
-              <Text style={styles.cellTitle}>RootCause:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleRootCause}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.RootCause)}</Text>
-                  <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Remark:</Text>
-              <View style={styles.cellData}>
-                <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleRemark(true) }}>
-                  <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.Remark)}</Text>
-                  <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={iconColor} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cellTitle}>Pictures:</Text>
-              <TouchableOpacity style={styles.cellData} disabled={!isOwner} onPress={_onPressManageImage}>
-                <Ionicons style={styles.iconAction} name='md-image-outline' size={20} color={!isOwner ? DISABLED_COLOR : BASE_COLOR} />
+      <ScrollView style={styles.table} contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.box}>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Id:</Text>
+            <Text style={styles.cellData}>{observationDetail.ObservationID}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Status:</Text>
+            <RenderStatus status={observationDetail.ObservationStatus} />
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Date:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => setIsVisibleDate(true)}>
+                <Text style={styles.textAction}>{Formater.formatDateData(observationDetail.ObservationDate)}</Text>
+                <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={iconColor} />
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.actionContainer}>
-            {
-              observationDetail.ObservationStatus == Constant.QA_OBSERVATION_DRAFT && isOwner
-                ?
-                <>
-                  <TouchableOpacity style={styles.buttonLeft} onPress={() => { _onPressSubmitToServer(Constant.QA_OBSERVATION_DRAFT) }}>
-                    <Text style={styles.buttonTitle}>Save as Draft</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.buttonRight} onPress={() => { _onPressSubmitToServer(Constant.QA_OBSERVATION_FINAL) }}>
-                    <Text style={styles.buttonTitle}>Save as Final</Text>
-                  </TouchableOpacity>
-                </>
-                :
-                <>
-                  <TouchableOpacity style={styles.buttonLeftDisabled} disabled={true}>
-                    <Text style={styles.buttonTitle}>Save as Draft</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.buttonRightDisabled} disabled={true}>
-                    <Text style={styles.buttonTitle}>Save as Final</Text>
-                  </TouchableOpacity>
-                </>
-            }
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Discipline:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleDiscipline(true) }}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.DisciplineCode)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </ScrollView>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Description:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleDescription(true) }}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.ObservationDesciption)}</Text>
+                <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Category:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleCategory}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.ObservationCategory)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>NonConforming Record:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleNonConformingRecord(true) }}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.NonConformingRecord)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Subjection:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleSubjection}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.SubjectionOfObservation)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Process Period:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleProcessPeriod}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.ProcessPeriod)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View><View style={styles.row}>
+            <Text style={styles.cellTitle}>RelevantTeam:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleRelevantTeam}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.RelevantTeam)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View><View style={styles.row}>
+            <Text style={styles.cellTitle}>RootCause:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={_onPressVisibleRootCause}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.RootCause)}</Text>
+                <Ionicons style={styles.iconAction} name='md-list' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Remark:</Text>
+            <View style={styles.cellData}>
+              <TouchableOpacity style={styles.containerAction} disabled={isDisabled} onPress={() => { setIsVisibleRemark(true) }}>
+                <Text style={styles.textAction}>{Formater.formatEmptyData(observationDetail.Remark)}</Text>
+                <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={iconColor} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>Pictures:</Text>
+            <TouchableOpacity style={styles.cellData} disabled={!isOwner} onPress={_onPressManageImage}>
+              <Ionicons style={styles.iconAction} name='md-image-outline' size={20} color={!isOwner ? DISABLED_COLOR : BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.actionContainer}>
+          {
+            observationDetail.ObservationStatus == Constant.QA_OBSERVATION_DRAFT && isOwner
+              ?
+              <>
+                <TouchableOpacity style={styles.buttonLeft} onPress={() => { _onPressSubmitToServer(Constant.QA_OBSERVATION_DRAFT) }}>
+                  <Text style={styles.buttonTitle}>Save as Draft</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => { _onPressSubmitToServer(Constant.QA_OBSERVATION_FINAL) }}>
+                  <Text style={styles.buttonTitle}>Save as Final</Text>
+                </TouchableOpacity>
+                {
+                  observationDetail.ObservationID !== Constant.ID_TBA
+                    ?
+                    <TouchableOpacity style={styles.buttonRight} onPress={() => { _onPressDeleteObservation() }}>
+                      <Text style={styles.buttonTitle}>Delete</Text>
+                    </TouchableOpacity>
+                    :
+                    <TouchableOpacity style={styles.buttonRightDisabled} disabled={true}>
+                      <Text style={styles.buttonTitle}>Delete</Text>
+                    </TouchableOpacity>
+                }
+              </>
+              :
+              <>
+                <TouchableOpacity style={styles.buttonLeftDisabled} disabled={true}>
+                  <Text style={styles.buttonTitle}>Save as Draft</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonDisabled} disabled={true}>
+                  <Text style={styles.buttonTitle}>Save as Final</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonRightDisabled} disabled={true}>
+                  <Text style={styles.buttonTitle}>Delete</Text>
+                </TouchableOpacity>
+              </>
+          }
+        </View>
+      </ScrollView>
     );
   };
-
   const RenderStatus = ({ status }) => {
     if (status == Constant.QA_OBSERVATION_DRAFT) {
       return (<Text style={styles.cellStatusDraft}>{Constant.STATUS_DRAFT}</Text>);
@@ -690,6 +720,7 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
         <Dialog.Button label='Enter' onPress={_onChangeRemark} />
       </Dialog.Container>
       <AwesomeAlert
+        progressColor={BASE_COLOR}
         show={isUploading}
         showProgress={true}
         closeOnTouchOutside={false}
@@ -774,6 +805,12 @@ const styles = StyleSheet.create({
     marginRight: 4,
     backgroundColor: BASE_COLOR,
   },
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+  },
   buttonRight: {
     flex: 1,
     justifyContent: 'center',
@@ -789,6 +826,14 @@ const styles = StyleSheet.create({
     borderColor: '#999999',
     borderWidth: 1,
     marginRight: 4,
+  },
+  buttonDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
+    borderColor: '#999999',
+    borderWidth: 1,
   },
   buttonRightDisabled: {
     flex: 1,

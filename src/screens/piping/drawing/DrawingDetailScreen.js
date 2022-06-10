@@ -709,10 +709,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>
                   <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-                  <Text> - WeldType: </Text>
-                  <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.WeldType)}</Text>
+                  <Text> - ConType: </Text>
+                  <Text style={[styles.textMeta, styles.greenText]}>{Formater.formatEmptyData(item.ConType)}</Text>
                   {
-                    item.WeldType == 'TW' && code == Constant.CODE_FITUP
+                    item.ConType == 'TW' && code == Constant.CODE_FITUP
                       ?
                       <>
                         <Text>   </Text>
@@ -738,10 +738,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 <>
                   <Text>WeldNo: </Text>
                   <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-                  <Text> - WeldType: </Text>
-                  <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
+                  <Text> - ConType: </Text>
+                  <Text style={styles.textMeta}>{Formater.formatEmptyData(item.ConType)}</Text>
                   {
-                    item.WeldType == 'TW' && code == Constant.CODE_FITUP
+                    item.ConType == 'TW' && code == Constant.CODE_FITUP
                       ?
                       <>
                         <Text>   </Text>
