@@ -158,7 +158,7 @@ const LamcheckImageScreen = ({ route }) => {
       { name: 'projectCode', data: projectCode },
       { name: 'drawingNo', data: drawingNo },
       { name: 'jointNo', data: jointNo },
-      { name: 'rowIndex', data: rowIndex },
+      { name: 'rowIndex', data: rowIndex.toString() },
     ];
 
     addFilesToBody()
