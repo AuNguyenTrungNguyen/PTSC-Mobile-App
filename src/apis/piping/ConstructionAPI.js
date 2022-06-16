@@ -93,6 +93,23 @@ export const UpdateConstructionDetailAPI = (projectCode, facilityCode, userUpdat
     }
   ).then(res => res.json());
 
+
+
+export const GetTeamReportAPI = (projectCode, disciplineCode, team, date, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetTeamReport'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&team=' + team
+    + '&date=' + date,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 // export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, location, type, code, token) =>
 //   fetch(
 //     Port_Server

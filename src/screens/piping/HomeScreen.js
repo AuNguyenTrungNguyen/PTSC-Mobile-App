@@ -350,6 +350,16 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Daily Report
+  const _onPressDailyReport = async () => {
+    navigation.navigate(
+      'DailyReport',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Buttom Action
   const _onPressConstructionUpdate = () => {
     navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
@@ -440,7 +450,7 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title={'Daily Report'} onPress={_onPressDailyReport} iconName={'ios-stats-chart-sharp'} />
             </View>
           </ScrollView>
           <View style={styles.action}>

@@ -21,6 +21,13 @@ export default class Formater {
       return '0.00';
     }
   }
+  static formatZeroDigits = number => {
+    try {
+      return number.toFixed(0);
+    } catch {
+      return '0';
+    }
+  }
 
   static formatDateSQL = data => {
     return Moment(data).format("YYYY-MM-DD HH:mm:ss");
