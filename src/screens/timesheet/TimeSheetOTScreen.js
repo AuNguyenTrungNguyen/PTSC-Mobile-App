@@ -798,7 +798,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowHours(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowHours(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearHours} />
         <Dialog.Button label='OK' onPress={_onChangeHours} />
       </Dialog.Container>
@@ -809,7 +809,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
           onChangeText={(text) => setNoteDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowNote(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowNote(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearNote} />
         <Dialog.Button label='OK' onPress={_onChangeNote} />
       </Dialog.Container>

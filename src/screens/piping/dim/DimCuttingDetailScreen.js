@@ -590,7 +590,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
         <Dialog.Description style={{ color: QC_COLOR }}>
           Checkbox this color for send DIM CUTTING to QC.
         </Dialog.Description>
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleHelp(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleHelp(false) }} />
       </Dialog.Container>
       <SelectPopupTwoColumns
         visible={isVisibleSerial}
@@ -623,7 +623,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setNoteDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowNote(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowNote(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearNote} />
         <Dialog.Button label='OK' onPress={_onChangeNote} />
       </Dialog.Container> */}

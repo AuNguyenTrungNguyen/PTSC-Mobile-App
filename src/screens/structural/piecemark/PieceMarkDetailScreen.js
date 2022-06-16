@@ -410,7 +410,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
         <Dialog.Description style={{ color: QC_COLOR }}>
           Checkbox this color for send DIM CUTTING to QC.
         </Dialog.Description>
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleHelp(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleHelp(false) }} />
       </Dialog.Container>
     </SafeAreaView>
   );

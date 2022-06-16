@@ -502,7 +502,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleThickness(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleThickness(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeThickness} />
       </Dialog.Container>
     </SafeAreaView>

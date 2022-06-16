@@ -813,7 +813,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
           onChangeText={(text) => setRemarkDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialogRemark(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowDialogRemark(false) }} />
         <Dialog.Button label='OK' onPress={_onPressSubmitRemark} />
       </Dialog.Container>
     </SafeAreaView>

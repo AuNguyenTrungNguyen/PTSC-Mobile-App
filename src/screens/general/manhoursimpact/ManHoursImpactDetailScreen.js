@@ -319,7 +319,7 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setMhrs(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsVisibleMhrs(false);
           setMhrs(manHoursImpactDetail.Mhrs);
         }} />
@@ -344,7 +344,7 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setRemark(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsVisibleRemark(false);
           setRemark(manHoursImpactDetail.Remark);
         }} />

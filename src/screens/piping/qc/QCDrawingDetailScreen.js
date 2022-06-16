@@ -440,7 +440,7 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
               onChangeText={(text) => setRemarkDisplay(text)}
               underlineColorAndroid={BASE_COLOR}
             />
-            <Dialog.Button label='Cancle' onPress={() => { setIsVisibleRemark(false) }} />
+            <Dialog.Button label='Cancel' onPress={() => { setIsVisibleRemark(false) }} />
             <Dialog.Button label='OK' onPress={_onChangeRemark} />
           </Dialog.Container>
         </View>

@@ -209,7 +209,7 @@ const ManHoursImpactListScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialog(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowDialog(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeTime} />
       </Dialog.Container>
       <AwesomeAlert

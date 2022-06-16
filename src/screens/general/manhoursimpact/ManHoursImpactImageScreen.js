@@ -533,7 +533,7 @@ const ManHoursImpactImageScreen = ({ route }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);

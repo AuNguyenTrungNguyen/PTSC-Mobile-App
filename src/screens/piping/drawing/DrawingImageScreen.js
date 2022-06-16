@@ -76,20 +76,20 @@ const DrawingImageScreen = ({ route }) => {
         });
     } else {
       GetDrawingImageAPI(projectCode, facilityCode, drawingNo, sheet, jointNo, code, role, token)
-      .then(res => {
-        if (res.Success) {
-          setDrawingImageList(res.Data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
+        .then(res => {
+          if (res.Success) {
+            setDrawingImageList(res.Data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
           setIsLoading(false);
           setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
+        });
     }
   };
 
@@ -532,7 +532,7 @@ const DrawingImageScreen = ({ route }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);

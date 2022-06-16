@@ -225,7 +225,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         if ((column.indexOf('QCVisualRemark') >= 0 && !time) || (column.indexOf('QCVisualRemark') < 0 && !oldItem['QCVisualRemark'])) {
           messages.push('Time');
         }
-        if (oldItem['JointNo'].includes('#')){
+        if (oldItem['JointNo'].includes('#')) {
           if ((column.indexOf('LengthWeld') >= 0 && !lengthWeld) || (column.indexOf('LengthWeld') < 0 && !oldItem['LengthWeld'])) {
             messages.push('LengthWeld');
           }
@@ -1449,7 +1449,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               underlineColorAndroid={BASE_COLOR}
               keyboardType={'numeric'}
             />
-            <Dialog.Button label='Cancle' onPress={() => { setIsVisiblePercent(false) }} />
+            <Dialog.Button label='Cancel' onPress={() => { setIsVisiblePercent(false) }} />
             <Dialog.Button label='OK' onPress={_onChangePercent} />
           </Dialog.Container>
           <Dialog.Container visible={isVisibleLengthWeld}>
@@ -1461,7 +1461,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               underlineColorAndroid={BASE_COLOR}
               keyboardType={'numeric'}
             />
-            <Dialog.Button label='Cancle' onPress={() => { setIsVisibleLengthWeld(false) }} />
+            <Dialog.Button label='Cancel' onPress={() => { setIsVisibleLengthWeld(false) }} />
             <Dialog.Button label='OK' onPress={_onChangeLengthWeld} />
           </Dialog.Container>
         </View>
@@ -1510,7 +1510,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setTimeDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTime(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleTime(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeTime} />
       </Dialog.Container>
       <Dialog.Container visible={isVisibleJointNo}>
@@ -1520,7 +1520,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           onChangeText={(no) => setJointNo(no)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleJointNo(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleJointNo(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearJointNo} />
         <Dialog.Button label='OK' onPress={_onSearchJointNo} />
       </Dialog.Container>

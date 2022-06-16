@@ -561,7 +561,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={OPP_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialogEdit(false);
           setPictureId(null);
           setPictureNote(null);

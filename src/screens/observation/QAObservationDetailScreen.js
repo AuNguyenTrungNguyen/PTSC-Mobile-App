@@ -668,7 +668,7 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setDescription(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsVisibleDescription(false);
           setDescription(observationDetail.ObservationDesciption);
         }} />
@@ -713,7 +713,7 @@ const QAObservationDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setRemark(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsVisibleRemark(false);
           setRemark(observationDetail.Remark);
         }} />

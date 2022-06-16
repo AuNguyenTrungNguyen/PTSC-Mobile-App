@@ -1641,7 +1641,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               underlineColorAndroid={BASE_COLOR}
               keyboardType={'numeric'}
             />
-            <Dialog.Button label='Cancle' onPress={() => { setIsVisiblePercent(false) }} />
+            <Dialog.Button label='Cancel' onPress={() => { setIsVisiblePercent(false) }} />
             <Dialog.Button label='OK' onPress={_onChangePercent} />
           </Dialog.Container>
           <Dialog.Container visible={isVisibleLengthWeld}>
@@ -1653,7 +1653,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
               underlineColorAndroid={BASE_COLOR}
               keyboardType={'numeric'}
             />
-            <Dialog.Button label='Cancle' onPress={() => { setIsVisibleLengthWeld(false) }} />
+            <Dialog.Button label='Cancel' onPress={() => { setIsVisibleLengthWeld(false) }} />
             <Dialog.Button label='OK' onPress={_onChangeLengthWeld} />
           </Dialog.Container>
         </View>
@@ -1702,7 +1702,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           onChangeText={(text) => setTimeDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleTime(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleTime(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeTime} />
       </Dialog.Container>
       <Dialog.Container visible={isVisibleJointNo}>
@@ -1712,7 +1712,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
           onChangeText={(no) => setJointNo(no)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleJointNo(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleJointNo(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearJointNo} />
         <Dialog.Button label='OK' onPress={_onSearchJointNo} />
       </Dialog.Container>
