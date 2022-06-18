@@ -19,6 +19,7 @@ import {
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
+
 import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
@@ -111,13 +112,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
   );
 
   //-- Manage Workers
-  const _onPressManageWorker = () => {
+  const _onPressManageWorker = isDelete => {
     navigation.navigate(
       'TimeSheetManagerWorker',
       {
         userLogin: userLogin,
         department: department,
-        fullname: fullname
+        fullname: fullname,
+        isDelete: isDelete,
       }
     );
   };
@@ -638,171 +640,175 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getTeamLeaderInfo)} />
-        :
-        <View style={styles.container}>
-          <View>
-            <View style={styles.headerRow}>
-              <Text style={styles.headerCellTitle}>Ngày:</Text>
-              <View style={styles.headerCellData}>
-                <Text style={styles.headerText}>{Formater.formatDateData(currentDate)}</Text>
-                {
-                  filter === SPENDING_TEXT
-                    ?
-                    <Text style={styles.textFilterSpending}>{filter}</Text>
-                    :
-                    <Text style={styles.textFilterUpdated}>{filter}</Text>
-                }
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getTeamLeaderInfo)} />
+          :
+          <View style={styles.container}>
+            <View>
+              <View style={styles.headerRow}>
+                <Text style={styles.headerCellTitle}>Ngày:</Text>
+                <View style={styles.headerCellData}>
+                  <Text style={styles.headerText}>{Formater.formatDateData(currentDate)}</Text>
+                  {
+                    filter === SPENDING_TEXT
+                      ?
+                      <Text style={styles.textFilterSpending}>{filter}</Text>
+                      :
+                      <Text style={styles.textFilterUpdated}>{filter}</Text>
+                  }
+                </View>
               </View>
-            </View>
-            <View style={styles.headerRow}>
-              <Text style={styles.headerCellTitle}>LSX:</Text>
-              <View style={styles.headerCellAction}>
-                <Text style={styles.headerText}>{workOrder}</Text>
-                <Ionicons onPress={() => { setIsShowWorkOrder(true); }}
-                  style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
-                <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut() }}
-                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+              <View style={styles.headerRow}>
+                <Text style={styles.headerCellTitle}>LSX:</Text>
+                <View style={styles.headerCellAction}>
+                  <Text style={styles.headerText}>{workOrder}</Text>
+                  <Ionicons onPress={() => { setIsShowWorkOrder(true); }}
+                    style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
+                  <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut() }}
+                    style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                </View>
               </View>
-            </View>
-            <View style={styles.headerRow}>
-              <View style={styles.headerCellShotcut}>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('HC')}>
-                  <Text style={styles.headerShotcutText}>{'HC'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca1')}>
-                  <Text style={styles.headerShotcutText}>{'Ca1'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca2')}>
-                  <Text style={styles.headerShotcutText}>{'Ca2'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca3')}>
-                  <Text style={styles.headerShotcutText}>{'Ca3'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca Lỡ')}>
-                  <Text style={styles.headerShotcutText}>{'Ca Lỡ'}</Text>
-                </TouchableOpacity>
+              <View style={styles.headerRow}>
+                <View style={styles.headerCellShotcut}>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('HC')}>
+                    <Text style={styles.headerShotcutText}>{'HC'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca1')}>
+                    <Text style={styles.headerShotcutText}>{'Ca1'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca2')}>
+                    <Text style={styles.headerShotcutText}>{'Ca2'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca3')}>
+                    <Text style={styles.headerShotcutText}>{'Ca3'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca Lỡ')}>
+                    <Text style={styles.headerShotcutText}>{'Ca Lỡ'}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-            <View style={styles.headerRow}>
-              <View style={styles.headerCellShotcut}>
-                {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
+              <View style={styles.headerRow}>
+                <View style={styles.headerCellShotcut}>
+                  {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
                   <Text style={styles.headerShotcutText}>{'2'}</Text>
                 </TouchableOpacity> */}
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('4')}>
-                  <Text style={styles.headerShotcutText}>{'4'}</Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('6')}>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('4')}>
+                    <Text style={styles.headerShotcutText}>{'4'}</Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('6')}>
                   <Text style={styles.headerShotcutText}>{'6'}</Text>
                 </TouchableOpacity> */}
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('8')}>
-                  <Text style={styles.headerShotcutText}>{'8'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => setIsShowHours(true)}>
-                  <Text style={styles.headerShotcutText}>{hours}...</Text>
-                </TouchableOpacity>
-                <FontAwesome5 onPress={() => { _onChangHoursShotcut(hours) }}
-                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('8')}>
+                    <Text style={styles.headerShotcutText}>{'8'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => setIsShowHours(true)}>
+                    <Text style={styles.headerShotcutText}>{hours}...</Text>
+                  </TouchableOpacity>
+                  <FontAwesome5 onPress={() => { _onChangHoursShotcut(hours) }}
+                    style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                </View>
+              </View>
+              <View style={styles.headerRowMultiLine}>
+                <Text style={styles.headerCellTitle}>Ghi chú:</Text>
+                <View style={styles.headerCellAction}>
+                  <Text style={styles.headerText}>{note}</Text>
+                  <FontAwesomeIcon onPress={() => { setIsShowNote(true); }}
+                    style={styles.headerIcon} name='pencil' size={20} color={BASE_COLOR} />
+                  <FontAwesome5 onPress={() => { _onChangNoteShotcut() }}
+                    style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                </View>
               </View>
             </View>
-            <View style={styles.headerRowMultiLine}>
-              <Text style={styles.headerCellTitle}>Ghi chú:</Text>
-              <View style={styles.headerCellAction}>
-                <Text style={styles.headerText}>{note}</Text>
-                <FontAwesomeIcon onPress={() => { setIsShowNote(true); }}
-                  style={styles.headerIcon} name='pencil' size={20} color={BASE_COLOR} />
-                <FontAwesome5 onPress={() => { _onChangNoteShotcut() }}
-                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
-              </View>
+            <View style={styles.headerRowAction}>
+              {
+                filter === SPENDING_TEXT
+                  ?
+                  <>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressCheckAll}>
+                      <Text style={styles.buttonTitle}>Chọn tất cả</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressClearAll}>
+                      <Text style={styles.buttonTitle}>Bỏ chọn</Text>
+                    </TouchableOpacity>
+                  </>
+                  :
+                  <>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressCheckAllUpdated}>
+                      <Text style={styles.buttonTitle}>Chọn tất cả</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressClearAllUpdated}>
+                      <Text style={styles.buttonTitle}>Bỏ chọn</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressDeleteUpdated}>
+                      <Text style={styles.buttonTitle}>Xóa</Text>
+                    </TouchableOpacity>
+                  </>
+              }
             </View>
-          </View>
-          <View style={styles.headerRowAction}>
             {
               filter === SPENDING_TEXT
                 ?
-                <>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressCheckAll}>
-                    <Text style={styles.buttonTitle}>Chọn tất cả</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressClearAll}>
-                    <Text style={styles.buttonTitle}>Bỏ chọn</Text>
-                  </TouchableOpacity>
-                </>
+                workerList.length
+                  ?
+                  <VirtualizedList
+                    style={styles.table}
+                    data={workerList}
+                    getItemCount={data => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(item, index) => index}
+                    renderItem={renderItem}
+                  />
+                  :
+                  <ListEmptyData />
                 :
-                <>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressCheckAllUpdated}>
-                    <Text style={styles.buttonTitle}>Chọn tất cả</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressClearAllUpdated}>
-                    <Text style={styles.buttonTitle}>Bỏ chọn</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressDeleteUpdated}>
-                    <Text style={styles.buttonTitle}>Xóa</Text>
-                  </TouchableOpacity>
-                </>
+                workerUpdatedList.length
+                  ?
+                  <VirtualizedList
+                    style={styles.table}
+                    data={workerUpdatedList}
+                    getItemCount={data => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(item, index) => index}
+                    renderItem={renderItem}
+                  />
+                  :
+                  <ListEmptyData />
             }
+            <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={() => { _onPressManageWorker(false) }}>
+                <Text style={styles.buttonTitle}>Thêm CN</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonCenter} onPress={() => { _onPressManageWorker(true) }}>
+                <Text style={styles.buttonTitle}>Xóa CN</Text>
+              </TouchableOpacity>
+              {
+                filter === SPENDING_TEXT
+                  ?
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressTransfer}>
+                    <Text style={styles.buttonTitle}>Chuyển</Text>
+                  </TouchableOpacity>
+                  : <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                    <Text style={styles.buttonTitle}>Gửi Server</Text>
+                  </TouchableOpacity>
+              }
+            </View>
           </View>
-          {
-            filter === SPENDING_TEXT
-              ?
-              workerList.length
-                ?
-                <VirtualizedList
-                  style={styles.table}
-                  data={workerList}
-                  getItemCount={data => data.length}
-                  getItem={(data, index) => {
-                    return data[index];
-                  }}
-                  keyExtractor={(item, index) => index}
-                  renderItem={renderItem}
-                />
-                :
-                <ListEmptyData />
-              :
-              workerUpdatedList.length
-                ?
-                <VirtualizedList
-                  style={styles.table}
-                  data={workerUpdatedList}
-                  getItemCount={data => data.length}
-                  getItem={(data, index) => {
-                    return data[index];
-                  }}
-                  keyExtractor={(item, index) => index}
-                  renderItem={renderItem}
-                />
-                :
-                <ListEmptyData />
-          }
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManageWorker}>
-              <Text style={styles.buttonTitle}>QL Công nhân</Text>
-            </TouchableOpacity>
-            {
-              filter === SPENDING_TEXT
-                ?
-                <TouchableOpacity style={styles.buttonRight} onPress={_onPressTransfer}>
-                  <Text style={styles.buttonTitle}>Chuyển</Text>
-                </TouchableOpacity>
-                : <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-                  <Text style={styles.buttonTitle}>Gửi Server</Text>
-                </TouchableOpacity>
-            }
-          </View>
-        </View>
       }
       <SelectPopupTimeSheet
         visible={isShowWorkOrder}
@@ -1009,6 +1015,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
     marginRight: 4,
+  },
+  buttonCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
   },
   buttonRight: {
     flex: 1,
