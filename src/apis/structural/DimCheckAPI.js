@@ -1,7 +1,7 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, type, isSpending, token) => {
+export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, location, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
@@ -23,9 +23,10 @@ export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, 
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev
-    + '&type=' + type
+    + '&filterType=' + filterType
     + '&scope=' + scope
-    + '&isSpending=' + isSpending,
+    + '&isSpending=' + isSpending
+    + '&location=' + location,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
