@@ -110,19 +110,20 @@ export const GetTeamReportAPI = (projectCode, disciplineCode, team, date, token)
       },
     }).then(res => res.json());
 
-// export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, location, type, code, token) =>
-//   fetch(
-//     Port_Server
-//     + '/api/structural/Construction/GetConstructionQCStatusList'
-//     + '?projectCode=' + projectCode
-//     + '&drawingNo=' + drawingNo
-//     + '&jointNo=' + jointNo
-//     + '&location=' + location
-//     + '&type=' + type
-//     + '&code=' + code,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }).then(res => res.json());
+export const GetQCStatusListAPI = (projectCode, code, facilityCode, drawingNo, weldNo, filterType, siteLocaion, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetQCStatusList'
+    + '?projectCode=' + projectCode
+    + '&code=' + code
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&weldNo=' + weldNo
+    + '&filterType=' + filterType
+    + '&siteLocation=' + siteLocaion,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());

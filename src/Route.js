@@ -31,6 +31,7 @@ import DrawingDetailScreen from './screens/piping/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/piping/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/piping/drawing/DrawingAddWelderScreen';
 import DailyReportScreen from './screens/piping/drawing/DailyReportScreen';
+import DrawingQCStatusScreen from './screens/piping/drawing/DrawingQCStatusScreen';
 
 import SpoolMatrixScreen from './screens/piping/spool/SpoolMatrixScreen';
 import SpoolCameraScreen from './screens/piping/spool/SpoolCameraScreen';
@@ -228,6 +229,14 @@ const PipingStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+      <PipingStack.Screen
+        name='QCStatus'
+        component={DrawingQCStatusScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
 
       <PipingStack.Screen

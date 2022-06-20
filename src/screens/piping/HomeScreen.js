@@ -10,6 +10,7 @@ import Header from '../../components/Header';
 import { GetPIPNotifyNumberAPI } from '../../apis/app/AppAPI';
 import MessageAlert from '../../components/MessageAlert';
 import LoadingRefresh from '../../components/LoadingRefresh';
+import SelectActions from '../../components/SelectActions';
 
 const HomeScreen = ({ route, navigation }) => {
 
@@ -134,36 +135,51 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
-  //-- CONS FitUp
-  const _onPressQRCodeFitUp = async () => {
-    let teamLeader = await Helper.getData('USERNAME');
+  //-- CONS MANAGERMENT
+  // const [isVisibleConsFitUp, setIsVisibleConsFitUp] = useState(false);
+  // const [isVisibleConsWeld, setIsVisibleConsWeld] = useState(false);
+  const _onPressManageCons = code => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code\n\nSearch: Search Request List\n\nQC Status: View Request List QC',
+      [
+        { text: 'Scan', onPress: () => _onPressQRCodeCons(code) },
+        { text: 'Search', onPress: _onPresSearchCons },
+        { text: 'QC Status', onPress: () => { _onPressQCStatusCons(code) } },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeCons = async code => {
+    const teamLeader = await Helper.getData('USERNAME');
     navigation.navigate(
       'Camera',
       {
-        code: Constant.CODE_FITUP,
+        code: code,
         source: Constant.CAMERA_PIP_CONS,
         projectCode: projectCode,
         teamLeader: teamLeader,
       }
     );
   };
-
-  //-- CONS Weld
-  const _onPressQRCodeWeld = async () => {
-    let teamLeader = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'Camera',
-      {
-        code: Constant.CODE_WELD,
-        source: Constant.CAMERA_PIP_CONS,
-        projectCode: projectCode,
-        teamLeader: teamLeader,
-      }
-    );
+  const _onPresSearchCons = async () => {
+    navigation.navigate('DrawingList', {
+      projectCode: projectCode
+    });
+  };
+  const _onPressQCStatusCons = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'QC Status ' + code;
+    navigation.navigate('QCStatus', {
+      projectCode: projectCode,
+      userLogin: userLogin,
+      code: code,
+      title: title,
+    });
   };
 
   //-- QC FitUp
-  const _onPressMamageQCFitUp = () => {
+  const _onPressManageQCFitUp = () => {
     Alert.alert(
       '',
       'Scan: Scan QR Code FitUp Drawing\n\nSpend List: Spend FitUp Request List',
@@ -200,7 +216,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   //-- QC Visual
-  const _onPressMamageQCVisual = () => {
+  const _onPressManageQCVisual = () => {
     Alert.alert(
       '',
       'Scan: Scan QR Code Visual Drawing\n\nSpend List: Spend Visual Request List',
@@ -433,12 +449,12 @@ const HomeScreen = ({ route, navigation }) => {
               <RenderItemBox title={'QC\nDim Cutting'} onPress={_onPressDimCuttingQCList} number={notifyNumbers.DimCutting} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'Cons Scan\nFitUp'} onPress={_onPressQRCodeFitUp} />
-              <RenderItemBox title={'Cons Scan\nWeld'} onPress={_onPressQRCodeWeld} />
+              <RenderItemBox title={'Cons Scan\nFitUp'} onPress={() => { _onPressManageCons(Constant.CODE_FITUP) }} number={notifyNumbers.FitUp} />
+              <RenderItemBox title={'Cons Scan\nWeld'} onPress={() => { _onPressManageCons(Constant.CODE_WELD) }} number={notifyNumbers.Visual} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressMamageQCFitUp} number={notifyNumbers.FitUp} />
-              <RenderItemBox title={'QC Scan\nVisual'} onPress={_onPressMamageQCVisual} number={notifyNumbers.Visual} />
+              <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressManageQCFitUp} number={notifyNumbers.FitUp} />
+              <RenderItemBox title={'QC Scan\nVisual'} onPress={_onPressManageQCVisual} number={notifyNumbers.Visual} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
@@ -471,6 +487,50 @@ const HomeScreen = ({ route, navigation }) => {
           </View>
         </View>
       }
+      {/* <SelectActions
+        title={'CONS FitUp'}
+        data={[
+          {
+            icon: 'qr-code-outline',
+            text: 'Scan QRCode',
+            callback: () => { _onPressQRCodeCons(Constant.CODE_FITUP) }
+          },
+          {
+            icon: 'md-search',
+            text: 'Search List',
+            callback: () => { _onPresSearchCons() }
+          },
+          {
+            icon: 'ios-time-outline',
+            text: 'QC Status List',
+            callback: () => { _onPressQCStatusCons(Constant.CODE_FITUP) }
+          },
+        ]}
+        visible={isVisibleConsFitUp}
+        onCancel={() => { setIsVisibleConsFitUp(false) }}
+      />
+      <SelectActions
+        title={'CONS Weld'}
+        data={[
+          {
+            icon: 'qr-code-outline',
+            text: 'Scan QRCode',
+            callback: () => { _onPressQRCodeCons(Constant.CODE_WELD) }
+          },
+          {
+            icon: 'md-search',
+            text: 'Search List',
+            callback: () => { _onPresSearchCons() }
+          },
+          {
+            icon: 'ios-time-outline',
+            text: 'QC Status List',
+            callback: () => { _onPressQCStatusCons(Constant.CODE_WELD) }
+          },
+        ]}
+        visible={isVisibleConsWeld}
+        onCancel={() => { setIsVisibleConsWeld(false) }}
+      /> */}
     </SafeAreaView>
   );
 };
