@@ -2,9 +2,9 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
+import Networker from '../../../utils/Networker';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
@@ -13,7 +13,6 @@ import { GetDimCuttingQCListAPI, UpdateDimCuttingQCListAPI } from '../../../apis
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DimCuttingQCListScreen = ({ route, navigation }) => {
@@ -65,16 +64,7 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
 
   const callAPI = executedAPI => {
     setIsSearching(true);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        setIsSearching(false);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
   useEffect(
     () => {

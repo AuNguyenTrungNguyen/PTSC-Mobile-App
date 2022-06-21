@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, TextInput, ActivityIndicator, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import NetInfo from '@react-native-community/netinfo';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 
 import { GetWelderListAPI } from '../../../apis/app/AppAPI';
 
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 
@@ -31,16 +30,7 @@ export default ({ route, navigation }) => {
     } else {
       setIsSearching(true);
     }
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsSearching(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
 
   const _onChangeWelderID = id => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 import Formater from '../../../utils/Formater';
@@ -26,15 +26,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
 
   const callAPI = executedAPI => {
     setIsLoading(true);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
   useEffect(
     () => {

@@ -7,10 +7,10 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
@@ -84,15 +84,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const callAPI = executedAPI => {
     setIsLoading(false);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
 
   //-- Get Data

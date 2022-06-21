@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Dialog from 'react-native-dialog';
 
+import Networker from '../../../utils//Networker';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
@@ -74,16 +73,7 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
 
   const callAPI = executedAPI => {
     setIsSearching(true);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        setIsSearching(false);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
   useEffect(
     async () => {

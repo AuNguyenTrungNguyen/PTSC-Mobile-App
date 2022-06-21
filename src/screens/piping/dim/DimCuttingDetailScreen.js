@@ -4,7 +4,6 @@ import CheckBox from '@react-native-community/checkbox';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Dialog from "react-native-dialog";
 
@@ -15,11 +14,12 @@ import {
 
 import { GetLocationListAPI, GetTeamListFilterAPI, GetSerialNoAndHeatNoListAPI } from '../../../apis/app/AppAPI';
 
+import Networker from '../../../utils/Networker';
 import Constant from '../../../utils/Constant';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
+
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
 import SelectPopup from '../../../components/SelectPopup';
@@ -81,15 +81,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
     if (loading) {
       setIsLoading(true);
     }
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
   const getAllData = async () => {
     try {

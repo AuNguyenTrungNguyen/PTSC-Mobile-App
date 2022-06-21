@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
@@ -14,7 +14,6 @@ import { GetQCListAPI, GetCurrentQCInfoAPI, GetQCCompletePercentAPI } from '../.
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const QCDrawingListScreen = ({ route, navigation }) => {
@@ -70,15 +69,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
     if (loading) {
       setIsLoading(true);
     }
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
 
   //-- Facility

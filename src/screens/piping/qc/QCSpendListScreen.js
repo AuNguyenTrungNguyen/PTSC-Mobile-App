@@ -2,11 +2,11 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
 import Dialog from 'react-native-dialog';
 
+import Networker from '../../../utils/Networker';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
@@ -16,7 +16,6 @@ import { GetFacilityListAPI, GetInspectorListAPI } from '../../../apis/app/AppAP
 import { GetSpendListAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
 import SelectPopup from '../../../components/SelectPopup';
@@ -83,16 +82,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
 
   const callAPI = executedAPI => {
     setIsSearching(true);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        setIsSearching(false);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
   useEffect(
     async () => {

@@ -2,14 +2,15 @@ import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import NetInfo from '@react-native-community/netinfo';
 
+import Networker from '../../utils/Networker';
 import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
-import Header from '../../components/Header';
+
 import { GetPIPNotifyNumberAPI } from '../../apis/app/AppAPI';
-import MessageAlert from '../../components/MessageAlert';
+
 import LoadingRefresh from '../../components/LoadingRefresh';
+import Header from '../../components/Header';
 import SelectActions from '../../components/SelectActions';
 
 const HomeScreen = ({ route, navigation }) => {
@@ -41,15 +42,7 @@ const HomeScreen = ({ route, navigation }) => {
   const callAPI = executedAPI => {
     if (isFocused) {
       setIsLoading(true);
-      NetInfo.fetch().then(state => {
-        if (!state.isConnected) {
-          setIsLoading(false);
-          setIsError(true);
-          MessageAlert('WARNING', 'Network not available!');
-        } else {
-          executedAPI();
-        }
-      });
+      Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
     }
   };
   const getNotifyNumbers = async () => {
@@ -472,63 +465,64 @@ const HomeScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
-        :
-        <View style={styles.container}>
-          <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
-          <ScrollView style={styles.table}>
-            {
-              (
-                notifyNumbers.DimCutting)
-                ?
-                <View style={styles.line} />
-                :
-                null
-            }
-            <View style={styles.row}>
-              <RenderItemBox title={'Cons\nDim Cutting'} onPress={_onPressManageDimCutting} />
-              <RenderItemBox title={'QC\nDim Cutting'} onPress={_onPressDimCuttingQCList} number={notifyNumbers.DimCutting} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Cons Scan\nFitUp'} onPress={() => { _onPressManageCons(Constant.CODE_FITUP) }} number={notifyNumbers.FitUp} />
-              <RenderItemBox title={'Cons Scan\nWeld'} onPress={() => { _onPressManageCons(Constant.CODE_WELD) }} number={notifyNumbers.Visual} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'QC Scan\nFitUp'} onPress={() => { _onPressManageQC(Constant.CODE_FITUP) }} number={notifyNumbers.FitUp} />
-              <RenderItemBox title={'QC Scan\nVisual'} onPress={() => { _onPressManageQC(Constant.CODE_VISUAL) }} number={notifyNumbers.Visual} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
-              <RenderItemBox title={'Search\nAll Status'} onPress={_onPressSearchAllStatus} iconName={'md-search'} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
-              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-              <RenderItemBox title={'Daily Report'} onPress={_onPressDailyReport} iconName={'ios-stats-chart-sharp'} />
-            </View>
-          </ScrollView>
-          <View style={styles.action}>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewReports}>
-              <Text style={styles.buttonTitle}>View Reports</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressConstructionUpdate}>
-              <Text style={styles.buttonTitle}>Construction Update</Text>
-            </TouchableOpacity>
-            <View style={styles.containerMultiButtons}>
-              <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQCUpdate}>
-                <Text style={styles.buttonTitle}>QC Update</Text>
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
+          :
+          <View style={styles.container}>
+            <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+            <ScrollView style={styles.table}>
+              {
+                (
+                  notifyNumbers.DimCutting)
+                  ?
+                  <View style={styles.line} />
+                  :
+                  null
+              }
+              <View style={styles.row}>
+                <RenderItemBox title={'Cons\nDim Cutting'} onPress={_onPressManageDimCutting} />
+                <RenderItemBox title={'QC\nDim Cutting'} onPress={_onPressDimCuttingQCList} number={notifyNumbers.DimCutting} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Cons Scan\nFitUp'} onPress={() => { _onPressManageCons(Constant.CODE_FITUP) }} number={notifyNumbers.FitUp} />
+                <RenderItemBox title={'Cons Scan\nWeld'} onPress={() => { _onPressManageCons(Constant.CODE_WELD) }} number={notifyNumbers.Visual} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'QC Scan\nFitUp'} onPress={() => { _onPressManageQC(Constant.CODE_FITUP) }} number={notifyNumbers.FitUp} />
+                <RenderItemBox title={'QC Scan\nVisual'} onPress={() => { _onPressManageQC(Constant.CODE_VISUAL) }} number={notifyNumbers.Visual} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />
+                <RenderItemBox title={'Search\nAll Status'} onPress={_onPressSearchAllStatus} iconName={'md-search'} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
+                <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
+                <RenderItemBox title={'Daily Report'} onPress={_onPressDailyReport} iconName={'ios-stats-chart-sharp'} />
+              </View>
+            </ScrollView>
+            <View style={styles.action}>
+              <TouchableOpacity style={styles.buttonContainer} onPress={_onPressViewReports}>
+                <Text style={styles.buttonTitle}>View Reports</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressNDTUpdate}>
-                <Text style={styles.buttonTitle}>NDT Update</Text>
+              <TouchableOpacity style={styles.buttonContainerPadding} onPress={_onPressConstructionUpdate}>
+                <Text style={styles.buttonTitle}>Construction Update</Text>
               </TouchableOpacity>
+              <View style={styles.containerMultiButtons}>
+                <TouchableOpacity style={styles.buttonLeft} onPress={_onPressQCUpdate}>
+                  <Text style={styles.buttonTitle}>QC Update</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonRight} onPress={_onPressNDTUpdate}>
+                  <Text style={styles.buttonTitle}>NDT Update</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
       }
       {/* <SelectActions
         title={'CONS FitUp'}

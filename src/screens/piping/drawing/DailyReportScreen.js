@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Keyboard, VirtualizedList, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import NetInfo from '@react-native-community/netinfo';
 import Moment from 'moment';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 
 import { GetTeamListFilterAPI } from '../../../apis/app/AppAPI';
@@ -12,7 +12,6 @@ import { GetTeamReportAPI } from '../../../apis/piping/ConstructionAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Formater from '../../../utils/Formater';
 
@@ -60,15 +59,7 @@ const DailyReportScreen = ({ route, navigation }) => {
     if (loading) {
       setIsLoading(true);
     }
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
   useEffect(
     () => {

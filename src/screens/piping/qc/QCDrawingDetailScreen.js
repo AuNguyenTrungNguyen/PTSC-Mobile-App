@@ -3,20 +3,19 @@ import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import Dialog from 'react-native-dialog';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
 import { GetQCDetailAPI, UpdateQCDetailAPI } from '../../../apis/piping/QCAPI';
 
-import MessageAlert from '../../../components/MessageAlert';
+import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
-import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 
 const QCDrawingDetailScreen = ({ route, navigation }) => {
 
@@ -59,15 +58,7 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
 
   const callAPI = executedAPI => {
     setIsLoading(false);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
   useEffect(
     () => {
