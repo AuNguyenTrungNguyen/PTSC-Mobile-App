@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Modal, Dimensions, ScrollView, ActivityIndicator, Appearance, Alert } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-simple-toast';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
+
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import GetDrawingListAPI from '../../../apis/drawing/GetDrawingListAPI';
+import { GetQCListAPI } from '../../../apis/piping/QCAPI';
+
+import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
+import SelectPopup from '../../../components/SelectPopup';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
@@ -18,20 +21,23 @@ const DrawingSearchScreen = ({ route, navigation }) => {
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
-  const [facilityList, setFacilityList] = useState([]);
-  const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
-  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
-
-  const [drawingNo, setDrawingNo] = useState('');
-  const [oldDrawingNo, setOldDrawingNo] = useState('');
-
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
   const [drawingList, setDrawingList] = useState(null);
 
+  const [drawingNo, setDrawingNo] = useState('');
+  const [oldDrawingNo, setOldDrawingNo] = useState(null);
+  const [weldNo, setWeldNo] = useState('');
+  const [oldWeldNo, setOldWeldNo] = useState(null);
+
+  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
+  const [facilityList, setFacilityList] = useState([]);
+  const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
+
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
+
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -74,10 +80,11 @@ const DrawingSearchScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Facility
   const getFacilityList = async () => {
-    let token = await Helper.getData('TOKEN');
+    const token = await Helper.getData('TOKEN');
     GetFacilityListAPI(projectCode, token)
-      .then((res) => {
+      .then(res => {
         if (res.success) {
           setFacilityList(res.data);
           setIsLoading(false);
@@ -90,31 +97,50 @@ const DrawingSearchScreen = ({ route, navigation }) => {
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
-      });;
+      });
   };
-
-  const _onChangeDrawingNo = (no) => {
-    setDrawingNo(no);
-  };
-
-  const _onChangeFacilityCode = (code) => {
+  const _onChangeFacilityCode = code => {
     if (code !== facilityCode) {
       setFacilityCode(code);
-      callAPI(() => { searchDrawing(code, drawingNo) }, false);
+      callAPI(() => { searchDrawing(code, drawingNo, weldNo) }, false);
+    }
+    setIsVisibleFacility(false);
+  };
+  const _onPressClearFacilityCode = () => {
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      setFacilityCode(FACILITY_CODE_DEFAULT);
+      callAPI(() => { searchDrawing('', drawingNo, weldNo) }, false);
     }
     setIsVisibleFacility(false);
   };
 
-  const searchDrawing = async (facilityCode, drawingNo) => {
+  //-- DrawingNo & WeldNo
+  const _onChangeDrawingNo = no => {
+    setDrawingNo(no);
+  };
+  const _onChangeWeldNo = no => {
+    setWeldNo(no);
+  };
+
+  //-- Search Action
+  const _onPressSearchDrawing = () => {
+    if (oldDrawingNo !== drawingNo || oldWeldNo !== weldNo) {
+      Keyboard.dismiss();
+      setOldDrawingNo(drawingNo);
+      setOldWeldNo(weldNo);
+      callAPI(() => { searchDrawing(facilityCode, drawingNo, weldNo) }, false);
+    }
+  };
+  const searchDrawing = async (facilityCode, drawingNo, weldNo) => {
     setIsSearching(true);
-    setOldDrawingNo(drawingNo);
-    let token = await Helper.getData('TOKEN');
-    facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    drawingNo = drawingNo != null ? drawingNo : '';
-    GetDrawingListAPI(projectCode, facilityCode, drawingNo, token)
+    const token = await Helper.getData('TOKEN');
+    facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
+    drawingNo = drawingNo ? drawingNo : '';
+    weldNo = weldNo ? weldNo : '';
+    GetQCListAPI(projectCode, facilityCode, drawingNo, weldNo, token)
       .then(res => {
-        if (res.success) {
-          setDrawingList(res.data);
+        if (res.Success) {
+          setDrawingList(res.Data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -130,81 +156,9 @@ const DrawingSearchScreen = ({ route, navigation }) => {
       });
   };
 
-  const _onPressSearchDrawing = () => {
-    if (oldDrawingNo !== drawingNo) {
-      Keyboard.dismiss();
-      callAPI(() => { searchDrawing(facilityCode, drawingNo) }, false);
-    }
-  };
-
-  const _onPressClearModel = () => {
-    if (facilityCode !== FACILITY_CODE_DEFAULT) {
-      setFacilityCode(FACILITY_CODE_DEFAULT);
-      callAPI(() => { searchDrawing('', drawingNo) }, false);
-    }
-    setIsVisibleFacility(false);
-  };
-
-  const _onPressCancelModel = () => {
-    setIsVisibleFacility(false);
-  };
-
-  const _onPressShowModel = () => {
-    if (facilityList.length) {
-      setIsVisibleFacility(true);
-    } else {
-      Toast.show('No have Facility to filter', Toast.SHORT);
-    }
-  };
 
 
 
-  /**
-   * Drawing List
-   **/
-  const ListSearchData = () => (
-    <View style={styles.noDataContainer}>
-      <ActivityIndicator size='large' color={BASE_COLOR} />
-    </View>
-  );
-
-  const ListEmptyData = () => (
-    <View style={styles.noDataContainer}>
-      {
-        (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) || drawingNo
-          ?
-          <Text style={styles.noDataTitle}>No have any data with</Text>
-          :
-          <Text style={styles.noDataTitle}>No have any data</Text>
-      }
-      {
-        facilityCode && facilityCode != FACILITY_CODE_DEFAULT
-          ?
-          <>
-            <Text style={styles.noDataTitle}>FacilityCode:</Text>
-            <Text style={styles.noDataText}>{facilityCode}</Text>
-          </>
-          :
-          null
-      }
-      {
-        drawingNo
-          ?
-          <>
-            <Text style={styles.noDataTitle}>DrawingNo:</Text>
-            <Text style={styles.noDataText}>{drawingNo}</Text>
-          </>
-          :
-          null
-      }
-    </View>
-  );
-
-  const ListSelectData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>Enter FacilityCode or DrawingNo to search!</Text>
-    </View>
-  );
 
   const renderItem = ({ item }) => {
     return (
@@ -223,147 +177,144 @@ const DrawingSearchScreen = ({ route, navigation }) => {
           {
             item.WebLink
               ?
-              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Open All Status Drawing')} style={styles.cellData}>
+              <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'PIP Open Drawing')} style={styles.cellData}>
                 <Text style={CoreStyle.textLinkWithLine}>{item.DrawingNo}</Text>
               </TouchableOpacity>
               :
-              <Text style={styles.cellData}>{formatEmptyData(item.DrawingNo)}</Text>
+              <Text style={styles.cellData}>{item.DrawingNo}</Text>
           }
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Sheet:</Text>
-          <Text style={styles.cellData}>{formatEmptyData(item.Sheet)}</Text>
+          <Text style={styles.cellData}>{item.Sheet}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Rev:</Text>
-          <Text style={styles.cellData}>{formatEmptyData(item.Rev)}</Text>
+          <View style={styles.cellData}>
+            <View style={styles.cellValue}>
+              <Text style={styles.textValue}>{item.Rev}</Text>
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
     );
   };
-
-  const formatEmptyData = data => {
-    return data != null ? data : '';
+  const RenderList = () => {
+    {
+      if (isSearching) {
+        return <ListLoadingData />
+      } else if (drawingList == null) {
+        return <ListSelectData title={'Enter DrawingNo, FacilityCode or WeldNo'} />
+      } else if (!drawingList.length) {
+        return <ListEmptyData />
+      } else {
+        return <></>
+      }
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getFacilityList)} />
-        :
-        <View style={styles.container}>
-          {
-            isShowDescription.show
-              ?
-              (<View style={styles.headerContainer}>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>FacilityCode:</Text>
-                  <TouchableOpacity style={styles.selectInput} onPress={_onPressShowModel}>
-                    <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle}>DrawingNo:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={drawingNo}
-                      onChangeText={_onChangeDrawingNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {drawingNo == ''
-                      ? null
-                      : <FontAwesome5Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
-                    }
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError}
+            _onPressRefresh={() => { callAPI(() => { searchDrawing(facilityCode, drawingNo) }, true) }} />
+          :
+          <View style={styles.container}>
+            {
+              isShowDescription.show
+                ?
+                <View style={styles.headerContainer}>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>ProjectCode:</Text>
+                    <Text style={styles.infoData}>{projectCode}</Text>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>FacilityCode:</Text>
+                    <TouchableOpacity style={styles.selectInput} onPress={() => { setIsVisibleFacility(true) }}>
+                      <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>DrawingNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={drawingNo}
+                        onChangeText={_onChangeDrawingNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        drawingNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>WeldNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        weldNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle} />
+                    <TouchableOpacity
+                      style={styles.searchButton}
+                      onPress={_onPressSearchDrawing}
+                      disabled={isSearching}>
+                      <Text style={styles.buttonTitle}>Search Drawing</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-                <View style={styles.rowInfo}>
-                  <Text style={styles.infoTitle} />
-                  <TouchableOpacity
-                    style={styles.searchButton}
-                    onPress={_onPressSearchDrawing}
-                    disabled={isSearching}>
-                    <Text style={styles.buttonTitle}>Search Drawing</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>)
-              :
-              null
-          }
-          {
-            isSearching
-              ?
-              <ListSearchData />
-              :
-              (drawingList == null)
-                ?
-                <ListSelectData />
                 :
-                (!drawingList.length)
-                  ?
-                  <ListEmptyData />
-                  :
-                  <>
-                    <Text style={styles.textNote}>* Click an item to view detail</Text>
-                    <VirtualizedList
-                      style={styles.table}
-                      data={drawingList}
-                      getItemCount={(data) => data.length}
-                      getItem={(data, index) => {
-                        return data[index];
-                      }}
-                      keyExtractor={(item) => {
-                        return item.Id;;
-                      }}
-                      renderItem={renderItem}
-                    />
-                  </>
-          }
-        </View>
+                null
+            }
+            {
+              !isSearching && drawingList && drawingList.length
+                ?
+                <>
+                  <Text style={CoreStyle.textNote}>* Click an item to view detail</Text>
+                  <VirtualizedList
+                    style={styles.table}
+                    data={drawingList}
+                    getItemCount={data => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(item, index) => index}
+                    renderItem={renderItem}
+                  />
+                </>
+                :
+                <RenderList />
+            }
+          </View>
       }
-      <Modal
-        animationType='fade'
-        transparent={true}
-        visible={isVisibleFacility}>
-        <View style={modals.dim}>
-          <SafeAreaView>
-            <View style={modals.container}>
-              <View style={modals.list}>
-                <ScrollView>
-                  {facilityList.map((item) => {
-                    return (
-                      <TouchableOpacity style={modals.row} onPress={() => _onChangeFacilityCode(item.code)}>
-                        <Text style={modals.cell}>{item.code}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-              <View style={modals.action}>
-                <TouchableOpacity style={modals.button} onPress={_onPressClearModel}>
-                  <Text style={modals.buttonTitle}>Clear</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={modals.button} onPress={_onPressCancelModel}>
-                  <Text style={modals.buttonTitle}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      </Modal>
+      <SelectPopup
+        visible={isVisibleFacility}
+        data={facilityList}
+        onCancel={() => setIsVisibleFacility(false)}
+        onClear={_onPressClearFacilityCode}
+        onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
     </SafeAreaView >
   );
 };
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -419,7 +370,6 @@ const styles = StyleSheet.create({
     height: '100%',
     color: BASE_COLOR,
     paddingVertical: 0,
-    justifyContent: 'center'
   },
   inputIcon: {
     marginLeft: 4,
@@ -438,12 +388,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  textNote: {
-    color: BASE_COLOR,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    marginBottom: 4,
-  },
   table: {
     flexGrow: 1,
   },
@@ -462,17 +406,51 @@ const styles = StyleSheet.create({
     minHeight: 16,
     marginBottom: 4,
   },
+  rowAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   cellTitle: {
     flex: 3,
-    justifyContent: 'center',
   },
   cellData: {
     flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
+    flexDirection: 'row',
+  },
+  cellValue: {
+    flex: 1,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
     justifyContent: 'center',
   },
-
+  textValue: {
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+  },
+  cellProgress: {
+    flex: 5,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  cellAction: {
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAction: {
+    color: BASE_COLOR,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+  },
   noDataContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -482,74 +460,38 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
   noDataTitle: {
-    paddingTop: 8,
+    paddingTop: 4,
     fontSize: 16,
-    textAlign: 'center',
   },
   noDataText: {
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
 
+  scanContainer: {
+    marginTop: 12,
+    height: 36,
+    flexDirection: 'row',
+  },
+  buttonLeft: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    marginRight: 4,
+  },
+  buttonRight: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
+    marginLeft: 4,
+  },
   buttonTitle: {
     color: OPP_COLOR,
   },
   buttonTitleDark: {
     color: BASE_COLOR,
-  },
-});
-const modals = StyleSheet.create({
-  dim: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  container: {
-    backgroundColor: OPP_COLOR,
-    width: windowWidth * 0.85,
-    height: undefined,
-    maxHeight: windowHeight * 0.85,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-  },
-  list: {
-    padding: 16,
-    width: windowWidth * 0.85,
-    height: undefined,
-  },
-  row: {
-    flexDirection: 'row',
-    minHeight: 36,
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  cell: {
-    flex: 5,
-    color: BASE_COLOR,
-    paddingLeft: 4,
-    paddingRight: 4,
-  },
-  action: {
-    width: windowWidth * 0.85,
-    height: 36,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginRight: 16,
-    marginBottom: 16,
-  },
-  button: {
-    width: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: BASE_COLOR,
-    padding: 4,
-    marginRight: 8,
-  },
-  buttonTitle: {
-    color: OPP_COLOR,
   },
 });
 

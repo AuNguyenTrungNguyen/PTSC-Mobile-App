@@ -30,6 +30,8 @@ const DrawingListScreen = ({ route, navigation }) => {
   const [drawingList, setDrawingList] = useState(null);
   const [drawingNo, setDrawingNo] = useState('');
   const [oldDrawingNo, setOldDrawingNo] = useState(null);
+  const [weldNo, setWeldNo] = useState('');
+  const [oldWeldNo, setOldWeldNo] = useState(null);
 
   const [isVisibleFacility, setIsVisibleFacility] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
@@ -101,28 +103,42 @@ const DrawingListScreen = ({ route, navigation }) => {
   const _onChangeFacilityCode = code => {
     if (code !== facilityCode) {
       setFacilityCode(code);
-      callAPI(() => { searchDrawing(code, drawingNo) }, false);
+      callAPI(() => { searchDrawing(code, drawingNo, weldNo) }, false);
     }
     setIsVisibleFacility(false);
   };
   const _onPressClearFacilityCode = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      callAPI(() => { searchConstruction('', drawingNo) }, false);
+      callAPI(() => { searchConstruction('', drawingNo, weldNo) }, false);
     }
     setIsVisibleFacility(false);
   };
 
-  //-- DrawingNo Code
+  //-- DrawingNo & WeldNo
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
   };
-  const searchDrawing = async (facilityCode, drawingNo) => {
+  const _onChangeWeldNo = no => {
+    setWeldNo(no);
+  };
+
+  //-- Search Action
+  const _onPressSearchDrawing = () => {
+    if (oldDrawingNo !== drawingNo || oldWeldNo !== weldNo) {
+      Keyboard.dismiss();
+      setOldDrawingNo(drawingNo);
+      setOldWeldNo(weldNo);
+      callAPI(() => { searchDrawing(facilityCode, drawingNo, weldNo) }, false);
+    }
+  };
+  const searchDrawing = async (facilityCode, drawingNo, weldNo) => {
     setIsSearching(true);
     const token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo ? drawingNo : '';
-    GetConstructionListAPI(projectCode, facilityCode, drawingNo, token)
+    weldNo = weldNo ? weldNo : '';
+    GetConstructionListAPI(projectCode, facilityCode, drawingNo, weldNo, token)
       .then(res => {
         if (res.Success) {
           setDrawingList(res.Data);
@@ -139,13 +155,6 @@ const DrawingListScreen = ({ route, navigation }) => {
         setIsError(true);
         setIsSearching(false);
       });
-  };
-  const _onPressSearchDrawing = () => {
-    if (oldDrawingNo !== drawingNo) {
-      Keyboard.dismiss();
-      setOldDrawingNo(drawingNo);
-      callAPI(() => { searchDrawing(facilityCode, drawingNo) }, false);
-    }
   };
 
   //-- Item Action
@@ -397,6 +406,22 @@ const DrawingListScreen = ({ route, navigation }) => {
                       {drawingNo == ''
                         ? null
                         : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>WeldNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        weldNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>

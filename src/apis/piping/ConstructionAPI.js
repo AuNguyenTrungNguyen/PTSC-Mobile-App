@@ -16,13 +16,30 @@ export const GetDrawingCompletePercentAPI = (projectCode, drawingNo, sheet, rev,
     }
   ).then(res => res.json());
 
-export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
+export const GetDrawingCompleteAllPercentAPI = (projectCode, drawingNo, sheet, rev, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetDrawingCompleteAllPercent'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+
+export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, weldNo, token) =>
   fetch(
     Port_Server
     + '/api/piping/GetConstructionList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + drawingNo
+    + '&weldNo=' + weldNo,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

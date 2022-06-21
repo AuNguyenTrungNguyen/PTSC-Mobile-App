@@ -178,6 +178,49 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- QC MANAGERMENT
+  // const [isVisibleConsFitUp, setIsVisibleConsFitUp] = useState(false);
+  // const [isVisibleConsWeld, setIsVisibleConsWeld] = useState(false);
+  const _onPressManageQC = code => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code\n\nSearch: Search Request List\n\nSpend List: View Spending List',
+      [
+        { text: 'Scan', onPress: () => _onPressQRCodeQC(code) },
+        { text: 'Search', onPress: _onPresSearchQC },
+        { text: 'Spend List', onPress: () => { _onPressSpedingListQC(code) } },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeQC = async code => {
+    const teamLeader = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'Camera',
+      {
+        code: code,
+        source: Constant.CAMERA_PIP_QC,
+        projectCode: projectCode,
+        teamLeader: teamLeader,
+      }
+    );
+  };
+  const _onPresSearchQC = async () => {
+    navigation.navigate('QCDrawingList', {
+      projectCode: projectCode
+    });
+  };
+  const _onPressSpedingListQC = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = 'QC Spend ' + code;
+    navigation.navigate('QCSpendList', {
+      projectCode: projectCode,
+      userLogin: userLogin,
+      code: code,
+      title: title,
+    });
+  };
+
   //-- QC FitUp
   const _onPressManageQCFitUp = () => {
     Alert.alert(
@@ -453,8 +496,8 @@ const HomeScreen = ({ route, navigation }) => {
               <RenderItemBox title={'Cons Scan\nWeld'} onPress={() => { _onPressManageCons(Constant.CODE_WELD) }} number={notifyNumbers.Visual} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC Scan\nFitUp'} onPress={_onPressManageQCFitUp} number={notifyNumbers.FitUp} />
-              <RenderItemBox title={'QC Scan\nVisual'} onPress={_onPressManageQCVisual} number={notifyNumbers.Visual} />
+              <RenderItemBox title={'QC Scan\nFitUp'} onPress={() => { _onPressManageQC(Constant.CODE_FITUP) }} number={notifyNumbers.FitUp} />
+              <RenderItemBox title={'QC Scan\nVisual'} onPress={() => { _onPressManageQC(Constant.CODE_VISUAL) }} number={notifyNumbers.Visual} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Scan \nAll Status'} onPress={_onPressQRCodeAllStatus} />

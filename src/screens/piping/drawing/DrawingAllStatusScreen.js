@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import Moment from 'moment';
 
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 import Formater from '../../../utils/Formater';
-import GetFacilityCodeByDrawingAPI from '../../../apis/drawing/GetTopFacilityCodeAPI';
-import GetDrawingCompleteAllPercentAPI from '../../../apis/drawing/GetDrawingCompleteAllPercentAPI';
+import Constant from '../../../utils/Constant';
+
 import GetSpoolMatrixListAPI from '../../../apis/spool/GetSpoolMatrixListAPI';
+import { GetCurrentConstructionInfoAPI, GetDrawingCompleteAllPercentAPI } from '../../../apis/piping/ConstructionAPI';
+
+import { ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
@@ -22,13 +24,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
   const [percentList, setPercentList] = useState([]);
   const [spoolList, setSpoolList] = useState([]);
 
-  useEffect(
-    () => {
-      callAPI(getAllData);
-    }, []
-  );
-
-  const callAPI = (executedAPI) => {
+  const callAPI = executedAPI => {
     setIsLoading(true);
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
@@ -40,50 +36,88 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
       }
     });
   };
-
+  useEffect(
+    () => {
+      callAPI(getAllData);
+    }, []
+  );
   const getAllData = async () => {
     let token = await Helper.getData('TOKEN');
     try {
       let arrayPromise = [GetDrawingCompleteAllPercentAPI(projectCode, drawingNo, sheet, rev, token)];
       if (facilityCode) {
         arrayPromise.push(GetSpoolMatrixListAPI(projectCode, facilityCode, drawingNo, token));
-      } else {
-        arrayPromise.push(GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token));
-      }
-      await Promise.all(arrayPromise)
-        .then(([percentResult, result]) => {
-          if (percentResult.success && result.success) {
-            setPercentList(percentResult.data);
-            if (!facilityCode) {
-              setFacilityCodeCalled(result.data);
-              GetSpoolMatrixListAPI(projectCode, result.data, drawingNo, token)
-                .then(res => {
-                  if (res.success) {
-                    setSpoolList(res.data);
-                    setIsLoading(false);
-                    setIsError(false);
-                  } else {
+        await Promise.all(arrayPromise)
+          .then(([percentResult, result]) => {
+            if (percentResult.Success && result.success) {
+              setPercentList(percentResult.Data);
+              if (!facilityCode) {
+                setFacilityCodeCalled(result.data);
+                GetSpoolMatrixListAPI(projectCode, result.data, drawingNo, token)
+                  .then(res => {
+                    if (res.success) {
+                      setSpoolList(res.data);
+                      setIsLoading(false);
+                      setIsError(false);
+                    } else {
+                      setIsLoading(false);
+                      setIsError(true);
+                    }
+                  }).catch(() => {
                     setIsLoading(false);
                     setIsError(true);
-                  }
-                }).catch(() => {
-                  setIsLoading(false);
-                  setIsError(true);
-                });
+                  });
+              } else {
+                setSpoolList(result.data);
+              }
+              setIsLoading(false);
+              setIsError(false);
             } else {
-              setSpoolList(result.data);
+              setIsLoading(false);
+              setIsError(true);
             }
-            setIsLoading(false);
-            setIsError(false);
-          } else {
+          })
+          .catch(() => {
             setIsLoading(false);
             setIsError(true);
-          }
-        })
-        .catch(() => {
-          setIsLoading(false);
-          setIsError(true);
-        });;
+          });
+      } else {
+        arrayPromise.push(GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token));
+        await Promise.all(arrayPromise)
+          .then(([percentResult, result]) => {
+            if (percentResult.Success && result.Success) {
+              setPercentList(percentResult.Data);
+              if (!facilityCode) {
+                setFacilityCodeCalled(result.Data);
+                GetSpoolMatrixListAPI(projectCode, result.Data, drawingNo, token)
+                  .then(res => {
+                    if (res.success) {
+                      setSpoolList(res.data);
+                      setIsLoading(false);
+                      setIsError(false);
+                    } else {
+                      setIsLoading(false);
+                      setIsError(true);
+                    }
+                  }).catch(() => {
+                    setIsLoading(false);
+                    setIsError(true);
+                  });
+              } else {
+                setSpoolList(result.data);
+              }
+              setIsLoading(false);
+              setIsError(false);
+            } else {
+              setIsLoading(false);
+              setIsError(true);
+            }
+          })
+          .catch(() => {
+            setIsLoading(false);
+            setIsError(true);
+          });
+      }
     } catch (error) {
       setIsLoading(false);
       setIsError(true);
@@ -91,8 +125,10 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressViewConstruction = async code => {
-    let teamLeader = await Helper.getData('USERNAME');
+
+  const _onPressViewCons = async code => {
+    const teamLeader = await Helper.getData('USERNAME');
+    const title = code + ' Detail';
     if (facilityCode) {
       navigation.navigate(
         'DrawingDetail',
@@ -104,23 +140,25 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
-          title: code == 'Visual' ? 'Weld' : code + ' Detail',
+          link: link,
+          title: title,
         }
       );
     } else {
-      let token = await Helper.getData('TOKEN');
-      GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+      const token = await Helper.getData('TOKEN');
+      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
         .then(res => {
-          if (res.success) {
+          if (res.Success) {
             navigation.navigate('DrawingDetail', {
               projectCode: projectCode,
-              facilityCode: res.data,
+              facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
               rev: rev,
               code: code,
               teamLeader: teamLeader,
-              title: code == 'Visual' ? 'Weld' : code + ' Detail',
+              link: res.Link,
+              title: title,
             });
           } else {
             setIsLoading(false);
@@ -132,11 +170,9 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
         });
     }
   };
-
   const _onPressViewQC = async code => {
-    let teamLeader = await Helper.getData('USERNAME');
-    let codeTitle = code == 'Visual' ? 'Weld' : code;
-    let title = 'QC ' + codeTitle + ' Detail';
+    const teamLeader = await Helper.getData('USERNAME');
+    const title = code + ' Detail';
     if (facilityCode) {
       navigation.navigate(
         'QCDrawingDetail',
@@ -148,22 +184,24 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
           rev: rev,
           code: code,
           teamLeader: teamLeader,
+          link: link,
           title: title,
         }
       );
     } else {
-      let token = await Helper.getData('TOKEN');
-      GetFacilityCodeByDrawingAPI(projectCode, drawingNo, sheet, rev, token)
+      const token = await Helper.getData('TOKEN');
+      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
         .then(res => {
-          if (res.success) {
+          if (res.Success) {
             navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
-              facilityCode: res.data,
+              facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
               rev: rev,
               code: code,
               teamLeader: teamLeader,
+              link: res.Link,
               title: title,
             });
           } else {
@@ -205,12 +243,6 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
       </View>
     );
   };
-
-  const ListEmptyData = () => (
-    <View style={styles.noDataContainer}>
-      <Text style={styles.noDataTitle}>No have any spool!</Text>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -263,17 +295,17 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
               </View>
             </View>
             <View style={styles.rowAction}>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewConstruction('FitUp') }}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewCons(Constant.CODE_FITUP) }}>
                 <Text style={styles.textAction}>Cons FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewConstruction('Weld') }}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewCons(Constant.CODE_WELD) }}>
                 <Text style={styles.textAction}>Cons Weld</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC('FitUp') }}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC(Constant.CODE_FITUP) }}>
                 <Text style={styles.textAction}>QC FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC('Visual') }}>
-                <Text style={styles.textAction}>QC Weld</Text>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC(Constant.CODE_VISUAL) }}>
+                <Text style={styles.textAction}>QC Visual</Text>
               </TouchableOpacity>
             </View>
           </View>
