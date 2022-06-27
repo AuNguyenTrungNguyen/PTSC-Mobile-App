@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance } from 'react-native';
 import Moment from 'moment';
+import NetInfo from '@react-native-community/netinfo';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
