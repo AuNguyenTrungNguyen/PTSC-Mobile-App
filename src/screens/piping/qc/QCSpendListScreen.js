@@ -374,8 +374,8 @@ const QCSpendListScreen = ({ route, navigation }) => {
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-            <Text> - WeldType: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
+            <Text> - ConType: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.ConType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
             <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
