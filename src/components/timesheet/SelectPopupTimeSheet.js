@@ -87,54 +87,22 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
                                 item.BudgetMHRS && item.BudgetMHRS < 0
                                   ?
                                   <>
-                                    <Text style={styles.cellLineTitleError}>Budget:</Text>
-                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
+                                    <Text style={styles.cellLineDataError}>Budget: {Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
                                   </>
                                   :
                                   <>
-                                    <Text style={styles.cellLineTitle}>Budget:</Text>
-                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
+                                    <Text style={styles.cellLineData}>Budget: {Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
                                   </>
                               }
                               {
                                 item.ActualMHRS && item.ActualMHRS < 0
                                   ?
                                   <>
-                                    <Text style={styles.cellLineTitleError}>Actual:</Text>
-                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
+                                    <Text style={styles.cellLineDataError}>Actual: {Formater.formatTwoDigits(item.ActualMHRS)}</Text>
                                   </>
                                   :
                                   <>
-                                    <Text style={styles.cellLineTitle}>Actual:</Text>
-                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
-                                  </>
-                              }
-                            </View>
-                            <View style={styles.row}>
-                              {
-                                item.EarnMHRS && item.EarnMHRS < 0
-                                  ?
-                                  <>
-                                    <Text style={styles.cellLineTitleError}>Earn:</Text>
-                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.EarnMHRS)}</Text>
-                                  </>
-                                  :
-                                  <>
-                                    <Text style={styles.cellLineTitle}>Earn:</Text>
-                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.EarnMHRS)}</Text>
-                                  </>
-                              }
-                              {
-                                item.WasteMHRS && item.WasteMHRS < 0
-                                  ?
-                                  <>
-                                    <Text style={styles.cellLineTitleError}>Waste:</Text>
-                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.WasteMHRS)}</Text>
-                                  </>
-                                  :
-                                  <>
-                                    <Text style={styles.cellLineTitle}>Waste:</Text>
-                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                    <Text style={styles.cellLineData}>Actual: {Formater.formatTwoDigits(item.ActualMHRS)}</Text>
                                   </>
                               }
                             </View>
@@ -143,17 +111,24 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
                                 item.RemainMHRS && item.RemainMHRS < 0
                                   ?
                                   <>
-                                    <Text style={styles.cellLineTitleError}>Remain:</Text>
-                                    <Text style={styles.cellLineDataError}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
+                                    <Text style={styles.cellLineDataError}>Remain: {Formater.formatTwoDigits(item.RemainMHRS)}</Text>
                                   </>
                                   :
                                   <>
-                                    <Text style={styles.cellLineTitle}>Remain:</Text>
-                                    <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
+                                    <Text style={styles.cellLineData}>Remain: {Formater.formatTwoDigits(item.RemainMHRS)}</Text>
                                   </>
                               }
-                              <View style={styles.cellLineTitle} />
-                              <View style={styles.cellLineData} />
+                              {
+                                item.WasteMHRS && item.WasteMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineDataError}>Waste: {Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineData}>Waste: {Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                  </>
+                              }
                             </View>
                           </TouchableOpacity>
                         );
