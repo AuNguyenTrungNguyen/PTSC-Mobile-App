@@ -101,13 +101,22 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   };
 
   const checkAllList = () => {
-    let isCheckAll = isCheckAllName === 'checkbox-blank-outline';
+    const isCheckAll = isCheckAllName === 'checkbox-blank-outline';
     if (isCheckAll) {
       if (constructionDetailList) {
         let array = [...constructionDetailList];
-        array.map(i => {
-          i.Selected = false;
-          return i;
+        array.map(item => {
+          let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
+          if (code == Constant.CODE_FITUP) {
+            isDisableItem = isDisableItem || (item['UTLAMPercent'] == 1 && item['LaminationTestResult'] != Constant.STATUS_ACCEPT);
+          } else {
+            isDisableItem = isDisableItem || item['FitUpResult'] != Constant.STATUS_ACCEPT;
+            if (item.JointNo.includes('#')) isDisableItem = false;
+          }
+          if (isDisableItem) {
+            item.Selected = false;
+          }
+          return item;
         });
         setConstructionDetailList(array);
       }
@@ -115,9 +124,18 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     } else {
       if (constructionDetailList) {
         let array = [...constructionDetailList];
-        array.map(i => {
-          i.Selected = true;
-          return i;
+        array.map(item => {
+          let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
+          if (code == Constant.CODE_FITUP) {
+            isDisableItem = isDisableItem || (item['UTLAMPercent'] == 1 && item['LaminationTestResult'] != Constant.STATUS_ACCEPT);
+          } else {
+            isDisableItem = isDisableItem || item['FitUpResult'] != Constant.STATUS_ACCEPT;
+            if (item.JointNo.includes('#')) isDisableItem = false;
+          }
+          if (!isDisableItem) {
+            item.Selected = true;
+          }
+          return item;
         });
         setConstructionDetailList(array);
       }
