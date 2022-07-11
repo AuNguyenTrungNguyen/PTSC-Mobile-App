@@ -409,6 +409,9 @@ const TimeSheetScreen = ({ route, navigation }) => {
     // _onChangWorkOrderShotcut(data);
     setIsShowWorkOrder(false);
   };
+  const _onReloadWorkOrder = data => {
+    setWorkOrderList(data);
+  };
 
 
   const [isShowHours, setIsShowHours] = useState(false);
@@ -815,6 +818,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
         data={workOrderList}
         onChangeItem={_onChangeWorkOrder}
         onCancel={() => setIsShowWorkOrder(false)}
+        onReload={_onReloadWorkOrder}
       />
       <Dialog.Container visible={isShowHours}>
         <Dialog.Title>{'Enter hours:'}</Dialog.Title>

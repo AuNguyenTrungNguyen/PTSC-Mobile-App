@@ -125,3 +125,17 @@ export const DeleteTimeSheetWorkerDateAPI = (projectCode, userUpdate, dateUpdate
       body: JSON.stringify({ projectCode, userUpdate, dateUpdate, listItemUpdate }),
     }
   ).then(res => res.json());
+
+export const RefreshWorkOrderAPI = (projectCode, userLogin, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/RefreshWorkOrder',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, userLogin }),
+    }
+  ).then(res => res.json());

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator, TextInput } from 'react-native';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import Formater from '../../utils/Formater';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import Networker from '../../utils/Networker';
+import Helper from '../../utils/Helper';
+import { GetTimeSheetWorkOrderListAPI, RefreshWorkOrderAPI } from '../../apis/timesheet/TimeSheetAPI';
 
-const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
+const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel, onReload }) => {
 
   const [workOrder, setWorkOrder] = useState('');
   const [workOrderList, setWorkOrderList] = useState(data);
@@ -24,6 +28,28 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
     else {
       setWorkOrderList(data);
     }
+  };
+
+  const _onRefreshWorkOrder = () => {
+    Networker.callAPI(refreshWorkOrder());
+  };
+  const refreshWorkOrder = async () => {
+    const token = await Helper.getData('TOKEN');
+    const projectCode = await Helper.getData('PROJECT_CODE');
+    const userLogin = await Helper.getData('USERNAME');
+    RefreshWorkOrderAPI(projectCode, userLogin, token)
+      .then(res => {
+        if (res.Success && onReload != null) {
+          GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token)
+            .then(res => {
+              onReload(res.data);
+              setWorkOrderList(res.data);
+            }
+            );
+        } else {
+        }
+      }).catch(() => {
+      });
   };
 
   const _onChangeWorkOrder = text => {
@@ -54,11 +80,18 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
                 {
                   workOrder == ''
                     ? null
-                    : <Icon name='times-circle' onPress={_onClearWorkOrder} style={styles.inputIcon} />
+                    : <FontAwesome5Icon name='times-circle' onPress={_onClearWorkOrder} style={styles.inputIcon} />
                 }
               </View>
               <TouchableOpacity style={styles.inputButton} onPress={_onSearchWorkOrder}>
-                <Text style={modals.buttonTitle}>Search</Text>
+                <FontAwesomeIcon
+                  size={20}
+                  name={'search'} color={OPP_COLOR} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.inputButton} onPress={_onRefreshWorkOrder}>
+                <FontAwesomeIcon
+                  size={20}
+                  name={'refresh'} color={OPP_COLOR} />
               </TouchableOpacity>
             </View>
             <View style={modals.list}>
@@ -285,12 +318,13 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
   inputButton: {
-    width: 60,
+    width: 48,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: BASE_COLOR,
     padding: 4,
+    marginLeft: 4,
   },
 });
 
