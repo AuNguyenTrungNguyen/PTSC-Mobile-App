@@ -17,7 +17,7 @@ import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/ConstructionAPI';
-import { GetLocationListAPI, GetSerialNoAndHeatNoListAPI, GetTeamListFilterAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListAPI, GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI, GetTeamListFilterAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -139,7 +139,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         if ((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) {
           messages.push('HeatNo01');
         }
-        if ((column.indexOf('Heat02') >= 0 && !percent) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) {
+        if ((column.indexOf('Heat02') >= 0 && !heat02) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) {
           messages.push('Heat02');
         }
         if ((column.indexOf('SiteLocation') >= 0 && !location) || (column.indexOf('SiteLocation') < 0 && !oldItem['SiteLocation'])) {
@@ -350,6 +350,40 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const getHeatNoList = async value => {
     const token = await Helper.getData('TOKEN');
     GetSerialNoAndHeatNoListAPI(projectCode, value, token)
+      .then(res => {
+        if (res.Success) {
+          setHeatNoList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsVisibleHeatNo(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsVisibleHeatNo(false);
+      });
+  };
+  const _onPressShowHeatNoPipeSupportPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleHeatNo(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getHeatNoPipeSupportList();
+      }
+    });
+  };
+  const getHeatNoPipeSupportList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetSerialNoAndHeatNoPipeSupportListAPI(projectCode, token)
       .then(res => {
         if (res.Success) {
           setHeatNoList(res.Data);
@@ -691,6 +725,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       isDisableItem = isDisableItem || (item['FitUpResult'] != Constant.STATUS_ACCEPT);
     }
     const isEnableClear = itemDate || itemPercent;
+    const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] == 'SP';
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
@@ -865,18 +900,33 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellDataLine}>
                   {
-                    <TouchableOpacity
-                      style={styles.itemActionIcon}
-                      onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
-                      <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
-                      {
-                        isDisableItem
-                          ?
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                          :
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                      }
-                    </TouchableOpacity>
+                    isPipeSupport
+                      ?
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat01')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
                   }
                 </View>
               </View>

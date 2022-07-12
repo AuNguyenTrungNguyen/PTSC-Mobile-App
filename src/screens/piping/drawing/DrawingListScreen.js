@@ -101,7 +101,7 @@ const DrawingListScreen = ({ route, navigation }) => {
   const _onPressClearFacilityCode = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      callAPI(() => { searchConstruction('', drawingNo, weldNo) }, false);
+      callAPI(() => { searchDrawing('', drawingNo, weldNo) }, false);
     }
     setIsVisibleFacility(false);
   };
