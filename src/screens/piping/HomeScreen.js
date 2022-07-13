@@ -307,13 +307,14 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   //-- TimeSheet
-  const _onPressManageLTimeSheet = async () => {
+  const _onPressManageTimeSheet = async () => {
     Alert.alert(
       '',
-      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime',
+      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime\n\nTimeSheet Report: TimeSheet Report Overtime',
       [
         { text: 'TimeSheet', onPress: _onPressTimeSheet },
         { text: 'TimeSheet OT', onPress: _onPressTimeSheetYesterday },
+        { text: 'TimeSheet Report', onPress: _onPressTimeSheetReport },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -335,6 +336,16 @@ const HomeScreen = ({ route, navigation }) => {
     let userLogin = await Helper.getData('USERNAME');
     navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheetOT',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressTimeSheetReport = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'TimeSheetReport',
       params: {
         projectCode: projectCode,
         userLogin: userLogin,
@@ -498,7 +509,7 @@ const HomeScreen = ({ route, navigation }) => {
                 <RenderItemBox title={'Search\nAll Status'} onPress={_onPressSearchAllStatus} iconName={'md-search'} />
               </View>
               <View style={styles.row}>
-                <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
+                <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
                 <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
               </View>
               <View style={styles.row}>

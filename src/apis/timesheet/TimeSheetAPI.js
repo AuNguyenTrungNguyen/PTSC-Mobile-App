@@ -139,3 +139,17 @@ export const RefreshWorkOrderAPI = (projectCode, userLogin, token) =>
       body: JSON.stringify({ projectCode, userLogin }),
     }
   ).then(res => res.json());
+
+export const GetTimeSheetReportAPI = (projectCode, userLogin, date, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/GetTimeSheetReport'
+    + '?projectCode=' + projectCode
+    + '&userLogin=' + userLogin
+    + '&date=' + date,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      }
+    }).then(res => res.json());

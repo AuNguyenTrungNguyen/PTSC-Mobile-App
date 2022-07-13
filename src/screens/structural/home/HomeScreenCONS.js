@@ -268,13 +268,14 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
 
   //-- TimeSheet
-  const _onPressManageLTimeSheet = async () => {
+  const _onPressManageTimeSheet = async () => {
     Alert.alert(
       '',
-      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime',
+      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime\n\nTimeSheet Report: TimeSheet Report Overtime',
       [
         { text: 'TimeSheet', onPress: _onPressTimeSheet },
         { text: 'TimeSheet OT', onPress: _onPressTimeSheetYesterday },
+        { text: 'TimeSheet Report', onPress: _onPressTimeSheetReport },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -296,6 +297,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheetOT',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressTimeSheetReport = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'TimeSheetReport',
       params: {
         projectCode: projectCode,
         userLogin: userLogin,
@@ -360,7 +371,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
             <View style={styles.row}>
               {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/> */}
               <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual} />
-              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />

@@ -16,6 +16,7 @@ import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHours
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
 import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
+import TimeSheetReportScreen from './screens/timesheet/TimeSheetReportScreen';
 
 import HomeScreen from './screens/piping/HomeScreen';
 import PipingDimCuttingListScreen from './screens/piping/dim/DimCuttingListScreen';
@@ -698,6 +699,16 @@ const CommonStackScreens = () => {
         options={
           {
             title: 'Manage Workers',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='TimeSheetReport'
+        component={TimeSheetReportScreen}
+        options={
+          {
+            title: 'TimeSheet Reports',
             headerBackTitle: 'Back',
           }
         }
