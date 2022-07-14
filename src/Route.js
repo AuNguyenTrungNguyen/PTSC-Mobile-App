@@ -12,6 +12,7 @@ import PDFViewScreen from './screens/pdf/PDFViewScreen';
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
 import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHoursImpactDetailScreen';
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
+import OpenDrawingScreen from './screens/general/opendrawing/OpenDrawingScreen';
 
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
 import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
@@ -742,6 +743,14 @@ const CommonStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+      <CommonStack.Screen
+        name='OpenDrawing'
+        component={OpenDrawingScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
       <CommonStack.Screen
         name='QAObservationOverviewList'

@@ -423,6 +423,17 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Open Drawing
+  const _onPressOpenDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenDrawing',
+      params: {
+        projectCode: projectCode,
+        title: 'Pipe Support'
+      }
+    });
+  };
+
   //-- Buttom Action
   const _onPressConstructionUpdate = () => {
     navigation.navigate('ConstructionUpdateManage', { projectCode: projectCode });
@@ -515,6 +526,10 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
                 <RenderItemBox title={'Daily Report'} onPress={_onPressDailyReport} iconName={'ios-stats-chart-sharp'} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Pipe Support'} onPress={_onPressOpenDrawing} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
             <View style={styles.action}>

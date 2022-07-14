@@ -1,44 +1,26 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
-export const GetTimeSheetWorkerListAPI = (userLogin, token) =>
-  fetch(
+export const GetPipeSupportDrawingAPI = async (projectCode, facilityCode, drawingNo, deck) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
     Port_Server
-    + '/api/General/GetTimeSheetWorkerList'
-    + '?userLogin=' + userLogin,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-
-export const GetTimeSheetWorkOrderListAPI = (projectCode, userLogin, token) =>
-  fetch(
-    Port_Server
-    + '/api/General/GetTimeSheetWorkOrderList'
+    + '/api/General/GetPipeSupportDrawing'
     + '?projectCode=' + projectCode
-    + '&userLogin=' + userLogin,
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&location=' + deck,
     {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      }
-    }).then(res => res.json());
-
-export const UpdateTimeSheetListlAPI = (userInsert, models, token) =>
-  fetch(
-    Port_Server 
-    + '/api/General/UpdateTimeSheetList',
-    {
-      method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userInsert, models }),
     }
   ).then(res => res.json());
+}
+
+
+
 
 export const GetManHoursImpactListAPI = (projectCode, userLogin, token) =>
   fetch(
