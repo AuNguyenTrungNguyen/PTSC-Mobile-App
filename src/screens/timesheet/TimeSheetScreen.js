@@ -16,10 +16,12 @@ import {
   UpdateTimeSheetListAPI,
   DeleteTimeSheetWorkerDateAPI
 } from '../../apis/timesheet/TimeSheetAPI';
+import { GetProjectListAPI } from '../../apis/app/LoginAPI';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
 
+import SelectPopup from '../../components/SelectPopup';
 import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
@@ -48,6 +50,10 @@ const TimeSheetScreen = ({ route, navigation }) => {
   const [workerList, setWorkerList] = useState([]);
   const [workerUpdatedList, setWorkerUpdatedList] = useState([]);
   const [workerErrorList, setWorkerErrorList] = useState([]);
+
+  const [projectList, setProjectList] = useState([]);
+  const [projectSelected, setProjectSeletecd] = useState(projectCode);
+  const [isVisibleProject, setIsVisibleProject] = useState(false);
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -133,6 +139,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           if (Object.keys(res.data).length) {
             setDepartment(res.data[0].DepartmentCode);
             setFullname(res.data[0].Fullname);
+            callAPI(getProjectList);
             callAPI(getAllData);
           }
           else {
@@ -163,9 +170,9 @@ const TimeSheetScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
-  const getTimeSheetWorkOrderList = async () => {
+  const getTimeSheetWorkOrderList = async (code = projectSelected) => {
     const token = await Helper.getData('TOKEN');
-    GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token)
+    GetTimeSheetWorkOrderListAPI(code, userLogin, token)
       .then(res => {
         if (res.success) {
           setWorkOrderList(res.data);
@@ -184,12 +191,20 @@ const TimeSheetScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
+  const getProjectList = () => {
+    GetProjectListAPI(userLogin)
+      .then(res => {
+        if (res.success) {
+          setProjectList(res.data);
+        }
+      });
+  };
   const getAllData = async () => {
     const token = await Helper.getData('TOKEN');
     try {
       let arrayPromise = [
-        GetTimeSheetWorkerListAPI(projectCode, userLogin, token),
-        GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token),
+        GetTimeSheetWorkerListAPI(projectSelected, userLogin, token),
+        GetTimeSheetWorkOrderListAPI(projectSelected, userLogin, token),
       ];
       await Promise.all(arrayPromise)
         .then(([workerResult, workOrderResult]) => {
@@ -248,7 +263,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     const resultList = workerUpdatedList.filter(i => i.SUBMITED == false);
     setIsUploading(true);
-    UpdateTimeSheetListAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
+    UpdateTimeSheetListAPI(projectSelected, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -275,7 +290,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
   //-- Delete Data
   const deleteTimeSheetWorkerDate = async deletedList => {
     const token = await Helper.getData('TOKEN');
-    DeleteTimeSheetWorkerDateAPI(projectCode, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
+    DeleteTimeSheetWorkerDateAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -527,6 +542,12 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setIsShowNote(false);
   };
 
+  const _onChangeProjectCode = code => {
+    setProjectSeletecd(code);
+    setIsVisibleProject(false);
+    callAPI(() => { getTimeSheetWorkOrderList(code) }, false);
+  };
+
 
 
 
@@ -661,6 +682,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
                       :
                       <Text style={styles.textFilterUpdated}>{filter}</Text>
                   }
+                </View>
+              </View>
+              <View style={styles.headerRow}>
+                <Text style={styles.headerCellTitle}>Dự án:</Text>
+                <View style={styles.headerCellAction}>
+                  <Text style={styles.headerText}>{projectSelected}</Text>
+                  <Ionicons onPress={() => { setIsVisibleProject(true); }}
+                    style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
                 </View>
               </View>
               <View style={styles.headerRow}>
@@ -814,6 +843,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           </View>
       }
       <SelectPopupTimeSheet
+        projectCode={projectSelected}
         visible={isShowWorkOrder}
         data={workOrderList}
         onChangeItem={_onChangeWorkOrder}
@@ -849,6 +879,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
       />
+      <SelectPopup
+        visible={isVisibleProject}
+        data={projectList}
+        onChangeItem={_onChangeProjectCode}
+        onCancel={() => setIsVisibleProject(false)} />
     </SafeAreaView>
   );
 };

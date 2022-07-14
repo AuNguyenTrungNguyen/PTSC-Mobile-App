@@ -7,7 +7,7 @@ import Networker from '../../utils/Networker';
 import Helper from '../../utils/Helper';
 import { GetTimeSheetWorkOrderListAPI, RefreshWorkOrderAPI } from '../../apis/timesheet/TimeSheetAPI';
 
-const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel, onReload }) => {
+const SelectPopupTimeSheet = ({ projectCode, data, visible, onChangeItem, onCancel, onReload }) => {
 
   const [workOrder, setWorkOrder] = useState('');
   const [workOrderList, setWorkOrderList] = useState(data);
@@ -35,7 +35,6 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel, onReload 
   };
   const refreshWorkOrder = async () => {
     const token = await Helper.getData('TOKEN');
-    const projectCode = await Helper.getData('PROJECT_CODE');
     const userLogin = await Helper.getData('USERNAME');
     RefreshWorkOrderAPI(projectCode, userLogin, token)
       .then(res => {
