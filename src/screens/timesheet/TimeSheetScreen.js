@@ -376,10 +376,16 @@ const TimeSheetScreen = ({ route, navigation }) => {
   };
   const _onPressDeleteUpdated = () => {
     if (workerUpdatedList) {
-      const dataList = workerUpdatedList.filter(i => i.SELECTED);
+      const dataList = workerUpdatedList.filter(i => i.SELECTED && i.WorkOrder && i.WorkOrder.startsWith(projectSelected));
       if (dataList.length) {
         const deletedList = dataList.map(i => i.ID);
         callAPI(() => { deleteTimeSheetWorkerDate(deletedList) }, false);
+      }
+      else {
+        const selectedList = workerUpdatedList.filter(i => i.SELECTED);
+        if (selectedList.length) {
+          MessageAlert('Chú ý', 'Chọn dự án phù hợp với LSX');
+        }
       }
     }
   };
@@ -452,6 +458,13 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onChangWorkOrderShotcut = (value = workOrder) => {
     const isSpending = filter === SPENDING_TEXT;
+    if (!isSpending && !value && workerUpdatedList.length) {
+      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+      if (checkSubmitList.length) {
+        MessageAlert('Chú ý', 'Bắt buộc chọn LSX');
+      }
+      return;
+    }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
     if (!data.length) {
@@ -490,6 +503,13 @@ const TimeSheetScreen = ({ route, navigation }) => {
   };
   const _onChangHoursShotcut = value => {
     const isSpending = filter === SPENDING_TEXT;
+    if (!isSpending && !value && workerUpdatedList.length) {
+      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+      if (checkSubmitList.length) {
+        MessageAlert('Chú ý', 'Bắt buộc chọn giờ');
+      }
+      return;
+    }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
     if (!data.length) {
