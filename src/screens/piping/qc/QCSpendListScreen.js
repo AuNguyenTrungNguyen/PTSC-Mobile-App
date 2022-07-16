@@ -315,20 +315,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
     onChangeData(value, index, key);
   };
 
-  const [isVisibleInspector, setIsVisibleInspector] = useState(false);
-  const [inspectorList, setInspectorList] = useState([]);
-  const _onPressShowInspector = (index, key) => {
+  const [isVisibleWeldType, setIsVisibleWeldType] = useState(false);
+  const _onPressShowWeldType = (index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
-    setIsVisibleInspector(true);
+    setIsVisibleWeldType(true);
   };
-  const _onChangeInspector = data => {
+  const _onChangeWeldType = data => {
     onChangeData(data);
-    setIsVisibleInspector(false);
-  };
-  const _onClearInspector = () => {
-    onChangeData(null);
-    setIsVisibleInspector(false);
+    setIsVisibleWeldType(false);
   };
 
   const [isVisibleGlobalInspector, setIsVisibleGlobalInspector] = useState(false);
@@ -366,6 +361,24 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setIsVisibleRemark(false);
   };
 
+  const [isVisibleInspector, setIsVisibleInspector] = useState(false);
+  const [inspectorList, setInspectorList] = useState([]);
+  const _onPressShowInspector = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleInspector(true);
+  };
+  const _onChangeInspector = data => {
+    onChangeData(data);
+    setIsVisibleInspector(false);
+  };
+  const _onClearInspector = () => {
+    onChangeData(null);
+    setIsVisibleInspector(false);
+  };
+
+
+
   //-- Render List
   const renderItem = ({ index, item }) => {
     return (
@@ -374,8 +387,13 @@ const QCSpendListScreen = ({ route, navigation }) => {
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-            <Text> - ConType: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.ConType)}</Text>
+            <Text>  WeldType:</Text>
+            <View style={styles.cellTitleAction}>
+              <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
+              <TouchableOpacity onPress={() => _onPressShowWeldType(index, 'WeldType')}>
+                <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.cellImageAction}>
             <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
@@ -841,6 +859,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
         data={inspectorList}
         onChangeItem={_onChangeGlobalInspector}
         onCancel={() => setIsVisibleGlobalInspector(false)} />
+      <SelectPopup
+        visible={isVisibleWeldType}
+        data={['BW', 'FW', 'GW', 'BRW']}
+        onChangeItem={_onChangeWeldType}
+        onCancel={() => setIsVisibleWeldType(false)} />
       <TotalLocationModal
         visible={isVisibleLocation}
         data={locationList}
@@ -973,6 +996,10 @@ const styles = StyleSheet.create({
   },
   cellTitleLine: {
     flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cellTitleAction: {
     flexDirection: 'row',
     alignItems: 'center',
   },

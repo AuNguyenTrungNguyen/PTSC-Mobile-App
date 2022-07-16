@@ -211,8 +211,8 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-            <Text> - ConType: </Text>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.ConType)}</Text>
+            <Text> - WeldType: </Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
         </View>
         {
