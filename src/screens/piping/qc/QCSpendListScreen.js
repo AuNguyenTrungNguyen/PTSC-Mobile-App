@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
@@ -377,10 +378,57 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setIsVisibleInspector(false);
   };
 
+  const [isVisibleSize, setIsVisibleSize] = useState(false);
+  const [sizeDisplay, setSizeDisplay] = useState('');
+  const _onPressShowSize = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setSizeDisplay(value.toString());
+    } else {
+      setSizeDisplay('');
+    }
+    setIsVisibleSize(true);
+  };
+  const _onChangeSize = () => {
+    let value = sizeDisplay;
+    if (!value) {
+      value = '';
+    } else {
+      value = value.replace("\"", "");
+    }
+    setSizeDisplay(value);
+    onChangeData(value + "\"");
+    setIsVisibleSize(false);
+  };
+
+  const [isVisibleSCH, setIsVisibleSCH] = useState(false);
+  const [SCHDisplay, setSCHDisplay] = useState('');
+  const _onPressShowSCH = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setSCHDisplay(value.toString());
+    } else {
+      setSCHDisplay('');
+    }
+    setIsVisibleSCH(true);
+  };
+  const _onChangeSCH = () => {
+    let value = SCHDisplay;
+    if (!value) {
+      value = null;
+    }
+    setSCHDisplay(value);
+    onChangeData(value);
+    setIsVisibleSCH(false);
+  };
 
 
   //-- Render List
   const renderItem = ({ index, item }) => {
+    let size = Formater.formatEmptyData(item.Size);
+    size = size.replace("\"", "");
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -543,6 +591,26 @@ const QCSpendListScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualInspector)}</Text>
                   <TouchableOpacity onPress={() => _onPressShowInspector(index, 'QCVisualInspector')}>
                     <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>Size:</Text>
+                </View>
+                <View style={styles.cellOneAction}>
+                  <Text style={styles.textData}>{size + "\""}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowSize(size, index, 'Size')}>
+                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text>SCH:</Text>
+                </View>
+                <View style={styles.cellOneAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Schedule_THK) + ' '}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowSCH(item.Schedule_THK, index, 'Schedule_THK')}>
+                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -882,6 +950,26 @@ const QCSpendListScreen = ({ route, navigation }) => {
         <Dialog.Button label='Cancel' onPress={() => { setIsVisibleRemark(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeRemark} />
       </Dialog.Container>
+      <Dialog.Container visible={isVisibleSize}>
+        <Dialog.Title>{'Enter size:'}</Dialog.Title>
+        <Dialog.Input
+          value={sizeDisplay}
+          onChangeText={(text) => setSizeDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleSize(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeSize} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleSCH}>
+        <Dialog.Title>{'Enter SCH:'}</Dialog.Title>
+        <Dialog.Input
+          value={SCHDisplay}
+          onChangeText={(text) => setSCHDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleSCH(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeSCH} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };
@@ -1007,10 +1095,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  cellThreeAction: {
-    flex: 3,
+  cellOneAction: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap'
   },
   cellTwo: {
     flex: 2,
@@ -1019,6 +1108,11 @@ const styles = StyleSheet.create({
   cellThree: {
     flex: 3,
     justifyContent: 'center',
+  },
+  cellThreeAction: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   cellImageAction: {
     flex: 1,
