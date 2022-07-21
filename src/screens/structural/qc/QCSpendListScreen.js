@@ -298,6 +298,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
 
 
   const renderItem = ({ index, item }) => {
+    const isDisable = item.DIMStatus != Constant.STATUS_ACCEPT;
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -308,9 +309,17 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
           </View>
           <View style={styles.cellImageAction}>
-            <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
-              <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
-            </TouchableOpacity>
+            {
+              isDisable
+                ?
+                <View >
+                  <Ionicons size={24} name={'md-image-outline'} color={'#a3a3a3'} />
+                </View>
+                :
+                <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
+                  <Ionicons size={24} name={'md-image-outline'} color={iconColor} />
+                </TouchableOpacity>
+            }
           </View>
         </View>
         <View style={styles.row}>
@@ -419,11 +428,19 @@ const QCSpendListScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMRemark)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonAccept}
-                    onPress={() => _onPressChangeStatus(Constant.STATUS_ACCEPT, index, 'FitUpResult')}>
-                    <Text style={styles.labelAccept}>Accept</Text>
-                  </TouchableOpacity>
+                  {
+                    isDisable
+                      ?
+                      <View style={styles.buttonDisable}>
+                        <Text style={styles.labelDisable}>Accept</Text>
+                      </View>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonAccept}
+                        onPress={() => _onPressChangeStatus(Constant.STATUS_ACCEPT, index, 'FitUpResult')}>
+                        <Text style={styles.labelAccept}>Accept</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -434,21 +451,70 @@ const QCSpendListScreen = ({ route, navigation }) => {
                   <Text style={styles.textDataMargin}>{Formater.formatEmptyData(item.Location)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCFittupRemark)}>
-                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.buttonReject}
-                    onPress={() => _onPressChangeStatus(Constant.STATUS_REJECT, index, 'FitUpResult')}>
-                    <Text style={styles.labelReject}>Reject</Text>
-                  </TouchableOpacity>
+
+                  {
+                    isDisable
+                      ?
+                      <>
+                        <View>
+                          <Ionicons size={24} name={'md-document-text-outline'} color={'#a3a3a3'} style={{ marginRight: 4 }} />
+                        </View>
+                        <View style={styles.buttonDisable}>
+                          <Text style={styles.labelDisable}>Reject</Text>
+                        </View>
+                      </>
+                      :
+                      <>
+                        <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCFittupRemark)}>
+                          <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.buttonReject}
+                          onPress={() => _onPressChangeStatus(Constant.STATUS_REJECT, index, 'FitUpResult')}>
+                          <Text style={styles.labelReject}>Reject</Text>
+                        </TouchableOpacity>
+                      </>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
-                  <Text>Status:</Text>
+                  <Text>DIMStatus:</Text>
                 </View>
                 <View style={styles.cellTwoUnit}>
+                  {
+                    item.DIMStatus
+                      ?
+                      item.DIMStatus == Constant.STATUS_ACCEPT
+                        ?
+                        <Text style={styles.textAccept}>{item.DIMStatus}</Text>
+                        :
+                        <Text style={styles.textReject}>{item.DIMStatus}</Text>
+                      :
+                      <Text style={styles.textData}>{Formater.formatEmptyData(item.DIMStatus)}</Text>
+                  }
+                </View>
+                <View style={styles.cellAction}>
+                  {
+                    isDisable
+                      ?
+                      <View style={styles.buttonDisable}>
+                        <Text style={styles.labelDisable}>Clear</Text>
+                      </View>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonClean}
+                        onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
+                        <Text style={styles.labelClean}>Clear</Text>
+                      </TouchableOpacity>
+                  }
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>FitUpStatus:</Text>
+                </View>
+                <View style={styles.cellThreeUnit}>
                   {
                     item.FitUpResult
                       ?
@@ -460,13 +526,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
                       :
                       <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpResult)}</Text>
                   }
-                </View>
-                <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonClean}
-                    onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
-                    <Text style={styles.labelClean}>Clear</Text>
-                  </TouchableOpacity>
                 </View>
               </View>
             </>)
@@ -996,6 +1055,18 @@ const styles = StyleSheet.create({
   },
   labelClean: {
     color: BASE_COLOR,
+  },
+  buttonDisable: {
+    width: 70,
+    borderColor: '#a3a3a3',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelDisable: {
+    color: '#a3a3a3',
   },
 
   actionContainer: {
