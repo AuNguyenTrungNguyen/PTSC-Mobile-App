@@ -2,17 +2,18 @@ import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import NetInfo from '@react-native-community/netinfo';
 import Dialog from 'react-native-dialog';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import AwesomeAlert from 'react-native-awesome-alerts';
 import Toast from 'react-native-simple-toast';
+import Moment from 'moment';
 
-import { UpdateManHoursImpactDetailAPI } from '../../../apis/general/GeneralAPI';
+import { CreateManHoursImpactAPI, UpdateManHoursImpactAPI } from '../../../apis/general/GeneralAPI';
 import { GetFactorTypeAPI } from '../../../apis/app/AppAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
+import Networker from '../../../utils/Networker';
+
 import Header from '../../../components/Header';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -20,13 +21,23 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const ManHoursImpactDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, companyCode, workOrder, userLogin } = route.params;
+  const { projectCode, userLogin, workOrder, companyCode, rowIndex, dateItem, factorTypeItem, subFactorTypeItem, mhrsItem, remarkItem } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
-  const [manHoursImpactDetail, setManHoursImpactDetail] = useState({});
+  const [columnChange, setColumnChange] = useState([]);
+  const [manHoursImpactDetail, setManHoursImpactDetail] = useState({
+    RowIndex: rowIndex,
+    ProjectCode: projectCode,
+    CompanyCode: companyCode,
+    WorkOrderNo: workOrder,
+    Mhrs: mhrsItem,
+    Date: new Date(Moment(dateItem).format("YYYY-MM-DD")),
+    FactorType: factorTypeItem,
+    SubFactorType: subFactorTypeItem,
+    Remark: remarkItem,
+  });
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
@@ -50,19 +61,6 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
   useEffect(
     () => {
       callAPI(getFactorType);
-      setManHoursImpactDetail({
-        ProjectCode: projectCode,
-        FacilityCode: facilityCode,
-        CompanyCode: companyCode,
-        // Description: 'Mobile_Test',
-        Description: '',
-        WorkOrderNo: workOrder,
-        Mhrs: 0,
-        Date: new Date(),
-        FactorType: '',
-        SubFactorType: '',
-        Remark: '',
-      });
     }, []
   );
 
@@ -75,19 +73,11 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
     });
   };
 
-  const callAPI = (executedAPI, showUI = false) => {
-    if (!showUI) {
+  const callAPI = (executedAPI, loading = true) => {
+    if (loading) {
       setIsLoading(true);
     }
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
 
   const getFactorType = async () => {
@@ -110,33 +100,69 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
       });
   };
 
-  const updateManHoursImpactDetail = async () => {
-    let token = await Helper.getData('TOKEN');
-    UpdateManHoursImpactDetailAPI(userLogin, manHoursImpactDetail, token)
+  const createManHoursImpactDetail = async () => {
+    await Helper.storeData('IMPACT_LOAD', 'load');
+    CreateManHoursImpactAPI(userLogin, manHoursImpactDetail)
       .then(res => {
-        if (res.success) {
+        if (res.Success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
         } else {
-          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+          MessageAlert('Lỗi', res.Message.toString());
         }
-        setIsUploading(false);
       }).catch(() => {
-        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-        setIsUploading(false);
+        setIsLoading(false);
+        setIsError(true);
+      });
+  }
+  const updateManHoursImpactDetail = async () => {
+    await Helper.storeData('IMPACT_LOAD', 'load');
+    const unique = [...new Set(columnChange)];
+    const itemUpdate = [
+      {
+        'ColumnChange': unique,
+        'Model': manHoursImpactDetail
+      }
+    ];
+    UpdateManHoursImpactAPI(itemUpdate)
+      .then(res => {
+        if (res.Success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+        } else {
+          MessageAlert('Lỗi', res.Message.toString());
+        }
+      }).catch(() => {
+        setIsLoading(false);
+        setIsError(true);
       });
   }
 
   const _onPressSubmitToServer = async () => {
-    // if (true) {
-    setIsUploading(true);
-    callAPI(updateManHoursImpactDetail, true);
-    // } else {
-    //   Toast.show('No any data changes!', Toast.SHORT);
-    // }
+    if (!manHoursImpactDetail.FactorType) {
+      MessageAlert('Lỗi', 'Vui lòng nhập FactorType');
+      return;
+    }
+    if (!manHoursImpactDetail.SubFactorType) {
+      MessageAlert('Lỗi', 'Vui lòng nhập SubFactorType');
+      return;
+    }
+    if (!manHoursImpactDetail.Mhrs) {
+      MessageAlert('Lỗi', 'Vui lòng nhập Mhrs');
+      return;
+    }
+    if (!manHoursImpactDetail.Remark) {
+      MessageAlert('Lỗi', 'Vui lòng nhập Remark');
+      return;
+    }
+    if (rowIndex) {
+      callAPI(updateManHoursImpactDetail, false);
+    }
+    else {
+      callAPI(createManHoursImpactDetail, false);
+    }
   };
 
   const [isVisibleDate, setIsVisibleDate] = useState(false);
-  const [dateDisplay, setDateDisplay] = useState(new Date());
+  const [dateDisplay, setDateDisplay] = useState(manHoursImpactDetail.Date);
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
       // array[indexUpdate][keyUpdate] = Moment(selectedDate).format("YYYY-MM-DD");
@@ -147,12 +173,14 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
   };
 
   const [isVisibleMhrs, setIsVisibleMhrs] = useState(false);
-  const [mhrs, setMhrs] = useState(0);
+  const [mhrs, setMhrs] = useState(manHoursImpactDetail.Mhrs);
   const _onChangeMhrs = () => {
-    if (!mhrs) {
+    let data = mhrs;
+    if (!data) {
       setMhrs('');
+      data = '';
     }
-    let value = mhrs.replace(/,/g, '.');
+    let value = data.replace(/,/g, '.');
     if (!Helper.checkFormatNumber(value)) {
       Toast.show('Please enter Mhrs must be a number.', Toast.SHORT);
       return;
@@ -160,6 +188,11 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
     value = parseFloat(mhrs);
     manHoursImpactDetail.Mhrs = value;
     setIsVisibleMhrs(false);
+    if (rowIndex) {
+      let array = columnChange;
+      array.push('Mhrs');
+      setColumnChange(array);
+    }
   };
 
   const [isVisibleFactorType, setIsVisibleFactorType] = useState(false);
@@ -189,25 +222,15 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
   };
 
   const [isVisibleRemark, setIsVisibleRemark] = useState(false);
-  const [remark, setRemark] = useState('');
+  const [remark, setRemark] = useState(manHoursImpactDetail.Remark);
   const _onChangeRemark = () => {
     manHoursImpactDetail.Remark = remark;
     setIsVisibleRemark(false);
-  };
-
-  const _onPressManageImage = () => {
-    navigation.navigate(
-      'ManHoursImpactImage',
-      {
-        projectCode: projectCode,
-        facilityCode: facilityCode,
-        companyCode: companyCode,
-        workOrderNo: workOrder,
-        userLogin: userLogin,
-        factorType: manHoursImpactDetail.FactorType,
-        date: Formater.formatDateData(manHoursImpactDetail.Date)
-      }
-    );
+    if (rowIndex) {
+      let array = columnChange;
+      array.push('Remark');
+      setColumnChange(array);
+    }
   };
 
 
@@ -226,12 +249,22 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Date:</Text>
-                <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleDate(true) }}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(manHoursImpactDetail.Date)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
-                  </TouchableOpacity>
-                </View>
+                {
+                  rowIndex
+                    ?
+                    <View style={styles.cellData}>
+                      <View style={styles.containerAction}>
+                        <Text style={styles.textAction}>{Formater.formatDateData(manHoursImpactDetail.Date)}</Text>
+                      </View>
+                    </View>
+                    :
+                    <View style={styles.cellData}>
+                      <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleDate(true) }}>
+                        <Text style={styles.textAction}>{Formater.formatDateData(manHoursImpactDetail.Date)}</Text>
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                      </TouchableOpacity>
+                    </View>
+                }
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Mhrs:</Text>
@@ -244,21 +277,47 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>FactorType:</Text>
-                <View style={styles.cellData}>
+                {/* <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleFactorType(true) }}>
                     <Text style={styles.textAction}>{Formater.formatEmptyData(manHoursImpactDetail.FactorType)}</Text>
                     <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
                   </TouchableOpacity>
-                </View>
+                </View> */}
+                {
+                  rowIndex
+                    ?
+                    <View style={styles.cellData}>
+                      <View style={styles.containerAction}>
+                        <Text style={styles.textAction}>{Formater.formatEmptyData(manHoursImpactDetail.FactorType)}</Text>
+                      </View>
+                    </View>
+                    :
+                    <View style={styles.cellData}>
+                      <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleFactorType(true) }}>
+                        <Text style={styles.textAction}>{Formater.formatEmptyData(manHoursImpactDetail.FactorType)}</Text>
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                      </TouchableOpacity>
+                    </View>
+                }
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>SubFactorType:</Text>
-                <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleSubFactorType(true) }}>
-                    <Text style={styles.textAction}>{Formater.formatEmptyData(manHoursImpactDetail.SubFactorType)}</Text>
-                    <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                  </TouchableOpacity>
-                </View>
+                {
+                  rowIndex
+                    ?
+                    <View style={styles.cellData}>
+                      <View style={styles.containerAction}>
+                        <Text style={styles.textAction}>{Formater.formatEmptyData(manHoursImpactDetail.SubFactorType)}</Text>
+                      </View>
+                    </View>
+                    :
+                    <View style={styles.cellData}>
+                      <TouchableOpacity style={styles.containerAction} onPress={() => { setIsVisibleSubFactorType(true) }}>
+                        <Text style={styles.textAction}>{Formater.formatEmptyData(manHoursImpactDetail.SubFactorType)}</Text>
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                      </TouchableOpacity>
+                    </View>
+                }
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Remark:</Text>
@@ -268,12 +327,6 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
                     <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.cellTitle}>Pictures:</Text>
-                <TouchableOpacity style={styles.cellData} onPress={_onPressManageImage}>
-                  <Ionicons style={styles.iconAction} name='md-image-outline' size={20} color={BASE_COLOR} />
-                </TouchableOpacity>
               </View>
             </View>
             <View style={styles.actionContainer}>
@@ -288,6 +341,7 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
+    'ProjectCode': projectCode,
     'TeamLeader': userLogin,
   };
 
@@ -315,7 +369,7 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
       <Dialog.Container visible={isVisibleMhrs}>
         <Dialog.Title>{'Enter Mhrs'}</Dialog.Title>
         <Dialog.Input
-          value={mhrs}
+          value={mhrs != null ? mhrs.toString() : ''}
           onChangeText={(text) => setMhrs(text)}
           underlineColorAndroid={BASE_COLOR}
         />
@@ -350,12 +404,6 @@ const ManHoursImpactDetailScreen = ({ route, navigation }) => {
         }} />
         <Dialog.Button label='Enter' onPress={_onChangeRemark} />
       </Dialog.Container>
-      <AwesomeAlert
-        show={isUploading}
-        showProgress={true}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-      />
     </SafeAreaView>
   );
 };

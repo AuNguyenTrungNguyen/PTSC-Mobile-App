@@ -727,12 +727,10 @@ const CommonStackScreens = () => {
       <CommonStack.Screen
         name='ManHoursImpactDetail'
         component={ManHoursImpactDetailScreen}
-        options={
-          {
-            title: 'Create Man-hours',
-            headerBackTitle: 'Back',
-          }
-        }
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
       <CommonStack.Screen
         name='ManHoursImpactImage'

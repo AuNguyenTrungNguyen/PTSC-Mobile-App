@@ -17,17 +17,19 @@ export const GetPipeSupportDrawingAPI = async (projectCode, facilityCode, drawin
       },
     }
   ).then(res => res.json());
-}
+};
 
 
 
-
-export const GetManHoursImpactListAPI = (projectCode, userLogin, token) =>
-  fetch(
+export const GetManHoursImpactListAPI = async (projectCode, userLogin, workOrder, date) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
     Port_Server
     + '/api/General/GetManHoursImpactList'
     + '?projectCode=' + projectCode
-    + '&userLogin=' + userLogin,
+    + '&userLogin=' + userLogin
+    + '&workOrder=' + workOrder
+    + '&date=' + date,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -35,20 +37,52 @@ export const GetManHoursImpactListAPI = (projectCode, userLogin, token) =>
       },
     }
   ).then(res => res.json());
-
-export const UpdateManHoursImpactDetailAPI = (userInsert, model, token) =>
-  fetch(
+}
+export const DeleteManHoursImpactAPI = async (projectCode, rowIndex) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
     Port_Server
-    + '/api/General/UpdateManHoursImpactDetail',
+    + '/api/General/DeleteManHoursImpact',
     {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userInsert, model }),
+      body: JSON.stringify({ projectCode, rowIndex }),
     }
   ).then(res => res.json());
+}
+export const CreateManHoursImpactAPI = async (userUpdate, modelUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/CreateManHoursImpact',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate }),
+    }
+  ).then(res => res.json());
+}
+export const UpdateManHoursImpactAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/UpdateManHoursImpact',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ listItemUpdate }),
+    }
+  ).then(res => res.json());
+}
 
 export const GetManHoursImpactImageAPI = (workOrderNo, factorType, date, token) =>
   fetch(
