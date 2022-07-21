@@ -891,7 +891,13 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class01:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  {
+                    isPipeSupport
+                      ?
+                      <Text style={styles.textBase}>{'PS'}</Text>
+                      :
+                      <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -935,7 +941,13 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class02:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class2)}</Text>
+                  {
+                    isPipeSupport
+                      ?
+                      <Text style={styles.textBase}>{'PS'}</Text>
+                      :
+                      <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class2)}</Text>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -944,18 +956,33 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellDataLine}>
                   {
-                    <TouchableOpacity
-                      style={styles.itemActionIcon}
-                      onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
-                      <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
-                      {
-                        isDisableItem
-                          ?
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                          :
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                      }
-                    </TouchableOpacity>
+                    isPipeSupport
+                      ?
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat02')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
                   }
                 </View>
               </View>
