@@ -20,6 +20,9 @@ import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWork
 import TimeSheetReportScreen from './screens/timesheet/TimeSheetReportScreen';
 
 import HomeScreen from './screens/piping/HomeScreen';
+import HomeCONSScreen from './screens/piping/HomeCONSScreen';
+import HomeQCScreen from './screens/piping/HomeQCScreen';
+import HomeViewerScreen from './screens/piping/HomeViewerScreen';
 import PipingDimCuttingListScreen from './screens/piping/dim/DimCuttingListScreen';
 import PipingDimCuttingDetailScreen from './screens/piping/dim/DimCuttingDetailScreen';
 import PipingDimCuttingQCListScreen from './screens/piping/dim/DimCuttingQCListScreen';
@@ -406,6 +409,312 @@ const ReportStackScreens = () => {
   );
 };
 
+//-- PIP Stacks
+const PipingCONSStack = createStackNavigator();
+const PipingCONSStackScreens = () => {
+  return (
+    <PipingCONSStack.Navigator screenOptions={optionNavigation}>
+      <PipingCONSStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={HomeCONSScreen}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='Camera'
+        component={CameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingCONSStack.Screen
+        name='DimCuttingList'
+        component={PipingDimCuttingListScreen}
+        options={
+          {
+            title: 'Dim Cutting List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='DimCuttingDetail'
+        component={PipingDimCuttingDetailScreen}
+        options={
+          {
+            title: 'Dim Cutting Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingCONSStack.Screen
+        name='DrawingList'
+        component={DrawingListScreen}
+        options={
+          {
+            title: 'Drawing List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='DrawingDetail'
+        component={DrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <PipingCONSStack.Screen
+        name='DrawingImage'
+        component={DrawingImageScreen}
+        options={
+          {
+            title: 'Drawing Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='DrawingAddWelder'
+        component={DrawingAddWelderScreen}
+        options={
+          {
+            title: 'Select Welders',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='QCStatus'
+        component={DrawingQCStatusScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+
+      <PipingCONSStack.Screen
+        name='AllStatusCamera'
+        component={AllStatusCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='DrawingSearch'
+        component={DrawingSearchScreen}
+        options={
+          {
+            title: 'Search Drawing',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='DrawingAllStatus'
+        component={DrawingAllStatusScreen}
+        options={
+          {
+            title: 'Drawing Detail Status',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingCONSStack.Screen
+        name='DailyReport'
+        component={DailyReportScreen}
+        options={
+          {
+            title: 'Daily Report',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </PipingCONSStack.Navigator>
+  );
+};
+
+const PipingQCStack = createStackNavigator();
+const PipingQCStackScreens = () => {
+  return (
+    <PipingQCStack.Navigator screenOptions={optionNavigation}>
+      <PipingQCStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={HomeQCScreen}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+
+      <PipingQCStack.Screen
+        name='Camera'
+        component={CameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingQCStack.Screen
+        name='DimCuttingQCList'
+        component={PipingDimCuttingQCListScreen}
+        options={
+          {
+            title: 'QC Dim Cutting List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingQCStack.Screen
+        name='QCDrawingList'
+        component={QCDrawingListScreen}
+        options={
+          {
+            title: 'QC Drawing List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingQCStack.Screen
+        name='QCDrawingDetail'
+        component={QCDrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <PipingQCStack.Screen
+        name='DrawingImage'
+        component={DrawingImageScreen}
+        options={
+          {
+            title: 'Drawing Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingQCStack.Screen
+        name='QCSpendList'
+        component={QCSpendListScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+
+      <PipingQCStack.Screen
+        name='AllStatusCamera'
+        component={AllStatusCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingQCStack.Screen
+        name='DrawingSearch'
+        component={DrawingSearchScreen}
+        options={
+          {
+            title: 'Search Drawing',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingQCStack.Screen
+        name='DrawingAllStatus'
+        component={DrawingAllStatusScreen}
+        options={
+          {
+            title: 'Drawing Detail Status',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </PipingQCStack.Navigator>
+  );
+};
+
+const PipingViewerStack = createStackNavigator();
+const PipingViewerStackScreens = () => {
+  return (
+    <PipingViewerStack.Navigator screenOptions={optionNavigation}>
+      <PipingViewerStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={HomeViewerScreen}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+
+      <PipingViewerStack.Screen
+        name='Camera'
+        component={CameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingViewerStack.Screen
+        name='AllStatusCamera'
+        component={AllStatusCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingViewerStack.Screen
+        name='DrawingSearch'
+        component={DrawingSearchScreen}
+        options={
+          {
+            title: 'Search Drawing',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingViewerStack.Screen
+        name='DrawingAllStatus'
+        component={DrawingAllStatusScreen}
+        options={
+          {
+            title: 'Drawing Detail Status',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </PipingViewerStack.Navigator>
+  );
+};
+
+
+//-- STR Stacks
 const StructuralCONSStack = createStackNavigator();
 const StructuralCONSStackScreens = () => {
   return (
@@ -814,8 +1123,18 @@ export default () => {
         />
 
         <Stack.Screen
-          name={Constant.ROUTE__PIPING}
-          component={PipingStackScreens}
+          name={Constant.ROUTE__PIP_CONS}
+          component={PipingCONSStackScreens}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={Constant.ROUTE__PIP_QC}
+          component={PipingQCStackScreens}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={Constant.ROUTE__PIP_VIEWER}
+          component={PipingViewerStackScreens}
           options={{ headerShown: false }}
         />
 

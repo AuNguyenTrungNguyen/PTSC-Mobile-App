@@ -9,6 +9,12 @@ export default class Constant {
   static ROUTE__COMMON = 'COMMON_STACK';
 
   static ROUTE__PIPING = 'PIPING';
+  static ROUTE__PIP_CONS = 'PIP-CONS';
+  static ROUTE__PIP_QC = 'PIP-QC';
+  static ROUTE__PIP_QCDEPT = 'PIP-QCDEPT';
+  static ROUTE__PIP_QCWS = 'PIP-QCWS';
+  static ROUTE__PIP_VIEWER = 'PIP-VIEWER';
+
   static ROUTE__STRUCTURAL = 'STRUCTURAL';
   static ROUTE__STR_CONS = 'STR-CONS';
   static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
@@ -19,9 +25,9 @@ export default class Constant {
   static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
   static CAMERA_PIP_QC = 'CAMERA_PIP_QC';
 
-   //-- IMAGE ROLE
-   static IMAGE_ROLE_CONS = 'CONS';
-   static IMAGE_ROLE_QC = 'QC';
+  //-- IMAGE ROLE
+  static IMAGE_ROLE_CONS = 'CONS';
+  static IMAGE_ROLE_QC = 'QC';
 
   // CODE FILTER
   static FILTER_ALL = 'ALL';

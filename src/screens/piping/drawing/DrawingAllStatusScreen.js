@@ -287,16 +287,16 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
               </View>
             </View>
             <View style={styles.rowAction}>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewCons(Constant.CODE_FITUP) }}>
+              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
                 <Text style={styles.textAction}>Cons FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewCons(Constant.CODE_WELD) }}>
+              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
                 <Text style={styles.textAction}>Cons Weld</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC(Constant.CODE_FITUP) }}>
+              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
                 <Text style={styles.textAction}>QC FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC(Constant.CODE_VISUAL) }}>
+              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
                 <Text style={styles.textAction}>QC Visual</Text>
               </TouchableOpacity>
             </View>
