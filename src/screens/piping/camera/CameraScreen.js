@@ -25,8 +25,26 @@ const CameraScreen = ({ route, navigation }) => {
   const _onQRCodeRead = scanResult => {
     if (!isScanned) {
       setIsScanned(true);
-      var data = scanResult.data.split('_');
-      _checkDrawingRev(data[0], data[1], data[2]);
+
+      let result = scanResult.data.split('@');
+      if (!result || result.length < 3) {
+        result = scanResult.data.split('_');
+      }
+      let drawingNo = result[0];
+      let sheet = result[1];
+      let rev = result[2];
+
+      if (result.length > 3) {
+        let drawingCorrect = '';
+        for (i = 0; i < result.length - 3; i++) {
+          drawingCorrect += result[i] + '_';
+        }
+        drawingNo = drawingCorrect + result[result.length - 3];
+        sheet = result[result.length - 2];
+        rev = result[result.length - 1];
+      }
+
+      _checkDrawingRev(drawingNo, sheet, rev);
     }
   };
 

@@ -20,21 +20,39 @@ const AllStatusCameraScreen = ({ route, navigation }) => {
   };
 
   const goAllStatusScreen = async scanResult => {
-    var data = scanResult.split('_');
-    if (data != null && data[0] && data[1] && data[2]) {
+
+    let result = scanResult.split('@');
+    if (!result || result.length < 3) {
+      result = scanResult.split('_');
+    }
+    let drawingNo = result[0];
+    let sheet = result[1];
+    let rev = result[2];
+
+    if (result.length > 3) {
+      let drawingCorrect = '';
+      for (i = 0; i < result.length - 3; i++) {
+        drawingCorrect += result[i] + '_';
+      }
+      drawingNo = drawingCorrect + result[result.length - 3];
+      sheet = result[result.length - 2];
+      rev = result[result.length - 1];
+    }
+
+    if (drawingNo && sheet && rev) {
       let token = await Helper.getData('TOKEN');
       NetInfo.fetch().then(state => {
         if (!state.isConnected) {
           showComfirm('ERROR', 'Network not available!');
         } else {
-          GetDrawingLinkAPI(projectCode, data[0], data[1], data[2], token)
+          GetDrawingLinkAPI(projectCode, drawingNo, sheet, rev, token)
             .then(res => {
               if (res.success) {
                 navigation.navigate('DrawingAllStatus', {
                   projectCode: projectCode,
-                  drawingNo: data[0],
-                  sheet: data[1],
-                  rev: data[2],
+                  drawingNo: drawingNo,
+                  sheet: sheet,
+                  rev: rev,
                   link: res.data
                 });
                 setIsScanned(false);
