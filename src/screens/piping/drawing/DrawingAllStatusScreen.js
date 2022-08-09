@@ -117,8 +117,19 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
     }
   };
 
+  const [role, setRole] = useState('');
+  useEffect(
+    async () => {
+      var roleData = await Helper.getData("ROLE_CODE");
+      setRole(roleData);
+    }, []
+  );
 
   const _onPressViewCons = async code => {
+    if (role && role.includes('PIP-QC')) {
+      MessageAlert('Lỗi', 'Không có quyền vào module này!');
+      return;
+    }
     const teamLeader = await Helper.getData('USERNAME');
     const title = code + ' Detail';
     if (facilityCode) {
@@ -163,6 +174,10 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
     }
   };
   const _onPressViewQC = async code => {
+    if (role && role.includes('PIP-CONS')) {
+      MessageAlert('Lỗi', 'Không có quyền vào module này!');
+      return;
+    }
     const teamLeader = await Helper.getData('USERNAME');
     const title = code + ' Detail';
     if (facilityCode) {
@@ -287,16 +302,16 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
               </View>
             </View>
             <View style={styles.rowAction}>
-              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewCons(Constant.CODE_FITUP) }}>
                 <Text style={styles.textAction}>Cons FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewCons(Constant.CODE_WELD) }}>
                 <Text style={styles.textAction}>Cons Weld</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC(Constant.CODE_FITUP) }}>
                 <Text style={styles.textAction}>QC FitUp</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cellAction} activeOpacity={1}>
+              <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressViewQC(Constant.CODE_VISUAL) }}>
                 <Text style={styles.textAction}>QC Visual</Text>
               </TouchableOpacity>
             </View>

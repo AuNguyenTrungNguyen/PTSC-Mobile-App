@@ -19,6 +19,7 @@ export default class Constant {
   static ROUTE__STR_CONS = 'STR-CONS';
   static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
   static ROUTE__STR_QCWS = 'STR-QCWS';
+  static ROUTE__STR_VIEWER = 'STR-VIEWER';
 
   //-- CAMERA SOURCE
   static CAMERA_PIP_CONS_DIM = 'CAMERA_PIP_CONS_DIM';

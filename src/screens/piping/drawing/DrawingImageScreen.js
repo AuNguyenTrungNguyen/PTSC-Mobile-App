@@ -12,6 +12,7 @@ import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../../utils/Core';
 import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 import { GetImageAPI, GetDrawingImageAPI, DeleteImageAPI, EditImageAPI } from '../../../apis/piping/ImageAPI';
 
 import Header from '../../../components/Header';
@@ -53,6 +54,14 @@ const DrawingImageScreen = ({ route }) => {
   useEffect(
     () => {
       callAPI(getDrawingImage);
+    }, []
+  );
+
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  useEffect(
+    async () => {
+      var readOnly = await Helper.getData("ROLE_CODE");
+      setIsReadOnly(readOnly === Constant.ROUTE__PIP_VIEWER);
     }, []
   );
 
@@ -397,7 +406,7 @@ const DrawingImageScreen = ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.username}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase()
+            item.username.toLowerCase() === userLogin.toLowerCase() && !isReadOnly
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -415,7 +424,7 @@ const DrawingImageScreen = ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase()
+            item.username.toLowerCase() === userLogin.toLowerCase() && !isReadOnly
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -469,9 +478,17 @@ const DrawingImageScreen = ({ route }) => {
               <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
-              <Text style={styles.buttonTitle}>Add Pictures</Text>
-            </TouchableOpacity>
+            {
+              isReadOnly
+                ?
+                <TouchableOpacity style={styles.buttonUploadDisabled} activeOpacity={1}>
+                  <Text style={styles.buttonTitle}>Add Pictures</Text>
+                </TouchableOpacity>
+                :
+                <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
+                  <Text style={styles.buttonTitle}>Add Pictures</Text>
+                </TouchableOpacity>
+            }
           </View>
         </View>
       }
@@ -685,6 +702,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
+  },
+  buttonUploadDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
   },
   buttonLeft: {
     flex: 1,

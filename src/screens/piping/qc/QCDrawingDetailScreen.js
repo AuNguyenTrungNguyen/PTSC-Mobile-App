@@ -66,6 +66,14 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
     }, []
   );
 
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  useEffect(
+    async () => {
+      var readOnly = await Helper.getData("ROLE_CODE");
+      setIsReadOnly(readOnly === Constant.ROUTE__PIP_VIEWER);
+    }, []
+  );
+
   //-- Get Data
   const getData = async () => {
     const token = await Helper.getData('TOKEN');
@@ -206,7 +214,7 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
   };
   const renderItem = ({ index, item }) => {
     return (
-      <View style={styles.box}>
+      <View style={styles.box} pointerEvents={isReadOnly ? 'none' : 'auto'}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
@@ -227,11 +235,20 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonAccept}
-                    onPress={() => _onPressChangeStatus(Constant.STATUS_ACCEPT, index, 'FitUpResult')}>
-                    <Text style={styles.labelAccept}>Accept</Text>
-                  </TouchableOpacity>
+                  {
+                    isReadOnly
+                      ?
+                      <TouchableOpacity
+                        style={styles.buttonDisable}>
+                        <Text style={styles.labelDisabled}>Accept</Text>
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonAccept}
+                        onPress={() => _onPressChangeStatus(Constant.STATUS_ACCEPT, index, 'FitUpResult')}>
+                        <Text style={styles.labelAccept}>Accept</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -242,11 +259,20 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.FitPercentage)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonReject}
-                    onPress={() => _onPressChangeStatus(Constant.STATUS_REJECT, index, 'FitUpResult')}>
-                    <Text style={styles.labelReject}>Reject</Text>
-                  </TouchableOpacity>
+                  {
+                    isReadOnly
+                      ?
+                      <TouchableOpacity
+                        style={styles.buttonDisable}>
+                        <Text style={styles.labelDisabled}>Reject</Text>
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonReject}
+                        onPress={() => _onPressChangeStatus(Constant.STATUS_REJECT, index, 'FitUpResult')}>
+                        <Text style={styles.labelReject}>Reject</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -267,11 +293,20 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonClean}
-                    onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
-                    <Text style={styles.labelClean}>Clear</Text>
-                  </TouchableOpacity>
+                  {
+                    isReadOnly
+                      ?
+                      <TouchableOpacity
+                        style={styles.buttonDisable}>
+                        <Text style={styles.labelDisabled}>Clear</Text>
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonClean}
+                        onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
+                        <Text style={styles.labelClean}>Clear</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -287,7 +322,14 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                         ?
                         <>
                           <Text style={styles.textAction}>{Formater.formatEmptyData(item.QCFittupRemark)}</Text>
-                          <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} /></>
+                          {
+                            isReadOnly
+                              ?
+                              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                              :
+                              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                          }
+                        </>
                         :
                         <Text style={styles.textEnter}>Enter remark ...</Text>
                     }
@@ -313,11 +355,20 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonAccept}
-                    onPress={() => _onPressChangeStatus(Constant.STATUS_ACCEPT, index, 'VisualResult')}>
-                    <Text style={styles.labelAccept}>Accept</Text>
-                  </TouchableOpacity>
+                  {
+                    isReadOnly
+                      ?
+                      <TouchableOpacity
+                        style={styles.buttonDisable}>
+                        <Text style={styles.labelDisabled}>Accept</Text>
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonAccept}
+                        onPress={() => _onPressChangeStatus(Constant.STATUS_ACCEPT, index, 'VisualResult')}>
+                        <Text style={styles.labelAccept}>Accept</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -328,11 +379,20 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldPercentage)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonReject}
-                    onPress={() => _onPressChangeStatus(Constant.STATUS_REJECT, index, 'VisualResult')}>
-                    <Text style={styles.labelReject}>Reject</Text>
-                  </TouchableOpacity>
+                  {
+                    isReadOnly
+                      ?
+                      <TouchableOpacity
+                        style={styles.buttonDisable}>
+                        <Text style={styles.labelDisabled}>Reject</Text>
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonReject}
+                        onPress={() => _onPressChangeStatus(Constant.STATUS_REJECT, index, 'VisualResult')}>
+                        <Text style={styles.labelReject}>Reject</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -353,11 +413,20 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonClean}
-                    onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
-                    <Text style={styles.labelClean}>Clear</Text>
-                  </TouchableOpacity>
+                  {
+                    isReadOnly
+                      ?
+                      <TouchableOpacity
+                        style={styles.buttonDisable}>
+                        <Text style={styles.labelDisabled}>Clear</Text>
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.buttonClean}
+                        onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
+                        <Text style={styles.labelClean}>Clear</Text>
+                      </TouchableOpacity>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
@@ -369,7 +438,16 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
                     {
                       item.QCVisualRemark
                         ?
-                        <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
+                        <>
+                          <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualRemark)}</Text>
+                          {
+                            isReadOnly
+                              ?
+                              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                              :
+                              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                          }
+                        </>
                         :
                         <Text style={styles.textEnter}>Enter remark ...</Text>
                     }
@@ -414,9 +492,17 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
             <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
               <Text style={styles.buttonTitle}>Chèn ảnh</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-              <Text style={styles.buttonTitle}>Gửi Request</Text>
-            </TouchableOpacity>
+            {
+              isReadOnly
+                ?
+                <TouchableOpacity style={styles.buttonRightDisabled} activeOpacity={1}>
+                  <Text style={styles.buttonTitle}>Gửi Request</Text>
+                </TouchableOpacity>
+                :
+                <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                  <Text style={styles.buttonTitle}>Gửi Request</Text>
+                </TouchableOpacity>
+            }
           </View>
           <AwesomeAlert
             show={isUploading}
@@ -590,6 +676,18 @@ const styles = StyleSheet.create({
   labelClean: {
     color: BASE_COLOR,
   },
+  buttonDisable: {
+    width: 70,
+    borderColor: '#999999',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelDisabled: {
+    color: '#666666',
+  },
 
   noDataContainer: {
     flex: 1,
@@ -620,6 +718,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
+    marginLeft: 4,
+  },
+  buttonRightDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
     marginLeft: 4,
   },
   buttonTitle: {

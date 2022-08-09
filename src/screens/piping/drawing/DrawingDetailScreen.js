@@ -49,6 +49,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     }, [route.params?.welderSelected, route.params?.heatNoSelected, route.params?.index]
   );
 
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  useEffect(
+    async () => {
+      var readOnly = await Helper.getData("ROLE_CODE");
+      setIsReadOnly(readOnly === Constant.ROUTE__PIP_VIEWER);
+    }, []
+  );
+
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(
     () => {
@@ -726,7 +734,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     }
     const isEnableClear = itemDate || itemPercent;
     const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] == 'SP';
-
+    isDisableItem = isReadOnly ? true : isDisableItem;
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
         <View style={styles.row}>
@@ -1198,9 +1206,17 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
                 <Text style={styles.buttonTitle}>Chèn ảnh</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-                <Text style={styles.buttonTitle}>Gửi Request</Text>
-              </TouchableOpacity>
+              {
+                isReadOnly
+                  ?
+                  <TouchableOpacity style={styles.buttonRightDisabled} activeOpacity={1}>
+                    <Text style={styles.buttonTitle}>Gửi Request</Text>
+                  </TouchableOpacity>
+                  :
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                    <Text style={styles.buttonTitle}>Gửi Request</Text>
+                  </TouchableOpacity>
+              }
             </View>
           </View>
       }
@@ -1478,6 +1494,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
+    marginLeft: 4,
+  },
+  buttonRightDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
     marginLeft: 4,
   },
   buttonTitle: {

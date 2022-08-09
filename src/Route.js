@@ -709,6 +709,33 @@ const PipingViewerStackScreens = () => {
           }
         }
       />
+
+      <PipingViewerStack.Screen
+        name='DrawingDetail'
+        component={DrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <PipingViewerStack.Screen
+        name='QCDrawingDetail'
+        component={QCDrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <PipingViewerStack.Screen
+        name='DrawingImage'
+        component={DrawingImageScreen}
+        options={
+          {
+            title: 'Drawing Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </PipingViewerStack.Navigator>
   );
 };
