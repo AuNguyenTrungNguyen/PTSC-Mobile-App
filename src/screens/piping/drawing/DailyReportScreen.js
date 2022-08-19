@@ -153,13 +153,23 @@ const DailyReportScreen = ({ route, navigation }) => {
       });
   };
 
-
+  //-- Detail
+  const onGoToDetail = async item => {
+    navigation.navigate(
+      'DailyReportDetail',
+      {
+        projectCode: projectCode,
+        team: teamDisplay,
+        date: Formater.formatDateWithoutTimeSQL(item.Date),
+      }
+    );
+  };
 
 
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.box}>
+      <TouchableOpacity style={styles.box} onPress={() => { onGoToDetail(item) }}>
         <View style={styles.row}>
           <View style={styles.cell}>
             <Text>Date: </Text>
@@ -170,7 +180,7 @@ const DailyReportScreen = ({ route, navigation }) => {
             <Text style={styles.text}>{Formater.formatZeroDigits(item.Total)} </Text>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
   const RenderList = () => {
@@ -335,6 +345,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderColor: BASE_COLOR,
     borderRadius: 4,
+    marginVertical: 4,
     padding: 8,
   },
   row: {

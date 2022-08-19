@@ -1,4 +1,5 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetDrawingCompletePercentAPI = (projectCode, drawingNo, sheet, rev, token) =>
   fetch(
@@ -118,6 +119,20 @@ export const GetTeamReportAPI = (projectCode, disciplineCode, team, date, token)
     + '/api/piping/GetTeamReport'
     + '?projectCode=' + projectCode
     + '&disciplineCode=' + disciplineCode
+    + '&team=' + team
+    + '&date=' + date,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const GetTeamReportDetailAPI = (projectCode, team, date, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetTeamReportDetail'
+    + '?projectCode=' + projectCode
     + '&team=' + team
     + '&date=' + date,
     {

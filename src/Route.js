@@ -36,6 +36,7 @@ import DrawingDetailScreen from './screens/piping/drawing/DrawingDetailScreen';
 import DrawingImageScreen from './screens/piping/drawing/DrawingImageScreen';
 import DrawingAddWelderScreen from './screens/piping/drawing/DrawingAddWelderScreen';
 import DailyReportScreen from './screens/piping/drawing/DailyReportScreen';
+import DailyReportDetailScreen from './screens/piping/drawing/DailyReportDetailScreen';
 import DrawingQCStatusScreen from './screens/piping/drawing/DrawingQCStatusScreen';
 
 import SpoolMatrixScreen from './screens/piping/spool/SpoolMatrixScreen';
@@ -539,6 +540,16 @@ const PipingCONSStackScreens = () => {
         options={
           {
             title: 'Daily Report',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='DailyReportDetail'
+        component={DailyReportDetailScreen}
+        options={
+          {
+            title: 'Daily Report Detail',
             headerBackTitle: 'Back',
           }
         }
