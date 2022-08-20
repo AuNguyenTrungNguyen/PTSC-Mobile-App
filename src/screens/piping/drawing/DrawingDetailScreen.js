@@ -128,9 +128,15 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         const heat02 = item['Heat02'];
         const location = item['SiteLocation'];
         const team = item['FittingTeam'];
+        let conType = '';
+        const itemSource = detailDrawingList.filter(i => i.RowIndex === item.RowIndex);
+        if (itemSource && itemSource[0] && itemSource[0].ConType) {
+          conType = itemSource[0].ConType;
+        }
 
         if ((date && percent && heat01 && heat02 && location && team)
-          || (!date && !percent && !heat01 && !heat02 && !location && !team)) {
+          || (!date && !percent && !heat01 && !heat02 && !location && !team)
+          || (date && percent && location && team && conType === 'FW')) {
           return item;
         }
 
@@ -144,10 +150,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         if ((column.indexOf('FitPercentage') >= 0 && !percent) || (column.indexOf('FitPercentage') < 0 && !oldItem['FitPercentage'])) {
           messages.push('Percent');
         }
-        if ((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) {
+        if (((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) && conType !== 'FW') {
           messages.push('HeatNo01');
         }
-        if ((column.indexOf('Heat02') >= 0 && !heat02) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) {
+        if (((column.indexOf('Heat02') >= 0 && !heat02) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) && conType !== 'FW') {
           messages.push('Heat02');
         }
         if ((column.indexOf('SiteLocation') >= 0 && !location) || (column.indexOf('SiteLocation') < 0 && !oldItem['SiteLocation'])) {
