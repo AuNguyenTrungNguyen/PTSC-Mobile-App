@@ -136,7 +136,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
 
         if ((date && percent && heat01 && heat02 && location && team)
           || (!date && !percent && !heat01 && !heat02 && !location && !team)
-          || (date && percent && location && team && conType === 'FW')) {
+          || (date && percent && location && team && conType.includes('FW'))) {
           return item;
         }
 
@@ -150,10 +150,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         if ((column.indexOf('FitPercentage') >= 0 && !percent) || (column.indexOf('FitPercentage') < 0 && !oldItem['FitPercentage'])) {
           messages.push('Percent');
         }
-        if (((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) && conType !== 'FW') {
+        if (((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) && !conType.includes('FW')) {
           messages.push('HeatNo01');
         }
-        if (((column.indexOf('Heat02') >= 0 && !heat02) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) && conType !== 'FW') {
+        if (((column.indexOf('Heat02') >= 0 && !heat02) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) && !conType.includes('FW')) {
           messages.push('Heat02');
         }
         if ((column.indexOf('SiteLocation') >= 0 && !location) || (column.indexOf('SiteLocation') < 0 && !oldItem['SiteLocation'])) {
@@ -735,11 +735,16 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     const itemDate = code == Constant.CODE_FITUP ? item['FittingDate'] : item['WeldingDate'];
     const itemPercent = code == Constant.CODE_FITUP ? item['FitPercentage'] : item['WeldPercentage'];
     let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
-    if (code && code !== Constant.CODE_FITUP) {
-      isDisableItem = isDisableItem || (item['FitUpResult'] != Constant.STATUS_ACCEPT);
-    }
+    // if (code && code !== Constant.CODE_FITUP) {
+    //   isDisableItem = isDisableItem || (item['FitUpResult'] !== Constant.STATUS_ACCEPT);
+    // }
     const isEnableClear = itemDate || itemPercent;
-    const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] == 'SP';
+    const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] === 'SP';
+
+    //-- If ConType = 'TW', unlock UI
+    if (code === Constant.CODE_FITUP && item['ConType'] === 'TW') {
+      isDisableItem = false;
+    }
     isDisableItem = isReadOnly ? true : isDisableItem;
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
