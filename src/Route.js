@@ -69,6 +69,9 @@ import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/Piec
 import StructuralDimForCuttingQCStatusScreen from './screens/structural/dimcheck/DimForCuttingQCStatusScreen';
 import StructuralLamCheckSpendingListScreen from './screens/structural/lamcheck/LamCheckSpendingListScreen';
 import StructuralLamCheckQCStatusScreen from './screens/structural/lamcheck/LamCheckQCStatusScreen';
+import StructuralDIMAfterWeldListScreen from './screens/structural/dimcheck/DIMAfterWeldListScreen';
+import StructuralDIMAfterWeldDetailScreen from './screens/structural/dimcheck/DIMAfterWeldDetailScreen';
+import StructuralDIMAfterWeldDetailQCScreen from './screens/structural/dimcheck/DIMAfterWeldDetailQCScreen';
 
 import StructuralDimForCuttingListScreen from './screens/structural/dimcheck/DimForCuttingListScreen';
 import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
@@ -904,6 +907,27 @@ const StructuralCONSStackScreens = () => {
           }
         }
       />
+      {/* DIM After Weld */}
+      <StructuralCONSStack.Screen
+        name='DIMAfterWeldList'
+        component={StructuralDIMAfterWeldListScreen}
+        options={
+          {
+            title: 'DIM After Weld List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='DIMAfterWeldDetail'
+        component={StructuralDIMAfterWeldDetailScreen}
+        options={
+          {
+            title: 'DIM After Weld Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </StructuralCONSStack.Navigator>
   );
 };
@@ -1009,6 +1033,27 @@ const StructuralQCStackScreens = () => {
         options={
           {
             title: 'QC Hand Book',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* DIM After Weld */}
+      <StructuralQCStack.Screen
+        name='DIMAfterWeldListQC'
+        component={StructuralDIMAfterWeldListScreen}
+        options={
+          {
+            title: 'QC DIM After Weld List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralQCStack.Screen
+        name='DIMAfterWeldDetailQC'
+        component={StructuralDIMAfterWeldDetailQCScreen}
+        options={
+          {
+            title: 'QC DIM After Weld Detail',
             headerBackTitle: 'Back',
           }
         }

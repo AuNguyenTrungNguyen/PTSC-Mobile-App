@@ -303,6 +303,46 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
 
+  //-- DIM After Weld
+  const _onPressManageDIMAfterWeld = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode DIM After Weld\n\nSearch: Search DIM After Weld\n\nQC Status: QC Status DIM After Weld Request',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeDIMAfterWeld },
+        { text: 'Search', onPress: _onPressSearchDIMAfterWeld },
+        // { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressQRCodeDIMAfterWeld = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        destination: Naming.NAME_STR_DIM_AFTER_WELD_QC
+      }
+    );
+  };
+  const _onPressSearchDIMAfterWeld = async () => {
+    navigation.navigate(
+      'DIMAfterWeldListQC',
+      {
+        projectCode: projectCode,
+        isQC: true,
+      }
+    );
+  };
+  const _onPressQCStatusDIMAfterWeld = async () => {
+
+  };
+
   // QA Observation
   const _onPressQAObservation = async () => {
     Alert.alert(
@@ -415,6 +455,7 @@ const HomeScreenQC = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
+              {/* <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} /> */}
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
             </View>
             <View style={styles.row}>

@@ -65,6 +65,17 @@ const CameraScreen = ({ route, navigation }) => {
       } else if (destination === Naming.NAME_STR_QC) {
         title = 'QC ' + code;
         route = 'QCSpendList';
+      } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD) {
+        navigation.navigate('DIMAfterWeldList', {
+          projectCode: projectCode,
+          paramDrawingNo: drawingNo,
+        });
+      } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD_QC) {
+        navigation.navigate('DIMAfterWeldListQC', {
+          projectCode: projectCode,
+          paramDrawingNo: drawingNo,
+          isQC: true,
+        });
       }
 
       checkDrawingRev(drawingNo, sheet, rev, route, title);

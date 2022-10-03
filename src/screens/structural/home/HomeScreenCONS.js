@@ -255,6 +255,45 @@ const HomeScreenCONS = ({ route, navigation }) => {
     );
   };
 
+  //-- DIM After Weld
+  const _onPressManageDIMAfterWeld = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode DIM After Weld\n\nSearch: Search DIM After Weld\n\nQC Status: QC Status DIM After Weld Request',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeDIMAfterWeld },
+        { text: 'Search', onPress: _onPressSearchDIMAfterWeld },
+        // { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressQRCodeDIMAfterWeld = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        destination: Naming.NAME_STR_DIM_AFTER_WELD
+      }
+    );
+  };
+  const _onPressSearchDIMAfterWeld = async () => {
+    navigation.navigate(
+      'DIMAfterWeldList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+  const _onPressQCStatusDIMAfterWeld = async () => {
+
+  };
+
   // ManHours Impact
   const _onPressManHoursImpact = async () => {
     const userLogin = await Helper.getData('USERNAME');
@@ -377,10 +416,6 @@ const HomeScreenCONS = ({ route, navigation }) => {
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
               <RenderItemBox title={'Manpower\n'} />
             </View>
-            {/* <View style={styles.row}>
-              <RenderItemBox title={'Manpower\n'} />
-              <RenderItemBox disable={true} />
-            </View> */}
           </ScrollView>
         </View>
       }
