@@ -198,7 +198,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
 
   const _onPressViewMultiDetail = async (drawingNo, sheet, rev, link, code) => {
     Keyboard.dismiss();
-    const title = code + ' Multi Detail';
+    const title = code + ' Detail';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
         'ConstructionMultiDetail',

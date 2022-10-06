@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, Alert } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
@@ -11,7 +11,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import { GetLocationListAPI, GetTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -64,6 +64,13 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           </TouchableOpacity> */}
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { showConfirmGetReweldJointFromQC() }}>
+            <Ionicons
+              size={24}
+              name={'md-sync-circle-outline'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleJointNo(true) }}>
             <Ionicons
               size={24}
@@ -106,7 +113,11 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [isVisibleJointNo, setIsVisibleJointNo] = useState(false);
   const [jointNo, setJointNo] = useState('');
   const [oldJointNo, setOldJointNo] = useState('');
-  const _onClearJointNo = () => {
+  const inputRef = useRef();
+  useEffect(() => {
+    inputRef.current = jointNo;
+  });
+  const _onClearJointNo = async () => {
     if (jointNo != '') {
       setJointNo('');
       setOldJointNo('');
@@ -131,14 +142,17 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           setConstructionDetailList(res.data);
           setIsLoading(false);
           setIsError(false);
+          setIsUploading(false);
         } else {
           setIsLoading(false);
           setIsError(true);
+          setIsUploading(false);
         }
       })
       .catch(() => {
         setIsLoading(false);
         setIsError(true);
+        setIsUploading(false);
       });
   };
 
@@ -266,6 +280,38 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       Toast.show('No any data changes!', Toast.SHORT);
     }
   };
+
+  //-- Get re-weld joint from QC
+  const showConfirmGetReweldJointFromQC = () => {
+    Alert.alert(
+      '',
+      'Are you sure get re-weld joints from QC?',
+      [
+        { text: 'Get', onPress: () => _onPressGetReweldJointFromQC() },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressGetReweldJointFromQC = () => {
+    callAPI(() => getReweldJointFromQC());
+  };
+  const getReweldJointFromQC = useCallback(async () => {
+    setIsUploading(true);
+    const data = inputRef.current;
+    // Toast.show('Getting...', Toast.SHORT, ['RCTModalHostViewController']);
+    GetReweldFromQCAPI(projectCode, drawingNo)
+      .then(res => {
+        Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+        callAPI(() => getConstructionDetail(data));
+      }).catch(() => {
+        setIsUploading(false);
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+      });
+  }, [inputRef]);
+
 
   const _onPressManagePicture = () => {
     navigation.navigate(

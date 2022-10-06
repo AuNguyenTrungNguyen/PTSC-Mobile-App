@@ -1,4 +1,5 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
   fetch(
@@ -95,3 +96,19 @@ export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, 
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+
+export const GetReweldFromQCAPI = async (projectCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/structural/Construction/GetReweldFromQC',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, drawingNo }),
+    }
+  ).then(res => res.json());
+};
