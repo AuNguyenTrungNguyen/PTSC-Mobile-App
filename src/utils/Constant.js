@@ -61,6 +61,7 @@ export default class Constant {
   static STATUS_ACCEPT = 'ACC';
   static STATUS_REJECT = 'REJ';
   static STATUS_NOT_YET = 'NOT_YET';
+  static STATUS_ALL = 'ALL';
 
   //QA Observation
   static QA_OBSERVATION_DRAFT = 0;

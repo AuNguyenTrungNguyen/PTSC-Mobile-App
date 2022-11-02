@@ -455,12 +455,11 @@ const HomeScreenQC = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
-              {/* <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} /> */}
-              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
+              <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
               <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} />
-              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

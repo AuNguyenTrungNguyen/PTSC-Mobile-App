@@ -157,7 +157,7 @@ const DimCheckImageScreen = ({ route }) => {
       { name: 'username', data: userLogin },
       { name: 'projectCode', data: projectCode },
       { name: 'drawingNo', data: drawingNo },
-      { name: 'jointNo', data: jointNo },
+      { name: 'jointNo', data: jointNo ?? pieceMarkNo },
       { name: 'rowIndex', data: rowIndex.toString() },
     ];
 

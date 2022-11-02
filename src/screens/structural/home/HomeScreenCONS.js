@@ -408,13 +408,12 @@ const HomeScreenCONS = ({ route, navigation }) => {
               <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp} />
             </View>
             <View style={styles.row}>
-              {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/> */}
               <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual} />
-              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
+              <RenderItemBox title={'DIM\nAfter Weld'} onPress={_onPressManageDIMAfterWeld} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
-              <RenderItemBox title={'Manpower\n'} />
             </View>
           </ScrollView>
         </View>

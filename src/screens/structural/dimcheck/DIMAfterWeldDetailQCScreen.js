@@ -173,6 +173,22 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
     }
   };
 
+  const _onPressManagePicture = async (item) => {
+    const dataCode = await Helper.getData('DATACODE');
+    navigation.navigate(
+      'DimCheckImage',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        dataCode: dataCode,
+        rowIndex: item.RowIndex,
+        drawingNo: drawingNo,
+        pieceMarkNo: item.PieceMarkNo,
+        imageCode: 'DimAfterWeld'
+      }
+    );
+  };
+
 
   const [isVisibleInspector, setIsVisibleInspector] = useState(false);
   const [inspector, setInspector] = useState(null);
@@ -406,7 +422,7 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
       />
       <SelectPopup
         visible={isVisibleType}
-        data={[Constant.STATUS_NOT_YET, Constant.STATUS_ACCEPT, Constant.STATUS_REJECT]}
+        data={[Constant.STATUS_NOT_YET, Constant.STATUS_ACCEPT, Constant.STATUS_REJECT, Constant.STATUS_ALL]}
         onChangeItem={_onChangeType}
         onCancel={() => setIsVisibleType(false)}
       />
