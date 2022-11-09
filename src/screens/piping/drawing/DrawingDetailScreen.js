@@ -734,10 +734,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const renderItem = ({ index, item }) => {
     const itemDate = code == Constant.CODE_FITUP ? item['FittingDate'] : item['WeldingDate'];
     const itemPercent = code == Constant.CODE_FITUP ? item['FitPercentage'] : item['WeldPercentage'];
-    let isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
-    // if (code && code !== Constant.CODE_FITUP) {
-    //   isDisableItem = isDisableItem || (item['FitUpResult'] !== Constant.STATUS_ACCEPT);
-    // }
+    let isDisableItem = item['QCStatusMobile'] === Constant.STATUS_ACCEPT;
+    if (code && code !== Constant.CODE_FITUP) {
+      isDisableItem = isDisableItem || (item['FitUpResult'] !== Constant.STATUS_ACCEPT);
+    }
     const isEnableClear = itemDate || itemPercent;
     const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] === 'SP';
 
