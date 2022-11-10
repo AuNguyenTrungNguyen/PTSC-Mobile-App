@@ -177,12 +177,18 @@ android {
     }
 
     packagingOptions {
-        pickFirst "lib/armeabi-v7a/libc++_shared.so"
-        pickFirst "lib/arm64-v8a/libc++_shared.so"
-        pickFirst "lib/x86/libc++_shared.so"
-        pickFirst "lib/x86_64/libc++_shared.so"
-        pickFirst "lib/x86_64/libjsc.so"
-        pickFirst "lib/arm64-v8a/libjsc.so"
+        // pickFirst "lib/armeabi-v7a/libc++_shared.so"
+        // pickFirst "lib/arm64-v8a/libc++_shared.so"
+        // pickFirst "lib/x86/libc++_shared.so"
+        // pickFirst "lib/x86_64/libc++_shared.so"
+        // pickFirst "lib/x86_64/libjsc.so"
+        // pickFirst "lib/arm64-v8a/libjsc.so"
+
+        pickFirst "**/libdlib.so"
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libfbjni.so'
+        pickFirst '**/libc++_shared.so'
+
     }
 
     // applicationVariants are e.g. debug, release
@@ -204,7 +210,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:0.64.1!!"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.4.1"))
