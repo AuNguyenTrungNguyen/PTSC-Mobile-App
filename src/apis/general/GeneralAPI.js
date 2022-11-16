@@ -19,6 +19,23 @@ export const GetPipeSupportDrawingAPI = async (projectCode, facilityCode, drawin
   ).then(res => res.json());
 };
 
+export const GetIsometricDrawingAPI = async (projectCode, facilityCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/GetIsometricDrawing'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+
 
 
 export const GetManHoursImpactListAPI = async (projectCode, userLogin, workOrder, date) => {

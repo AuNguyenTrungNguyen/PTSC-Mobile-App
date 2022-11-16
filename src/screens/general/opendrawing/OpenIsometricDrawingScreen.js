@@ -2,22 +2,20 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import CheckBox from '@react-native-community/checkbox';
 
 import Networker from '../../../utils/Networker';
-import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetPipeSupportDrawingAPI } from '../../../apis/general/GeneralAPI';
+import { GetIsometricDrawingAPI } from '../../../apis/general/GeneralAPI';
 
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import SelectPopup from '../../../components/SelectPopup';
 
-const OpenDrawingScreen = ({ route, navigation }) => {
+const OpenIsometricDrawingScreen = ({ route, navigation }) => {
 
   const { projectCode } = route.params;
 
@@ -67,12 +65,11 @@ const OpenDrawingScreen = ({ route, navigation }) => {
   //-- Search Action
   const _onPressSearchDrawing = () => {
     Keyboard.dismiss();
-    callAPI(gerDrawingData);
+    callAPI(getDrawingData);
   };
-  async function gerDrawingData({ facility = facilityCode, deckFilter = deck } = {}) {
+  async function getDrawingData({ facility = facilityCode } = {}) {
     facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
-    deckFilter = (!deckFilter || deckFilter === DECK_DEFAULT) ? '' : deckFilter;
-    GetPipeSupportDrawingAPI(projectCode, facility, drawingNo, deckFilter)
+    GetIsometricDrawingAPI(projectCode, facility, drawingNo)
       .then(res => {
         if (res.Success && res.Data) {
           setDrawingList(res.Data);
@@ -126,36 +123,32 @@ const OpenDrawingScreen = ({ route, navigation }) => {
   const _onChangeFacilityCode = data => {
     if (data !== facilityCode) {
       setFacilityCode(data);
-      // callAPI(() => { gerDrawingData({ facility: data }) });
     }
     setIsVisibleFacility(false);
   };
   const _onClearFacilityCode = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      // callAPI(() => { gerDrawingData({ facility: FACILITY_CODE_DEFAULT }) });
     }
     setIsVisibleFacility(false);
   };
 
   //-- Deck filter
-  const DECK_DEFAULT = 'All Deck';
-  const [isVisibleDeck, setIsVisibleDeck] = useState(false);
-  const [deck, setDeck] = useState(DECK_DEFAULT);
-  const _onChangeDeck = async data => {
-    if (data !== deck) {
-      setDeck(data);
-      // callAPI(() => { gerDrawingData({ deckFilter: data }) });
-    }
-    setIsVisibleDeck(false);
-  };
-  const _onClearDeck = () => {
-    if (deck !== DECK_DEFAULT) {
-      setDeck(DECK_DEFAULT);
-      // callAPI(() => { gerDrawingData({ deckFilter: DECK_DEFAULT }) });
-    }
-    setIsVisibleDeck(false);
-  };
+  // const DECK_DEFAULT = 'All Deck';
+  // const [isVisibleDeck, setIsVisibleDeck] = useState(false);
+  // const [deck, setDeck] = useState(DECK_DEFAULT);
+  // const _onChangeDeck = async data => {
+  //   if (data !== deck) {
+  //     setDeck(data);
+  //   }
+  //   setIsVisibleDeck(false);
+  // };
+  // const _onClearDeck = () => {
+  //   if (deck !== DECK_DEFAULT) {
+  //     setDeck(DECK_DEFAULT);
+  //   }
+  //   setIsVisibleDeck(false);
+  // };
 
   //-- Render List
   const renderItem = ({ _, item }) => {
@@ -168,7 +161,7 @@ const OpenDrawingScreen = ({ route, navigation }) => {
             {
               item.WebLink
                 ?
-                <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Pipe Support')}>
+                <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Isometric')}>
                   <Text style={CoreStyle.textLink}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
                 </TouchableOpacity>
                 :
@@ -210,7 +203,7 @@ const OpenDrawingScreen = ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(gerDrawingData)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrawingData)} />
           :
           <View style={styles.container}>
             {
@@ -227,12 +220,12 @@ const OpenDrawingScreen = ({ route, navigation }) => {
                       <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.rowInfoAction}>
+                  {/* <View style={styles.rowInfoAction}>
                     <Text style={styles.infoTitleAction}>Deck:</Text>
                     <TouchableOpacity style={styles.selectInput} onPress={() => setIsVisibleDeck(true)}>
                       <Text style={styles.buttonTitleDark}>{deck}</Text>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
                   <View style={styles.rowInfoAction}>
                     <Text style={styles.infoTitleAction}>DrawingNo:</Text>
                     <View style={styles.inputContainer}>
@@ -286,12 +279,12 @@ const OpenDrawingScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleFacility(false)}
         onClear={_onClearFacilityCode}
         onChangeItem={_onChangeFacilityCode} />
-      <SelectPopup
+      {/* <SelectPopup
         visible={isVisibleDeck}
         data={['CED', 'CLD', 'MND', 'MZD', 'SDD', 'TOD']}
         onCancel={() => setIsVisibleDeck(false)}
         onClear={_onClearDeck}
-        onChangeItem={_onChangeDeck} />
+        onChangeItem={_onChangeDeck} /> */}
     </SafeAreaView>
   );
 };
@@ -524,4 +517,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OpenDrawingScreen;
+export default OpenIsometricDrawingScreen;

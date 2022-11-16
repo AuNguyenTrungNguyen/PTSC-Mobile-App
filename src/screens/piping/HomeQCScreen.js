@@ -210,13 +210,24 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
-  //-- Open Drawing
-  const _onPressOpenDrawing = async () => {
+  //-- Open Pipe Support Drawing
+  const _onPressOpenPipeSupportDrawing = async () => {
     navigation.navigate(Constant.ROUTE__COMMON, {
-      screen: 'OpenDrawing',
+      screen: 'OpenPipeSupportDrawing',
       params: {
         projectCode: projectCode,
         title: 'Pipe Support'
+      }
+    });
+  };
+
+  //-- Open Isometric Drawing
+  const _onPressOpenIsometricDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenIsometricDrawing',
+      params: {
+        projectCode: projectCode,
+        title: 'Isometric'
       }
     });
   };
@@ -279,7 +290,11 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-                <RenderItemBox title={'Pipe Support'} onPress={_onPressOpenDrawing} />
+                <RenderItemBox title={'Pipe Support'} onPress={_onPressOpenPipeSupportDrawing} iconName={'md-document-text'} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text'} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>

@@ -12,21 +12,22 @@ import PDFViewScreen from './screens/pdf/PDFViewScreen';
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
 import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHoursImpactDetailScreen';
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
-import OpenDrawingScreen from './screens/general/opendrawing/OpenDrawingScreen';
+// import OpenDrawingScreen from './screens/general/opendrawing/OpenDrawingScreen';
+import OpenPipeSupportDrawingScreen from './screens/general/opendrawing/OpenPipeSupportDrawingScreen';
+import OpenIsometricDrawingScreen from './screens/general/opendrawing/OpenIsometricDrawingScreen';
 
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
 import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
 import TimeSheetReportScreen from './screens/timesheet/TimeSheetReportScreen';
 
-import HomeScreen from './screens/piping/HomeScreen';
 import HomeCONSScreen from './screens/piping/HomeCONSScreen';
 import HomeQCScreen from './screens/piping/HomeQCScreen';
 import HomeViewerScreen from './screens/piping/HomeViewerScreen';
 import PipingDimCuttingListScreen from './screens/piping/dim/DimCuttingListScreen';
 import PipingDimCuttingDetailScreen from './screens/piping/dim/DimCuttingDetailScreen';
 import PipingDimCuttingQCListScreen from './screens/piping/dim/DimCuttingQCListScreen';
-import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
+// import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
 import AllStatusCameraScreen from './screens/piping/camera/AllStatusCameraScreen';
 import DrawingListScreen from './screens/piping/drawing/DrawingListScreen';
@@ -39,20 +40,20 @@ import DailyReportScreen from './screens/piping/drawing/DailyReportScreen';
 import DailyReportDetailScreen from './screens/piping/drawing/DailyReportDetailScreen';
 import DrawingQCStatusScreen from './screens/piping/drawing/DrawingQCStatusScreen';
 
-import SpoolMatrixScreen from './screens/piping/spool/SpoolMatrixScreen';
-import SpoolCameraScreen from './screens/piping/spool/SpoolCameraScreen';
-import HydrotestListScreen from './screens/piping/hydrotest/HydrotestListScreen';
+// import SpoolMatrixScreen from './screens/piping/spool/SpoolMatrixScreen';
+// import SpoolCameraScreen from './screens/piping/spool/SpoolCameraScreen';
+// import HydrotestListScreen from './screens/piping/hydrotest/HydrotestListScreen';
 import QCDrawingListScreen from './screens/piping/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/piping/qc/QCDrawingDetailScreen';
 import QCSpendListScreen from './screens/piping/qc/QCSpendListScreen';
-import NDTManagerScreen from './screens/piping/ndt/NDTManagerScreen';
-import NDTDetailScreen from './screens/piping/ndt/NDTDetailScreen';
-import NDTIssueScreen from './screens/piping/ndt/NDTIssueScreen';
-import ReportManagerScreen from './screens/piping/report/ReportManagerScreen';
-import ReportConstructionListScreen from './screens/piping/report/ReportConstructionListScreen';
-import ReportDisciplineListScreen from './screens/piping/report/ReportDisciplineListScreen';
-import ReportHistogramListScreen from './screens/piping/report/ReportHistogramListScreen';
-import ReportDailyManpowerListScreen from './screens/piping/report/ReportDailyManpowerListScreen';
+// import NDTManagerScreen from './screens/piping/ndt/NDTManagerScreen';
+// import NDTDetailScreen from './screens/piping/ndt/NDTDetailScreen';
+// import NDTIssueScreen from './screens/piping/ndt/NDTIssueScreen';
+// import ReportManagerScreen from './screens/piping/report/ReportManagerScreen';
+// import ReportConstructionListScreen from './screens/piping/report/ReportConstructionListScreen';
+// import ReportDisciplineListScreen from './screens/piping/report/ReportDisciplineListScreen';
+// import ReportHistogramListScreen from './screens/piping/report/ReportHistogramListScreen';
+// import ReportDailyManpowerListScreen from './screens/piping/report/ReportDailyManpowerListScreen';
 
 import StructuralHomeScreenCONS from './screens/structural/home/HomeScreenCONS';
 import StructuralHomeScreenQC from './screens/structural/home/HomeScreenQC';
@@ -88,329 +89,10 @@ import QCObservationImageScreen from './screens/observation/QAObservationImageSc
 import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 
 const Stack = createStackNavigator();
-const PipingStack = createStackNavigator();
-const NDTStack = createStackNavigator();
-const ReportStack = createStackNavigator();
 
 let optionNavigation = { headerStyle: { backgroundColor: 'aliceblue' } };
 if (Appearance.getColorScheme() === 'dark') {
   optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
-};
-
-const PipingStackScreens = () => {
-  return (
-    <PipingStack.Navigator screenOptions={optionNavigation}>
-      <PipingStack.Screen
-        name='Home'
-        component={HomeScreen}
-        options={
-          {
-            title: 'PTSC M&C',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DimCuttingList'
-        component={PipingDimCuttingListScreen}
-        options={
-          {
-            title: 'Dim Cutting List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DimCuttingDetail'
-        component={PipingDimCuttingDetailScreen}
-        options={
-          {
-            title: 'Dim Cutting Detail',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DimCuttingQCList'
-        component={PipingDimCuttingQCListScreen}
-        options={
-          {
-            title: 'QC Dim Cutting List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingStack.Screen
-        name='ConstructionUpdateManage'
-        component={ConstructionUpdateManageScreen}
-        options={
-          {
-            title: 'Construction Update',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingStack.Screen
-        name='DrawingList'
-        component={DrawingListScreen}
-        options={
-          {
-            title: 'Drawing List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='Camera'
-        component={CameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='AllStatusCamera'
-        component={AllStatusCameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DrawingSearch'
-        component={DrawingSearchScreen}
-        options={
-          {
-            title: 'Search Drawing',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DrawingAllStatus'
-        component={DrawingAllStatusScreen}
-        options={
-          {
-            title: 'Drawing Detail Status',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DrawingDetail'
-        component={DrawingDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <PipingStack.Screen
-        name='DrawingImage'
-        component={DrawingImageScreen}
-        options={
-          {
-            title: 'Drawing Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DrawingAddWelder'
-        component={DrawingAddWelderScreen}
-        options={
-          {
-            title: 'Select Welders',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='DailyReport'
-        component={DailyReportScreen}
-        options={
-          {
-            title: 'Daily Report',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='QCStatus'
-        component={DrawingQCStatusScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-
-      <PipingStack.Screen
-        name='SpoolMatrix'
-        component={SpoolMatrixScreen}
-        options={
-          {
-            title: 'Spool Matrix',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingStack.Screen
-        name='HydrotestList'
-        component={HydrotestListScreen}
-        options={
-          {
-            title: 'Hydrotest List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingStack.Screen
-        name='SpoolCamera'
-        component={SpoolCameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingStack.Screen
-        name='QCDrawingList'
-        component={QCDrawingListScreen}
-        options={
-          {
-            title: 'QC Drawing List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingStack.Screen
-        name='QCDrawingDetail'
-        component={QCDrawingDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <PipingStack.Screen
-        name='QCSpendList'
-        component={QCSpendListScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-
-      <PipingStack.Screen
-        name='NDT'
-        component={NDTStackScreens}
-        options={{ headerShown: false }}
-      />
-
-      <PipingStack.Screen
-        name='Report'
-        component={ReportStackScreens}
-        options={{ headerShown: false }}
-      />
-    </PipingStack.Navigator>
-  );
-};
-
-const NDTStackScreens = () => {
-  return (
-    <NDTStack.Navigator screenOptions={optionNavigation}>
-      <NDTStack.Screen
-        name='NDTManager'
-        component={NDTManagerScreen}
-        options={
-          {
-            title: 'NDT Update',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <NDTStack.Screen
-        name='NDTDetail'
-        component={NDTDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <NDTStack.Screen
-        name='NDTIssue'
-        component={NDTIssueScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-    </NDTStack.Navigator>
-  );
-};
-
-const ReportStackScreens = () => {
-  return (
-    <ReportStack.Navigator screenOptions={optionNavigation}>
-      <ReportStack.Screen
-        name='ReportManager'
-        component={ReportManagerScreen}
-        options={
-          {
-            title: 'Reports',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <ReportStack.Screen
-        name='ReportConstruction'
-        component={ReportConstructionListScreen}
-        options={
-          {
-            title: 'Construction List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <ReportStack.Screen
-        name='ReportDiscipline'
-        component={ReportDisciplineListScreen}
-        options={
-          {
-            title: 'Discipline List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <ReportStack.Screen
-        name='ReportHistogram'
-        component={ReportHistogramListScreen}
-        options={
-          {
-            title: 'Histogram List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <ReportStack.Screen
-        name='ReportDailyManpower'
-        component={ReportDailyManpowerListScreen}
-        options={
-          {
-            title: 'Daily Manpower List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-    </ReportStack.Navigator>
-  );
 };
 
 //-- PIP Stacks
@@ -1135,8 +817,16 @@ const CommonStackScreens = () => {
         }
       />
       <CommonStack.Screen
-        name='OpenDrawing'
-        component={OpenDrawingScreen}
+        name='OpenPipeSupportDrawing'
+        component={OpenPipeSupportDrawingScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <CommonStack.Screen
+        name='OpenIsometricDrawing'
+        component={OpenIsometricDrawingScreen}
         options={({ route }) => ({
           title: route.params.title,
           headerBackTitle: 'Back',
