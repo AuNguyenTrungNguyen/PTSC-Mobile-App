@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, Alert } from 'react-native';
 import Moment from 'moment';
 import NetInfo from '@react-native-community/netinfo';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -16,7 +16,7 @@ import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/ConstructionAPI';
+import { GetConstructionDetailAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/piping/ConstructionAPI';
 import { GetLocationListAPI, GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI, GetTeamListFilterAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
@@ -63,6 +63,13 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       navigation.setOptions({
         headerRight: () => (
           <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => { showConfirmGetReweldJointFromQC() }}>
+              <Ionicons
+                size={24}
+                name={'md-sync-circle-outline'} color={iconColor} />
+            </TouchableOpacity>
             <TouchableOpacity
               style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
               onPress={() => { setIsVisibleHelp(true) }}>
@@ -117,7 +124,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
 
 
-  // Submit Data
+  //-- Submit Data
   const checkConstructionDetail = () => {
     let messages = [];
     if (code == Constant.CODE_FITUP) {
@@ -234,6 +241,36 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       Toast.show('No any data changes!', Toast.SHORT);
     }
   };
+
+  //-- Get re-weld joint from QC
+  const showConfirmGetReweldJointFromQC = () => {
+    Alert.alert(
+      '',
+      'Are you sure get re-weld joints from QC?',
+      [
+        { text: 'Get', onPress: () => _onPressGetReweldJointFromQC() },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressGetReweldJointFromQC = () => {
+    callAPI(() => getReweldJointFromQC());
+  };
+  const getReweldJointFromQC = useCallback(async () => {
+    setIsUploading(true);
+    GetReweldFromQCAPI(projectCode, drawingNo)
+      .then(res => {
+        Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+        callAPI(() => getConstructionDetail());
+        setIsUploading(false);
+      }).catch(() => {
+        setIsUploading(false);
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+      });
+  }, []);
 
   //-- Manage Picture
   const _onPressManagePicture = () => {

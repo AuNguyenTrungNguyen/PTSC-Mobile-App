@@ -159,3 +159,21 @@ export const GetQCStatusListAPI = (projectCode, code, facilityCode, drawingNo, w
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+
+
+
+export const GetReweldFromQCAPI = async (projectCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetReweldFromQC',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, drawingNo }),
+    }
+  ).then(res => res.json());
+};
