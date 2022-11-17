@@ -771,18 +771,24 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const renderItem = ({ index, item }) => {
     const itemDate = code == Constant.CODE_FITUP ? item['FittingDate'] : item['WeldingDate'];
     const itemPercent = code == Constant.CODE_FITUP ? item['FitPercentage'] : item['WeldPercentage'];
+
     let isDisableItem = item['QCStatusMobile'] === Constant.STATUS_ACCEPT;
     if (code && code !== Constant.CODE_FITUP) {
       isDisableItem = isDisableItem || (item['FitUpResult'] !== Constant.STATUS_ACCEPT);
     }
-    const isEnableClear = itemDate || itemPercent;
-    const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] === 'SP';
-
-    //-- If ConType = 'TW', unlock UI
+    //-- If request FitUp and Visual = ACC, lock UI
+    if (code === Constant.CODE_FITUP && item['VisualResult'] === Constant.STATUS_ACCEPT) {
+      isDisableItem = true;
+    }
+    //-- If request FitUp and ConType = 'TW', unlock UI
     if (code === Constant.CODE_FITUP && item['ConType'] === 'TW') {
       isDisableItem = false;
     }
     isDisableItem = isReadOnly ? true : isDisableItem;
+
+    const isEnableClear = itemDate || itemPercent;
+    const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] === 'SP';
+
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
         <View style={styles.row}>
