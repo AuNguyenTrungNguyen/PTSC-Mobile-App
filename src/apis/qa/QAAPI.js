@@ -1,4 +1,5 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetObservationOverviewListAPI = (projectCode, discipline, id, description, token) =>
   fetch(
@@ -180,3 +181,36 @@ export const EditObservationImageAPI = (id, note, token) =>
       body: JSON.stringify({ id, note }),
     }
   ).then(res => res.json());
+
+
+export const GetWelderListAPI = async (id, name) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetWelderList'
+    + '?id=' + id
+    + '&name=' + name,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+
+export const GetCertificateListAPI = async (id, project) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetCertificateList'
+    + '?id=' + id
+    + '&projectCode=' + project,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};

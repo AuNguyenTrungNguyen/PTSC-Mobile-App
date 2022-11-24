@@ -232,6 +232,13 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Open QC Welder Card
+  const _onPressOpenQCWelderCard = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QCWelderCardList',
+    });
+  };
+
 
 
   const RenderItemBox = props => {
@@ -290,11 +297,11 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-                <RenderItemBox title={'Pipe Support'} onPress={_onPressOpenPipeSupportDrawing} iconName={'md-document-text'} />
+                <RenderItemBox title={'Pipe Support'} onPress={_onPressOpenPipeSupportDrawing} iconName={'md-document-text-outline'} />
               </View>
               <View style={styles.row}>
-                <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text'} />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text-outline'} />
+                <RenderItemBox title={'Welder Card'} onPress={_onPressOpenQCWelderCard} iconName={'md-card-outline'} />
               </View>
             </ScrollView>
           </View>

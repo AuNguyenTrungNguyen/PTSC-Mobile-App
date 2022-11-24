@@ -398,11 +398,20 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
 
-
+  //-- Open QC Welder Card
+  const _onPressOpenQCWelderCard = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QCWelderCardList',
+    });
+  };
 
 
 
   const RenderItemBox = props => {
+    let iconName = 'qr-code-outline';
+    if (props.iconName) {
+      iconName = props.iconName;
+    }
     return (
       <>
         <View style={styles.line} />
@@ -412,7 +421,7 @@ const HomeScreenQC = ({ route, navigation }) => {
             <>
               <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
                 <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-                <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
               </TouchableOpacity>
               {
                 props.number
@@ -459,7 +468,11 @@ const HomeScreenQC = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-              <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} />
+              <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} iconName={'md-book-outline'} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Welder Card'} onPress={_onPressOpenQCWelderCard} iconName={'md-card-outline'} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

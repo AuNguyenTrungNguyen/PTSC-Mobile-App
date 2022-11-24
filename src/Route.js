@@ -16,6 +16,10 @@ import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHours
 import OpenPipeSupportDrawingScreen from './screens/general/opendrawing/OpenPipeSupportDrawingScreen';
 import OpenIsometricDrawingScreen from './screens/general/opendrawing/OpenIsometricDrawingScreen';
 
+import QCWelderCardListScreen from './screens/general/weldercard/QCWelderCardListScreen';
+import QCWelderCardDetailScreen from './screens/general/weldercard/QCWelderCardDetailScreen';
+import QCWelderCardImageSceen from './screens/general/weldercard/QCWelderCardImageSceen';
+
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
 import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
@@ -744,6 +748,7 @@ const StructuralQCStackScreens = () => {
   );
 };
 
+//-- Common Stacks
 const CommonStack = createStackNavigator();
 const CommonStackScreens = () => {
   return (
@@ -868,6 +873,37 @@ const CommonStackScreens = () => {
         options={
           {
             title: 'Observation Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <CommonStack.Screen
+        name='QCWelderCardList'
+        component={QCWelderCardListScreen}
+        options={
+          {
+            title: 'Welder List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QCWelderCardDetail'
+        component={QCWelderCardDetailScreen}
+        options={
+          {
+            title: 'Welder Card',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QCWelderCardImage'
+        component={QCWelderCardImageSceen}
+        options={
+          {
+            title: 'Welder Image',
             headerBackTitle: 'Back',
           }
         }
