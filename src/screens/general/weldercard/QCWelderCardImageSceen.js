@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Modal, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Dimensions, Alert, Modal, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import ImagePicker from 'react-native-image-crop-picker';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImageResizer from 'react-native-image-resizer';
 import RNFetchBlob from 'rn-fetch-blob';
 import Toast from 'react-native-simple-toast';
@@ -13,9 +12,8 @@ import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../../utils/Core';
 import {
-  GetObservationImageAPI,
-  DeleteObservationImageAPI,
-  EditObservationImageAPI
+  GetQCWelderImageAPI,
+  DeleteQCWelderImageAPI
 } from '../../../apis/qa/QAAPI';
 
 import Helper from '../../../utils/Helper';
@@ -23,42 +21,23 @@ import Formater from '../../../utils/Formater';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
+import { ListEmptyData } from '../../../components/HelperUI';
 
-const QCWelderCardImageSceen = ({ route, navigation }) => {
+const QCWelderCardImageSceen = ({ route, _ }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [imageList, setImageList] = useState([]);
+
+  const { projectCode, userLogin, welderId, welderName } = route.params;
+
+  const [isSelecting, setIsSelecting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [image, setImage] = useState('');
-  const [imageUpload, setImageUpload] = useState('');
-
-  const { welderId, welderName } = route.params;
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={_onPressUploadImage}>
-            {
-              imageUpload
-                ?
-                <Ionicons
-                  size={24}
-                  name={'md-save-outline'} color={BASE_COLOR} />
-                :
-                null
-            }
-          </TouchableOpacity>
-        </View>
-      ),
-    });
-  }, [navigation, imageUpload]);
+  const [imageUploadList, setImageUploadList] = useState([]);
 
   useEffect(
     () => {
-      // callAPI(getImage);
+      callAPI(getImage);
     }, []
   );
 
@@ -75,31 +54,60 @@ const QCWelderCardImageSceen = ({ route, navigation }) => {
     });
   };
 
+  //-- Load
   const getImage = async () => {
-    // TODO
-    const token = await Helper.getData('TOKEN');
-    setImage('');
-    // GetObservationImageAPI(welderId, token)
-    //   .then(res => {
-    //     if (res.success) {
-    //       setImageList(res.data);
-    //       setIsLoading(false);
-    //       setIsError(false);
-    //     } else {
-    //       setIsLoading(false);
-    //       setIsError(true);
-    //     }
-    //   })
-    //   .catch(() => {
-    //     setIsLoading(false);
-    //     setIsError(true);
-    //   });
+    GetQCWelderImageAPI(projectCode, welderId)
+      .then(res => {
+        if (res.Success) {
+          setImageList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
   };
 
-  //-- Actions
-  const _onPressChangeImage = () => {
+  //-- Delete
+  const _onPressDeleteImage = async id => {
     Alert.alert(
-      'Change Image',
+      'Delete Image',
+      'Are you sure you want to delete this image',
+      [
+        {
+          text: 'Delete',
+          onPress: () => { deleteImage(id) },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+  const deleteImage = id => {
+    DeleteQCWelderImageAPI(id)
+      .then(res => {
+        Toast.show(res.Message.toString(), Toast.SHORT);
+        if (res.Success) {
+          let array = imageList.filter(image => image.Id !== id);
+          setImageList(array);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT);
+      });
+  }
+
+  //-- Upload
+  const _onPressAddImage = () => {
+    Alert.alert(
+      'Add Image',
       'Please select an option',
       [
         {
@@ -118,126 +126,105 @@ const QCWelderCardImageSceen = ({ route, navigation }) => {
       { cancelable: false }
     );
   };
-  const _onPressDeleteImage = async id => {
-    Alert.alert(
-      'Delete Image',
-      'Are you sure you want to delete this image',
-      [
-        {
-          text: 'Delete',
-          onPress: () => { deleteImage(id) },
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-  const deleteImage = async id => {
-    // TODO
-    const token = await Helper.getData('TOKEN');
-    setImage('');
-    setImageUpload('');
-    // DeleteObservationImageAPI(id, token)
-    //   .then(res => {
-    //     Toast.show(res.Message.toString(), Toast.SHORT);
-    //     if (res.success) {
-    //       let array = imageList.filter(image => image.id !== id);
-    //       setImageList(array);
-    //     }
-    //   }).catch(() => {
-    //     Toast.show('Please check that you are using the company network!', Toast.SHORT);
-    //   });
-  }
-
-  //-- Upload
   const _onPressOpenGallery = () => {
+    setIsLoading(true);
     ImagePicker.openPicker({
-      multiple: false,
-    }).then(image => {
-      setImageUpload(image.path);
+      multiple: true,
+      maxFiles: 100,
+    }).then(images => {
+      imagesUpload = [];
+      images.forEach(image => {
+        imagesUpload.push({ URL: image.path });
+      });
+      setImageUploadList(imagesUpload);
+      setIsSelecting(true);
     }).catch(() => {
+      setIsLoading(false);
+      setIsSelecting(false);
     });
   };
   const _onPressOpenCamera = () => {
+    setIsLoading(true);
     ImagePicker.openCamera({
       cropping: false,
     })
       .then(image => {
-        setImageUpload(image.path);
+        let imagesUpload = [];
+        imagesUpload.push({ URL: image.path });
+        setImageUploadList(imagesUpload);
+        setIsSelecting(true);
       }).catch(() => {
+        setIsLoading(false);
+        setIsSelecting(false);
+      });
+  };
+  const addFilesToBody = () => {
+    const promises = imageUploadList.map(async (image) => {
+      return await ImageResizer.createResizedImage(image.URL, 900, 450, 'PNG', 0)
+        .then(res => {
+          let file = {
+            name: 'file',
+            filename: res.name,
+            data: RNFetchBlob.wrap(res.path),
+          }
+          return file;
+        });
+    });
+    return Promise.all(promises);
+  };
+  const _onPressUploadImage = async () => {
+    setIsUploading(true);
+    const token = await Helper.getData('TOKEN');
+    const dataCode = await Helper.getData('DATACODE');
+    const username = await Helper.getData('USERNAME');
+
+    let body = [
+      { name: 'dataCode', data: dataCode },
+      { name: 'projectCode', data: projectCode },
+      { name: 'welderId', data: welderId },
+      { name: 'username', data: username },
+    ];
+
+    addFilesToBody()
+      .then(res => {
+        body = body.concat(res);
+        RNFetchBlob.fetch(
+          'POST',
+          Port_Server
+          + '/api/QA/UploadQCWelderImage',
+          {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'multipart/form-data',
+          },
+          body,
+        )
+          .then(res => {
+            res = JSON.parse(res.data);
+            if (res.Success) {
+              setImageUploadList([]);
+              setIsLoading(false);
+              setIsSelecting(false);
+              setIsUploading(false);
+              Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+              callAPI(getImage);
+            } else {
+              Toast.show('Please check that you are using the company network!', Toast.SHORT);
+              setIsLoading(false);
+              setIsError(true);
+              setIsUploading(false);
+            }
+          })
+          .catch(() => {
+            Toast.show('Please check that you are using the company network!', Toast.SHORT);
+            setIsLoading(false);
+            setIsError(true);
+            setIsUploading(false);
+          });
       });
   };
 
-  const _onPressUploadImage = async () => {
-    // TODO
-    const token = await Helper.getData('TOKEN');
-    setImage(imageUpload);
-    setImageUpload('');
-    // setIsUploading(true);
-    // let body = [
-    //   // { name: 'dataCode', data: dataCode },
-    //   // { name: 'username', data: userLogin },
-    //   // { name: 'projectCode', data: projectCode },
-    //   // { name: 'rowIndex', data: rowIndex.toString() },
-    //   { name: 'id', data: welderId },
-    // ];
-
-    // addFilesToBody()
-    //   .then(res => {
-    //     body = body.concat(res);
-    //     RNFetchBlob.fetch(
-    //       'POST',
-    //       Port_Server + '/api/QA/UploadObservationImage',
-    //       {
-    //         'Authorization': 'Bearer ' + token,
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //       body,
-    //     )
-    //       .then(res => {
-    //         res = JSON.parse(res.data);
-    //         if (res.success) {
-    //           setImageUpload('');
-    //           setIsLoading(false);
-    //           setIsLoading(false);
-    //           setIsSelecting(false);
-    //           setIsUploading(false);
-    //           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-    //         } else {
-    //           Toast.show('Please check that you are using the company network!', Toast.SHORT);
-    //           setIsLoading(false);
-    //           setIsError(true);
-    //           setIsUploading(false);
-    //         }
-    //       })
-    //       .catch(() => {
-    //         Toast.show('Please check that you are using the company network!', Toast.SHORT);
-    //         setIsLoading(false);
-    //         setIsError(true);
-    //         setIsUploading(false);
-    //       });
-    //   });
-  };
-  const addFilesToBody = () => {
-    // const promises = imageUpload.map(async (image) => {
-    //   return await ImageResizer.createResizedImage(image.uri, 900, 450, 'PNG', 0)
-    //     .then(res => {
-    //       let file = {
-    //         name: 'file',
-    //         filename: res.name,
-    //         data: RNFetchBlob.wrap(res.path),
-    //       }
-    //       return file;
-    //     });
-    // });
-    // return Promise.all(promises);
-  };
-
   //-- Open
-  /* const [isOpenImage, setIsOpenImage] = useState(false);
+  const [isOpenImage, setIsOpenImage] = useState(false);
   const [openImage, setOpenImage] = useState([]);
   const _onPressOpenImage = uri => {
     setOpenImage([{ uri: uri }]);
@@ -324,30 +311,57 @@ const QCWelderCardImageSceen = ({ route, navigation }) => {
 
     const status = await PermissionsAndroid.request(permission);
     return status === 'granted';
-  }; */
+  };
 
 
 
-  const WelderImage = () => (
-    <View style={styles.noDataContainer}>
+  const renderItem = ({ item }) => {
+    return (
       <View style={styles.imageContainer}>
-        {image || imageUpload
-          ?
+        <TouchableOpacity style={styles.imageItem} activeOpacity={1}
+          onPress={() => { _onPressOpenImage(item.URL) }}>
           <FastImage
             style={styles.imageItem}
             source={{
-              uri: image ? image : imageUpload,
-              priority: FastImage.priority.normal,
+              uri: item.URL,
             }}
           />
-          :
-          <Ionicons
-            size={96}
-            name={'md-person-circle-outline'} color={BASE_COLOR} />
-        }
+        </TouchableOpacity>
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoText}>{item.CreatebyUser.toUpperCase()}</Text>
+          {
+            item.CreatebyUser.toUpperCase() === userLogin.toUpperCase()
+              ?
+              (<TouchableOpacity
+                style={styles.infoAction}
+                onPress={() => _onPressDeleteImage(item.Id)}>
+                <Text style={styles.buttonTitleDark}>Delete</Text>
+              </TouchableOpacity>)
+              :
+              (<TouchableOpacity
+                style={styles.itemDisabled}
+                disabled={true}>
+                <Text style={styles.textDisabled}>Delete</Text>
+              </TouchableOpacity>)
+          }
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
+  const renderItemUpload = ({ item }) => {
+    return (
+      <View style={styles.imageContainer} key={item.URL}>
+        <View style={styles.imageItem} activeOpacity={1} key={item.URL}>
+          <FastImage
+            style={styles.imageItem}
+            source={{
+              uri: item.URL,
+            }}
+          />
+        </View>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -357,6 +371,12 @@ const QCWelderCardImageSceen = ({ route, navigation }) => {
         :
         <View style={styles.container}>
           <View style={styles.headerContainer}>
+            <View style={styles.rowInfo}>
+              <Text style={styles.infoTitle}>Project:</Text>
+              <View style={styles.infoDataContainer}>
+                <Text style={styles.infoData}>{Formater.formatEmptyData(projectCode)}</Text>
+              </View>
+            </View>
             <View style={styles.rowInfo}>
               <Text style={styles.infoTitle}>WelderID:</Text>
               <View style={styles.infoDataContainer}>
@@ -371,25 +391,76 @@ const QCWelderCardImageSceen = ({ route, navigation }) => {
             </View>
           </View>
 
-          <WelderImage />
+          {
+            imageList && imageList.length > 0
+              ?
+              <View style={styles.safeArea}>
+                <VirtualizedList
+                  style={styles.table}
+                  data={imageList}
+                  getItemCount={(data) => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={item => item.Id}
+                  renderItem={renderItem}
+                />
+              </View>
+              :
+              <ListEmptyData />
+          }
 
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressChangeImage}>
-              <Text style={styles.buttonTitle}>Change</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonRight} onPress={_onPressDeleteImage}>
-              <Text style={styles.buttonTitle}>Delete</Text>
+            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
+              <Text style={styles.buttonTitle}>Add Images</Text>
             </TouchableOpacity>
           </View>
         </View>
       }
-      {/* <ImageView
+      <Modal visible={isSelecting} animationType='slide'>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.container}>
+            <View style={styles.safeArea}>
+              <VirtualizedList
+                style={styles.table}
+                data={imageUploadList}
+                getItemCount={(data) => data.length}
+                getItem={(data, index) => {
+                  return data[index];
+                }}
+                keyExtractor={item => item.URL}
+                renderItem={renderItemUpload}
+              />
+            </View>
+            <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={() => {
+                setIsLoading(false);
+                setIsSelecting(false);
+              }}>
+                <Text style={styles.buttonTitle}>Cancel</Text>
+              </TouchableOpacity>
+              {
+                isUploading
+                  ?
+                  <TouchableOpacity style={styles.buttonRight}>
+                    <ActivityIndicator size='small' color={OPP_COLOR} />
+                  </TouchableOpacity>
+                  :
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressUploadImage}>
+                    <Text style={styles.buttonTitle}>Upload</Text>
+                  </TouchableOpacity>
+              }
+            </View>
+          </View>
+        </SafeAreaView>
+      </Modal>
+      <ImageView
         visible={isOpenImage}
         images={openImage}
         imageIndex={0}
         onRequestClose={() => setIsOpenImage(false)}
         FooterComponent={
-          ({ imageIndex }) => {
+          ({ _ }) => {
             return (
               <SafeAreaView style={styles.bottomImageRoot}>
                 <View style={styles.bottomImageContanier}>
@@ -403,13 +474,14 @@ const QCWelderCardImageSceen = ({ route, navigation }) => {
             );
           }
         }
-      /> */}
+      />
     </SafeAreaView>
   );
 };
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
+const SCREEN_WIDTH = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -460,27 +532,22 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top'
   },
   imageContainer: {
-    width: '100%',
-    height: '100%',
+    width: SCREEN_WIDTH - 28,
+    height: 'auto',
+    marginBottom: 8,
     borderColor: BASE_COLOR,
+    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   imageItem: {
     width: '100%',
-    height: '100%',
+    height: (SCREEN_WIDTH - 28) * 9 / 16,
   },
   infoContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  idText: {
-    flex: 1,
-    textAlign: 'center',
-    color: BASE_COLOR,
-    fontWeight: 'bold',
-    marginTop: 4,
   },
   infoText: {
     flex: 1,

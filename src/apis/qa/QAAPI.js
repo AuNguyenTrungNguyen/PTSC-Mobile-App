@@ -183,13 +183,13 @@ export const EditObservationImageAPI = (id, note, token) =>
   ).then(res => res.json());
 
 
-export const GetWelderListAPI = async (id, name) => {
+export const GetWelderListAPI = async (welderId, welderName) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/QA/GetWelderList'
-    + '?id=' + id
-    + '&name=' + name,
+    + '?id=' + welderId
+    + '&name=' + welderName,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -198,14 +198,13 @@ export const GetWelderListAPI = async (id, name) => {
     }
   ).then(res => res.json());
 };
-
-export const GetCertificateListAPI = async (id, project) => {
+export const GetCertificateListAPI = async (welderId, projectCode) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/QA/GetCertificateList'
-    + '?id=' + id
-    + '&projectCode=' + project,
+    + '?id=' + welderId
+    + '&projectCode=' + projectCode,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -214,3 +213,33 @@ export const GetCertificateListAPI = async (id, project) => {
     }
   ).then(res => res.json());
 };
+export const GetQCWelderImageAPI = async (projectCode, welderId) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetQCWelderImage'
+    + '?projectCode=' + projectCode
+    + '&id=' + welderId,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const DeleteQCWelderImageAPI = async Id => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/DeleteQCWelderImage',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ Id }),
+    }
+  ).then(res => res.json());
+}

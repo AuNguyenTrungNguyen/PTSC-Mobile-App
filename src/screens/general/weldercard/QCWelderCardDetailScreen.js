@@ -29,13 +29,13 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={_onPressImage}>
             <Ionicons
               size={24}
               name={'md-image-outline'} color={iconColor} />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -95,11 +95,14 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
   };
 
   //-- Image
-  const _onPressImage = () => {
+  const _onPressImage = async () => {
+    const userLogin = await Helper.getData('USERNAME');
     Keyboard.dismiss();
     navigation.navigate(
       'QCWelderCardImage',
       {
+        projectCode: projectCode,
+        userLogin: userLogin,
         welderId: welderId,
         welderName: welderName,
       }
@@ -175,10 +178,10 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text>WPS:</Text>
+            <Text>Code:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.WPS)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.Code)}</Text>
           </View>
         </View>
         <View style={styles.row}>
