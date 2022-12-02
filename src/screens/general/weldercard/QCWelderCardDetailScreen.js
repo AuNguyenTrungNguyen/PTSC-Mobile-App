@@ -248,7 +248,7 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
   };
   const RenderList = () => {
     {
-      if (isSearching) {
+      if (isSearching || certificateList == null) {
         return <ListLoadingData />
       } else {
         return <ListEmptyData />
