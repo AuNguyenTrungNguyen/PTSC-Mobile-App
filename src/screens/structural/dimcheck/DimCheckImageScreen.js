@@ -157,8 +157,8 @@ const DimCheckImageScreen = ({ route }) => {
       { name: 'username', data: userLogin },
       { name: 'projectCode', data: projectCode },
       { name: 'drawingNo', data: drawingNo },
-      { name: 'jointNo', data: jointNo },
-      { name: 'rowIndex', data: rowIndex },
+      { name: 'jointNo', data: jointNo ?? pieceMarkNo },
+      { name: 'rowIndex', data: rowIndex.toString() },
     ];
 
     if (imageCode) {
@@ -540,7 +540,7 @@ const DimCheckImageScreen = ({ route }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);

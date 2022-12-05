@@ -629,7 +629,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
           value={remarkDisplay}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowDialogRemark(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowDialogRemark(false) }} />
       </Dialog.Container>
     </SafeAreaView>
   );

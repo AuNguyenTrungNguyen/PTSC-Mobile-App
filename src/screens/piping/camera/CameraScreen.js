@@ -6,6 +6,7 @@ import NetInfo from '@react-native-community/netinfo';
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 
+import { GetCurrentDimCuttingInfoAPI } from '../../../apis/piping/DimAPI';
 import { GetCurrentConstructionInfoAPI, CheckDrawingRevAPI } from '../../../apis/piping/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
@@ -24,8 +25,26 @@ const CameraScreen = ({ route, navigation }) => {
   const _onQRCodeRead = scanResult => {
     if (!isScanned) {
       setIsScanned(true);
-      var data = scanResult.data.split('_');
-      _checkDrawingRev(data[0], data[1], data[2]);
+
+      let result = scanResult.data.split('@');
+      if (!result || result.length < 3) {
+        result = scanResult.data.split('_');
+      }
+      let drawingNo = result[0];
+      let sheet = result[1];
+      let rev = result[2];
+
+      if (result.length > 3) {
+        let drawingCorrect = '';
+        for (i = 0; i < result.length - 3; i++) {
+          drawingCorrect += result[i] + '_';
+        }
+        drawingNo = drawingCorrect + result[result.length - 3];
+        sheet = result[result.length - 2];
+        rev = result[result.length - 1];
+      }
+
+      _checkDrawingRev(drawingNo, sheet, rev);
     }
   };
 
@@ -38,7 +57,7 @@ const CameraScreen = ({ route, navigation }) => {
         if (projectCode == 'GALLAF03' && drawingNo && !drawingNo.startsWith("WHP03-PMC2-")) {
           drawingNo = 'WHP03-PMC2-' + drawingNo
         }
-        CheckDrawingRevAPI(projectCode, drawingNo, sheet, token)
+        CheckDrawingRevAPI(projectCode, drawingNo, sheet, rev, source, token)
           .then(res => {
             if (res.Success) {
               if (res.Data != null && rev != res.Data) {
@@ -76,47 +95,75 @@ const CameraScreen = ({ route, navigation }) => {
       if (!state.isConnected) {
         showComfirm('ERROR', 'Network not available!');
       } else {
-        GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
-          .then(res => {
-            if (res.Success && res.Data != null) {
-              if (source == Constant.CAMERA_PIP_CONS) {
-                navigation.navigate('DrawingDetail', {
+        if (source === Constant.CAMERA_PIP_CONS_DIM) {
+          GetCurrentDimCuttingInfoAPI(projectCode, drawingNo, sheet, rev, token)
+            .then(res => {
+              if (res.Success && res.Data != null) {
+                navigation.navigate('DimCuttingDetail', {
                   projectCode: projectCode,
-                  facilityCode: res.Data,
-                  drawingNo: drawingNo,
-                  sheet: sheet,
-                  rev: rev,
-                  code: code,
-                  teamLeader: teamLeader,
-                  title: code + ' Detail',
+                  CPName: drawingNo,
+                  CPSheet: sheet,
+                  CPRev: rev,
+                  userLogin: teamLeader,
                   link: res.Link,
                 });
+              } else if (res.Data == null) {
+                const message = 'Not find Data with: \n'
+                  + 'ProjectCode: ' + projectCode + '\n'
+                  + 'CPName: ' + drawingNo + '\n'
+                  + 'CPSheet: ' + sheet + '\n'
+                  + 'CPRev: ' + rev;
+                showComfirm('ERROR', message);
               } else {
-                navigation.navigate('QCDrawingDetail', {
-                  projectCode: projectCode,
-                  facilityCode: res.Data,
-                  drawingNo: drawingNo,
-                  sheet: sheet,
-                  rev: rev,
-                  code: code,
-                  teamLeader: teamLeader,
-                  title: 'QC ' + code + ' Detail',
-                  link: res.Link,
-                });
+                showComfirm('ERROR', 'Please check that you are using the company network!');
               }
-            } else if (res.Data == null) {
-              const message = 'Not find FacilityCode with: \n'
-                + 'ProjectCode: ' + projectCode + '\n'
-                + 'DrawingNo: ' + drawingNo + '\n'
-                + 'Sheet: ' + sheet + '\n'
-                + 'Rev: ' + rev;
-              showComfirm('ERROR', message);
-            } else {
+            }).catch(() => {
               showComfirm('ERROR', 'Please check that you are using the company network!');
-            }
-          }).catch(() => {
-            showComfirm('ERROR', 'Please check that you are using the company network!');
-          });
+            });
+        }
+        else {
+          GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+            .then(res => {
+              if (res.Success && res.Data != null) {
+                if (source == Constant.CAMERA_PIP_CONS) {
+                  navigation.navigate('DrawingDetail', {
+                    projectCode: projectCode,
+                    facilityCode: res.Data,
+                    drawingNo: drawingNo,
+                    sheet: sheet,
+                    rev: rev,
+                    code: code,
+                    teamLeader: teamLeader,
+                    title: code + ' Detail',
+                    link: res.Link,
+                  });
+                } else {
+                  navigation.navigate('QCDrawingDetail', {
+                    projectCode: projectCode,
+                    facilityCode: res.Data,
+                    drawingNo: drawingNo,
+                    sheet: sheet,
+                    rev: rev,
+                    code: code,
+                    teamLeader: teamLeader,
+                    title: 'QC ' + code + ' Detail',
+                    link: res.Link,
+                  });
+                }
+              } else if (res.Data == null) {
+                const message = 'Not find FacilityCode with: \n'
+                  + 'ProjectCode: ' + projectCode + '\n'
+                  + 'DrawingNo: ' + drawingNo + '\n'
+                  + 'Sheet: ' + sheet + '\n'
+                  + 'Rev: ' + rev;
+                showComfirm('ERROR', message);
+              } else {
+                showComfirm('ERROR', 'Please check that you are using the company network!');
+              }
+            }).catch(() => {
+              showComfirm('ERROR', 'Please check that you are using the company network!');
+            });
+        }
       }
     });
   };

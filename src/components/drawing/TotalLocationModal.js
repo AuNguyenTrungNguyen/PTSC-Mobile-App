@@ -21,10 +21,10 @@ const TotalLocationModal = props => {
                   ?
                   props.data.length
                     ?
-                    props.data.map((item) => {
+                    props.data.map((item, index) => {
                       const location = props.site ? item.SiteLocation : item.Location;
                       return (
-                        <TouchableOpacity style={modals.row} key={new Date()} onPress={() => props.onPressChangeLocation(location)}>
+                        <TouchableOpacity style={modals.row} key={index} onPress={() => props.onPressChangeLocation(location)}>
                           <Text style={modals.cellTitle}>{location}</Text>
                           <View style={modals.cellLine} />
                           <Text style={modals.cellData}>{item.Total}</Text>

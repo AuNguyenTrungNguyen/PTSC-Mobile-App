@@ -21,16 +21,24 @@ const CameraScreen = ({ route, navigation }) => {
 
   const _onQRCodeRead = scanResult => {
     if (scanResult.data !== null && !isScanned && isFocused) {
-      if (scanResult.data.split('_').length != 3) {
-        setIsScanned(true);
-        showComfirm('ERROR', 'The drawing not correct format!');
-        return;
+      let result = scanResult.data.split('@');
+      if (!result || result.length < 3) {
+        result = scanResult.data.split('_');
       }
-
-      const result = scanResult.data.split('_');
       let drawingNo = result[0];
       let sheet = result[1];
       let rev = result[2];
+
+      if (result.length > 3) {
+        let drawingCorrect = '';
+        for (i = 0; i < result.length - 3; i++) {
+          drawingCorrect += result[i] + '_';
+        }
+        drawingNo = drawingCorrect + result[result.length - 3];
+        sheet = result[result.length - 2];
+        rev = result[result.length - 1];
+      }
+
       if ((code === Constant.CODE_CUT && !drawingNo.includes('CP'))
         || (code === Constant.CODE_PAINT && !drawingNo.includes('PM'))) {
         setIsScanned(true);
@@ -57,6 +65,17 @@ const CameraScreen = ({ route, navigation }) => {
       } else if (destination === Naming.NAME_STR_QC) {
         title = 'QC ' + code;
         route = 'QCSpendList';
+      } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD) {
+        navigation.navigate('DIMAfterWeldList', {
+          projectCode: projectCode,
+          paramDrawingNo: drawingNo,
+        });
+      } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD_QC) {
+        navigation.navigate('DIMAfterWeldListQC', {
+          projectCode: projectCode,
+          paramDrawingNo: drawingNo,
+          isQC: true,
+        });
       }
 
       checkDrawingRev(drawingNo, sheet, rev, route, title);

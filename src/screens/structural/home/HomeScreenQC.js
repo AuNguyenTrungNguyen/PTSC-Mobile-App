@@ -303,6 +303,46 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
 
+  //-- DIM After Weld
+  const _onPressManageDIMAfterWeld = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode DIM After Weld\n\nSearch: Search DIM After Weld\n\nQC Status: QC Status DIM After Weld Request',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeDIMAfterWeld },
+        { text: 'Search', onPress: _onPressSearchDIMAfterWeld },
+        // { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressQRCodeDIMAfterWeld = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        destination: Naming.NAME_STR_DIM_AFTER_WELD_QC
+      }
+    );
+  };
+  const _onPressSearchDIMAfterWeld = async () => {
+    navigation.navigate(
+      'DIMAfterWeldListQC',
+      {
+        projectCode: projectCode,
+        isQC: true,
+      }
+    );
+  };
+  const _onPressQCStatusDIMAfterWeld = async () => {
+
+  };
+
   // QA Observation
   const _onPressQAObservation = async () => {
     Alert.alert(
@@ -320,35 +360,35 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
   const _onPressOverviewListObservation = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'QAObservationOverviewList',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationOverviewList',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
   const _onPressListObservation = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'QAObservationList',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationList',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
       }
-    );
+    });
   };
   const _onPressCreateObservation = async () => {
-    let userLogin = await Helper.getData('USERNAME');
-    navigation.navigate(
-      'QAObservationDetail',
-      {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QAObservationDetail',
+      params: {
         projectCode: projectCode,
         userLogin: userLogin,
         owner: userLogin
-      },
-    );
+      }
+    });
   };
 
   // QC Hand Book
@@ -358,10 +398,20 @@ const HomeScreenQC = ({ route, navigation }) => {
     );
   };
 
+  //-- Open QC Welder Card
+  const _onPressOpenQCWelderCard = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'QCWelderCardList',
+    });
+  };
 
 
 
   const RenderItemBox = props => {
+    let iconName = 'qr-code-outline';
+    if (props.iconName) {
+      iconName = props.iconName;
+    }
     return (
       <>
         <View style={styles.line} />
@@ -371,7 +421,7 @@ const HomeScreenQC = ({ route, navigation }) => {
             <>
               <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
                 <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-                <Ionicons name='qr-code-outline' size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
               </TouchableOpacity>
               {
                 props.number
@@ -414,10 +464,14 @@ const HomeScreenQC = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
-              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
+              <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} />
+              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
+              <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} iconName={'md-book-outline'} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Welder Card'} onPress={_onPressOpenQCWelderCard} iconName={'md-card-outline'} />
               <RenderItemBox disable={true} />
             </View>
           </ScrollView>

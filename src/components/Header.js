@@ -13,6 +13,14 @@ const Header = props => {
       });
       continue;
     }
+    if (key === 'CPName') {
+      array.push({
+        title: key,
+        value: value.CPName,
+        link: value.Link,
+      });
+      continue;
+    }
     array.push({
       title: key,
       value: value,

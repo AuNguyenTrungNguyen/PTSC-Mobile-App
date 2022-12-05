@@ -13,11 +13,15 @@ import {
   GetTimeSheetTeamLeaderInfoAPI,
   GetTimeSheetWorkOrderListAPI,
   GetTimeSheetWorkerListOTAPI,
-  UpdateTimeSheetOTAPI
+  UpdateTimeSheetOTAPI,
+  DeleteTimeSheetWorkerDateAPI
 } from '../../apis/timesheet/TimeSheetAPI';
+import { GetProjectListAPI } from '../../apis/app/LoginAPI';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
+
+import SelectPopup from '../../components/SelectPopup';
 import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
@@ -45,6 +49,11 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
   const [workOrderList, setWorkOrderList] = useState([]);
   const [workerList, setWorkerList] = useState([]);
   const [workerUpdatedList, setWorkerUpdatedList] = useState([]);
+  const [workerErrorList, setWorkerErrorList] = useState([]);
+
+  const [projectList, setProjectList] = useState([]);
+  const [projectSelected, setProjectSeletecd] = useState(projectCode);
+  const [isVisibleProject, setIsVisibleProject] = useState(false);
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -99,6 +108,15 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     }, [navigation]
   );
 
+  const [isRefreshWorkOrder, setIsRefreshWorkOrder] = useState(null);
+  useEffect(
+    () => {
+      if (isRefreshWorkOrder) {
+        callAPI(getTimeSheetWorkOrderList, false);
+      }
+    }, [isRefreshWorkOrder]
+  );
+
   //-- Get Data
   const getTeamLeaderInfo = async () => {
     const token = await Helper.getData('TOKEN');
@@ -107,6 +125,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         if (res.success) {
           if (Object.keys(res.data).length) {
             setDepartment(res.data[0].DepartmentCode);
+            callAPI(getProjectList);
             callAPI(getAllData);
           }
           else {
@@ -137,12 +156,41 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
+  const getTimeSheetWorkOrderList = async (code = projectSelected) => {
+    const token = await Helper.getData('TOKEN');
+    GetTimeSheetWorkOrderListAPI(code, userLogin, token)
+      .then(res => {
+        if (res.success) {
+          setWorkOrderList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+          setIsUploading(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsUploading(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsUploading(false);
+      });
+  };
+  const getProjectList = () => {
+    GetProjectListAPI(userLogin)
+      .then(res => {
+        if (res.success) {
+          setProjectList(res.data);
+        }
+      });
+  };
   const getAllData = async () => {
     const token = await Helper.getData('TOKEN');
     try {
       let arrayPromise = [
-        GetTimeSheetWorkerListOTAPI(projectCode, userLogin, Formater.formatDateSQL(currentDate), token),
-        GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token),
+        GetTimeSheetWorkerListOTAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), token),
+        GetTimeSheetWorkOrderListAPI(projectSelected, userLogin, token),
       ];
       await Promise.all(arrayPromise)
         .then(([workerResult, workOrderResult]) => {
@@ -201,7 +249,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     const resultList = workerUpdatedList.filter(i => i.SUBMITED == false);
     setIsUploading(true);
-    UpdateTimeSheetOTAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
+    UpdateTimeSheetOTAPI(projectSelected, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -218,10 +266,46 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
-        setIsUploading(false);
+        setIsRefreshWorkOrder(new Date());
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);
+      });
+  };
+
+  //-- Delete Data
+  const deleteTimeSheetWorkerDate = async deletedList => {
+    const token = await Helper.getData('TOKEN');
+    DeleteTimeSheetWorkerDateAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
+      .then(res => {
+        if (res.success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          setIsRefreshWorkOrder(new Date());
+          const dataList = workerUpdatedList.filter(item => deletedList.find(id => (id === item.ID)));
+          const updatedList = workerUpdatedList.filter(item => !deletedList.find(id => (id === item.ID)));
+          dataList.map((item) => {
+            item.SUBMITED = true;
+            item.SELECTED = false;
+            item.UPDATED = false;
+            item.ColorWorkOrder = null;
+            item.ColorShift = null;
+            item.ColorHours = null;
+            item.ColorNote = null;
+
+            item.Overtime = '';
+            item.Shift = '';
+            item.MHR = null;
+            item.Note = '';
+            return item;
+          });
+          const data = workerList.concat(dataList).sort((a, b) => (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
+          setWorkerList(data);
+          setWorkerUpdatedList(updatedList);
+        } else {
+          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
       });
   };
 
@@ -276,6 +360,20 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
       setWorkerUpdatedList(array);
     }
   };
+  const _onPressDeleteUpdated = () => {
+    if (workerUpdatedList) {
+      const dataList = workerUpdatedList.filter(i => i.SELECTED && i.WorkOrder && i.WorkOrder.includes(projectSelected));
+      if (dataList.length) {
+        const deletedList = dataList.map(i => i.ID);
+        callAPI(() => { deleteTimeSheetWorkerDate(deletedList) }, false);
+      } else {
+        const selectedList = workerUpdatedList.filter(i => i.SELECTED);
+        if (selectedList.length) {
+          MessageAlert('Chú ý', 'Chọn dự án phù hợp với LSX');
+        }
+      }
+    }
+  };
   const _onChangeCheckboxUpdated = (value, index) => {
     let array = [...workerUpdatedList];
     if (array) {
@@ -285,13 +383,17 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     setWorkerUpdatedList(array);
   };
 
-
+  //-- Transfer Action
   const _onPressTransfer = () => {
     if (!workerList.length) {
       return;
     }
 
-    let transferList = workerList.filter(i => i.Overtime);
+    const errorList = workerList.filter(i => (!i.Overtime || !i.WorkOrder || !i.Shift) && i.SELECTED);
+    const result = errorList.map(i => i.RowIndex);
+    setWorkerErrorList(result);
+
+    const transferList = workerList.filter(i => i.Overtime && i.WorkOrder && i.Shift);
     if (transferList) {
       let addlist = [];
       transferList.forEach(item => {
@@ -312,6 +414,9 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     setWorkOrder(data);
     // _onChangWorkOrderShotcut(data);
     setIsShowWorkOrder(false);
+  };
+  const _onReloadWorkOrder = data => {
+    setWorkOrderList(data);
   };
 
 
@@ -338,6 +443,13 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
 
   const _onChangWorkOrderShotcut = (value = workOrder) => {
     const isSpending = filter === SPENDING_TEXT;
+    if (!isSpending && !value && workerUpdatedList.length) {
+      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+      if (checkSubmitList.length) {
+        MessageAlert('Chú ý', 'Bắt buộc chọn LSX');
+      }
+      return;
+    }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
     if (!data.length) {
@@ -376,6 +488,13 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
   };
   const _onChangHoursShotcut = value => {
     const isSpending = filter === SPENDING_TEXT;
+    if (!isSpending && !value && workerUpdatedList.length) {
+      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+      if (checkSubmitList.length) {
+        MessageAlert('Chú ý', 'Bắt buộc chọn giờ');
+      }
+      return;
+    }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
     if (!data.length) {
@@ -428,15 +547,28 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     setIsShowNote(false);
   };
 
+  const _onChangeProjectCode = code => {
+    setProjectSeletecd(code);
+    setIsVisibleProject(false);
+    callAPI(() => { getTimeSheetWorkOrderList(code) }, false);
+  };
+
+
 
 
 
   const renderItem = ({ index, item }) => {
+    const isError = workerErrorList.includes(item.RowIndex);
     return (
-      <View
-        style={styles.box}>
+      <View style={isError ? styles.errorBox : styles.box}>
         <View style={styles.row}>
-          <Text style={styles.cellData}>{item.ID} - {item.Fullname}</Text>
+          {/* {
+            filter === UPDATED_TEXT &&
+            <View style={styles.cellCheckbox}>
+              <Ionicons name='ios-backspace-outline' size={24} color={'red'} onPress={() => { deleteTimeSheetWorkerDate(item.ID) }} />
+            </View>
+          } */}
+          <Text style={styles.cell}>{item.ID} - {item.Fullname}</Text>
           <View style={styles.cellCheckbox}>
             {
               filter === SPENDING_TEXT
@@ -557,6 +689,14 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
               </View>
             </View>
             <View style={styles.headerRow}>
+              <Text style={styles.headerCellTitle}>Dự án:</Text>
+              <View style={styles.headerCellAction}>
+                <Text style={styles.headerText}>{projectSelected}</Text>
+                <Ionicons onPress={() => { setIsVisibleProject(true); }}
+                  style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
+              </View>
+            </View>
+            <View style={styles.headerRow}>
               <Text style={styles.headerCellTitle}>LSX:</Text>
               <View style={styles.headerCellAction}>
                 <Text style={styles.headerText}>{workOrder}</Text>
@@ -587,11 +727,11 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.headerRow}>
               <View style={styles.headerCellShotcut}>
+                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('1.5')}>
+                  <Text style={styles.headerShotcutText}>{'1.5'}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
                   <Text style={styles.headerShotcutText}>{'2'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('3')}>
-                  <Text style={styles.headerShotcutText}>{'3'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('4')}>
                   <Text style={styles.headerShotcutText}>{'4'}</Text>
@@ -619,11 +759,6 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
               filter === SPENDING_TEXT
                 ?
                 <>
-                  {/* <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressApplySelected}>
-                    <Text style={styles.buttonTitle}>Gán công</Text>
-                  </TouchableOpacity> */}
                   <TouchableOpacity
                     style={styles.headerButton}
                     onPress={_onPressCheckAll}>
@@ -637,11 +772,6 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
                 </>
                 :
                 <>
-                  {/* <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressApplySelectedUpdated}>
-                    <Text style={styles.buttonTitle}>Gán công</Text>
-                  </TouchableOpacity> */}
                   <TouchableOpacity
                     style={styles.headerButton}
                     onPress={_onPressCheckAllUpdated}>
@@ -651,6 +781,11 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
                     style={styles.headerButton}
                     onPress={_onPressClearAllUpdated}>
                     <Text style={styles.buttonTitle}>Bỏ chọn</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.headerButton}
+                    onPress={_onPressDeleteUpdated}>
+                    <Text style={styles.buttonTitle}>Xóa</Text>
                   </TouchableOpacity>
                 </>
             }
@@ -703,10 +838,12 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         </View>
       }
       <SelectPopupTimeSheet
+        projectCode={projectSelected}
         visible={isShowWorkOrder}
         data={workOrderList}
         onChangeItem={_onChangeWorkOrder}
         onCancel={() => setIsShowWorkOrder(false)}
+        onReload={_onReloadWorkOrder}
       />
       <Dialog.Container visible={isShowHours}>
         <Dialog.Title>{'Enter hours:'}</Dialog.Title>
@@ -716,7 +853,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowHours(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowHours(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearHours} />
         <Dialog.Button label='OK' onPress={_onChangeHours} />
       </Dialog.Container>
@@ -727,7 +864,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
           onChangeText={(text) => setNoteDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowNote(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowNote(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearNote} />
         <Dialog.Button label='OK' onPress={_onChangeNote} />
       </Dialog.Container>
@@ -737,6 +874,11 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
       />
+      <SelectPopup
+        visible={isVisibleProject}
+        data={projectList}
+        onChangeItem={_onChangeProjectCode}
+        onCancel={() => setIsVisibleProject(false)} />
     </SafeAreaView>
   );
 };
@@ -845,11 +987,26 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 8,
   },
+  errorBox: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: 'red',
+    borderWidth: 2,
+    borderRadius: 4,
+    padding: 4,
+    marginBottom: 8,
+  },
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     minHeight: 16,
     marginBottom: 4,
+  },
+  cell: {
+    flexDirection: 'row',
+    flex: 1,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
   },
   cellTitle: {
     height: '100%'

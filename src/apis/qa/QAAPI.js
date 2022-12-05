@@ -1,4 +1,5 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetObservationOverviewListAPI = (projectCode, discipline, id, description, token) =>
   fetch(
@@ -127,6 +128,20 @@ export const CreateOrUpdateObservationAPI = (model, token) =>
     }
   ).then(res => res.json());
 
+export const DeleteObservationAPI = (projectCode, id, token) =>
+  fetch(
+    Port_Server
+    + '/api/QA/DeleteObservation',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, id }),
+    }
+  ).then(res => res.json());
+
 export const GetObservationImageAPI = (tableRowIndex, token) =>
   fetch(
     Port_Server
@@ -166,3 +181,65 @@ export const EditObservationImageAPI = (id, note, token) =>
       body: JSON.stringify({ id, note }),
     }
   ).then(res => res.json());
+
+
+export const GetWelderListAPI = async (welderId, welderName) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetWelderList'
+    + '?id=' + welderId
+    + '&name=' + welderName,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetCertificateListAPI = async (welderId, projectCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetCertificateList'
+    + '?id=' + welderId
+    + '&projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetQCWelderImageAPI = async (projectCode, welderId) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetQCWelderImage'
+    + '?projectCode=' + projectCode
+    + '&id=' + welderId,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const DeleteQCWelderImageAPI = async Id => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/DeleteQCWelderImage',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ Id }),
+    }
+  ).then(res => res.json());
+}

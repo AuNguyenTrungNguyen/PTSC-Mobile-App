@@ -9,18 +9,26 @@ export default class Constant {
   static ROUTE__COMMON = 'COMMON_STACK';
 
   static ROUTE__PIPING = 'PIPING';
+  static ROUTE__PIP_CONS = 'PIP-CONS';
+  static ROUTE__PIP_QC = 'PIP-QC';
+  static ROUTE__PIP_QCDEPT = 'PIP-QCDEPT';
+  static ROUTE__PIP_QCWS = 'PIP-QCWS';
+  static ROUTE__PIP_VIEWER = 'PIP-VIEWER';
+
   static ROUTE__STRUCTURAL = 'STRUCTURAL';
   static ROUTE__STR_CONS = 'STR-CONS';
   static ROUTE__STR_QCDEPT = 'STR-QCDEPT';
   static ROUTE__STR_QCWS = 'STR-QCWS';
+  static ROUTE__STR_VIEWER = 'STR-VIEWER';
 
   //-- CAMERA SOURCE
+  static CAMERA_PIP_CONS_DIM = 'CAMERA_PIP_CONS_DIM';
   static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
-  static CAMERA_QC_CONS = 'CAMERA_QC_CONS';
+  static CAMERA_PIP_QC = 'CAMERA_PIP_QC';
 
-   //-- IMAGE ROLE
-   static IMAGE_ROLE_CONS = 'CONS';
-   static IMAGE_ROLE_QC = 'QC';
+  //-- IMAGE ROLE
+  static IMAGE_ROLE_CONS = 'CONS';
+  static IMAGE_ROLE_QC = 'QC';
 
   // CODE FILTER
   static FILTER_ALL = 'ALL';
@@ -35,6 +43,7 @@ export default class Constant {
   static CODE_VISUAL = 'Visual';
   static CODE_CUT = 'Cut';
   static CODE_PAINT = 'Paint';
+  static CODE_DIM = 'Dim';
 
   // CODE IMAGE
   static CODE_MAN_HOURS_IMPACT = 'WOFactor';
@@ -52,6 +61,7 @@ export default class Constant {
   static STATUS_ACCEPT = 'ACC';
   static STATUS_REJECT = 'REJ';
   static STATUS_NOT_YET = 'NOT_YET';
+  static STATUS_ALL = 'ALL';
 
   //QA Observation
   static QA_OBSERVATION_DRAFT = 0;

@@ -22,7 +22,7 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 
 const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
 
-  const { userLogin, department, fullname } = route.params;
+  const { userLogin, department, fullname, isDelete } = route.params;
 
   const [workerId, setWorkerId] = useState('');
   const [workerName, setWorkerName] = useState('');
@@ -33,7 +33,7 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [isVisibleType, setIsVisibleType] = useState(false);
-  const [type, setType] = useState('');
+  const [type, setType] = useState(isDelete ? Constant.FILTER_MY : Constant.FILTER_ALL);
   const _onChangeType = data => {
     if (data != type) {
       setType(data);
@@ -52,13 +52,16 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { setIsVisibleType(true) }}>
-            <Ionicons
-              size={24}
-              name={'md-ellipsis-vertical-circle'} color={iconColor} />
-          </TouchableOpacity>
+          {
+            !isDelete &&
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => { setIsVisibleType(true) }}>
+              <Ionicons
+                size={24}
+                name={'md-ellipsis-vertical-circle'} color={iconColor} />
+            </TouchableOpacity>
+          }
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -164,23 +167,8 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressAddWorker = () => {
+  const _onPressUpdateWorker = () => {
     if (workerUpdateList.length) {
-      // Alert.alert(
-      //   'WARNING',
-      //   'Are you sure move workers selected to your group?',
-      //   [
-      //     {
-      //       text: 'Cancel',
-      //       style: 'cancel'
-      //     },
-      //     {
-      //       text: 'Next',
-      //       onPress: updateTimeSheetWorkerList
-      //     }
-      //   ],
-      //   { cancelable: false },
-      // );
       updateTimeSheetWorkerList();
     } else {
       navigation.navigate('TimeSheet');
@@ -188,9 +176,11 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
   };
 
   const updateTimeSheetWorkerList = async () => {
-    let token = await Helper.getData('TOKEN');
+    const token = await Helper.getData('TOKEN');
     setIsUploading(true);
-    UpdateTimeSheetWorkerListAPI(userLogin, fullname, workerUpdateList, token)
+    const teamLeaderId = isDelete ? '' : userLogin;
+    const teamLeaderName = isDelete ? '' : fullname;
+    UpdateTimeSheetWorkerListAPI(teamLeaderId, teamLeaderName, workerUpdateList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -218,16 +208,7 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
       } else if (!workerList.length) {
         return <ListEmptyData />
       } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={workerList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
+        <></>
       }
     }
   };
@@ -340,10 +321,25 @@ const TimeSheetManageWorkerScreen = ({ route, navigation }) => {
               <Text style={styles.infoTitle}>Selected:</Text>
               <Text style={styles.infoData}>{workerSelected}</Text>
             </View>
-            <RenderWorkerList />
+            {
+              workerList && workerList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={workerList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderWorkerList />
+            }
             <View style={styles.actionContainer}>
-              <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddWorker}>
-                <Text style={styles.buttonTitle}>Add Workers</Text>
+              <TouchableOpacity style={styles.buttonUpload} onPress={_onPressUpdateWorker}>
+                <Text style={styles.buttonTitle}>{isDelete ? 'Delete Workers' : 'Add Workers'}</Text>
               </TouchableOpacity>
             </View>
           </View>

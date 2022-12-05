@@ -10,7 +10,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import Helper from '../../../utils/Helper';
-import GetFacilityListAPI from '../../../apis/app/GetFacilityListAPI';
+import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
 import GetSpoolMatrixListAPI from '../../../apis/spool/GetSpoolMatrixListAPI';
 import UpdateSpoolDetailAPI from '../../../apis/spool/UpdateSpoolDetailAPI';
 import MessageAlert from '../../../components/MessageAlert';

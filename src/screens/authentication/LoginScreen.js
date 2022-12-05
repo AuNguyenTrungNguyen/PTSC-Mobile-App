@@ -187,21 +187,53 @@ const LoginScreen = ({ navigation }) => {
               Helper.storeData('ROLE_CODE', roleCode);
               Helper.storeData('DATACODE', 'PTSCMC');
               if (disciplineCode.toUpperCase() === Constant.ROUTE__STRUCTURAL) {
-                if (roleCode === Constant.ROUTE__STR_QCWS) {
-                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
+                if (roleCode === Constant.ROUTE__STR_CONS
+                  || roleCode === Constant.ROUTE__STR_QCWS
+                  || roleCode === Constant.ROUTE__STR_QCDEPT) {
+                  if (roleCode === Constant.ROUTE__STR_QCWS) {
+                    Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
+                  }
+                  if (roleCode === Constant.ROUTE__STR_QCDEPT) {
+                    Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
+                  }
+                  navigation.replace(roleCode, {
+                    screen: Constant.ROUTE__HOME,
+                    params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                  });
                 }
-                if (roleCode === Constant.ROUTE__STR_QCDEPT) {
-                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
+                else {
+                  Helper.clearData();
+                  MessageAlert('Lỗi', 'Vui lòng chọn Module và Role phù hợp.');
+                  setIsLoadingLogin(false);
+                  return;
                 }
-                navigation.replace(roleCode, {
-                  screen: Constant.ROUTE__HOME,
-                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
-                });
-              } else {
-                navigation.replace(Constant.ROUTE__PIPING, {
-                  screen: 'Home',
-                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
-                });
+              }
+              else if (disciplineCode.toUpperCase() === Constant.ROUTE__PIPING) {
+                if (roleCode === Constant.ROUTE__PIP_CONS
+                  || roleCode === Constant.ROUTE__PIP_QCWS
+                  || roleCode === Constant.ROUTE__PIP_QCDEPT
+                  || roleCode === Constant.ROUTE__PIP_VIEWER) {
+                  let route = roleCode;
+                  if (roleCode === Constant.ROUTE__PIP_QCWS || roleCode === Constant.ROUTE__PIP_QCDEPT) {
+                    route = Constant.ROUTE__PIP_QC;
+                    Helper.storeData('ROLE_CODE', route);
+                  }
+                  navigation.replace(route, {
+                    screen: Constant.ROUTE__HOME,
+                    params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                  });
+                } else {
+                  Helper.clearData();
+                  MessageAlert('Lỗi', 'Vui lòng chọn Module và Role phù hợp.');
+                  setIsLoadingLogin(false);
+                  return;
+                }
+              }
+              else {
+                Helper.clearData();
+                MessageAlert('Lỗi', 'Vui lòng chọn Module và Role phù hợp.');
+                setIsLoadingLogin(false);
+                return;
               }
             }
           })

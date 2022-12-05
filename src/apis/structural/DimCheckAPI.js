@@ -1,7 +1,7 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, type, isSpending, token) => {
+export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, location, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
@@ -23,9 +23,10 @@ export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, 
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev
-    + '&type=' + type
+    + '&filterType=' + filterType
     + '&scope=' + scope
-    + '&isSpending=' + isSpending,
+    + '&isSpending=' + isSpending
+    + '&location=' + location,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -125,6 +126,7 @@ export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark,
     }).then(res => res.json());
 };
 
+//-- DIM After Weld
 export const UpdateDimForCuttingListAPI = (userUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server
@@ -138,3 +140,68 @@ export const UpdateDimForCuttingListAPI = (userUpdate, listItemUpdate, token) =>
       body: JSON.stringify({ userUpdate, listItemUpdate }),
     }
   ).then(res => res.json());
+
+export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingNo, assemblyCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/structural/DimCheck/GetDIMAfterWeldList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&assemblyCode=' + assemblyCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
+export const GetDIMAfterWeldDetailAPI = async (projectCode, facilityCode, drawingNo, assemblyCode, filterType = '') => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/structural/DimCheck/GetDIMAfterWeldDetail'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&assemblyCode=' + assemblyCode
+    + '&filterType=' + filterType,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
+export const UpdateDIMAfterWeldDetailAPI = async (team, listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/structural/DimCheck/UpdateDIMAfterWeldDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ team, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+
+export const UpdateDIMAfterWeldDetailQCAPI = async (inspector, listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/structural/DimCheck/UpdateDIMAfterWeldDetailQC',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ inspector, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};

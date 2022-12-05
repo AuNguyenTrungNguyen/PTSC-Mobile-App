@@ -1,22 +1,25 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import CheckBox from '@react-native-community/checkbox';
 import Dialog from 'react-native-dialog';
 
+import Networker from '../../../utils/Networker';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
+import CoreStyle from '../../../utils/CoreStyle';
 
+import { GetFacilityListAPI, GetInspectorListAPI } from '../../../apis/app/AppAPI';
 import { GetSpendListAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
+import SelectPopup from '../../../components/SelectPopup';
 
 const QCSpendListScreen = ({ route, navigation }) => {
 
@@ -29,12 +32,8 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const [spendList, setSpendList] = useState([]);
   const [updateSpendList, setUpdateSpendList] = useState([]);
 
-  const [isVisibleTotal, setIsVisibleTotal] = useState(false);
-  const [totalList, setTotalList] = useState([]);
-
   const [drawingNo, setDrawingNo] = useState('');
   const [weldNo, setWeldNo] = useState('');
-  const [location, setLocation] = useState('');
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -42,9 +41,22 @@ const QCSpendListScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          {
+            code === Constant.CODE_VISUAL
+              ?
+              <TouchableOpacity
+                style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+                onPress={() => { setIsVisibleNDTFilter(true) }}>
+                <Ionicons
+                  size={24}
+                  name={'md-ellipsis-vertical-circle'} color={iconColor} />
+              </TouchableOpacity>
+              :
+              null
+          }
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => { setIsVisibleTotal(true) }}>
+            onPress={() => { setIsVisibleLocation(true) }}>
             <Ionicons
               size={24}
               name={'md-list-circle-outline'} color={iconColor} />
@@ -71,20 +83,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
 
   const callAPI = executedAPI => {
     setIsSearching(true);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        setIsSearching(false);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
   useEffect(
-    () => {
+    async () => {
+      callAPI(getFacilityList);
+      callAPI(getInspectorList);
       callAPI(getSpendListData);
+      const inspector = await Helper.getData('QC_INSPECTOR');
+      setGlobalInspector(inspector);
     }, []
   );
 
@@ -93,13 +100,22 @@ const QCSpendListScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     callAPI(getSpendListData);
   };
-  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location) => {
-    let token = await Helper.getData('TOKEN');
-    GetSpendListAPI(projectCode, drawing, weld, locate, code, token)
+  const getSpendListData = async (facility = facilityCode, drawing = drawingNo, weld = weldNo, locate = location, filter = NDTFilter) => {
+    const token = await Helper.getData('TOKEN');
+
+    facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
+
+    if (filter === NDT_FILTER_100) {
+      filter = Constant.PIECE_MARK_CHECKED;
+    } else if (filter === NDT_FILTER_OTHERS) {
+      filter = Constant.PIECE_MARK_UNCHECKED;
+    }
+
+    GetSpendListAPI(projectCode, facility, drawing, weld, locate, code, filter, token)
       .then(res => {
         if (res.Success && res.Data) {
-          setSpendList(res.Data.List);
-          setTotalList(res.Data.Location);
+          setSpendList(res.Data);
+          setLocationList(res.Second);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -113,6 +129,43 @@ const QCSpendListScreen = ({ route, navigation }) => {
         setIsLoading(false);
         setIsError(true);
         setIsSearching(false);
+      });
+  };
+  const getFacilityList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetFacilityListAPI(projectCode, token)
+      .then(res => {
+        if (res.success) {
+          setFacilityList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+  const getInspectorList = async () => {
+    const token = await Helper.getData('TOKEN');
+    const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+    GetInspectorListAPI(projectCode, disciplineCode, 'Piping & Welding Inspector', token)
+      .then(res => {
+        if (res.Success) {
+          setInspectorList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
       });
   };
 
@@ -167,48 +220,124 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setWeldNo(no);
   };
 
-  //-- Location
+  //-- FacilityCode filter
+  const FACILITY_CODE_DEFAULT = 'All Facility Code';
+  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
+  const [facilityList, setFacilityList] = useState([]);
+  const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
+  const _onChangeFacilityCode = code => {
+    if (code !== facilityCode) {
+      setFacilityCode(code);
+      callAPI(() => { getSpendListData(code) });
+    }
+    setIsVisibleFacility(false);
+  };
+  const _onClearFacilityCode = () => {
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      setFacilityCode(FACILITY_CODE_DEFAULT);
+      callAPI(() => { getSpendListData('') });
+    }
+    setIsVisibleFacility(false);
+  };
+
+  //-- Location filter
+  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
+  const [locationList, setLocationList] = useState([]);
+  const [location, setLocation] = useState('');
   const _onPressChangeLocation = loc => {
     if (loc != location) {
       setLocation(loc);
-      callAPI(() => { getSpendListData(drawingNo, weldNo, loc) });
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, loc) });
     }
-    setIsVisibleTotal(false);
+    setIsVisibleLocation(false);
   };
   const _onPressClearLocation = () => {
     _onPressChangeLocation('');
   };
 
+  //-- NDTPercent filter
+  const NDT_FILTER_100 = '100%';
+  const NDT_FILTER_OTHERS = 'Others';
+  const [isVisibleNDTFilter, setIsVisibleNDTFilter] = useState(false);
+  const [NDTFilter, setNDTFilter] = useState('');
+  const _onChangeNDTFilter = filter => {
+    if (filter !== NDTFilter) {
+      setNDTFilter(filter);
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, location, filter) });
+    }
+    setIsVisibleNDTFilter(false);
+  };
+  const _onClearNDTFilter = () => {
+    if (NDTFilter !== '') {
+      setNDTFilter('');
+      callAPI(() => { getSpendListData(facilityCode, drawingNo, weldNo, location, '') });
+    }
+    setIsVisibleNDTFilter(false);
+  };
+
   //-- Update Data
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
-  const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate) => {
+  const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate, inspectorKey) => {
     let array = [...spendList];
     array[localIndex][localKey] = data;
+    if (inspectorKey) {
+      array[localIndex][inspectorKey] = globalInspector;
+    }
     setSpendList(array);
 
     array = [...updateSpendList];
     const rowIndex = spendList[localIndex].RowIndex;
     const objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, [localKey]: data });
+      if (inspectorKey) {
+        array.push({ RowIndex: rowIndex, [localKey]: data, [inspectorKey]: globalInspector });
+      } else {
+        array.push({ RowIndex: rowIndex, [localKey]: data });
+      }
     } else {
-      array[objIndex][localKey] = spendList[localIndex][localKey];
+      array[objIndex][localKey] = data;
+      if (inspectorKey) {
+        array[objIndex][inspectorKey] = globalInspector;
+      }
     }
     setUpdateSpendList(array);
   };
 
   const _onPressChangeStatus = (value, index, key) => {
-    if (spendList[index][key] !== value) {
-      setIndexUpdate(index);
-      setKeyUpdate(key);
-      onChangeData(value, index, key);
-    }
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    const inspectorKey = code === Constant.CODE_FITUP ? 'QCFittupInspector' : 'QCVisualInspector';
+    onChangeData(value, index, key, inspectorKey);
   };
 
   const _onChangeCheckbox = (index, key, value) => {
     value = value ? 'x' : null;
     onChangeData(value, index, key);
+  };
+
+  const [isVisibleWeldType, setIsVisibleWeldType] = useState(false);
+  const _onPressShowWeldType = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleWeldType(true);
+  };
+  const _onChangeWeldType = data => {
+    onChangeData(data);
+    setIsVisibleWeldType(false);
+  };
+
+  const [isVisibleGlobalInspector, setIsVisibleGlobalInspector] = useState(false);
+  const [globalInspector, setGlobalInspector] = useState('');
+  const _onPressShowGlobalInspector = () => {
+    setIsVisibleGlobalInspector(true);
+  };
+  const _onChangeGlobalInspector = async data => {
+    setGlobalInspector(data);
+    if (globalInspector !== data) {
+      await Helper.storeData('QC_INSPECTOR', data);
+    }
+    setIsVisibleGlobalInspector(false);
   };
 
   const [isVisibleRemark, setIsVisibleRemark] = useState(false);
@@ -233,16 +362,86 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setIsVisibleRemark(false);
   };
 
+  const [isVisibleInspector, setIsVisibleInspector] = useState(false);
+  const [inspectorList, setInspectorList] = useState([]);
+  const _onPressShowInspector = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleInspector(true);
+  };
+  const _onChangeInspector = data => {
+    onChangeData(data);
+    setIsVisibleInspector(false);
+  };
+  const _onClearInspector = () => {
+    onChangeData(null);
+    setIsVisibleInspector(false);
+  };
+
+  const [isVisibleSize, setIsVisibleSize] = useState(false);
+  const [sizeDisplay, setSizeDisplay] = useState('');
+  const _onPressShowSize = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setSizeDisplay(value.toString());
+    } else {
+      setSizeDisplay('');
+    }
+    setIsVisibleSize(true);
+  };
+  const _onChangeSize = () => {
+    let value = sizeDisplay;
+    if (!value) {
+      value = '';
+    } else {
+      value = value.replace("\"", "");
+    }
+    setSizeDisplay(value);
+    onChangeData(value + "\"");
+    setIsVisibleSize(false);
+  };
+
+  const [isVisibleSCH, setIsVisibleSCH] = useState(false);
+  const [SCHDisplay, setSCHDisplay] = useState('');
+  const _onPressShowSCH = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setSCHDisplay(value.toString());
+    } else {
+      setSCHDisplay('');
+    }
+    setIsVisibleSCH(true);
+  };
+  const _onChangeSCH = () => {
+    let value = SCHDisplay;
+    if (!value) {
+      value = null;
+    }
+    setSCHDisplay(value);
+    onChangeData(value);
+    setIsVisibleSCH(false);
+  };
+
+
   //-- Render List
   const renderItem = ({ index, item }) => {
+    let size = Formater.formatEmptyData(item.Size);
+    size = size.replace("\"", "");
     return (
       <View style={styles.box}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             <Text>WeldNo: </Text>
-            <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldNo)}</Text>
-            <Text> - WeldType: </Text>
-            <Text style={styles.textMeta}>{Formater.formatEmptyData(item.WeldType)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldNo)}</Text>
+            <Text>  WeldType:</Text>
+            <View style={styles.cellTitleAction}>
+              <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldType)}</Text>
+              <TouchableOpacity onPress={() => _onPressShowWeldType(index, 'WeldType')}>
+                <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.cellImageAction}>
             <TouchableOpacity onPress={() => { _onPressManagePicture(item) }}>
@@ -251,15 +450,15 @@ const QCSpendListScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTitle}>
+          <View style={styles.cellOne}>
             <Text>DrawingNo: </Text>
           </View>
-          <View style={styles.cellDrawingAction}>
+          <View style={styles.cellThree}>
             {
               item.WebLink
                 ?
                 <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'View Drawing Spend List')}>
-                  <Text style={styles.textDataOpen}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
+                  <Text style={CoreStyle.textLinkWithLine}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
                 </TouchableOpacity>
                 :
                 <Text style={styles.textData}>{Formater.formatEmptyData(item.DrawingNo)}</Text>
@@ -267,16 +466,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTitle}>
+          <View style={styles.cellOne}>
             <Text>Sheet:</Text>
           </View>
-          <View style={styles.cellData}>
+          <View style={styles.cellOne}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.Sheet)}</Text>
           </View>
-          <View style={styles.cellTitle}>
+          <View style={styles.cellOne}>
             <Text>Rev:</Text>
           </View>
-          <View style={styles.cellData}>
+          <View style={styles.cellOne}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.Rev)}</Text>
           </View>
         </View>
@@ -285,24 +484,35 @@ const QCSpendListScreen = ({ route, navigation }) => {
             ?
             <>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>HeatNo01:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>HeatNo02:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
+                  <Text>Inspector:</Text>
+                </View>
+                <View style={styles.cellThreeAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.QCFittupInspector)}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowInspector(index, 'QCFittupInspector')}>
+                    <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
                   <Text>FittingDate:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.FittingDate)}</Text>
                 </View>
                 <View style={styles.cellAction}>
@@ -314,10 +524,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>Location:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
                 </View>
                 <View style={styles.cellAction}>
@@ -332,10 +542,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>FitUpStatus:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   {
                     item.FitUpResult
                       ?
@@ -360,27 +570,56 @@ const QCSpendListScreen = ({ route, navigation }) => {
             :
             <>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>WelderIDs:</Text>
+                <View style={styles.cellOne}>
+                  <Text>WeldDate:</Text>
                 </View>
-                <View style={styles.cellWelder}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
+                <View style={styles.cellOne}>
+                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text>Location:</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
+                  <Text>Inspector:</Text>
+                </View>
+                <View style={styles.cellThreeAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.QCVisualInspector)}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowInspector(index, 'QCVisualInspector')}>
+                    <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>Size:</Text>
+                </View>
+                <View style={styles.cellOneAction}>
+                  <Text style={styles.textData}>{size + "\""}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowSize(size, index, 'Size')}>
+                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text>SCH:</Text>
+                </View>
+                <View style={styles.cellOneAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Schedule_THK) + ' '}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowSCH(item.Schedule_THK, index, 'Schedule_THK')}>
+                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
                   <Text>WPSNo:</Text>
                 </View>
-                <View style={styles.cellWelder}>
+                <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
-                </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>WeldingDate:</Text>
-                </View>
-                <View style={styles.cellData}>
-                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity
@@ -391,11 +630,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>Location:</Text>
+                <View style={styles.cellOne}>
+                  <Text>WelderID:</Text>
                 </View>
-                <View style={styles.cellData}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
+                <View style={styles.cellTwo}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity onPress={() => _onPressShowRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
@@ -409,10 +648,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>VisualStatus:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellTwo}>
                   {
                     item.VisualResult
                       ?
@@ -434,18 +673,18 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>NDTPercent:</Text>
                 </View>
-                <View style={styles.cellWelder}>
+                <View style={styles.cellTitleLine}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.NDTPercent)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>UT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.UT && item.UT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
@@ -460,10 +699,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>RT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.RT && item.RT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
@@ -478,10 +717,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>MT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.MT && item.MT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
@@ -498,10 +737,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>PT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.PT && item.PT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
@@ -516,10 +755,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>PMI:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.PMI && item.PMI !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
@@ -534,10 +773,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onAnimationType='flat'
                   />
                 </View>
-                <View style={styles.cellTitle}>
+                <View style={styles.cellOne}>
                   <Text>PAUT:</Text>
                 </View>
-                <View style={styles.cellData}>
+                <View style={styles.cellOne}>
                   <CheckBox
                     value={item.PAUT && item.PAUT !== null}
                     onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
@@ -562,95 +801,141 @@ const QCSpendListScreen = ({ route, navigation }) => {
     {
       if (isSearching) {
         return <ListLoadingData />
-      } else if (!spendList.length) {
-        return <ListEmptyData />
       } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={spendList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
+        return <ListEmptyData />
       }
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
-        :
-        <View style={styles.container}>
-          {
-            isShowDescription.show
-              ?
-              (<View style={styles.headerContainer}>
-                <View style={styles.rowInfo}>
-                  <Text>Project: </Text>
-                  <Text style={[styles.infoData]}>{projectCode.toUpperCase()}</Text>
-                  <Text>   User: </Text>
-                  <Text style={[styles.infoData]}>{userLogin.toUpperCase()}</Text>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction}>DrawingNo:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={drawingNo}
-                      onChangeText={_onChangeDrawingNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {drawingNo == ''
-                      ? null
-                      : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
-                    }
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getSpendListData)} />
+          :
+          <View style={styles.container}>
+            {
+              isShowDescription.show
+                ?
+                (<View style={styles.headerContainer}>
+                  <View style={styles.rowInfo}>
+                    <Text>User:   </Text>
+                    <Text style={styles.infoData}>{userLogin}</Text>
+                    <Text>   Inspector:   </Text>
+                    <View style={styles.cellThreeAction}>
+                      <Text style={styles.textData}>{globalInspector}</Text>
+                      <TouchableOpacity onPress={() => _onPressShowGlobalInspector()}>
+                        <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction}>WeldNo:</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.inputText}
-                      value={weldNo}
-                      onChangeText={_onChangeWeldNo}
-                      underlineColorAndroid='transparent'
-                    />
-                    {weldNo == ''
-                      ? null
-                      : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
-                    }
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>FacilityCode:</Text>
+                    <TouchableOpacity style={styles.selectInput} onPress={() => { setIsVisibleFacility(true) }}>
+                      <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                    </TouchableOpacity>
                   </View>
-                </View>
-                <View style={styles.rowInfoAction}>
-                  <Text style={styles.infoTitleAction} />
-                  <TouchableOpacity
-                    style={styles.searchButton}
-                    onPress={_onPressSearchDrawing}
-                    disabled={isSearching}>
-                    <Text style={styles.buttonTitle}>Search Drawing</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>)
-              :
-              null
-          }
-          <RenderList />
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
-              <Text style={styles.buttonTitle}>Submit to Server</Text>
-            </TouchableOpacity>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>DrawingNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={drawingNo}
+                        onChangeText={_onChangeDrawingNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        drawingNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>WeldNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        weldNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction} />
+                    <TouchableOpacity
+                      style={styles.searchButton}
+                      onPress={_onPressSearchDrawing}
+                      disabled={isSearching}>
+                      <Text style={styles.buttonTitle}>Search Drawing</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>)
+                :
+                null
+            }
+            {
+              spendList && spendList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={spendList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderList />
+            }
+            <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonAction} onPress={_onPressSubmitToServer}>
+                <Text style={styles.buttonTitle}>Submit to Server</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
       }
+      <SelectPopup
+        visible={isVisibleFacility}
+        data={facilityList}
+        onCancel={() => setIsVisibleFacility(false)}
+        onClear={_onClearFacilityCode}
+        onChangeItem={_onChangeFacilityCode} />
+      <SelectPopup
+        visible={isVisibleNDTFilter}
+        data={[NDT_FILTER_100, NDT_FILTER_OTHERS]}
+        onCancel={() => setIsVisibleNDTFilter(false)}
+        onClear={_onClearNDTFilter}
+        onChangeItem={_onChangeNDTFilter} />
+      <SelectPopup
+        visible={isVisibleInspector}
+        data={inspectorList}
+        onChangeItem={_onChangeInspector}
+        onClear={_onClearInspector}
+        onCancel={() => setIsVisibleInspector(false)} />
+      <SelectPopup
+        visible={isVisibleGlobalInspector}
+        data={inspectorList}
+        onChangeItem={_onChangeGlobalInspector}
+        onCancel={() => setIsVisibleGlobalInspector(false)} />
+      <SelectPopup
+        visible={isVisibleWeldType}
+        data={['BW', 'FW', 'GW', 'BRW']}
+        onChangeItem={_onChangeWeldType}
+        onCancel={() => setIsVisibleWeldType(false)} />
       <TotalLocationModal
-        visible={isVisibleTotal}
-        data={totalList}
-        onClose={() => setIsVisibleTotal(false)}
+        visible={isVisibleLocation}
+        data={locationList}
+        onClose={() => setIsVisibleLocation(false)}
         onPressChangeLocation={_onPressChangeLocation}
         onPressClearLocation={_onPressClearLocation}
         site={true}
@@ -662,8 +947,28 @@ const QCSpendListScreen = ({ route, navigation }) => {
           onChangeText={(text) => setRemarkDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleRemark(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleRemark(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeRemark} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleSize}>
+        <Dialog.Title>{'Enter size:'}</Dialog.Title>
+        <Dialog.Input
+          value={sizeDisplay}
+          onChangeText={(text) => setSizeDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleSize(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeSize} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleSCH}>
+        <Dialog.Title>{'Enter SCH:'}</Dialog.Title>
+        <Dialog.Input
+          value={SCHDisplay}
+          onChangeText={(text) => setSCHDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleSCH(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeSCH} />
       </Dialog.Container>
     </SafeAreaView>
   );
@@ -694,10 +999,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoData: {
-    flex: 2,
     fontWeight: 'bold',
     color: BASE_COLOR,
     textAlign: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',
@@ -707,6 +1013,17 @@ const styles = StyleSheet.create({
   },
   infoTitleAction: {
     flex: 3,
+  },
+  selectInput: {
+    flexDirection: 'row',
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    borderRadius: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -759,49 +1076,50 @@ const styles = StyleSheet.create({
     margin: 4,
     minHeight: 20,
   },
-  textData: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-  },
   checkBox: {
     fontWeight: 'bold',
     color: BASE_COLOR,
     width: 24,
     height: 24,
   },
-  textDataOpen: {
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    textDecorationLine: 'underline',
-    color: BASE_COLOR,
+  cellTitleLine: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  cellTitle: {
+  cellTitleAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cellOne: {
     flex: 1,
     justifyContent: 'center',
   },
-  cellTitleLine: {
+  cellOneAction: {
+    flex: 1,
     flexDirection: 'row',
-    flex: 3,
     alignItems: 'center',
+    flexWrap: 'wrap'
   },
-  cellWelder: {
+  cellTwo: {
     flex: 2,
     justifyContent: 'center',
   },
-  cellData: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  cellDrawingAction: {
+  cellThree: {
     flex: 3,
     justifyContent: 'center',
+  },
+  cellThreeAction: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   cellImageAction: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  textMeta: {
+  textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
   },

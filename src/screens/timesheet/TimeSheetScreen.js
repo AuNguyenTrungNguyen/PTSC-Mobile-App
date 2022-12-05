@@ -13,11 +13,15 @@ import {
   GetTimeSheetTeamLeaderInfoAPI,
   GetTimeSheetWorkOrderListAPI,
   GetTimeSheetWorkerListAPI,
-  UpdateTimeSheetListAPI
+  UpdateTimeSheetListAPI,
+  DeleteTimeSheetWorkerDateAPI
 } from '../../apis/timesheet/TimeSheetAPI';
+import { GetProjectListAPI } from '../../apis/app/LoginAPI';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
+
+import SelectPopup from '../../components/SelectPopup';
 import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
@@ -45,6 +49,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
   const [workOrderList, setWorkOrderList] = useState([]);
   const [workerList, setWorkerList] = useState([]);
   const [workerUpdatedList, setWorkerUpdatedList] = useState([]);
+  const [workerErrorList, setWorkerErrorList] = useState([]);
+
+  const [projectList, setProjectList] = useState([]);
+  const [projectSelected, setProjectSeletecd] = useState(projectCode);
+  const [isVisibleProject, setIsVisibleProject] = useState(false);
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -96,17 +105,27 @@ const TimeSheetScreen = ({ route, navigation }) => {
   useEffect(
     () => {
       callAPI(getTeamLeaderInfo);
-    }, [navigation]
+    }, [navigation, route.params?.workerUpdated]
+  );
+
+  const [isRefreshWorkOrder, setIsRefreshWorkOrder] = useState(null);
+  useEffect(
+    () => {
+      if (isRefreshWorkOrder) {
+        callAPI(getTimeSheetWorkOrderList, false);
+      }
+    }, [isRefreshWorkOrder]
   );
 
   //-- Manage Workers
-  const _onPressManageWorker = () => {
+  const _onPressManageWorker = isDelete => {
     navigation.navigate(
       'TimeSheetManagerWorker',
       {
         userLogin: userLogin,
         department: department,
-        fullname: fullname
+        fullname: fullname,
+        isDelete: isDelete,
       }
     );
   };
@@ -120,6 +139,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           if (Object.keys(res.data).length) {
             setDepartment(res.data[0].DepartmentCode);
             setFullname(res.data[0].Fullname);
+            callAPI(getProjectList);
             callAPI(getAllData);
           }
           else {
@@ -150,12 +170,41 @@ const TimeSheetScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
+  const getTimeSheetWorkOrderList = async (code = projectSelected) => {
+    const token = await Helper.getData('TOKEN');
+    GetTimeSheetWorkOrderListAPI(code, userLogin, token)
+      .then(res => {
+        if (res.success) {
+          setWorkOrderList(res.data);
+          setIsLoading(false);
+          setIsError(false);
+          setIsUploading(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsUploading(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsUploading(false);
+      });
+  };
+  const getProjectList = () => {
+    GetProjectListAPI(userLogin)
+      .then(res => {
+        if (res.success) {
+          setProjectList(res.data);
+        }
+      });
+  };
   const getAllData = async () => {
     const token = await Helper.getData('TOKEN');
     try {
       let arrayPromise = [
-        GetTimeSheetWorkerListAPI(projectCode, userLogin, token),
-        GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token),
+        GetTimeSheetWorkerListAPI(projectSelected, userLogin, token),
+        GetTimeSheetWorkOrderListAPI(projectSelected, userLogin, token),
       ];
       await Promise.all(arrayPromise)
         .then(([workerResult, workOrderResult]) => {
@@ -214,7 +263,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     const resultList = workerUpdatedList.filter(i => i.SUBMITED == false);
     setIsUploading(true);
-    UpdateTimeSheetListAPI(projectCode, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
+    UpdateTimeSheetListAPI(projectSelected, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
       .then(res => {
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -231,10 +280,46 @@ const TimeSheetScreen = ({ route, navigation }) => {
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
-        setIsUploading(false);
+        setIsRefreshWorkOrder(new Date());
       }).catch(() => {
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         setIsUploading(false);
+      });
+  };
+
+  //-- Delete Data
+  const deleteTimeSheetWorkerDate = async deletedList => {
+    const token = await Helper.getData('TOKEN');
+    DeleteTimeSheetWorkerDateAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
+      .then(res => {
+        if (res.success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          setIsRefreshWorkOrder(new Date());
+          const dataList = workerUpdatedList.filter(item => deletedList.find(id => (id === item.ID)));
+          const updatedList = workerUpdatedList.filter(item => !deletedList.find(id => (id === item.ID)));
+          dataList.map((item) => {
+            item.SUBMITED = true;
+            item.SELECTED = false;
+            item.UPDATED = false;
+            item.ColorWorkOrder = null;
+            item.ColorShift = null;
+            item.ColorHours = null;
+            item.ColorNote = null;
+
+            item.WorkOrder = '';
+            item.Shift = '';
+            item.MHR = null;
+            item.Note = '';
+            return item;
+          });
+          const data = workerList.concat(dataList).sort((a, b) => (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
+          setWorkerList(data);
+          setWorkerUpdatedList(updatedList);
+        } else {
+          Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
+        }
+      }).catch(() => {
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
       });
   };
 
@@ -289,6 +374,21 @@ const TimeSheetScreen = ({ route, navigation }) => {
       setWorkerUpdatedList(array);
     }
   };
+  const _onPressDeleteUpdated = () => {
+    if (workerUpdatedList) {
+      const dataList = workerUpdatedList.filter(i => i.SELECTED && i.WorkOrder && i.WorkOrder.startsWith(projectSelected));
+      if (dataList.length) {
+        const deletedList = dataList.map(i => i.ID);
+        callAPI(() => { deleteTimeSheetWorkerDate(deletedList) }, false);
+      }
+      else {
+        const selectedList = workerUpdatedList.filter(i => i.SELECTED);
+        if (selectedList.length) {
+          MessageAlert('Chú ý', 'Chọn dự án phù hợp với LSX');
+        }
+      }
+    }
+  };
   const _onChangeCheckboxUpdated = (value, index) => {
     let array = [...workerUpdatedList];
     if (array) {
@@ -298,13 +398,17 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setWorkerUpdatedList(array);
   };
 
-
+  //-- Transfer Action
   const _onPressTransfer = () => {
     if (!workerList.length) {
       return;
     }
 
-    let transferList = workerList.filter(i => i.MHR || i.Overtime);
+    const errorList = workerList.filter(i => (!i.MHR || !i.WorkOrder || !i.Shift) && i.SELECTED);
+    const result = errorList.map(i => i.RowIndex);
+    setWorkerErrorList(result);
+
+    const transferList = workerList.filter(i => i.MHR && i.WorkOrder && i.Shift);
     if (transferList) {
       let addlist = [];
       transferList.forEach(item => {
@@ -325,6 +429,9 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setWorkOrder(data);
     // _onChangWorkOrderShotcut(data);
     setIsShowWorkOrder(false);
+  };
+  const _onReloadWorkOrder = data => {
+    setWorkOrderList(data);
   };
 
 
@@ -351,6 +458,13 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onChangWorkOrderShotcut = (value = workOrder) => {
     const isSpending = filter === SPENDING_TEXT;
+    if (!isSpending && !value && workerUpdatedList.length) {
+      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+      if (checkSubmitList.length) {
+        MessageAlert('Chú ý', 'Bắt buộc chọn LSX');
+      }
+      return;
+    }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
     if (!data.length) {
@@ -389,6 +503,13 @@ const TimeSheetScreen = ({ route, navigation }) => {
   };
   const _onChangHoursShotcut = value => {
     const isSpending = filter === SPENDING_TEXT;
+    if (!isSpending && !value && workerUpdatedList.length) {
+      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+      if (checkSubmitList.length) {
+        MessageAlert('Chú ý', 'Bắt buộc chọn giờ');
+      }
+      return;
+    }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
     if (!data.length) {
@@ -441,16 +562,28 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setIsShowNote(false);
   };
 
+  const _onChangeProjectCode = code => {
+    setProjectSeletecd(code);
+    setIsVisibleProject(false);
+    callAPI(() => { getTimeSheetWorkOrderList(code) }, false);
+  };
+
 
 
 
 
   const renderItem = ({ index, item }) => {
+    const isError = workerErrorList.includes(item.RowIndex);
     return (
-      <View
-        style={styles.box}>
+      <View style={isError ? styles.errorBox : styles.box}>
         <View style={styles.row}>
-          <Text style={styles.cellData}>{item.ID} - {item.Fullname}</Text>
+          {/* {
+            filter === UPDATED_TEXT &&
+            <View style={styles.cellCheckbox}>
+              <Ionicons name='ios-backspace-outline' size={24} color={'red'} onPress={() => { deleteTimeSheetWorkerDate(item.ID) }} />
+            </View>
+          } */}
+          <Text style={styles.cell}>{item.ID} - {item.Fullname}</Text>
           <View style={styles.cellCheckbox}>
             {
               filter === SPENDING_TEXT
@@ -551,182 +684,191 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {isLoading || isError
-        ?
-        <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getTeamLeaderInfo)} />
-        :
-        <View style={styles.container}>
-          <View>
-            <View style={styles.headerRow}>
-              <Text style={styles.headerCellTitle}>Ngày:</Text>
-              <View style={styles.headerCellData}>
-                <Text style={styles.headerText}>{Formater.formatDateData(currentDate)}</Text>
-                {
-                  filter === SPENDING_TEXT
-                    ?
-                    <Text style={styles.textFilterSpending}>{filter}</Text>
-                    :
-                    <Text style={styles.textFilterUpdated}>{filter}</Text>
-                }
+      {
+        isLoading || isError
+          ?
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getTeamLeaderInfo)} />
+          :
+          <View style={styles.container}>
+            <View>
+              <View style={styles.headerRow}>
+                <Text style={styles.headerCellTitle}>Ngày:</Text>
+                <View style={styles.headerCellData}>
+                  <Text style={styles.headerText}>{Formater.formatDateData(currentDate)}</Text>
+                  {
+                    filter === SPENDING_TEXT
+                      ?
+                      <Text style={styles.textFilterSpending}>{filter}</Text>
+                      :
+                      <Text style={styles.textFilterUpdated}>{filter}</Text>
+                  }
+                </View>
               </View>
-            </View>
-            <View style={styles.headerRow}>
-              <Text style={styles.headerCellTitle}>LSX:</Text>
-              <View style={styles.headerCellAction}>
-                <Text style={styles.headerText}>{workOrder}</Text>
-                <Ionicons onPress={() => { setIsShowWorkOrder(true); }}
-                  style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
-                <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut() }}
-                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+              <View style={styles.headerRow}>
+                <Text style={styles.headerCellTitle}>Dự án:</Text>
+                <View style={styles.headerCellAction}>
+                  <Text style={styles.headerText}>{projectSelected}</Text>
+                  <Ionicons onPress={() => { setIsVisibleProject(true); }}
+                    style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
+                </View>
               </View>
-            </View>
-            <View style={styles.headerRow}>
-              <View style={styles.headerCellShotcut}>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('HC')}>
-                  <Text style={styles.headerShotcutText}>{'HC'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca1')}>
-                  <Text style={styles.headerShotcutText}>{'Ca1'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca2')}>
-                  <Text style={styles.headerShotcutText}>{'Ca2'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca3')}>
-                  <Text style={styles.headerShotcutText}>{'Ca3'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca Lỡ')}>
-                  <Text style={styles.headerShotcutText}>{'Ca Lỡ'}</Text>
-                </TouchableOpacity>
+              <View style={styles.headerRow}>
+                <Text style={styles.headerCellTitle}>LSX:</Text>
+                <View style={styles.headerCellAction}>
+                  <Text style={styles.headerText}>{workOrder}</Text>
+                  <Ionicons onPress={() => { setIsShowWorkOrder(true); }}
+                    style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
+                  <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut() }}
+                    style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                </View>
               </View>
-            </View>
-            <View style={styles.headerRow}>
-              <View style={styles.headerCellShotcut}>
-                {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
+              <View style={styles.headerRow}>
+                <View style={styles.headerCellShotcut}>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('HC')}>
+                    <Text style={styles.headerShotcutText}>{'HC'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca1')}>
+                    <Text style={styles.headerShotcutText}>{'Ca1'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca2')}>
+                    <Text style={styles.headerShotcutText}>{'Ca2'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca3')}>
+                    <Text style={styles.headerShotcutText}>{'Ca3'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca Lỡ')}>
+                    <Text style={styles.headerShotcutText}>{'Ca Lỡ'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.headerRow}>
+                <View style={styles.headerCellShotcut}>
+                  {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('2')}>
                   <Text style={styles.headerShotcutText}>{'2'}</Text>
                 </TouchableOpacity> */}
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('4')}>
-                  <Text style={styles.headerShotcutText}>{'4'}</Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('6')}>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('4')}>
+                    <Text style={styles.headerShotcutText}>{'4'}</Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('6')}>
                   <Text style={styles.headerShotcutText}>{'6'}</Text>
                 </TouchableOpacity> */}
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('8')}>
-                  <Text style={styles.headerShotcutText}>{'8'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerShotcutItem} onPress={() => setIsShowHours(true)}>
-                  <Text style={styles.headerShotcutText}>{hours}...</Text>
-                </TouchableOpacity>
-                <FontAwesome5 onPress={() => { _onChangHoursShotcut(hours) }}
-                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangHoursShotcut('8')}>
+                    <Text style={styles.headerShotcutText}>{'8'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => setIsShowHours(true)}>
+                    <Text style={styles.headerShotcutText}>{hours}...</Text>
+                  </TouchableOpacity>
+                  <FontAwesome5 onPress={() => { _onChangHoursShotcut(hours) }}
+                    style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                </View>
+              </View>
+              <View style={styles.headerRowMultiLine}>
+                <Text style={styles.headerCellTitle}>Ghi chú:</Text>
+                <View style={styles.headerCellAction}>
+                  <Text style={styles.headerText}>{note}</Text>
+                  <FontAwesomeIcon onPress={() => { setIsShowNote(true); }}
+                    style={styles.headerIcon} name='pencil' size={20} color={BASE_COLOR} />
+                  <FontAwesome5 onPress={() => { _onChangNoteShotcut() }}
+                    style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                </View>
               </View>
             </View>
-            <View style={styles.headerRowMultiLine}>
-              <Text style={styles.headerCellTitle}>Ghi chú:</Text>
-              <View style={styles.headerCellAction}>
-                <Text style={styles.headerText}>{note}</Text>
-                <FontAwesomeIcon onPress={() => { setIsShowNote(true); }}
-                  style={styles.headerIcon} name='pencil' size={20} color={BASE_COLOR} />
-                <FontAwesome5 onPress={() => { _onChangNoteShotcut() }}
-                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
-              </View>
+            <View style={styles.headerRowAction}>
+              {
+                filter === SPENDING_TEXT
+                  ?
+                  <>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressCheckAll}>
+                      <Text style={styles.buttonTitle}>Chọn tất cả</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressClearAll}>
+                      <Text style={styles.buttonTitle}>Bỏ chọn</Text>
+                    </TouchableOpacity>
+                  </>
+                  :
+                  <>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressCheckAllUpdated}>
+                      <Text style={styles.buttonTitle}>Chọn tất cả</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressClearAllUpdated}>
+                      <Text style={styles.buttonTitle}>Bỏ chọn</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={_onPressDeleteUpdated}>
+                      <Text style={styles.buttonTitle}>Xóa</Text>
+                    </TouchableOpacity>
+                  </>
+              }
             </View>
-          </View>
-          <View style={styles.headerRowAction}>
             {
               filter === SPENDING_TEXT
                 ?
-                <>
-                  {/* <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressApplySelected}>
-                    <Text style={styles.buttonTitle}>Gán công</Text>
-                  </TouchableOpacity> */}
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressCheckAll}>
-                    <Text style={styles.buttonTitle}>Chọn tất cả</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressClearAll}>
-                    <Text style={styles.buttonTitle}>Bỏ chọn</Text>
-                  </TouchableOpacity>
-                </>
+                workerList.length
+                  ?
+                  <VirtualizedList
+                    style={styles.table}
+                    data={workerList}
+                    getItemCount={data => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(item, index) => index}
+                    renderItem={renderItem}
+                  />
+                  :
+                  <ListEmptyData />
                 :
-                <>
-                  {/* <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressApplySelectedUpdated}>
-                    <Text style={styles.buttonTitle}>Gán công</Text>
-                  </TouchableOpacity> */}
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressCheckAllUpdated}>
-                    <Text style={styles.buttonTitle}>Chọn tất cả</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.headerButton}
-                    onPress={_onPressClearAllUpdated}>
-                    <Text style={styles.buttonTitle}>Bỏ chọn</Text>
-                  </TouchableOpacity>
-                </>
+                workerUpdatedList.length
+                  ?
+                  <VirtualizedList
+                    style={styles.table}
+                    data={workerUpdatedList}
+                    getItemCount={data => data.length}
+                    getItem={(data, index) => {
+                      return data[index];
+                    }}
+                    keyExtractor={(item, index) => index}
+                    renderItem={renderItem}
+                  />
+                  :
+                  <ListEmptyData />
             }
+            <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonLeft} onPress={() => { _onPressManageWorker(false) }}>
+                <Text style={styles.buttonTitle}>Thêm CN</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonCenter} onPress={() => { _onPressManageWorker(true) }}>
+                <Text style={styles.buttonTitle}>Xóa CN</Text>
+              </TouchableOpacity>
+              {
+                filter === SPENDING_TEXT
+                  ?
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressTransfer}>
+                    <Text style={styles.buttonTitle}>Chuyển</Text>
+                  </TouchableOpacity>
+                  : <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                    <Text style={styles.buttonTitle}>Gửi Server</Text>
+                  </TouchableOpacity>
+              }
+            </View>
           </View>
-          {
-            filter === SPENDING_TEXT
-              ?
-              workerList.length
-                ?
-                <VirtualizedList
-                  style={styles.table}
-                  data={workerList}
-                  getItemCount={data => data.length}
-                  getItem={(data, index) => {
-                    return data[index];
-                  }}
-                  keyExtractor={(item, index) => index}
-                  renderItem={renderItem}
-                />
-                :
-                <ListEmptyData />
-              :
-              workerUpdatedList.length
-                ?
-                <VirtualizedList
-                  style={styles.table}
-                  data={workerUpdatedList}
-                  getItemCount={data => data.length}
-                  getItem={(data, index) => {
-                    return data[index];
-                  }}
-                  keyExtractor={(item, index) => index}
-                  renderItem={renderItem}
-                />
-                :
-                <ListEmptyData />
-          }
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManageWorker}>
-              <Text style={styles.buttonTitle}>QL Công nhân</Text>
-            </TouchableOpacity>
-            {
-              filter === SPENDING_TEXT
-                ?
-                <TouchableOpacity style={styles.buttonRight} onPress={_onPressTransfer}>
-                  <Text style={styles.buttonTitle}>Chuyển</Text>
-                </TouchableOpacity>
-                : <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-                  <Text style={styles.buttonTitle}>Gửi Server</Text>
-                </TouchableOpacity>
-            }
-          </View>
-        </View>
       }
       <SelectPopupTimeSheet
+        projectCode={projectSelected}
         visible={isShowWorkOrder}
         data={workOrderList}
         onChangeItem={_onChangeWorkOrder}
         onCancel={() => setIsShowWorkOrder(false)}
+        onReload={_onReloadWorkOrder}
       />
       <Dialog.Container visible={isShowHours}>
         <Dialog.Title>{'Enter hours:'}</Dialog.Title>
@@ -736,7 +878,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowHours(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowHours(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearHours} />
         <Dialog.Button label='OK' onPress={_onChangeHours} />
       </Dialog.Container>
@@ -747,7 +889,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           onChangeText={(text) => setNoteDisplay(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsShowNote(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsShowNote(false) }} />
         <Dialog.Button label='Clear' onPress={_onClearNote} />
         <Dialog.Button label='OK' onPress={_onChangeNote} />
       </Dialog.Container>
@@ -757,6 +899,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
       />
+      <SelectPopup
+        visible={isVisibleProject}
+        data={projectList}
+        onChangeItem={_onChangeProjectCode}
+        onCancel={() => setIsVisibleProject(false)} />
     </SafeAreaView>
   );
 };
@@ -865,11 +1012,26 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 8,
   },
+  errorBox: {
+    flexDirection: 'column',
+    width: '100%',
+    borderColor: 'red',
+    borderWidth: 2,
+    borderRadius: 4,
+    padding: 4,
+    marginBottom: 8,
+  },
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     minHeight: 16,
     marginBottom: 4,
+  },
+  cell: {
+    flexDirection: 'row',
+    flex: 1,
+    fontWeight: 'bold',
+    color: BASE_COLOR,
   },
   cellTitle: {
     height: '100%'
@@ -912,6 +1074,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
     marginRight: 4,
+  },
+  buttonCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: BASE_COLOR,
   },
   buttonRight: {
     flex: 1,

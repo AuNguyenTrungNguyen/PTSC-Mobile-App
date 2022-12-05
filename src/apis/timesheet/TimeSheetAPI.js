@@ -111,3 +111,45 @@ export const UpdateTimeSheetWorkerListAPI = (teamLeaderId, teamLeaderName, listI
       body: JSON.stringify({ teamLeaderId, teamLeaderName, listItemUpdate }),
     }
   ).then(res => res.json());
+
+export const DeleteTimeSheetWorkerDateAPI = (projectCode, userUpdate, dateUpdate, listItemUpdate, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/DeleteTimeSheetWorkerDate',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, userUpdate, dateUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+
+export const RefreshWorkOrderAPI = (projectCode, userLogin, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/RefreshWorkOrder',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, userLogin }),
+    }
+  ).then(res => res.json());
+
+export const GetTimeSheetReportAPI = (projectCode, userLogin, date, token) =>
+  fetch(
+    Port_Server
+    + '/api/TimeSheet/GetTimeSheetReport'
+    + '?projectCode=' + projectCode
+    + '&userLogin=' + userLogin
+    + '&date=' + date,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      }
+    }).then(res => res.json());

@@ -255,6 +255,45 @@ const HomeScreenCONS = ({ route, navigation }) => {
     );
   };
 
+  //-- DIM After Weld
+  const _onPressManageDIMAfterWeld = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode DIM After Weld\n\nSearch: Search DIM After Weld\n\nQC Status: QC Status DIM After Weld Request',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeDIMAfterWeld },
+        { text: 'Search', onPress: _onPressSearchDIMAfterWeld },
+        // { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressQRCodeDIMAfterWeld = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        destination: Naming.NAME_STR_DIM_AFTER_WELD
+      }
+    );
+  };
+  const _onPressSearchDIMAfterWeld = async () => {
+    navigation.navigate(
+      'DIMAfterWeldList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+  const _onPressQCStatusDIMAfterWeld = async () => {
+
+  };
+
   // ManHours Impact
   const _onPressManHoursImpact = async () => {
     const userLogin = await Helper.getData('USERNAME');
@@ -268,13 +307,14 @@ const HomeScreenCONS = ({ route, navigation }) => {
   };
 
   //-- TimeSheet
-  const _onPressManageLTimeSheet = async () => {
+  const _onPressManageTimeSheet = async () => {
     Alert.alert(
       '',
-      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime',
+      'TimeSheet: Company TimeSheet\n\nTimeSheet OT: Company TimeSheet Overtime\n\nTimeSheet Report: TimeSheet Report Overtime',
       [
         { text: 'TimeSheet', onPress: _onPressTimeSheet },
         { text: 'TimeSheet OT', onPress: _onPressTimeSheetYesterday },
+        { text: 'TimeSheet Report', onPress: _onPressTimeSheetReport },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -296,6 +336,16 @@ const HomeScreenCONS = ({ route, navigation }) => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'TimeSheetOT',
+      params: {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressTimeSheetReport = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'TimeSheetReport',
       params: {
         projectCode: projectCode,
         userLogin: userLogin,
@@ -358,18 +408,13 @@ const HomeScreenCONS = ({ route, navigation }) => {
               <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp} />
             </View>
             <View style={styles.row}>
-              {/* <RenderItemBox title={'Construction\nFitUp'} onPress={_onPressManageFitUp} number={spendNumbers.FitUp}/> */}
               <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual} />
-              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageLTimeSheet} />
+              <RenderItemBox title={'DIM\nAfter Weld'} onPress={_onPressManageDIMAfterWeld} />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
-              <RenderItemBox title={'Manpower\n'} />
             </View>
-            {/* <View style={styles.row}>
-              <RenderItemBox title={'Manpower\n'} />
-              <RenderItemBox disable={true} />
-            </View> */}
           </ScrollView>
         </View>
       }

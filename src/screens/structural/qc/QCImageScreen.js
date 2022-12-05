@@ -170,7 +170,7 @@ const QCImageScreen = ({ route }) => {
         }
         RNFetchBlob.fetch(
           'POST',
-          Port_Server 
+          Port_Server
           + '/api/structural/QC/UploadQCImage',
           {
             'Authorization': 'Bearer ' + token,
@@ -528,7 +528,7 @@ const QCImageScreen = ({ route }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);

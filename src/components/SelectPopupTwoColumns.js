@@ -1,32 +1,32 @@
 import React from 'react';
 import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator } from 'react-native';
 
-const SelectPopupTwoColumns = props => {
+const SelectPopupTwoColumns = ({ visible, leftHeader, rightHeader, data, leftKey, rightKey, onChangeItem, onClear, onCancel }) => {
   return (
     <Modal
       animationType='fade'
       transparent={true}
-      visible={props.visible}>
+      visible={visible}>
       <View style={modals.dim}>
         <SafeAreaView>
           <View style={modals.container}>
             <View style={modals.list}>
               <View style={modals.row}>
-                <Text style={modals.cellTitleHeader}>{props.leftHeader}</Text>
+                <Text style={modals.cellTitleHeader}>{leftHeader}</Text>
                 <View style={modals.cellLine} />
-                <Text style={modals.cellDataHeader}>{props.rightHeader}</Text>
+                <Text style={modals.cellDataHeader}>{rightHeader}</Text>
               </View>
               <ScrollView>
                 {
-                  props.data != null
+                  data != null
                     ?
-                    props.data.length
+                    data.length
                       ?
-                      props.data.map((item, index) => {
-                        const valueLeft = item[props.leftKey] ? item[props.leftKey] : '';
-                        const valueRight = item[props.rightKey] ? item[props.rightKey]: '';
+                      data.map((item, index) => {
+                        const valueLeft = item[leftKey] ? item[leftKey] : '';
+                        const valueRight = item[rightKey] ? item[rightKey] : '';
                         return (
-                          <TouchableOpacity style={modals.row} key={index} onPress={() => props.onChangeItem(valueLeft)}>
+                          <TouchableOpacity style={modals.row} key={index} onPress={() => onChangeItem(item)}>
                             <Text style={modals.cellTitle}>{valueLeft}</Text>
                             <View style={modals.cellLine} />
                             <Text style={modals.cellData}>{valueRight}</Text>
@@ -45,15 +45,15 @@ const SelectPopupTwoColumns = props => {
               </ScrollView>
             </View>
             {
-              props.data != null &&
+              data != null &&
               <View style={modals.action}>
                 {
-                  !!props.data.length && !!props.onClear &&
-                  <TouchableOpacity style={modals.button} onPress={props.onClear}>
+                  !!data.length && !!onClear &&
+                  <TouchableOpacity style={modals.button} onPress={() => { onClear() }}>
                     <Text style={modals.buttonTitle}>Clear</Text>
                   </TouchableOpacity>
                 }
-                <TouchableOpacity style={modals.button} onPress={props.onCancel}>
+                <TouchableOpacity style={modals.button} onPress={() => { onCancel() }}>
                   <Text style={modals.buttonTitle}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -88,7 +88,7 @@ const modals = StyleSheet.create({
   list: {
     padding: 16,
     width: windowWidth * 0.85,
-    height: undefined,
+    maxHeight: windowHeight * 0.85 - 36 - 16,
   },
   row: {
     flexDirection: 'row',
@@ -98,7 +98,7 @@ const modals = StyleSheet.create({
     height: 36,
   },
   cellTitleHeader: {
-    flex: 2,
+    flex: 1,
     color: BASE_COLOR,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -117,7 +117,7 @@ const modals = StyleSheet.create({
     backgroundColor: BASE_COLOR,
   },
   cellTitle: {
-    flex: 2,
+    flex: 1,
     color: BASE_COLOR,
     textAlign: 'center',
     fontSize: 15,

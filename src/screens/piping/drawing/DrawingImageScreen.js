@@ -12,6 +12,7 @@ import CameraRoll from '@react-native-community/cameraroll';
 
 import { Port_Server } from '../../../utils/Core';
 import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 import { GetImageAPI, GetDrawingImageAPI, DeleteImageAPI, EditImageAPI } from '../../../apis/piping/ImageAPI';
 
 import Header from '../../../components/Header';
@@ -56,6 +57,14 @@ const DrawingImageScreen = ({ route }) => {
     }, []
   );
 
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  useEffect(
+    async () => {
+      var readOnly = await Helper.getData("ROLE_CODE");
+      setIsReadOnly(readOnly === Constant.ROUTE__PIP_VIEWER);
+    }, []
+  );
+
   const getDrawingImage = async () => {
     const token = await Helper.getData('TOKEN');
     if (rowIndex) {
@@ -76,20 +85,20 @@ const DrawingImageScreen = ({ route }) => {
         });
     } else {
       GetDrawingImageAPI(projectCode, facilityCode, drawingNo, sheet, jointNo, code, role, token)
-      .then(res => {
-        if (res.Success) {
-          setDrawingImageList(res.Data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
+        .then(res => {
+          if (res.Success) {
+            setDrawingImageList(res.Data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+          }
+        })
+        .catch(() => {
           setIsLoading(false);
           setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
+        });
     }
   };
 
@@ -397,7 +406,7 @@ const DrawingImageScreen = ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.username}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase()
+            item.username.toLowerCase() === userLogin.toLowerCase() && !isReadOnly
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -415,7 +424,7 @@ const DrawingImageScreen = ({ route }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{item.note ? item.note : ''}</Text>
           {
-            item.username.toLowerCase() == userLogin.toLowerCase()
+            item.username.toLowerCase() === userLogin.toLowerCase() && !isReadOnly
               ?
               (<TouchableOpacity
                 style={styles.infoAction}
@@ -469,9 +478,17 @@ const DrawingImageScreen = ({ route }) => {
               <ListEmptyData />
           }
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
-              <Text style={styles.buttonTitle}>Add Pictures</Text>
-            </TouchableOpacity>
+            {
+              isReadOnly
+                ?
+                <TouchableOpacity style={styles.buttonUploadDisabled} activeOpacity={1}>
+                  <Text style={styles.buttonTitle}>Add Pictures</Text>
+                </TouchableOpacity>
+                :
+                <TouchableOpacity style={styles.buttonUpload} onPress={_onPressAddImage}>
+                  <Text style={styles.buttonTitle}>Add Pictures</Text>
+                </TouchableOpacity>
+            }
           </View>
         </View>
       }
@@ -532,7 +549,7 @@ const DrawingImageScreen = ({ route }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);
@@ -685,6 +702,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
+  },
+  buttonUploadDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
   },
   buttonLeft: {
     flex: 1,

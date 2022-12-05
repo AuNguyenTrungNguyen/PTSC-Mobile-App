@@ -1,14 +1,20 @@
 import { Port_Server } from '../../utils/Core';
 
-export const GetSpendNumbersAPI = (projectCode, token) =>
+export const GetQCCompletePercentAPI = (projectCode, drawingNo, sheet, rev, token) =>
   fetch(
-    Port_Server + '/api/piping/GetSpendNumbers?projectCode=' + projectCode,
+    Port_Server
+    + '/api/piping/GetQCCompletePercent'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-    }).then(res => res.json());
+    }
+  ).then(res => res.json());
 
 export const GetQCListAPI = (projectCode, facilityCode, drawingNo, weldNo, token) =>
   fetch(
@@ -72,15 +78,17 @@ export const UpdateQCDetailAPI = (projectCode, facilityCode, userUpdate, code, l
     }
   ).then(res => res.json());
 
-export const GetSpendListAPI = (projectCode, drawingNo, weldNo, siteLocaion, code, token) =>
+export const GetSpendListAPI = (projectCode, facilityCode, drawingNo, weldNo, siteLocaion, code, ndtFilter, token) =>
   fetch(
     Port_Server
     + '/api/piping/GetSpendList'
     + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
     + '&weldNo=' + weldNo
     + '&siteLocation=' + siteLocaion
-    + '&code=' + code,
+    + '&code=' + code
+    + '&filterType=' + ndtFilter,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -88,7 +96,7 @@ export const GetSpendListAPI = (projectCode, drawingNo, weldNo, siteLocaion, cod
       },
     }).then(res => res.json());
 
-export const UpdateSpendListAPI = (projectCode, userUpdate, code, listItemUpdate, token)=>
+export const UpdateSpendListAPI = (projectCode, userUpdate, code, listItemUpdate, token) =>
   fetch(
     Port_Server
     + '/api/piping/UpdateSpendList',

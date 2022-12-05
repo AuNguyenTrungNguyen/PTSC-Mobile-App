@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TextInput, TouchableOpacity, Keyboard, VirtualizedList, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionListAPI, GetCurrentConstructionInfoAPI } from '../../../apis/piping/ConstructionAPI';
-import GetDrawingCompletePercentAPI from '../../../apis/drawing/GetDrawingCompletePercentAPI';
+import { GetConstructionListAPI, GetCurrentConstructionInfoAPI, GetDrawingCompletePercentAPI } from '../../../apis/piping/ConstructionAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DrawingListScreen = ({ route, navigation }) => {
@@ -31,6 +29,8 @@ const DrawingListScreen = ({ route, navigation }) => {
   const [drawingList, setDrawingList] = useState(null);
   const [drawingNo, setDrawingNo] = useState('');
   const [oldDrawingNo, setOldDrawingNo] = useState(null);
+  const [weldNo, setWeldNo] = useState('');
+  const [oldWeldNo, setOldWeldNo] = useState(null);
 
   const [isVisibleFacility, setIsVisibleFacility] = useState(false);
   const [facilityList, setFacilityList] = useState([]);
@@ -69,15 +69,7 @@ const DrawingListScreen = ({ route, navigation }) => {
     if (loading) {
       setIsLoading(true);
     }
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
 
   //-- Facility Code
@@ -102,28 +94,42 @@ const DrawingListScreen = ({ route, navigation }) => {
   const _onChangeFacilityCode = code => {
     if (code !== facilityCode) {
       setFacilityCode(code);
-      callAPI(() => { searchDrawing(code, drawingNo) }, false);
+      callAPI(() => { searchDrawing(code, drawingNo, weldNo) }, false);
     }
     setIsVisibleFacility(false);
   };
   const _onPressClearFacilityCode = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      callAPI(() => { searchConstruction('', drawingNo) }, false);
+      callAPI(() => { searchDrawing('', drawingNo, weldNo) }, false);
     }
     setIsVisibleFacility(false);
   };
 
-  //-- DrawingNo Code
+  //-- DrawingNo & WeldNo
   const _onChangeDrawingNo = no => {
     setDrawingNo(no);
   };
-  const searchDrawing = async (facilityCode, drawingNo) => {
+  const _onChangeWeldNo = no => {
+    setWeldNo(no);
+  };
+
+  //-- Search Action
+  const _onPressSearchDrawing = () => {
+    if (oldDrawingNo !== drawingNo || oldWeldNo !== weldNo) {
+      Keyboard.dismiss();
+      setOldDrawingNo(drawingNo);
+      setOldWeldNo(weldNo);
+      callAPI(() => { searchDrawing(facilityCode, drawingNo, weldNo) }, false);
+    }
+  };
+  const searchDrawing = async (facilityCode, drawingNo, weldNo) => {
     setIsSearching(true);
     const token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo ? drawingNo : '';
-    GetConstructionListAPI(projectCode, facilityCode, drawingNo, token)
+    weldNo = weldNo ? weldNo : '';
+    GetConstructionListAPI(projectCode, facilityCode, drawingNo, weldNo, token)
       .then(res => {
         if (res.Success) {
           setDrawingList(res.Data);
@@ -141,24 +147,16 @@ const DrawingListScreen = ({ route, navigation }) => {
         setIsSearching(false);
       });
   };
-  const _onPressSearchDrawing = () => {
-    if (oldDrawingNo !== drawingNo) {
-      Keyboard.dismiss();
-      setOldDrawingNo(drawingNo);
-      callAPI(() => { searchDrawing(facilityCode, drawingNo) }, false);
-    }
-  };
 
   //-- Item Action
-  const _onPressCompletePercent = async (drawingNo, sheet, rev) => {
+  const _onPressCompletePercent = async (index, drawingNo, sheet, rev) => {
     Keyboard.dismiss();
-    let index = drawingList.findIndex((obj => obj.DrawingNo == drawingNo && obj.Sheet == sheet && obj.Rev == rev));
-    let token = await Helper.getData('TOKEN');
+    const token = await Helper.getData('TOKEN');
     GetDrawingCompletePercentAPI(projectCode, drawingNo, sheet, rev, token)
       .then(res => {
-        if (res.success) {
-          let array = [...drawingList];
-          array[index]['progess'] = res.data;
+        if (res.Success) {
+          const array = [...drawingList];
+          array[index]['percentages'] = res.Data;
           setDrawingList(array);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT);
@@ -292,7 +290,7 @@ const DrawingListScreen = ({ route, navigation }) => {
 
 
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ index, item }) => {
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -319,14 +317,14 @@ const DrawingListScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.cellProgress}>
               {
-                item.progess
+                item.percentages
                   ?
                   <>
-                    <Text style={styles.cellAction}>{item.progess.FitUp}%</Text>
-                    <Text style={styles.cellAction}>{item.progess.Weld}%</Text>
+                    <Text style={styles.cellAction}>{item.percentages.FitUp}%</Text>
+                    <Text style={styles.cellAction}>{item.percentages.Weld}%</Text>
                   </>
                   :
-                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(item.DrawingNo, item.Sheet, item.Rev) }}>
+                  <TouchableOpacity style={styles.cellAction} onPress={() => { _onPressCompletePercent(index, item.DrawingNo, item.Sheet, item.Rev) }}>
                     <Text style={styles.textAction}>Complete Percent</Text>
                   </TouchableOpacity>
               }
@@ -359,16 +357,7 @@ const DrawingListScreen = ({ route, navigation }) => {
       } else if (!drawingList.length) {
         return <ListEmptyData />
       } else {
-        return <VirtualizedList
-          style={styles.table}
-          data={drawingList}
-          getItemCount={data => data.length}
-          getItem={(data, index) => {
-            return data[index];
-          }}
-          keyExtractor={(item, index) => index}
-          renderItem={renderItem}
-        />
+        return <></>
       }
     }
   };
@@ -412,6 +401,22 @@ const DrawingListScreen = ({ route, navigation }) => {
                     </View>
                   </View>
                   <View style={styles.rowInfo}>
+                    <Text style={styles.infoTitle}>WeldNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={weldNo}
+                        onChangeText={_onChangeWeldNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        weldNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeWeldNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle} />
                     <TouchableOpacity
                       style={styles.searchButton}
@@ -424,7 +429,22 @@ const DrawingListScreen = ({ route, navigation }) => {
                 :
                 null
             }
-            <RenderList />
+            {
+              !isSearching && drawingList && drawingList.length
+                ?
+                <VirtualizedList
+                  style={styles.table}
+                  data={drawingList}
+                  getItemCount={data => data.length}
+                  getItem={(data, index) => {
+                    return data[index];
+                  }}
+                  keyExtractor={(item, index) => index}
+                  renderItem={renderItem}
+                />
+                :
+                <RenderList />
+            }
           </View>
       }
       <SelectPopup

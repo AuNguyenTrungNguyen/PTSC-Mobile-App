@@ -173,7 +173,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
     let dataCode = await Helper.getData('DATACODE');
     let body = [
       { name: 'projectCode', data: projectCode },
-      { name: 'rowIndex', data: String(rowIndex) },
+      { name: 'rowIndex', data: rowIndex.toString() },
       { name: 'jointNo', data: jointNo },
       { name: 'drawingNo', data: drawingNo },
       { name: 'code', data: code },
@@ -561,7 +561,7 @@ const NDTIssueScreen = ({ route, navigation }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={OPP_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialogEdit(false);
           setPictureId(null);
           setPictureNote(null);

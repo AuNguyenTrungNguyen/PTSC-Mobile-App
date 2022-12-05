@@ -129,10 +129,10 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
         let column = keys.filter(i => (i !== 'RowIndex' && i !== 'Id' && i !== 'LamThickness_mm'));
         if (column != null && !column.length) {
           let objIndex = lamCheckSpendingList.findIndex((obj => obj.RowIndex == item.RowIndex));
-          if(lamCheckSpendingList[objIndex] != null 
-            && (!lamCheckSpendingList[objIndex].LaminationTestRequestByTeam 
-              && !lamCheckSpendingList[objIndex].LamRemark)){
-                errors.push(item.RowIndex);
+          if (lamCheckSpendingList[objIndex] != null
+            && (!lamCheckSpendingList[objIndex].LaminationTestRequestByTeam
+              && !lamCheckSpendingList[objIndex].LamRemark)) {
+            errors.push(item.RowIndex);
           }
         }
         return item;
@@ -534,7 +534,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
           onChangeText={(text) => setRemark(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleRemark(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleRemark(false) }} />
         <Dialog.Button label='OK' onPress={_onSubmitRemark} />
       </Dialog.Container>
       <Dialog.Container visible={isVisibleThickness}>
@@ -546,7 +546,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisibleThickness(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleThickness(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeThickness} />
       </Dialog.Container>
       <AwesomeAlert

@@ -1,22 +1,23 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, ActivityIndicator, Appearance } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, Alert } from 'react-native';
 import Moment from 'moment';
+import NetInfo from '@react-native-community/netinfo';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog from "react-native-dialog";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-simple-toast';
-import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import CheckBox from '@react-native-community/checkbox';
 
+import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/ConstructionAPI';
-import { GetLocationListAPI, GetHeatNoListAPI, GetTeamListFilterAPI, GetWPSListAPI, } from '../../../apis/app/AppAPI';
+import { GetConstructionDetailAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/piping/ConstructionAPI';
+import { GetLocationListAPI, GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI, GetTeamListFilterAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -24,6 +25,7 @@ import Header from '../../../components/Header';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
+import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DrawingDetailScreen = ({ route, navigation }) => {
 
@@ -34,20 +36,25 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [detailDrawingList, setDetailDrawingList] = useState(null);
   const [updateDrawingList, setUpdateDrawingList] = useState([]);
-  // const [errorList, setErrorList] = useState([]);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   useEffect(
     () => {
       if (route.params?.welderSelected) {
         _onChangeWelders(route.params?.welderSelected);
-      } else if (route.params?.heatNoSelected) {
-        _onChangeHeatNo(route.params?.heatNoSelected);
       }
       else {
         callAPI(getConstructionDetail);
       }
     }, [route.params?.welderSelected, route.params?.heatNoSelected, route.params?.index]
+  );
+
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  useEffect(
+    async () => {
+      var readOnly = await Helper.getData("ROLE_CODE");
+      setIsReadOnly(readOnly === Constant.ROUTE__PIP_VIEWER);
+    }, []
   );
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -56,6 +63,13 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       navigation.setOptions({
         headerRight: () => (
           <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => { showConfirmGetReweldJointFromQC() }}>
+              <Ionicons
+                size={24}
+                name={'md-sync-circle-outline'} color={iconColor} />
+            </TouchableOpacity>
             <TouchableOpacity
               style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
               onPress={() => { setIsVisibleHelp(true) }}>
@@ -86,17 +100,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const callAPI = executedAPI => {
     setIsLoading(false);
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
+    Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
 
+  //-- Get Data
   const getConstructionDetail = async () => {
     const token = await Helper.getData('TOKEN');
     GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
@@ -116,167 +123,27 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       });
   };
 
-  // const handleDataUpdateFitup = () => {
-  //   updateDrawingList.forEach(element => {
-  //     const data = detailDrawingList.find(i => i.RowIndex === element['RowIndex'] && i.WeldNo === element['WeldNo']);
-  //     if (!element.hasOwnProperty('ItemDate')) {
-  //       element['ItemDate'] = data['FittingDate'];
-  //     }
-  //     if (!element.hasOwnProperty('ItemPercent')) {
-  //       element['ItemPercent'] = data['FitPercentage'];
-  //     }
-  //     if (!element.hasOwnProperty('Heat01')) {
-  //       element['Heat01'] = data['Heat01'];
-  //     }
-  //     if (!element.hasOwnProperty('Heat02')) {
-  //       element['Heat02'] = data['Heat02'];
-  //     }
-  //     if (!element.hasOwnProperty('Location')) {
-  //       element['Location'] = data['Location'];
-  //     }
-  //     if (!element.hasOwnProperty('FittingTeam')) {
-  //       element['FittingTeam'] = data['FittingTeam'];
-  //     }
-  //     if (!element.hasOwnProperty('QCFittupRemark')) {
-  //       element['QCFittupRemark'] = data['QCFittupRemark'];
-  //     }
 
-  //     // Check CLEAR
-  //     if (!element['ItemDate']
-  //       && !element['ItemPercent']
-  //       && !element['Heat01']
-  //       && !element['Heat02']
-  //       && !element['Location']
-  //       && !element['FittingTeam']
-  //       && (!element['QCFittupRemark'] || element['QCFittupRemark'] == Constant.EMPTY_VALUE_STRING)) {
-  //       element['IsClear'] = true;
-  //     }
-  //   });
-  //   callAPI(updateDrawingDetailFitUp);
-  // };
-  // const updateDrawingDetailFitUp = async () => {
-  //   const token = await Helper.getData('TOKEN');
-  //   let errorListData = [];
-  //   let doneListData = [];
-
-  //   doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.Heat01 && i.Heat02 && i.Location && i.FittingTeam) || i.IsClear);
-  //   const doneIds = doneListData.map(i => i.RowIndex);
-  //   errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
-
-  //   if (errorListData.length) {
-  //     const errorIds = errorListData.map(i => i.RowIndex);
-  //     setErrorList(errorIds);
-  //   } else {
-  //     setErrorList([]);
-  //   }
-  //   if (doneListData.length) {
-  //     setIsUploading(true);
-  //     UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, doneListData, token)
-  //       .then(res => {
-  //         if (res.success) {
-  //           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-  //         } else {
-  //           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         }
-  //         if (errorListData.length) {
-  //           setUpdateDrawingList(errorListData);
-  //         } else {
-  //           setUpdateDrawingList([]);
-  //         }
-  //         setIsUploading(false);
-  //       }).catch(() => {
-  //         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         setIsUploading(false);
-  //       });
-  //   }
-  // };
-  // const handleDataUpdateWeld = () => {
-  //   updateDrawingList.forEach(element => {
-  //     const data = detailDrawingList.find(i => i.RowIndex === element['RowIndex'] && i.WeldNo === element['WeldNo']);
-  //     if (!element.hasOwnProperty('ItemDate')) {
-  //       element['ItemDate'] = data['WeldingDate'];
-  //     }
-  //     if (!element.hasOwnProperty('ItemPercent')) {
-  //       element['ItemPercent'] = data['WeldPercentage'];
-  //     }
-  //     if (!element.hasOwnProperty('WelderID')) {
-  //       element['WelderID'] = data['WelderID'];
-  //     }
-  //     if (!element.hasOwnProperty('WPSNo')) {
-  //       element['WPSNo'] = data['WPSNo'];
-  //     }
-  //     // Check CLEAR
-  //     if (!element['ItemDate'] && !element['ItemPercent'] && !element['WelderID'] && !element['WPSNo']) {
-  //       element['IsClear'] = true;
-  //     }
-  //   });
-  //   callAPI(updateDrawingDetailWeld);
-  // };
-  // const updateDrawingDetailWeld = async () => {
-  //   const token = await Helper.getData('TOKEN');
-  //   let errorListData = [];
-  //   let doneListData = [];
-
-  //   doneListData = updateDrawingList.filter(i => (i.ItemDate && i.ItemPercent && i.WelderID && i.WPSNo) || i.IsClear);
-  //   const doneIds = doneListData.map(i => i.RowIndex);
-  //   errorListData = updateDrawingList.filter(i => doneIds.indexOf(i.RowIndex) === -1);
-
-  //   if (errorListData.length) {
-  //     const errorIds = errorListData.map(i => i.RowIndex);
-  //     setErrorList(errorIds);
-  //   } else {
-  //     setErrorList([]);
-  //   }
-  //   if (doneListData.length) {
-  //     setIsUploading(true);
-  //     UpdateDrawingDetailAPI(projectCode, facilityCode, drawingNo, teamLeader, code, doneListData, token)
-  //       .then(res => {
-  //         if (res.success) {
-  //           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-  //         } else {
-  //           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         }
-  //         if (errorListData.length) {
-  //           setUpdateDrawingList(errorListData);
-  //         } else {
-  //           setUpdateDrawingList([]);
-  //         }
-  //         setIsUploading(false);
-  //       }).catch(() => {
-  //         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
-  //         setIsUploading(false);
-  //       });
-  //   }
-  // };
-
-  //-- ABC
-  // const _onPressSubmitToServer = async () => {
-  //   if (updateDrawingList.length) {
-  //     if (code == Constant.CODE_FITUP) {
-  //       handleDataUpdateFitup();
-  //     }
-  //     else {
-  //       handleDataUpdateWeld();
-  //     }
-  //   } else {
-  //     Toast.show('No any data changes!', Toast.SHORT);
-  //   }
-  // };
-
-  // Submit to Server
-
+  //-- Submit Data
   const checkConstructionDetail = () => {
     let messages = [];
     if (code == Constant.CODE_FITUP) {
       updateDrawingList.map(item => {
         const date = item['FittingDate'];
         const percent = item['FitPercentage'];
-        // const heat01 = item['Heat01'];
-        // const heat02 = item['Heat02'];
+        const heat01 = item['Heat01'];
+        const heat02 = item['Heat02'];
         const location = item['SiteLocation'];
         const team = item['FittingTeam'];
+        let conType = '';
+        const itemSource = detailDrawingList.filter(i => i.RowIndex === item.RowIndex);
+        if (itemSource && itemSource[0] && itemSource[0].ConType) {
+          conType = itemSource[0].ConType;
+        }
 
-        if ((date && percent && location && team) || (!date && !percent && !location && !team)) {
+        if ((date && percent && heat01 && heat02 && location && team)
+          || (!date && !percent && !heat01 && !heat02 && !location && !team)
+          || (date && percent && location && team && conType.includes('FW'))) {
           return item;
         }
 
@@ -289,6 +156,12 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('FitPercentage') >= 0 && !percent) || (column.indexOf('FitPercentage') < 0 && !oldItem['FitPercentage'])) {
           messages.push('Percent');
+        }
+        if (((column.indexOf('Heat01') >= 0 && !heat01) || (column.indexOf('Heat01') < 0 && !oldItem['Heat01'])) && !conType.includes('FW')) {
+          messages.push('HeatNo01');
+        }
+        if (((column.indexOf('Heat02') >= 0 && !heat02) || (column.indexOf('Heat02') < 0 && !oldItem['Heat02'])) && !conType.includes('FW')) {
+          messages.push('Heat02');
         }
         if ((column.indexOf('SiteLocation') >= 0 && !location) || (column.indexOf('SiteLocation') < 0 && !oldItem['SiteLocation'])) {
           messages.push('Location');
@@ -305,9 +178,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         const percent = item['WeldPercentage'];
         const welderId = item['WelderID'];
         const wspNo = item['WPSNo'];
+        const team = item['WelderTeam'];
 
-        if ((date && percent && welderId && wspNo)
-          || (!date && !percent && !welderId && !wspNo)) {
+        if ((date && percent && welderId && wspNo && team)
+          || (!date && !percent && !welderId && !wspNo && !team)) {
           return item;
         }
 
@@ -326,6 +200,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('WPSNo') >= 0 && !wspNo) || (column.indexOf('WPSNo') < 0 && !oldItem['WPSNo'])) {
           messages.push('WPSNo');
+        }
+        if ((column.indexOf('WelderTeam') >= 0 && !team) || (column.indexOf('WelderTeam') < 0 && !oldItem['WelderTeam'])) {
+          messages.push('Team');
         }
         return item;
       });
@@ -365,6 +242,36 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     }
   };
 
+  //-- Get re-weld joint from QC
+  const showConfirmGetReweldJointFromQC = () => {
+    Alert.alert(
+      '',
+      'Are you sure get re-weld joints from QC?',
+      [
+        { text: 'Get', onPress: () => _onPressGetReweldJointFromQC() },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressGetReweldJointFromQC = () => {
+    callAPI(() => getReweldJointFromQC());
+  };
+  const getReweldJointFromQC = useCallback(async () => {
+    setIsUploading(true);
+    GetReweldFromQCAPI(projectCode, drawingNo)
+      .then(res => {
+        Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+        callAPI(() => getConstructionDetail());
+        setIsUploading(false);
+      }).catch(() => {
+        setIsUploading(false);
+        Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+      });
+  }, []);
+
   //-- Manage Picture
   const _onPressManagePicture = () => {
     navigation.navigate(
@@ -382,6 +289,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Update Local Data
   const [indexUpdate, setIndexUpdate] = useState(-1);
   const [keyUpdate, setKeyUpdate] = useState('');
   const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate) => {
@@ -427,7 +335,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
     if (value) {
-      setDateDisplay(value);
+      setDateDisplay(new Date(Moment(value).format("YYYY-MM-DDT00:00:00")));
     } else {
       setDateDisplay(new Date());
     }
@@ -471,20 +379,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       setIndexUpdate(index);
       setKeyUpdate(key);
       onChangeData(value, index, key);
-      // let array = [...detailDrawingList];
-      // array[index][key] = value;
-      // setDetailDrawingList(array);
-
-      // array = [...updateDrawingList];
-      // let rowIndex = detailDrawingList[index].RowIndex;
-      // let weldNo = detailDrawingList[index].WeldNo;
-      // let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-      // if (objIndex < 0) {
-      //   array.push({ RowIndex: rowIndex, WeldNo: weldNo, ['ItemPercent']: value });
-      // } else {
-      //   array[objIndex]['ItemPercent'] = detailDrawingList[index][key];
-      // }
-      // setUpdateDrawingList(array);
     }
   };
 
@@ -506,11 +400,44 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const getHeatNoList = async value => {
     const token = await Helper.getData('TOKEN');
-    GetHeatNoListAPI(projectCode, value, token)
-    // GetHeatNoListPopupAPI(projectCode, value, token)
+    GetSerialNoAndHeatNoListAPI(projectCode, value, token)
       .then(res => {
-        if (res.success) {
-          setHeatNoList(res.data);
+        if (res.Success) {
+          setHeatNoList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsVisibleHeatNo(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsVisibleHeatNo(false);
+      });
+  };
+  const _onPressShowHeatNoPipeSupportPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleHeatNo(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getHeatNoPipeSupportList();
+      }
+    });
+  };
+  const getHeatNoPipeSupportList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetSerialNoAndHeatNoPipeSupportListAPI(projectCode, token)
+      .then(res => {
+        if (res.Success) {
+          setHeatNoList(res.Data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -530,7 +457,39 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setIsVisibleHeatNo(false);
   };
   const _onChangeHeatNo = data => {
-    onChangeData(data);
+    let heatNoData = null;
+    let seriNoData = null;
+    if (data) {
+      heatNoData = data.HeatNo_TagNo;
+      seriNoData = data.SeriNo;
+    }
+
+    let array = [...detailDrawingList];
+    let arrayUpdate = [...updateDrawingList];
+
+    const rowIndex = array[indexUpdate].RowIndex;
+    const objIndex = arrayUpdate.findIndex((obj => obj.RowIndex == rowIndex));
+
+    let keyHeatNo = '';
+    let keySerialNo = '';
+    if (keyUpdate === 'Heat01') {
+      keyHeatNo = 'Heat01';
+      keySerialNo = 'SerialNo01';
+    } else {
+      keyHeatNo = 'Heat02';
+      keySerialNo = 'SerialNo02';
+    }
+
+    array[indexUpdate][keyHeatNo] = heatNoData;
+    array[indexUpdate][keySerialNo] = seriNoData;
+    if (objIndex < 0) {
+      arrayUpdate.push({ RowIndex: rowIndex, [keyHeatNo]: heatNoData, [keySerialNo]: seriNoData });
+    } else {
+      arrayUpdate[objIndex][keyHeatNo] = array[indexUpdate][keyHeatNo];
+      arrayUpdate[objIndex][keySerialNo] = array[indexUpdate][keySerialNo];
+    }
+    setDetailDrawingList(array);
+    setUpdateDrawingList(arrayUpdate);
     setIsVisibleHeatNo(false);
   };
 
@@ -695,46 +654,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     onChangeData(welderSelected);
   };
 
-  // const _onPressSelectHeatNo = (value, index, key) => {
-  //   setIndexUpdate(index);
-  //   setKeyUpdate(key);
-  //   navigation.navigate(
-  //     'DrawingAddHeatNo',
-  //     {
-  //       projectCode: projectCode,
-  //       itemCode: value,
-  //       index: index,
-  //     }
-  //   );
-  // };
-  // const _onChangeHeatNo = data => {
-  //   let array = [...detailDrawingList];
-  //   array[indexUpdate][keyUpdate] = !data ? null : data.HeatNo_TagNo;
-  //   setDetailDrawingList(array);
-
-  //   array = [...updateDrawingList];
-  //   let rowIndex = detailDrawingList[indexUpdate].RowIndex;
-  //   let weldNo = detailDrawingList[indexUpdate].WeldNo;
-  //   let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-  //   if (objIndex < 0) {
-  //     if (keyUpdate == 'Heat01') {
-  //       array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo01']: !data ? null : data.SeriNo, ['ItemDescription01']: !data ? null : data.ItemDescription });
-  //     } else {
-  //       array.push({ RowIndex: rowIndex, WeldNo: weldNo, [keyUpdate]: !data ? null : data.HeatNo_TagNo, ['SeriNo02']: !data ? null : data.SeriNo, ['ItemDescription02']: !data ? null : data.ItemDescription });
-  //     }
-  //   } else {
-  //     array[objIndex][keyUpdate] = detailDrawingList[indexUpdate][keyUpdate];
-  //     if (keyUpdate == 'Heat01') {
-  //       array[objIndex]['SeriNo01'] = !data ? null : data.SeriNo;
-  //       array[objIndex]['ItemDescription01'] = !data ? null : data.ItemDescription;
-  //     } else {
-  //       array[objIndex]['SeriNo02'] = !data ? null : data.SeriNo;
-  //       array[objIndex]['ItemDescription02'] = !data ? null : data.ItemDescription;
-  //     }
-  //   }
-  //   setUpdateDrawingList(array);
-  // };
-
   const _onPressClearNow = (index) => {
     const keyDate = code == Constant.CODE_FITUP ? 'FittingDate' : 'WeldingDate';
     const keyPercent = code == Constant.CODE_FITUP ? 'FitPercentage' : 'WeldPercentage';
@@ -746,14 +665,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     if (code == Constant.CODE_FITUP) {
       array[index]['Heat01'] = valueClear;
       array[index]['Heat02'] = valueClear;
+      array[index]['SerialNo01'] = valueClear;
+      array[index]['SerialNo02'] = valueClear;
       array[index]['SiteLocation'] = valueClear;
       array[index]['FittingTeam'] = valueClear;
-      // if (array[index]['ConType'] == 'TW') {
-      //   array[index]['QCFittupRemark'] = Constant.EMPTY_VALUE_STRING;
-      // }
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
+      array[index]['WelderTeam'] = valueClear;
     }
     setDetailDrawingList(array);
 
@@ -768,6 +687,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           [keyPercent]: valueClear,
           ['Heat01']: valueClear,
           ['Heat02']: valueClear,
+          ['SerialNo01']: valueClear,
+          ['SerialNo02']: valueClear,
           ['SiteLocation']: valueClear,
           ['FittingTeam']: valueClear,
         });
@@ -777,7 +698,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           [keyDate]: valueClear,
           [keyPercent]: valueClear,
           ['WelderID']: valueClear,
-          ['WPSNo']: valueClear
+          ['WPSNo']: valueClear,
+          ['WelderTeam']: valueClear,
         });
       }
     } else {
@@ -786,11 +708,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       if (code == Constant.CODE_FITUP) {
         array[objIndex]['Heat01'] = valueClear;
         array[objIndex]['Heat02'] = valueClear;
+        array[objIndex]['SerialNo01'] = valueClear;
+        array[objIndex]['SerialNo02'] = valueClear;
         array[objIndex]['SiteLocation'] = valueClear;
         array[objIndex]['FittingTeam'] = valueClear;
       } else {
         array[objIndex]['WelderID'] = valueClear;
         array[objIndex]['WPSNo'] = valueClear;
+        array[objIndex]['WelderTeam'] = valueClear;
       }
     }
     setUpdateDrawingList(array);
@@ -818,6 +743,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setUpdateDrawingList(array);
   };
 
+
   //-- Render Header
   const headerData = {
     'Project': projectCode,
@@ -830,6 +756,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const headerAction = () => {
     Helper.openDrawingPDF(navigation, link, 'PIP CONS Drawing')
   };
+
 
   //-- Render Detail
   const RenderConstructionDetail = () => {
@@ -845,36 +772,29 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     const itemDate = code == Constant.CODE_FITUP ? item['FittingDate'] : item['WeldingDate'];
     const itemPercent = code == Constant.CODE_FITUP ? item['FitPercentage'] : item['WeldPercentage'];
 
-    const isDisableItem = item['QCStatusMobile'] == Constant.STATUS_ACCEPT;
+    let isDisableItem = item['QCStatusMobile'] === Constant.STATUS_ACCEPT;
+    if (code && code !== Constant.CODE_FITUP) {
+      isDisableItem = isDisableItem || (item['FitUpResult'] !== Constant.STATUS_ACCEPT);
+    }
+    //-- If request FitUp and Visual = ACC, lock UI
+    if (code === Constant.CODE_FITUP && item['VisualResult'] === Constant.STATUS_ACCEPT) {
+      isDisableItem = true;
+    }
+    //-- If request FitUp and ConType = 'TW', unlock UI
+    if (code === Constant.CODE_FITUP && item['ConType'] === 'TW') {
+      isDisableItem = false;
+    }
+    isDisableItem = isReadOnly ? true : isDisableItem;
+
     const isEnableClear = itemDate || itemPercent;
-
-    // let isDateValid = itemDate != null && Moment(itemDate).format("DD-MMM-YY") !== Moment(new Date()).format("DD-MMM-YY");
-    // let isPercentValid = itemPercent != null && itemPercent == 100;
-    // let isUpdateValid = updateDrawingList.findIndex((obj => obj.RowIndex == item.RowIndex)) < 0;
-
-    // let isDisableItem = isDateValid && isPercentValid && isUpdateValid;
-    // let checkHasData = code == Constant.CODE_FITUP  ? (itemDate || itemPercent) : (itemDate || itemPercent || item['WelderID']);
-    // let isUserError = errorList.indexOf(item.RowIndex) > -1;
-
-    // let isDisableByProject = false;
-    // if (itemDate) {
-    //   let nowString = Moment(new Date()).format("YYYY-MM-DD");
-    //   let now = Moment(nowString, "YYYY-MM-DD");
-    //   let dateString = Moment(itemDate, "YYYY-MM-DD");
-    //   let date = Moment(dateString, "YYYY-MM-DD");
-    //   isDisableByProject = Moment.duration(now.diff(date)).asDays() > 1 ? true : false;
-    // }
-    // isDisableByProject = isUpdateValid && isDisableByProject;
-
-    // const isCompleteText = projectCode === 'DNWHP' ? isDisableByProject : isDisableItem;
-    // isDisableItem = false;
+    const isPipeSupport = item['WeldNo'].startsWith('S') && item['ConType'] === 'SP';
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
         <View style={styles.row}>
           <View style={styles.cellTitleLine}>
             {
-              isDisableItem
+              item['QCStatusMobile'] == Constant.STATUS_ACCEPT
                 ?
                 <Text style={styles.greenText}>
                   <Text>WeldNo: </Text>
@@ -974,7 +894,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FittingDate:</Text>
+                  <Text style={styles.redText}>FittingDate:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -994,7 +914,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FitPercent:</Text>
+                  <Text style={styles.redText}>FitPercent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -1033,42 +953,48 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class01:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  {
+                    isPipeSupport
+                      ?
+                      <Text style={styles.textBase}>{'PS'}</Text>
+                      :
+                      <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  }
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>HeatNo01:</Text>
+                  <Text style={styles.redText}>HeatNo01:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   {
-                    // item.ItemCode01
-                    // ?
-                    <TouchableOpacity
-                      style={styles.itemActionIcon}
-                      onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
-                      <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
-                      {
-                        isDisableItem
-                          ?
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                          :
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                      }
-                    </TouchableOpacity>
-                    // :
-                    // <TouchableOpacity
-                    //   style={styles.itemActionIcon}
-                    //   onPress={() => _onPressSelectHeatNo(item.ItemCode01, index, 'Heat01')}>
-                    //   <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
-                    //   {
-                    //     isDisableItem
-                    //       ?
-                    //       <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                    //       :
-                    //       <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                    //   }
-                    // </TouchableOpacity>
+                    isPipeSupport
+                      ?
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat01')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
                   }
                 </View>
               </View>
@@ -1077,48 +1003,54 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class02:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Class2)}</Text>
-                </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellTitle}>
-                  <Text>HeatNo02:</Text>
-                </View>
-                <View style={styles.cellDataLine}>
                   {
-                    // item.ItemCode02
-                    //   ?
-                    <TouchableOpacity
-                      style={styles.itemActionIcon}
-                      onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
-                      <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
-                      {
-                        isDisableItem
-                          ?
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                          :
-                          <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                      }
-                    </TouchableOpacity>
-                    //   :
-                    //   <TouchableOpacity
-                    //     style={styles.itemActionIcon}
-                    //     onPress={() => _onPressSelectHeatNo(item.ItemCode02, index, 'Heat02')}>
-                    //     <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
-                    //     {
-                    //       isDisableItem
-                    //         ?
-                    //         <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                    //         :
-                    //         <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                    //     }
-                    //   </TouchableOpacity>
+                    isPipeSupport
+                      ?
+                      <Text style={styles.textBase}>{'PS'}</Text>
+                      :
+                      <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class2)}</Text>
                   }
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>Location:</Text>
+                  <Text style={styles.redText}>HeatNo02:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  {
+                    isPipeSupport
+                      ?
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat02')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                  }
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>Location:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -1138,7 +1070,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>FittingTeam:</Text>
+                  <Text style={styles.redText}>FittingTeam:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1160,7 +1092,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldingDate:</Text>
+                  <Text style={styles.redText}>WeldingDate:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -1180,7 +1112,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WeldPercent:</Text>
+                  <Text style={styles.redText}>WeldPercent:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
@@ -1232,7 +1164,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WelderIDs:</Text>
+                  <Text style={styles.redText}>WelderIDs:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1251,7 +1183,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>WPS:</Text>
+                  <Text style={styles.redText}>WPS:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
@@ -1268,11 +1200,31 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>WelderTeam:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowTeamPopup(index, 'WelderTeam')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderTeam)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-people-outline' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
             </>
         }
       </View>
     );
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -1308,9 +1260,17 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               <TouchableOpacity style={styles.buttonLeft} onPress={_onPressManagePicture}>
                 <Text style={styles.buttonTitle}>Chèn ảnh</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
-                <Text style={styles.buttonTitle}>Gửi Request</Text>
-              </TouchableOpacity>
+              {
+                isReadOnly
+                  ?
+                  <TouchableOpacity style={styles.buttonRightDisabled} activeOpacity={1}>
+                    <Text style={styles.buttonTitle}>Gửi Request</Text>
+                  </TouchableOpacity>
+                  :
+                  <TouchableOpacity style={styles.buttonRight} onPress={_onPressSubmitToServer}>
+                    <Text style={styles.buttonTitle}>Gửi Request</Text>
+                  </TouchableOpacity>
+              }
             </View>
           </View>
       }
@@ -1341,17 +1301,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           underlineColorAndroid={BASE_COLOR}
           keyboardType={'numeric'}
         />
-        <Dialog.Button label='Cancle' onPress={() => { setIsVisiblePercent(false) }} />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisiblePercent(false) }} />
         <Dialog.Button label='OK' onPress={_onChangePercent} />
       </Dialog.Container>
-      <SelectPopup
-        visible={isVisibleHeatNo}
-        data={heatNoList}
-        onChangeItem={_onChangeHeatNo}
-        onCancel={() => setIsVisibleHeatNo(false)}
-        onClear={_onPressClearHeatNo}
-      />
-      {/* <SelectPopupTwoColumns
+      <SelectPopupTwoColumns
         visible={isVisibleHeatNo}
         leftHeader={'HeatNo'}
         rightHeader={'SeriNo'}
@@ -1361,7 +1314,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         onChangeItem={_onChangeHeatNo}
         onCancel={() => setIsVisibleHeatNo(false)}
         onClear={_onPressClearHeatNo}
-      /> */}
+      />
       <SelectPopup
         visible={isVisibleLocation}
         data={locationList}
@@ -1522,7 +1475,15 @@ const styles = StyleSheet.create({
   greenText: {
     color: 'green',
   },
+  redText: {
+    color: 'red',
+  },
   textData: {
+    minWidth: 80,
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  textBase: {
     minWidth: 80,
     fontWeight: 'bold',
     color: BASE_COLOR,
@@ -1587,6 +1548,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BASE_COLOR,
+    marginLeft: 4,
+  },
+  buttonRightDisabled: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
     marginLeft: 4,
   },
   buttonTitle: {

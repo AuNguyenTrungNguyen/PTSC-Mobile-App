@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator, TextInput } from 'react-native';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import Formater from '../../utils/Formater';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import Networker from '../../utils/Networker';
+import Helper from '../../utils/Helper';
+import { GetTimeSheetWorkOrderListAPI, RefreshWorkOrderAPI } from '../../apis/timesheet/TimeSheetAPI';
 
-const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
+const SelectPopupTimeSheet = ({ projectCode, data, visible, onChangeItem, onCancel, onReload }) => {
 
   const [workOrder, setWorkOrder] = useState('');
   const [workOrderList, setWorkOrderList] = useState(data);
@@ -24,6 +28,27 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
     else {
       setWorkOrderList(data);
     }
+  };
+
+  const _onRefreshWorkOrder = () => {
+    Networker.callAPI(refreshWorkOrder());
+  };
+  const refreshWorkOrder = async () => {
+    const token = await Helper.getData('TOKEN');
+    const userLogin = await Helper.getData('USERNAME');
+    RefreshWorkOrderAPI(projectCode, userLogin, token)
+      .then(res => {
+        if (res.Success && onReload != null) {
+          GetTimeSheetWorkOrderListAPI(projectCode, userLogin, token)
+            .then(res => {
+              onReload(res.data);
+              setWorkOrderList(res.data);
+            }
+            );
+        } else {
+        }
+      }).catch(() => {
+      });
   };
 
   const _onChangeWorkOrder = text => {
@@ -54,11 +79,18 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
                 {
                   workOrder == ''
                     ? null
-                    : <Icon name='times-circle' onPress={_onClearWorkOrder} style={styles.inputIcon} />
+                    : <FontAwesome5Icon name='times-circle' onPress={_onClearWorkOrder} style={styles.inputIcon} />
                 }
               </View>
               <TouchableOpacity style={styles.inputButton} onPress={_onSearchWorkOrder}>
-                <Text style={modals.buttonTitle}>Search</Text>
+                <FontAwesomeIcon
+                  size={20}
+                  name={'search'} color={OPP_COLOR} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.inputButton} onPress={_onRefreshWorkOrder}>
+                <FontAwesomeIcon
+                  size={20}
+                  name={'refresh'} color={OPP_COLOR} />
               </TouchableOpacity>
             </View>
             <View style={modals.list}>
@@ -74,26 +106,61 @@ const SelectPopupTimeSheet = ({ data, visible, onChangeItem, onCancel }) => {
                             <View style={styles.row}>
                               <Text style={styles.cellTitle}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
                             </View>
+                            {
+                              item.WorkOrderName
+                                ?
+                                <View style={styles.row}>
+                                  <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrderName)}</Text>
+                                </View> :
+                                null
+                            }
                             <View style={styles.row}>
-                              <Text style={styles.cellData}>{Formater.formatEmptyData(item.WorkOrderName)}</Text>
+                              {
+                                item.BudgetMHRS && item.BudgetMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineDataError}>Budget: {Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineData}>Budget: {Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
+                                  </>
+                              }
+                              {
+                                item.ActualMHRS && item.ActualMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineDataError}>Actual: {Formater.formatTwoDigits(item.ActualMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineData}>Actual: {Formater.formatTwoDigits(item.ActualMHRS)}</Text>
+                                  </>
+                              }
                             </View>
                             <View style={styles.row}>
-                              <Text style={styles.cellLine}>Budget:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.BudgetMHRS)}</Text>
-                              <Text style={styles.cellLine}>Actual:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.ActualMHRS)}</Text>
-                            </View>
-                            <View style={styles.row}>
-                              <Text style={styles.cellLine}>Earn:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.EarnMHRS)}</Text>
-                              <Text style={styles.cellLine}>Waste:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.WasteMHRS)}</Text>
-                            </View>
-                            <View style={styles.row}>
-                              <Text style={styles.cellLine}>Remain:</Text>
-                              <Text style={styles.cellLineData}>{Formater.formatTwoDigits(item.RemainMHRS)}</Text>
-                              <View style={styles.cellLine} />
-                              <View style={styles.cellLineData} />
+                              {
+                                item.RemainMHRS && item.RemainMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineDataError}>Remain: {Formater.formatTwoDigits(item.RemainMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineData}>Remain: {Formater.formatTwoDigits(item.RemainMHRS)}</Text>
+                                  </>
+                              }
+                              {
+                                item.WasteMHRS && item.WasteMHRS < 0
+                                  ?
+                                  <>
+                                    <Text style={styles.cellLineDataError}>Waste: {Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                  </>
+                                  :
+                                  <>
+                                    <Text style={styles.cellLineData}>Waste: {Formater.formatTwoDigits(item.WasteMHRS)}</Text>
+                                  </>
+                              }
                             </View>
                           </TouchableOpacity>
                         );
@@ -206,12 +273,20 @@ const styles = StyleSheet.create({
     flex: 1,
     color: BASE_COLOR,
   },
-  cellLine: {
+  cellLineTitle: {
     flex: 1,
   },
   cellLineData: {
-    flex: 2,
+    flex: 1.5,
     color: BASE_COLOR,
+  },
+  cellLineTitleError: {
+    flex: 1,
+    color: 'red',
+  },
+  cellLineDataError: {
+    flex: 1.5,
+    color: 'red',
   },
 
   searchContainer: {
@@ -242,12 +317,13 @@ const styles = StyleSheet.create({
     color: BASE_COLOR,
   },
   inputButton: {
-    width: 60,
+    width: 48,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: BASE_COLOR,
     padding: 4,
+    marginLeft: 4,
   },
 });
 

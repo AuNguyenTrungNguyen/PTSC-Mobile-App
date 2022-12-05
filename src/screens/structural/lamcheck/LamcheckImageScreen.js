@@ -158,7 +158,7 @@ const LamcheckImageScreen = ({ route }) => {
       { name: 'projectCode', data: projectCode },
       { name: 'drawingNo', data: drawingNo },
       { name: 'jointNo', data: jointNo },
-      { name: 'rowIndex', data: rowIndex },
+      { name: 'rowIndex', data: rowIndex.toString() },
     ];
 
     addFilesToBody()
@@ -528,7 +528,7 @@ const LamcheckImageScreen = ({ route }) => {
           onChangeText={(text) => setPictureNote(text)}
           underlineColorAndroid={BASE_COLOR}
         />
-        <Dialog.Button label='Cancle' onPress={() => {
+        <Dialog.Button label='Cancel' onPress={() => {
           setIsShowDialog(false);
           setPictureId(null);
           setPictureNote(null);

@@ -82,11 +82,24 @@ export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, to
       },
     }).then(res => res.json());
 
-export const GetHeatNoListAPI = (projectCode, itemCode, token) =>
+export const GetSerialNoAndHeatNoListAPI = (projectCode, itemCode, token) =>
   fetch(
     Port_Server
-    + '/api/App/GetHeatNoList?projectCode=' + projectCode
+    + '/api/App/GetSerialNoAndHeatNoList'
+    + '?projectCode=' + projectCode
     + '&itemCode=' + itemCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
+export const GetSerialNoAndHeatNoPipeSupportListAPI = (projectCode, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetSerialNoAndHeatNoPipeSupportList'
+    + '?projectCode=' + projectCode,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -121,6 +134,20 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
       }
     }).then(res => res.json());
 
+export const GetInspectorListAPI = (projectCode, disciplineCode, filterType, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/GetInspectorList'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&filterType=' + encodeURIComponent(filterType),
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+
 export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
@@ -138,6 +165,16 @@ export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
       },
     }).then(res => res.json());
 };
+
+export const GetPIPNotifyNumberAPI = (projectCode, token) =>
+  fetch(
+    Port_Server + '/api/App/GetPIPNotifyNumber?projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
 
 export const GetFactorTypeAPI = (projectCode, token) =>
   fetch(
