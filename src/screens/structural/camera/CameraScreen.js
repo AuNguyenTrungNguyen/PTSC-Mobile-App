@@ -69,12 +69,15 @@ const CameraScreen = ({ route, navigation }) => {
         navigation.navigate('DIMAfterWeldList', {
           projectCode: projectCode,
           paramDrawingNo: drawingNo,
+          isShowDetail: false,
+          isPending: false,
         });
       } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD_QC) {
         navigation.navigate('DIMAfterWeldListQC', {
           projectCode: projectCode,
           paramDrawingNo: drawingNo,
-          isQC: true,
+          isShowDetail: true,
+          isPending: false,
         });
       }
 

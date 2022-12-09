@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 const HomeScreenQC = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0, DimAfterWeld: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -307,11 +307,11 @@ const HomeScreenQC = ({ route, navigation }) => {
   const _onPressManageDIMAfterWeld = async () => {
     Alert.alert(
       '',
-      'Scan: Scan QRCode DIM After Weld\n\nSearch: Search DIM After Weld\n\nQC Status: QC Status DIM After Weld Request',
+      'Spend List: Spend DIM After Weld List\n\nScan: Scan QRCode DIM After Weld\n\nSearch: Search DIM After Weld\n',
       [
+        { text: 'Spend List', onPress: _onPressQCStatusDIMAfterWeld },
         { text: 'Scan', onPress: _onPressQRCodeDIMAfterWeld },
         { text: 'Search', onPress: _onPressSearchDIMAfterWeld },
-        // { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -335,12 +335,20 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DIMAfterWeldListQC',
       {
         projectCode: projectCode,
-        isQC: true,
+        isShowDetail: true,
+        isPending: false,
       }
     );
   };
   const _onPressQCStatusDIMAfterWeld = async () => {
-
+    navigation.navigate(
+      'DIMAfterWeldListQC',
+      {
+        projectCode: projectCode,
+        isShowDetail: true,
+        isPending: true,
+      }
+    );
   };
 
   // QA Observation
@@ -475,7 +483,7 @@ const HomeScreenQC = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
-              <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} />
+              <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} number={spendNumbers.DimAfterWeld} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />

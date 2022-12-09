@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 const HomeScreenCONS = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0 });
+  const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0, DimAfterWeld: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -263,7 +263,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       [
         { text: 'Scan', onPress: _onPressQRCodeDIMAfterWeld },
         { text: 'Search', onPress: _onPressSearchDIMAfterWeld },
-        // { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
+        { text: 'QC Status', onPress: _onPressQCStatusDIMAfterWeld },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -287,11 +287,21 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'DIMAfterWeldList',
       {
         projectCode: projectCode,
+        isShowDetail: false,
+        isPending: false,
       }
     );
   };
   const _onPressQCStatusDIMAfterWeld = async () => {
-
+    navigation.navigate(
+      'DIMAfterWeldList',
+      {
+        projectCode: projectCode,
+        isShowDetail: true,
+        isPending: false,
+        isReadOnly: true,
+      }
+    );
   };
 
   // ManHours Impact
@@ -422,7 +432,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Construction\nWeld'} onPress={_onPressManageWeld} number={spendNumbers.Visual} />
-              <RenderItemBox title={'DIM\nAfter Weld'} onPress={_onPressManageDIMAfterWeld} />
+              <RenderItemBox title={'DIM\nAfter Weld'} onPress={_onPressManageDIMAfterWeld} number={spendNumbers.DimAfterWeld} />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />

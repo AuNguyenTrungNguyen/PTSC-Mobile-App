@@ -106,6 +106,7 @@ export const EditDimCheckImageAPI = (id, note, token) =>
     }
   ).then(res => res.json());
 
+//-- DIM For Cutting
 export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark, type, isSpending, token) => {
   if (!isSpending) {
     isSpending = false;
@@ -125,8 +126,6 @@ export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark,
       },
     }).then(res => res.json());
 };
-
-//-- DIM After Weld
 export const UpdateDimForCuttingListAPI = (userUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server
@@ -141,7 +140,8 @@ export const UpdateDimForCuttingListAPI = (userUpdate, listItemUpdate, token) =>
     }
   ).then(res => res.json());
 
-export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingNo, assemblyCode) => {
+//-- DIM After Weld
+export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingNo, assemblyCode, filterType) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -149,7 +149,8 @@ export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingN
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&assemblyCode=' + assemblyCode,
+    + '&assemblyCode=' + assemblyCode
+    + '&filterType=' + filterType,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -189,7 +190,6 @@ export const UpdateDIMAfterWeldDetailAPI = async (team, listItemUpdate) => {
     }
   ).then(res => res.json());
 };
-
 export const UpdateDIMAfterWeldDetailQCAPI = async (inspector, listItemUpdate) => {
   const token = await Helper.getData('TOKEN');
   return fetch(

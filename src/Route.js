@@ -615,6 +615,16 @@ const StructuralCONSStackScreens = () => {
           }
         }
       />
+      <StructuralQCStack.Screen
+        name='DIMAfterWeldDetailQC'
+        component={StructuralDIMAfterWeldDetailQCScreen}
+        options={
+          {
+            title: 'QC DIM After Weld Status',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </StructuralCONSStack.Navigator>
   );
 };

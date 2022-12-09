@@ -6,17 +6,17 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
 import { GetDIMAfterWeldListAPI } from '../../../apis/structural/DimCheckAPI';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
 import LoadingRefresh from '../../../components/LoadingRefresh';
-import { set } from 'react-native-reanimated';
 
 const DIMAfterWeldListScreen = ({ route, navigation }) => {
 
-  const { projectCode, paramDrawingNo, isQC } = route.params;
+  const { projectCode, paramDrawingNo, isShowDetail, isPending, isReadOnly } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -63,7 +63,7 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      if (isFocused && isQC) {
+      if (isFocused && isShowDetail && !isReadOnly) {
         if (selectedFacility && selectedDrawing && selectedAssembly) {
           callAPI(() => { updatePieceMark(selectedFacility, selectedDrawing, selectedAssembly) }, false);
         }
@@ -138,7 +138,8 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
     facilityCode = (facilityCode !== null && facilityCode !== FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo !== null ? drawingNo : '';
     assemblyCode = assemblyCode !== null ? assemblyCode : '';
-    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, token)
+    const filterType = !isPending ? '' : Constant.STATUS_NOT_YET;
+    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, filterType, token)
       .then(res => {
         if (res.Success) {
           setPieceMarkList(res.Data);
@@ -158,7 +159,8 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
   };
   const updatePieceMark = async (facilityCode, drawingNo, assemblyCode) => {
     const token = await Helper.getData('TOKEN');
-    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, token)
+    const filterType = !isPending ? '' : Constant.STATUS_NOT_YET;
+    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, filterType, token)
       .then(res => {
         if (res.Success) {
           if (res.Data && res.Data.length == 1) {
@@ -191,13 +193,15 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
     setSelectedDrawing(item.CuttingSheetDrawingNo);
     setSelectedAssembly(item.AssemblyCode);
     navigation.navigate(
-      isQC ? 'DIMAfterWeldDetailQC' : 'DIMAfterWeldDetail',
+      isShowDetail ? 'DIMAfterWeldDetailQC' : 'DIMAfterWeldDetail',
       {
         projectCode: projectCode,
         facilityCode: item.FacilityCode,
         drawingNo: item.CuttingSheetDrawingNo,
         assemblyCode: item.AssemblyCode,
         userLogin: userLogin,
+        isPending: isPending,
+        isReadOnly: isReadOnly,
       }
     );
   };
@@ -247,7 +251,7 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
           <Text style={styles.cellData}>{item.AssemblyCode}</Text>
         </View>
         {
-          isQC &&
+          isShowDetail &&
           <View style={styles.row}>
             <View style={styles.cellStatus}>
               <Text style={styles.cellPending}>Pending: {item.Pending}</Text>

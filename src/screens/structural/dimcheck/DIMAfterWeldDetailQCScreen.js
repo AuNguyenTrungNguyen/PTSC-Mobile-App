@@ -23,7 +23,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, drawingNo, assemblyCode, userLogin, link } = route.params;
+  const { projectCode, facilityCode, drawingNo, assemblyCode, userLogin, link, isPending, isReadOnly } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -50,13 +50,13 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
+          {!isPending && <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={() => { setIsVisibleType(true) }}>
             <Ionicons
               size={24}
               name={'md-ellipsis-vertical-circle'} color={iconColor} />
-          </TouchableOpacity>
+          </TouchableOpacity>}
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -290,29 +290,31 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
             }
           </View>
         </View>
-        <View style={styles.row}>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonAccept}
-              onPress={() => _onChangeStatus(index, item.RowIndex, Constant.STATUS_ACCEPT)}>
-              <Text style={styles.labelAccept}>Accept</Text>
-            </TouchableOpacity>
+        {
+          !isReadOnly && <View style={styles.row}>
+            <View style={styles.cellAction}>
+              <TouchableOpacity
+                style={styles.buttonAccept}
+                onPress={() => _onChangeStatus(index, item.RowIndex, Constant.STATUS_ACCEPT)}>
+                <Text style={styles.labelAccept}>Accept</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cellAction}>
+              <TouchableOpacity
+                style={styles.buttonReject}
+                onPress={() => _onChangeStatus(index, item.RowIndex, Constant.STATUS_REJECT)}>
+                <Text style={styles.labelReject}>Reject</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cellAction}>
+              <TouchableOpacity
+                style={styles.buttonImage}
+                onPress={() => { _onPressManagePicture(item) }}>
+                <Text style={styles.labelImage}>Picture</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonReject}
-              onPress={() => _onChangeStatus(index, item.RowIndex, Constant.STATUS_REJECT)}>
-              <Text style={styles.labelReject}>Reject</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cellAction}>
-            <TouchableOpacity
-              style={styles.buttonImage}
-              onPress={() => { _onPressManagePicture(item) }}>
-              <Text style={styles.labelImage}>Picture</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        }
       </View>
     );
   };
@@ -347,7 +349,8 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
               <Text style={styles.dataTitle}>Inspector:</Text>
               <View style={styles.dataItem}>
                 <Text style={styles.dataText}>{inspector}</Text>
-                <FontAwesomeIcon onPress={() => { setIsVisibleInspector(true) }}
+                <FontAwesomeIcon
+                  onPress={!isReadOnly ? () => { setIsVisibleInspector(true) } : null}
                   style={styles.dataIcon} name='pencil' size={24} color={BASE_COLOR} />
               </View>
             </View>
@@ -400,11 +403,13 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
                   renderItem={renderItem}
                 />
           }
-          <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitToServer}>
-              <Text style={styles.buttonTitle}>Submit to Server</Text>
-            </TouchableOpacity>
-          </View>
+          {
+            !isReadOnly && <View style={styles.actionContainer}>
+              <TouchableOpacity style={styles.buttonContainer} onPress={_onPressSubmitToServer}>
+                <Text style={styles.buttonTitle}>Submit to Server</Text>
+              </TouchableOpacity>
+            </View>
+          }
         </View>
       }
       <AwesomeAlert
