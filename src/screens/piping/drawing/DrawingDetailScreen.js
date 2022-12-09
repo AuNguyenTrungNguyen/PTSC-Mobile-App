@@ -57,6 +57,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     }, []
   );
 
+  useEffect(
+    () => {
+      if (code !== Constant.CODE_FITUP) {
+        callAPI(getWPSList);
+      }
+    }, []
+  );
+
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(
     () => {
@@ -209,6 +217,19 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     }
     return messages;
   };
+  const checkWPS = () => {
+    let messages = [];
+    updateDrawingList.map(item => {
+      const objIndex = detailDrawingList.findIndex(obj => obj.RowIndex == item.RowIndex);
+      const oldItem = detailDrawingList[objIndex];
+
+      if (wpsList != null && oldItem['WPSNo'] && !wpsList.includes(oldItem['WPSNo'])) {
+        messages.push('WPSNo not in QC List');
+      }
+      return item;
+    });
+    return messages;
+  };
   const updateConstructionDetail = async () => {
     const token = await Helper.getData('TOKEN');
     const listUpdate = Helper.handleListUpdate(updateDrawingList);
@@ -229,13 +250,22 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       });
   };
   const _onPressSubmitToServer = async () => {
+    let error = [];
+    let uniqueError = [];
     if (updateDrawingList.length) {
-      const error = checkConstructionDetail();
+      error = checkConstructionDetail();
       if (error.length) {
-        const uniqueError = [...new Set(error)];
+        uniqueError = [...new Set(error)];
         MessageAlert('ERROR', '\nPlesase enter: ' + uniqueError.join(', '));
       } else {
-        callAPI(updateConstructionDetail);
+        error = checkWPS();
+        if (error.length) {
+          uniqueError = [...new Set(error)];
+          MessageAlert('ERROR', uniqueError.join(', '));
+        }
+        else {
+          callAPI(updateConstructionDetail);
+        }
       }
     } else {
       Toast.show('No any data changes!', Toast.SHORT);

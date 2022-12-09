@@ -52,6 +52,14 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     }, [route.params?.welderSelected, route.params?.pieceMarkNoSelected, route.params?.index]
   );
 
+  useEffect(
+    () => {
+      if (code !== Constant.CODE_FITUP) {
+        callAPI(getWPSList);
+      }
+    }, []
+  );
+
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
 
   useLayoutEffect(() => {
@@ -301,6 +309,19 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
     }
     return messages;
   };
+  const checkWPS = () => {
+    let messages = [];
+    constructionUpdateList.map(item => {
+      const objIndex = constructionDetailList.findIndex(obj => obj.RowIndex == item.RowIndex);
+      const oldItem = constructionDetailList[objIndex];
+
+      if (wpsList != null && oldItem['WPSNo'] && !wpsList.includes(oldItem['WPSNo'])) {
+        messages.push('WPSNo not in QC List');
+      }
+      return item;
+    });
+    return messages;
+  };
   const updateConstructionDetail = async () => {
     let token = await Helper.getData('TOKEN');
     let listUpdate = Helper.handleListUpdate(constructionUpdateList);
@@ -320,13 +341,22 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       });
   };
   const _onPressSubmitToServer = async () => {
+    let error = [];
+    let uniqueError = [];
     if (constructionUpdateList.length) {
-      let error = checkConstructionDetail();
+      error = checkConstructionDetail();
       if (error.length) {
-        let uniqueError = [...new Set(error)];
+        uniqueError = [...new Set(error)];
         MessageAlert('ERROR', '\nPlesase enter: ' + uniqueError.join(', '));
       } else {
-        callAPI(updateConstructionDetail);
+        error = checkWPS();
+        if (error.length) {
+          uniqueError = [...new Set(error)];
+          MessageAlert('ERROR', uniqueError.join(', '));
+        }
+        else {
+          callAPI(updateConstructionDetail);
+        }
       }
     } else {
       Toast.show('No any data changes!', Toast.SHORT);
