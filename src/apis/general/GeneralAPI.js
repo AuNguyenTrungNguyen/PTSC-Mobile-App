@@ -37,6 +37,37 @@ export const GetIsometricDrawingAPI = async (projectCode, facilityCode, drawingN
 };
 
 
+export const GetStructureDrawingDataTypeAPI = async (projectCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/GetStructureDrawingDataType'
+    + '?projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetStructureDrawingAPI = async (projectCode, drawingNo, filterType) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/GetStructureDrawing'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&filterType=' + filterType,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+
 
 export const GetManHoursImpactListAPI = async (projectCode, userLogin, workOrder, date) => {
   const token = await Helper.getData('TOKEN');

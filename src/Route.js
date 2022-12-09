@@ -15,6 +15,7 @@ import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHours
 // import OpenDrawingScreen from './screens/general/opendrawing/OpenDrawingScreen';
 import OpenPipeSupportDrawingScreen from './screens/general/opendrawing/OpenPipeSupportDrawingScreen';
 import OpenIsometricDrawingScreen from './screens/general/opendrawing/OpenIsometricDrawingScreen';
+import OpenStructuralDrawingScreen from './screens/general/opendrawing/OpenStructuralDrawingScreen';
 
 import QCWelderCardListScreen from './screens/general/weldercard/QCWelderCardListScreen';
 import QCWelderCardDetailScreen from './screens/general/weldercard/QCWelderCardDetailScreen';
@@ -832,6 +833,14 @@ const CommonStackScreens = () => {
       <CommonStack.Screen
         name='OpenIsometricDrawing'
         component={OpenIsometricDrawingScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <CommonStack.Screen
+        name='OpenStructuralDrawing'
+        component={OpenStructuralDrawingScreen}
         options={({ route }) => ({
           title: route.params.title,
           headerBackTitle: 'Back',

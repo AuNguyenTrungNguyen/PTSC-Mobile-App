@@ -405,6 +405,17 @@ const HomeScreenQC = ({ route, navigation }) => {
     });
   };
 
+  //-- Open Structural Drawing
+  const _onPressOpenStructuralDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenStructuralDrawing',
+      params: {
+        projectCode: projectCode,
+        title: 'Structure'
+      }
+    });
+  };
+
 
 
   const RenderItemBox = props => {
@@ -472,7 +483,7 @@ const HomeScreenQC = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Welder Card'} onPress={_onPressOpenQCWelderCard} iconName={'md-card-outline'} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title={'Structure\nDrawing'} onPress={_onPressOpenStructuralDrawing} iconName={'md-document-text'} />
             </View>
           </ScrollView>
         </View>
