@@ -365,6 +365,29 @@ const HomeScreenCONS = ({ route, navigation }) => {
 
   //-- Open Structural Drawing
   const _onPressOpenStructuralDrawing = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Structure Drawing\n\nSearch: Search Structure Drawing',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeStructuralDrawing },
+        { text: 'Search', onPress: _onPressSearchStructuralDrawing },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressQRCodeStructuralDrawing = async () => {
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        destination: Naming.NAME_STR_OPEN_DRAWING
+      }
+    );
+  };
+  const _onPressSearchStructuralDrawing = async () => {
     navigation.navigate(Constant.ROUTE__COMMON, {
       screen: 'OpenStructuralDrawing',
       params: {

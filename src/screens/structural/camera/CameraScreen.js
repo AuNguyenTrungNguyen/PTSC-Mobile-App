@@ -79,6 +79,12 @@ const CameraScreen = ({ route, navigation }) => {
           isShowDetail: true,
           isPending: false,
         });
+      } else if (destination === Naming.NAME_STR_OPEN_DRAWING) {
+        navigation.navigate('OpenStructuralDrawing', {
+          projectCode: projectCode,
+          paramDrawingNo: drawingNo,
+          title: 'Structure'
+        });
       }
 
       checkDrawingRev(drawingNo, sheet, rev, route, title);

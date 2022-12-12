@@ -16,7 +16,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const OpenStructuralDrawingScreen = ({ route, navigation }) => {
 
-  const { projectCode } = route.params;
+  const { projectCode, paramDrawingNo } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -58,6 +58,10 @@ const OpenStructuralDrawingScreen = ({ route, navigation }) => {
   useEffect(
     () => {
       callAPI(getSourceList);
+      if (paramDrawingNo) {
+        setDrawingNo(paramDrawingNo);
+        callAPI(() => { getDrawingData(paramDrawingNo, sourceFilter) }, false);
+      }
     }, []
   );
 
@@ -66,9 +70,10 @@ const OpenStructuralDrawingScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     callAPI(getDrawingData);
   };
-  async function getDrawingData({ source = sourceFilter } = {}) {
+  async function getDrawingData({ drawing = drawingNo, source = sourceFilter } = {}) {
+    drawing = !drawing ? '' : drawing;
     source = (!source || source === FILTER_DEFAULT) ? '' : source;
-    GetStructureDrawingAPI(projectCode, drawingNo, source)
+    GetStructureDrawingAPI(projectCode, drawing, source)
       .then(res => {
         if (res.Success && res.Data) {
           setDrawingList(res.Data);

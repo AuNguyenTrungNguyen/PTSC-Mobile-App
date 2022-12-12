@@ -9,4 +9,6 @@ export default class Naming {
   static NAME_STR_DIM_AFTER_WELD = 'NAME_STR_DIM_AFTER_WELD';
   static NAME_STR_DIM_AFTER_WELD_QC = 'NAME_STR_DIM_AFTER_WELD_QC';
 
+  static NAME_STR_OPEN_DRAWING = 'NAME_STR_OPEN_DRAWING';
+
 };
