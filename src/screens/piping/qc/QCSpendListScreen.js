@@ -90,7 +90,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
       callAPI(getFacilityList);
       callAPI(getInspectorList);
       callAPI(getSpendListData);
-      const inspector = await Helper.getData('QC_INSPECTOR');
+      const inspector = await Helper.getData('QC_INSPECTOR_PIP');
       setGlobalInspector(inspector);
     }, []
   );
@@ -335,7 +335,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const _onChangeGlobalInspector = async data => {
     setGlobalInspector(data);
     if (globalInspector !== data) {
-      await Helper.storeData('QC_INSPECTOR', data);
+      await Helper.storeData('QC_INSPECTOR_PIP', data);
     }
     setIsVisibleGlobalInspector(false);
   };

@@ -11,6 +11,7 @@ import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import CoreStyle from '../../../utils/CoreStyle';
+import { GetInspectorListAPI } from '../../../apis/app/AppAPI';
 import { GetQCSpendListQRCodeAPI, UpdateQCSpendListAPI } from '../../../apis/structural/QCAPI';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
@@ -83,7 +84,11 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   useEffect(
-    () => {
+    async () => {
+      callAPI(getInspectorList);
+      const inspector = await Helper.getData('QC_INSPECTOR_STR');
+      setGlobalInspector(inspector);
+
       if (paramDrawingNo) {
         setDrawingNo(paramDrawingNo);
         callAPI(() => { getSpendListData(paramDrawingNo, weldNo, location, type) });
@@ -174,22 +179,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onPressChangeStatus = (value, index, key) => {
-    let array = [...spendList];
-    array[index][key] = value;
-    setSpendList(array);
-
-    array = [...updateSpendList];
-    let rowIndex = spendList[index].RowIndex;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-    if (objIndex < 0) {
-      array.push({ RowIndex: rowIndex, [key]: value });
-    } else {
-      array[objIndex][key] = value;
-    }
-    setUpdateSpendList(array);
-  };
-
   const _onPressManagePicture = item => {
     navigation.navigate(
       'QCImage',
@@ -205,28 +194,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
     );
   };
 
-
-  // CHECKBOX
-  const _onChangeCheckbox = (index, key, value) => {
-    value = value ? 'x' : null;
-
-    let array = [...spendList];
-    array[index][key] = value;
-    setSpendList(array);
-
-    array = [...updateSpendList];
-    let rowIndex = spendList[index].RowIndex;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
-    if (objIndex < 0) {
-      array.push(
-        { RowIndex: rowIndex, [key]: value });
-    } else {
-      array[objIndex][key] = value;
-    }
-    setUpdateSpendList(array);
-  };
-
-
   // LOCATION
   const _onPressChangeLocation = loc => {
     if (loc != location) {
@@ -239,7 +206,6 @@ const QCSpendListScreen = ({ route, navigation }) => {
     _onPressChangeLocation('');
   };
 
-
   // TYPE
   const _onChangeType = data => {
     if (data != type) {
@@ -249,50 +215,119 @@ const QCSpendListScreen = ({ route, navigation }) => {
     setIsVisibleType(false);
   };
 
+  // INSPECTOR
+  const [inspectorList, setInspectorList] = useState([]);
+  const getInspectorList = async () => {
+    const token = await Helper.getData('TOKEN');
+    const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+    GetInspectorListAPI(projectCode, disciplineCode, 'QC Structure', token)
+      .then(res => {
+        if (res.Success) {
+          setInspectorList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+  const [isVisibleInspector, setIsVisibleInspector] = useState(false);
+  const _onPressShowInspector = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleInspector(true);
+  };
+  const _onChangeInspector = data => {
+    onChangeData(data);
+    setIsVisibleInspector(false);
+  };
+  const [isVisibleGlobalInspector, setIsVisibleGlobalInspector] = useState(false);
+  const [globalInspector, setGlobalInspector] = useState('');
+  const _onPressShowGlobalInspector = () => {
+    setIsVisibleGlobalInspector(true);
+  };
+  const _onChangeGlobalInspector = async data => {
+    setGlobalInspector(data);
+    if (globalInspector !== data) {
+      await Helper.storeData('QC_INSPECTOR_STR', data);
+    }
+    setIsVisibleGlobalInspector(false);
+  };
 
-  // REMARK
+  //-- CheckBox
+  const _onChangeCheckbox = (value, index, key) => {
+    value = value ? 'x' : null;
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    const inspectorKey = code === Constant.CODE_FITUP ? 'FitUpInspectName' : 'VisualInspectName';
+    onChangeData(value, index, key, inspectorKey);
+  };
+
+  //-- Status
+  const _onPressChangeStatus = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    const inspectorKey = code === Constant.CODE_FITUP ? 'FitUpInspectName' : 'VisualInspectName';
+    onChangeData(value, index, key, inspectorKey);
+  };
+
+  //-- Remark
   const [remarkDisplay, setRemarkDisplay] = useState('');
   const [isShowDialogRemark, setIsShowDialogRemark] = useState(false);
-  const [indexUpdate, setIndexUpdate] = useState(-1);
-  const _onPressShowDialogRemark = (index, value) => {
+  const _onPressShowDialogRemark = (value, index, key) => {
     setIndexUpdate(index);
+    setKeyUpdate(key);
     if (value) {
-      value = value ? value : null;
-      setRemarkDisplay(value);
+      setRemarkDisplay(value.toString());
     } else {
       setRemarkDisplay('');
     }
     setIsShowDialogRemark(true);
   };
   const _onPressSubmitRemark = () => {
-    let keyStatus = code == Constant.CODE_FITUP ? 'FitUpResult' : 'VisualResult';
-    let keyRemark = code == Constant.CODE_FITUP ? 'QCFittupRemark' : 'QCVisualRemark';
-    let value = remarkDisplay ? remarkDisplay : '';
-
+    let value = remarkDisplay;
+    if (!value) {
+      value = null;
+    }
+    const inspectorKey = code === Constant.CODE_FITUP ? 'FitUpInspectName' : 'VisualInspectName';
+    onChangeData(value, indexUpdate, keyUpdate, inspectorKey);
+    setRemarkDisplay(value);
     setIsShowDialogRemark(false);
+  };
 
+  //-- CHANGE
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+  const [keyUpdate, setKeyUpdate] = useState('');
+  const onChangeData = (data, localIndex = indexUpdate, localKey = keyUpdate, inspectorKey) => {
     let array = [...spendList];
-    array[indexUpdate][keyStatus] = Constant.STATUS_REJECT;
-    array[indexUpdate][keyRemark] = value;
+    array[localIndex][localKey] = data;
+    if (inspectorKey) {
+      array[localIndex][inspectorKey] = globalInspector;
+    }
     setSpendList(array);
 
     array = [...updateSpendList];
-    let rowIndex = spendList[indexUpdate].RowIndex;
-    let objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    const rowIndex = spendList[localIndex].RowIndex;
+    const objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
     if (objIndex < 0) {
-      array.push(
-        {
-          RowIndex: rowIndex,
-          [keyStatus]: Constant.STATUS_REJECT,
-          [keyRemark]: value
-        });
+      if (inspectorKey) {
+        array.push({ RowIndex: rowIndex, [localKey]: data, [inspectorKey]: globalInspector });
+      } else {
+        array.push({ RowIndex: rowIndex, [localKey]: data });
+      }
     } else {
-      array[objIndex][keyStatus] = Constant.STATUS_REJECT;
-      array[objIndex][keyRemark] = value;
+      array[objIndex][localKey] = data;
+      if (inspectorKey) {
+        array[objIndex][inspectorKey] = globalInspector;
+      }
     }
     setUpdateSpendList(array);
   };
-
 
 
 
@@ -414,6 +449,17 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
+                  <Text>Inspector:</Text>
+                </View>
+                <View style={styles.cellThreeUnitAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.FitUpInspectName)}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowInspector(index, 'FitUpInspectName')}>
+                    <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
                   <Text>FittingDate:</Text>
                 </View>
                 <View style={styles.cellThreeUnit}>
@@ -465,7 +511,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                       </>
                       :
                       <>
-                        <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCFittupRemark)}>
+                        <TouchableOpacity onPress={() => _onPressShowDialogRemark(item.QCFittupRemark, index, 'QCFittupRemark')}>
                           <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -545,7 +591,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                   <Text>%UT:</Text>
                 </View>
                 <View style={styles.cellOneUnit}>
-                  <Text style={styles.textData}>{Formater.formatTwoDigits(item.UTLAMPercent)}</Text>
+                  <Text style={styles.textData}>{Formater.formatTwoDigits(item.UTPercent)}</Text>
                 </View>
                 <View style={styles.cellOneUnit}>
                   <Text>%MT:</Text>
@@ -576,10 +622,20 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <Text>VisualTeam:</Text>
                 </View>
-                <View style={styles.cellTwoUnit}>
+                <View style={styles.cellThreeUnit}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualRequestByTeam)}</Text>
                 </View>
-                <View style={styles.cellOneUnit} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>Inspector:</Text>
+                </View>
+                <View style={styles.cellThreeUnitAction}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualInspectName)}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowInspector(index, 'VisualInspectName')}>
+                    <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
@@ -622,7 +678,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                   <Text style={styles.textDataMargin}>{Formater.formatEmptyData(item.Location)}</Text>
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity onPress={() => _onPressShowDialogRemark(index, item.QCVisualRemark)}>
+                  <TouchableOpacity onPress={() => _onPressShowDialogRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
                     <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -664,7 +720,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <CheckBox
                     value={!!item.MT}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
+                    onValueChange={newValue => _onChangeCheckbox(newValue, index, 'MT')}
                     style={styles.checkBox}
                     boxType='square'
                     disabled={false}
@@ -682,7 +738,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <CheckBox
                     value={!!item.RT}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
+                    onValueChange={newValue => _onChangeCheckbox(newValue, index, 'RT')}
                     style={styles.checkBox}
                     boxType='square'
                     disabled={false}
@@ -700,7 +756,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <CheckBox
                     value={!!item.PAUT}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
+                    onValueChange={newValue => _onChangeCheckbox(newValue, index, 'PAUT')}
                     style={styles.checkBox}
                     boxType='square'
                     disabled={false}
@@ -720,7 +776,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <CheckBox
                     value={!!item.UT}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
+                    onValueChange={newValue => _onChangeCheckbox(newValue, index, 'UT')}
                     style={styles.checkBox}
                     boxType='square'
                     disabled={false}
@@ -738,7 +794,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 <View style={styles.cellOneUnit}>
                   <CheckBox
                     value={!!item.PT}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
+                    onValueChange={newValue => _onChangeCheckbox(newValue, index, 'PT')}
                     style={styles.checkBox}
                     boxType='square'
                     disabled={false}
@@ -769,12 +825,17 @@ const QCSpendListScreen = ({ route, navigation }) => {
           {
             isShowDescription.show
               ?
-              (<View style={styles.headerContainer}>
+              <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
-                  <Text>Project: </Text>
-                  <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
-                  <Text> User: </Text>
+                  <Text>User:   </Text>
                   <Text style={styles.infoData}>{userLogin}</Text>
+                  <Text>   Inspector:   </Text>
+                  <View style={styles.cellThreeAction}>
+                    <Text style={styles.textData}>{globalInspector}</Text>
+                    <TouchableOpacity onPress={() => _onPressShowGlobalInspector()}>
+                      <Ionicons name='md-list' size={20} color={BASE_COLOR} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
                 <View style={styles.rowInfoAction}>
                   <Text style={styles.infoTitleAction}>DrawingNo:</Text>
@@ -818,7 +879,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     <Text style={styles.buttonTitle}>Search Drawing</Text>
                   </TouchableOpacity>
                 </View>
-              </View>)
+              </View>
               :
               null
           }
@@ -875,6 +936,16 @@ const QCSpendListScreen = ({ route, navigation }) => {
         <Dialog.Button label='Cancel' onPress={() => { setIsShowDialogRemark(false) }} />
         <Dialog.Button label='OK' onPress={_onPressSubmitRemark} />
       </Dialog.Container>
+      <SelectPopup
+        visible={isVisibleInspector}
+        data={inspectorList}
+        onChangeItem={_onChangeInspector}
+        onCancel={() => setIsVisibleInspector(false)} />
+      <SelectPopup
+        visible={isVisibleGlobalInspector}
+        data={inspectorList}
+        onChangeItem={_onChangeGlobalInspector}
+        onCancel={() => setIsVisibleGlobalInspector(false)} />
     </SafeAreaView>
   );
 };
@@ -904,10 +975,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoData: {
-    flex: 2,
     fontWeight: 'bold',
     color: BASE_COLOR,
     textAlign: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cellThreeAction: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',
@@ -996,6 +1073,11 @@ const styles = StyleSheet.create({
   cellThreeUnit: {
     flex: 3,
     justifyContent: 'center',
+  },
+  cellThreeUnitAction: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   textData: {
     fontWeight: 'bold',
