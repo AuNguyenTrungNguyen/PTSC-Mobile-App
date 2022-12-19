@@ -24,11 +24,11 @@ const LoginScreen = ({ navigation }) => {
   const [projectCode, setProjectCode] = useState(PROJECT_CODE_DEFAULT);
   const [isVisibleProject, setIsVisibleProject] = useState(false);
 
-  const DISCIPLINE_CODE_DEFAULT = 'Select Module';
-  const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(false);
-  const [disciplineList, setDisciplineList] = useState([]);
-  const [disciplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
-  const [isVisibleDiscipline, setIsVisibleDiscipline] = useState(false);
+  // const DISCIPLINE_CODE_DEFAULT = 'Select Module';
+  // const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(false);
+  // const [disciplineList, setDisciplineList] = useState([]);
+  // const [disciplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
+  // const [isVisibleDiscipline, setIsVisibleDiscipline] = useState(false);
 
   const ROLE_CODE_DEFAULT = 'Select Role';
   const [isLoadingRole, setIsLoadingRole] = useState(false);
@@ -52,15 +52,15 @@ const LoginScreen = ({ navigation }) => {
   const callAPI = (executedAPI, key) => {
     if (key === PROJECT_CODE_DEFAULT) {
       setIsLoadingProject(true);
-    } else if (key === DISCIPLINE_CODE_DEFAULT) {
-      setIsLoadingDiscipline(true);
+      // } else if (key === DISCIPLINE_CODE_DEFAULT) {
+      //   setIsLoadingDiscipline(true);
     } else if (key === ROLE_CODE_DEFAULT) {
       setIsLoadingRole(true);
     }
     NetInfo.fetch().then(state => {
       if (!state.isConnected) {
         setIsLoadingProject(false);
-        setIsLoadingDiscipline(false);
+        // setIsLoadingDiscipline(false);
         setIsLoadingRole(false);
         confirmAlert();
       } else {
@@ -88,25 +88,25 @@ const LoginScreen = ({ navigation }) => {
         confirmAlert();
       });
   };
-  const getModuleList = () => {
-    GetModuleListAPI()
-      .then(res => {
-        if (res.success) {
-          setIsLoadingDiscipline(false);
-          if (!res.data.length) {
-            MessageAlert('ERROR', 'Don\'t have any modules with this account.\nTry entering another account.');
-          } else {
-            setDisciplineList(res.data);
-            setIsVisibleDiscipline(true);
-          }
-        } else {
-          confirmAlert();
-        }
-      })
-      .catch(() => {
-        confirmAlert();
-      });
-  };
+  // const getModuleList = () => {
+  //   GetModuleListAPI()
+  //     .then(res => {
+  //       if (res.success) {
+  //         // setIsLoadingDiscipline(false);
+  //         if (!res.data.length) {
+  //           MessageAlert('ERROR', 'Don\'t have any modules with this account.\nTry entering another account.');
+  //         } else {
+  //           setDisciplineList(res.data);
+  //           setIsVisibleDiscipline(true);
+  //         }
+  //       } else {
+  //         confirmAlert();
+  //       }
+  //     })
+  //     .catch(() => {
+  //       confirmAlert();
+  //     });
+  // };
   const getRoleList = () => {
     GetRoleListAPI(username)
       .then(res => {
@@ -157,11 +157,11 @@ const LoginScreen = ({ navigation }) => {
           setIsLoadingLogin(false);
           return;
         }
-        if (disciplineCode === DISCIPLINE_CODE_DEFAULT) {
-          MessageAlert('ERROR', 'Please select a module.');
-          setIsLoadingLogin(false);
-          return;
-        }
+        // if (disciplineCode === DISCIPLINE_CODE_DEFAULT) {
+        //   MessageAlert('ERROR', 'Please select a module.');
+        //   setIsLoadingLogin(false);
+        //   return;
+        // }
         if (roleCode === ROLE_CODE_DEFAULT) {
           MessageAlert('ERROR', 'Please select a role.');
           setIsLoadingLogin(false);
@@ -174,7 +174,7 @@ const LoginScreen = ({ navigation }) => {
               MessageAlert('ERROR', res.error_description);
               setIsLoadingLogin(false);
               setProjectCode(PROJECT_CODE_DEFAULT);
-              setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
+              // setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
               setRoleCode(ROLE_CODE_DEFAULT);
               return;
             }
@@ -183,56 +183,94 @@ const LoginScreen = ({ navigation }) => {
               Helper.storeData('USERNAME', res.userName);
               Helper.storeData('EXPIRES', res['.expires']);
               Helper.storeData('PROJECT_CODE', projectCode);
-              Helper.storeData('DISCIPLINE_CODE', disciplineCode);
               Helper.storeData('ROLE_CODE', roleCode);
               Helper.storeData('DATACODE', 'PTSCMC');
-              if (disciplineCode.toUpperCase() === Constant.ROUTE__STRUCTURAL) {
-                if (roleCode === Constant.ROUTE__STR_CONS
-                  || roleCode === Constant.ROUTE__STR_QCWS
-                  || roleCode === Constant.ROUTE__STR_QCDEPT) {
-                  if (roleCode === Constant.ROUTE__STR_QCWS) {
-                    Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
-                  }
-                  if (roleCode === Constant.ROUTE__STR_QCDEPT) {
-                    Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
-                  }
-                  navigation.replace(roleCode, {
-                    screen: Constant.ROUTE__HOME,
-                    params: { projectCode: projectCode, disciplineCode: disciplineCode }
-                  });
+
+              //-- DisciplineCode
+              if (roleCode === Constant.ROUTE__PIP_CONS
+                || roleCode === Constant.ROUTE__PIP_QCWS
+                || roleCode === Constant.ROUTE__PIP_QCDEPT) {
+
+                if (roleCode === Constant.ROUTE__PIP_QCWS) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
                 }
-                else {
-                  Helper.clearData();
-                  MessageAlert('Lỗi', 'Vui lòng chọn Module và Role phù hợp.');
-                  setIsLoadingLogin(false);
-                  return;
+                if (roleCode === Constant.ROUTE__PIP_QCDEPT) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
                 }
+
+                const disciplineCode = Constant.ROUTE__PIPING;
+                let route = roleCode;
+                if (roleCode === Constant.ROUTE__PIP_QCWS || roleCode === Constant.ROUTE__PIP_QCDEPT) {
+                  route = Constant.ROUTE__PIP_QC;
+                  Helper.storeData('ROLE_CODE', route);
+                }
+                Helper.storeData('DISCIPLINE_CODE', disciplineCode);
+                navigation.replace(route, {
+                  screen: Constant.ROUTE__HOME,
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                });
+                return;
               }
-              else if (disciplineCode.toUpperCase() === Constant.ROUTE__PIPING) {
-                if (roleCode === Constant.ROUTE__PIP_CONS
-                  || roleCode === Constant.ROUTE__PIP_QCWS
-                  || roleCode === Constant.ROUTE__PIP_QCDEPT
-                  || roleCode === Constant.ROUTE__PIP_VIEWER) {
-                  let route = roleCode;
-                  if (roleCode === Constant.ROUTE__PIP_QCWS || roleCode === Constant.ROUTE__PIP_QCDEPT) {
-                    route = Constant.ROUTE__PIP_QC;
-                    Helper.storeData('ROLE_CODE', route);
-                  }
-                  navigation.replace(route, {
-                    screen: Constant.ROUTE__HOME,
-                    params: { projectCode: projectCode, disciplineCode: disciplineCode }
-                  });
-                } else {
-                  Helper.clearData();
-                  MessageAlert('Lỗi', 'Vui lòng chọn Module và Role phù hợp.');
-                  setIsLoadingLogin(false);
-                  return;
+
+              if (roleCode === Constant.ROUTE__STR_CONS
+                || roleCode === Constant.ROUTE__STR_QCWS
+                || roleCode === Constant.ROUTE__STR_QCDEPT) {
+
+                if (roleCode === Constant.ROUTE__STR_QCWS) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
                 }
+                if (roleCode === Constant.ROUTE__STR_QCDEPT) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
+                }
+
+                const disciplineCode = Constant.ROUTE__STRUCTURAL;
+                let route = roleCode;
+                if (roleCode === Constant.ROUTE__STR_QCWS || roleCode === Constant.ROUTE__STR_QCDEPT) {
+                  route = Constant.ROUTE__STR_QC;
+                  Helper.storeData('ROLE_CODE', route);
+                }
+                Helper.storeData('DISCIPLINE_CODE', disciplineCode);
+                navigation.replace(route, {
+                  screen: Constant.ROUTE__HOME,
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                });
+                return;
               }
-              else {
-                Helper.clearData();
-                MessageAlert('Lỗi', 'Vui lòng chọn Module và Role phù hợp.');
-                setIsLoadingLogin(false);
+
+              if (roleCode === Constant.ROUTE__EIT_CONS
+                || roleCode === Constant.ROUTE__EIT_QCWS
+                || roleCode === Constant.ROUTE__EIT_QCDEPT) {
+
+                if (roleCode === Constant.ROUTE__EIT_QCWS) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
+                }
+                if (roleCode === Constant.ROUTE__EIT_QCDEPT) {
+                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
+                }
+
+                const disciplineCode = Constant.ROUTE__ELECTRICAL;
+                let route = roleCode;
+                if (roleCode === Constant.ROUTE__EIT_QCWS || roleCode === Constant.ROUTE__EIT_QCDEPT) {
+                  route = Constant.ROUTE__EIT_QC;
+                  Helper.storeData('ROLE_CODE', route);
+                }
+                Helper.storeData('DISCIPLINE_CODE', disciplineCode);
+                navigation.replace(route, {
+                  screen: Constant.ROUTE__HOME,
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                });
+                return;
+              }
+
+              if (roleCode === Constant.ROUTE__PIP_VIEWER
+                || roleCode === Constant.ROUTE__STR_VIEWER
+                || roleCode === Constant.ROUTE__EIT_VIEWER
+                || roleCode === Constant.ROUTE__VIEW_DRAWING) {
+                Helper.storeData('ROLE_CODE', Constant.ROUTE__VIEW_DRAWING);
+                navigation.replace(Constant.ROUTE__VIEW_DRAWING, {
+                  screen: Constant.ROUTE__HOME,
+                  params: { projectCode: projectCode }
+                });
                 return;
               }
             }
@@ -241,7 +279,7 @@ const LoginScreen = ({ navigation }) => {
             MessageAlert('ERROR', 'Please check that you are using the company network!');
             setIsLoadingLogin(false);
             setProjectCode(PROJECT_CODE_DEFAULT);
-            setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
+            // setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
             setRoleCode(ROLE_CODE_DEFAULT);
           });
       }
@@ -274,30 +312,30 @@ const LoginScreen = ({ navigation }) => {
     setIsVisibleProject(false);
   };
 
-  const _onPressSelectDiscipline = () => {
-    if (username === '' || password === '') {
-      MessageAlert('ERROR', 'The user name or password is invalid.');
-      return;
-    }
-    setIsLoadingDiscipline(true);
-    LoginAPI(username, password)
-      .then(res => {
-        res = JSON.parse(res.data);
-        if (res.access_token) {
-          callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
-          return;
-        }
-        setIsLoadingDiscipline(false);
-        MessageAlert('ERROR', res.error_description);
-      })
-      .catch(() => {
-        confirmAlert();
-      });
-  };
-  const _onChangeDisciplineCode = (item) => {
-    setDisciplineCode(item);
-    setIsVisibleDiscipline(false);
-  };
+  // const _onPressSelectDiscipline = () => {
+  //   if (username === '' || password === '') {
+  //     MessageAlert('ERROR', 'The user name or password is invalid.');
+  //     return;
+  //   }
+  //   setIsLoadingDiscipline(true);
+  //   LoginAPI(username, password)
+  //     .then(res => {
+  //       res = JSON.parse(res.data);
+  //       if (res.access_token) {
+  //         callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
+  //         return;
+  //       }
+  //       setIsLoadingDiscipline(false);
+  //       MessageAlert('ERROR', res.error_description);
+  //     })
+  //     .catch(() => {
+  //       confirmAlert();
+  //     });
+  // };
+  // const _onChangeDisciplineCode = (item) => {
+  //   setDisciplineCode(item);
+  //   setIsVisibleDiscipline(false);
+  // };
 
   const _onPressSelectRole = () => {
     if (username === '' || password === '') {
@@ -326,7 +364,7 @@ const LoginScreen = ({ navigation }) => {
 
   const confirmAlert = () => {
     setIsLoadingProject(false);
-    setIsLoadingDiscipline(false);
+    // setIsLoadingDiscipline(false);
     setIsLoadingRole(false);
     MessageAlert('ERROR', 'Please check that you are using the company network!');
   };
@@ -387,7 +425,7 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.selectText}>{projectCode}</Text>
                 </TouchableOpacity>
             }
-            {
+            {/* {
               isLoadingDiscipline
                 ? <TouchableOpacity style={styles.selectContainer}>
                   <ActivityIndicator size="large" color={BASE_COLOR} />
@@ -395,7 +433,7 @@ const LoginScreen = ({ navigation }) => {
                 : <TouchableOpacity style={styles.selectContainer} onPress={_onPressSelectDiscipline}>
                   <Text style={styles.selectText}>{disciplineCode}</Text>
                 </TouchableOpacity>
-            }
+            } */}
             {
               isLoadingRole
                 ? <TouchableOpacity style={styles.selectContainer}>
@@ -422,11 +460,11 @@ const LoginScreen = ({ navigation }) => {
         data={projectList}
         onChangeItem={_onChangeProjectCode}
         onCancel={() => setIsVisibleProject(false)} />
-      <SelectPopup
+      {/* <SelectPopup
         visible={isVisibleDiscipline}
         data={disciplineList}
         onChangeItem={_onChangeDisciplineCode}
-        onCancel={() => setIsVisibleDiscipline(false)} />
+        onCancel={() => setIsVisibleDiscipline(false)} /> */}
       <SelectPopup
         multi={true}
         visible={isVisibleRole}

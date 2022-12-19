@@ -3,24 +3,24 @@ import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearan
 import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Networker from '../../utils/Networker';
-import Helper from '../../utils/Helper';
-import Constant from '../../utils/Constant';
+import Naming from '../../../utils/Naming';
+import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 
-import { GetPIPNotifyNumberAPI } from '../../apis/app/AppAPI';
+import { GetPIPNotifyNumberAPI } from '../../../apis/app/AppAPI';
 
-import LoadingRefresh from '../../components/LoadingRefresh';
-import Header from '../../components/Header';
+import LoadingRefresh from '../../../components/LoadingRefresh';
+import Header from '../../../components/Header';
 
-const HomeScreen = ({ route, navigation }) => {
+const HomeViewerScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
-  const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
+  // const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const isFocused = useIsFocused();
+  // const isFocused = useIsFocused();
 
   let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -33,35 +33,35 @@ const HomeScreen = ({ route, navigation }) => {
     });
   }, [navigation]);
 
-  useEffect(
-    () => {
-      callAPI(getNotifyNumbers);
-    }, [isFocused]
-  );
-  const callAPI = executedAPI => {
-    if (isFocused) {
-      setIsLoading(true);
-      Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
-    }
-  };
-  const getNotifyNumbers = async () => {
-    const token = await Helper.getData('TOKEN');
-    GetPIPNotifyNumberAPI(projectCode, token)
-      .then(res => {
-        if (res.Success && res.Data) {
-          setNotifyNumbers(res.Data);
-          setIsLoading(false);
-          setIsError(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-      });
-  };
+  // useEffect(
+  //   () => {
+  //     callAPI(getNotifyNumbers);
+  //   }, [isFocused]
+  // );
+  // const callAPI = executedAPI => {
+  //   if (isFocused) {
+  //     setIsLoading(true);
+  //     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
+  //   }
+  // };
+  // const getNotifyNumbers = async () => {
+  //   const token = await Helper.getData('TOKEN');
+  //   GetPIPNotifyNumberAPI(projectCode, token)
+  //     .then(res => {
+  //       if (res.Success && res.Data) {
+  //         setNotifyNumbers(res.Data);
+  //         setIsLoading(false);
+  //         setIsError(false);
+  //       } else {
+  //         setIsLoading(false);
+  //         setIsError(true);
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setIsLoading(false);
+  //       setIsError(true);
+  //     });
+  // };
 
   //-- Logout
   const _onPressLogout = () => {
@@ -131,6 +131,40 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Open Structural Drawing
+  const _onPressOpenStructuralDrawing = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QRCode Structure Drawing\n\nSearch: Search Structure Drawing',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeStructuralDrawing },
+        { text: 'Search', onPress: _onPressSearchStructuralDrawing },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressQRCodeStructuralDrawing = async () => {
+    navigation.navigate(
+      Constant.ROUTE__CAMERA,
+      {
+        projectCode: projectCode,
+        destination: Naming.NAME_STR_OPEN_DRAWING
+      }
+    );
+  };
+  const _onPressSearchStructuralDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenStructuralDrawing',
+      params: {
+        projectCode: projectCode,
+        title: 'Structure'
+      }
+    });
+  };
+
 
 
   const RenderItemBox = props => {
@@ -167,10 +201,10 @@ const HomeScreen = ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => { }} />
           :
           <View style={styles.container}>
-            <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+            <Header data={{ 'Project': projectCode }}></Header>
             <ScrollView style={styles.table}>
               <View style={styles.row}>
                 <RenderItemBox title={'View \nAll Status'} onPress={_onPressViewAllStatus} />
@@ -178,7 +212,7 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text'} />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Structure\nDrawing'} onPress={_onPressOpenStructuralDrawing} />
               </View>
             </ScrollView>
           </View>
@@ -318,4 +352,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default HomeViewerScreen;

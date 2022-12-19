@@ -9,30 +9,29 @@ import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
 import PDFViewScreen from './screens/pdf/PDFViewScreen';
 
+//-- General
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
 import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHoursImpactDetailScreen';
 import ManHoursImpactImageScreen from './screens/general/manhoursimpact/ManHoursImpactImageScreen';
-// import OpenDrawingScreen from './screens/general/opendrawing/OpenDrawingScreen';
 import OpenPipeSupportDrawingScreen from './screens/general/opendrawing/OpenPipeSupportDrawingScreen';
 import OpenIsometricDrawingScreen from './screens/general/opendrawing/OpenIsometricDrawingScreen';
 import OpenStructuralDrawingScreen from './screens/general/opendrawing/OpenStructuralDrawingScreen';
-
 import QCWelderCardListScreen from './screens/general/weldercard/QCWelderCardListScreen';
 import QCWelderCardDetailScreen from './screens/general/weldercard/QCWelderCardDetailScreen';
 import QCWelderCardImageSceen from './screens/general/weldercard/QCWelderCardImageSceen';
 
+//-- TimeSheet
 import TimeSheetScreen from './screens/timesheet/TimeSheetScreen';
 import TimeSheetOTScreen from './screens/timesheet/TimeSheetOTScreen';
 import TimeSheetManageWorkerScreen from './screens/timesheet/TimeSheetManageWorkerScreen';
 import TimeSheetReportScreen from './screens/timesheet/TimeSheetReportScreen';
 
-import HomeCONSScreen from './screens/piping/HomeCONSScreen';
-import HomeQCScreen from './screens/piping/HomeQCScreen';
-import HomeViewerScreen from './screens/piping/HomeViewerScreen';
+//-- PIP
+import PipingHomeCONSScreen from './screens/piping/HomeCONSScreen';
+import PipingHomeQCScreen from './screens/piping/HomeQCScreen';
 import PipingDimCuttingListScreen from './screens/piping/dim/DimCuttingListScreen';
 import PipingDimCuttingDetailScreen from './screens/piping/dim/DimCuttingDetailScreen';
 import PipingDimCuttingQCListScreen from './screens/piping/dim/DimCuttingQCListScreen';
-// import ConstructionUpdateManageScreen from './screens/piping/ConstructionUpdateManageScreen';
 import CameraScreen from './screens/piping/camera/CameraScreen';
 import AllStatusCameraScreen from './screens/piping/camera/AllStatusCameraScreen';
 import DrawingListScreen from './screens/piping/drawing/DrawingListScreen';
@@ -44,24 +43,13 @@ import DrawingAddWelderScreen from './screens/piping/drawing/DrawingAddWelderScr
 import DailyReportScreen from './screens/piping/drawing/DailyReportScreen';
 import DailyReportDetailScreen from './screens/piping/drawing/DailyReportDetailScreen';
 import DrawingQCStatusScreen from './screens/piping/drawing/DrawingQCStatusScreen';
-
-// import SpoolMatrixScreen from './screens/piping/spool/SpoolMatrixScreen';
-// import SpoolCameraScreen from './screens/piping/spool/SpoolCameraScreen';
-// import HydrotestListScreen from './screens/piping/hydrotest/HydrotestListScreen';
 import QCDrawingListScreen from './screens/piping/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/piping/qc/QCDrawingDetailScreen';
 import QCSpendListScreen from './screens/piping/qc/QCSpendListScreen';
-// import NDTManagerScreen from './screens/piping/ndt/NDTManagerScreen';
-// import NDTDetailScreen from './screens/piping/ndt/NDTDetailScreen';
-// import NDTIssueScreen from './screens/piping/ndt/NDTIssueScreen';
-// import ReportManagerScreen from './screens/piping/report/ReportManagerScreen';
-// import ReportConstructionListScreen from './screens/piping/report/ReportConstructionListScreen';
-// import ReportDisciplineListScreen from './screens/piping/report/ReportDisciplineListScreen';
-// import ReportHistogramListScreen from './screens/piping/report/ReportHistogramListScreen';
-// import ReportDailyManpowerListScreen from './screens/piping/report/ReportDailyManpowerListScreen';
 
-import StructuralHomeScreenCONS from './screens/structural/home/HomeScreenCONS';
-import StructuralHomeScreenQC from './screens/structural/home/HomeScreenQC';
+//-- STR
+import StructuralHomeCONSScreen from './screens/structural/home/HomeScreenCONS';
+import StructuralHomeQCScreen from './screens/structural/home/HomeScreenQC';
 import StructuralCameraScreen from './screens/structural/camera/CameraScreen';
 import StructuralConstructionListScreen from './screens/structural/construction/ConstructionListScreen';
 import StructuralConstructionDetailScreen from './screens/structural/construction/ConstructionDetailScreen';
@@ -78,7 +66,6 @@ import StructuralLamCheckQCStatusScreen from './screens/structural/lamcheck/LamC
 import StructuralDIMAfterWeldListScreen from './screens/structural/dimcheck/DIMAfterWeldListScreen';
 import StructuralDIMAfterWeldDetailScreen from './screens/structural/dimcheck/DIMAfterWeldDetailScreen';
 import StructuralDIMAfterWeldDetailQCScreen from './screens/structural/dimcheck/DIMAfterWeldDetailQCScreen';
-
 import StructuralDimForCuttingListScreen from './screens/structural/dimcheck/DimForCuttingListScreen';
 import StructuralLamCheckTodoListScreen from './screens/structural/lamcheck/LamCheckTodoListScreen';
 import StructuralLamcheckImageScreen from './screens/structural/lamcheck/LamcheckImageScreen';
@@ -87,11 +74,21 @@ import StructuralDimCheckDetailScreen from './screens/structural/dimcheck/DimChe
 import StructuralDimCheckImageScreen from './screens/structural/dimcheck/DimCheckImageScreen';
 import StructuralQCSpendListScreen from './screens/structural/qc/QCSpendListScreen';
 import StructuralQCImageScreen from './screens/structural/qc/QCImageScreen';
+import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
+
+//-- EIT
+import ElectricalHomeScreenCONS from './screens/electircal/home/HomeCONSScreen';
+import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
+
+//-- VIEW
+import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
+
+
+//-- Observation
 import QCObservationOverviewListScreen from './screens/observation/QAObservationOverviewListScreen';
 import QCObservationListScreen from './screens/observation/QAObservationListScreen';
 import QCObservationDetailScreen from './screens/observation/QAObservationDetailScreen';
 import QCObservationImageScreen from './screens/observation/QAObservationImageScreen';
-import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 
 const Stack = createStackNavigator();
 
@@ -107,7 +104,7 @@ const PipingCONSStackScreens = () => {
     <PipingCONSStack.Navigator screenOptions={optionNavigation}>
       <PipingCONSStack.Screen
         name={Constant.ROUTE__HOME}
-        component={HomeCONSScreen}
+        component={PipingHomeCONSScreen}
         options={
           {
             title: 'PTSC M&C',
@@ -254,7 +251,7 @@ const PipingQCStackScreens = () => {
     <PipingQCStack.Navigator screenOptions={optionNavigation}>
       <PipingQCStack.Screen
         name={Constant.ROUTE__HOME}
-        component={HomeQCScreen}
+        component={PipingHomeQCScreen}
         options={
           {
             title: 'PTSC M&C',
@@ -355,92 +352,6 @@ const PipingQCStackScreens = () => {
   );
 };
 
-const PipingViewerStack = createStackNavigator();
-const PipingViewerStackScreens = () => {
-  return (
-    <PipingViewerStack.Navigator screenOptions={optionNavigation}>
-      <PipingViewerStack.Screen
-        name={Constant.ROUTE__HOME}
-        component={HomeViewerScreen}
-        options={
-          {
-            title: 'PTSC M&C',
-          }
-        }
-      />
-
-      <PipingViewerStack.Screen
-        name='Camera'
-        component={CameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingViewerStack.Screen
-        name='AllStatusCamera'
-        component={AllStatusCameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingViewerStack.Screen
-        name='DrawingSearch'
-        component={DrawingSearchScreen}
-        options={
-          {
-            title: 'Search Drawing',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <PipingViewerStack.Screen
-        name='DrawingAllStatus'
-        component={DrawingAllStatusScreen}
-        options={
-          {
-            title: 'Drawing Detail Status',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-
-      <PipingViewerStack.Screen
-        name='DrawingDetail'
-        component={DrawingDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <PipingViewerStack.Screen
-        name='QCDrawingDetail'
-        component={QCDrawingDetailScreen}
-        options={({ route }) => ({
-          title: route.params.title,
-          headerBackTitle: 'Back',
-        })}
-      />
-      <PipingViewerStack.Screen
-        name='DrawingImage'
-        component={DrawingImageScreen}
-        options={
-          {
-            title: 'Drawing Pictures',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-    </PipingViewerStack.Navigator>
-  );
-};
-
 
 //-- STR Stacks
 const StructuralCONSStack = createStackNavigator();
@@ -449,7 +360,7 @@ const StructuralCONSStackScreens = () => {
     <StructuralCONSStack.Navigator screenOptions={optionNavigation}>
       <StructuralCONSStack.Screen
         name={Constant.ROUTE__HOME}
-        component={StructuralHomeScreenCONS}
+        component={StructuralHomeCONSScreen}
         options={
           {
             title: 'PTSC M&C',
@@ -635,7 +546,7 @@ const StructuralQCStackScreens = () => {
     <StructuralQCStack.Navigator screenOptions={optionNavigation}>
       <StructuralQCStack.Screen
         name={Constant.ROUTE__HOME}
-        component={StructuralHomeScreenQC}
+        component={StructuralHomeQCScreen}
         options={
           {
             title: 'PTSC M&C',
@@ -758,6 +669,131 @@ const StructuralQCStackScreens = () => {
     </StructuralQCStack.Navigator>
   );
 };
+
+
+//-- EIT Stacks
+const ElectricalCONSStack = createStackNavigator();
+const ElectricalCONSStackScreens = () => {
+  return (
+    <ElectricalCONSStack.Navigator screenOptions={optionNavigation}>
+      <ElectricalCONSStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={ElectricalHomeScreenCONS}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+    </ElectricalCONSStack.Navigator>
+  );
+};
+
+const ElectricalQCStack = createStackNavigator();
+const ElectricalQCStackScreens = () => {
+  return (
+    <ElectricalQCStack.Navigator screenOptions={optionNavigation}>
+      <ElectricalQCStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={ElectricalHomeScreenQC}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+    </ElectricalQCStack.Navigator>
+  );
+};
+
+
+//-- VIEW Stacks
+const ViewerStack = createStackNavigator();
+const ViewerStackScreens = () => {
+  return (
+    <ViewerStack.Navigator screenOptions={optionNavigation}>
+      <ViewerStack.Screen
+        name={Constant.ROUTE__HOME}
+        component={HomeViewerScreen}
+        options={
+          {
+            title: 'PTSC M&C',
+          }
+        }
+      />
+
+      <ViewerStack.Screen
+        name={Constant.ROUTE__CAMERA}
+        component={StructuralCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <ViewerStack.Screen
+        name='AllStatusCamera'
+        component={AllStatusCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ViewerStack.Screen
+        name='DrawingSearch'
+        component={DrawingSearchScreen}
+        options={
+          {
+            title: 'Search Drawing',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ViewerStack.Screen
+        name='DrawingAllStatus'
+        component={DrawingAllStatusScreen}
+        options={
+          {
+            title: 'Drawing Detail Status',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <ViewerStack.Screen
+        name='DrawingDetail'
+        component={DrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <ViewerStack.Screen
+        name='QCDrawingDetail'
+        component={QCDrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
+      />
+      <ViewerStack.Screen
+        name='DrawingImage'
+        component={DrawingImageScreen}
+        options={
+          {
+            title: 'Drawing Pictures',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </ViewerStack.Navigator>
+  );
+};
+
 
 //-- Common Stacks
 const CommonStack = createStackNavigator();
@@ -960,27 +996,32 @@ export default () => {
           component={PipingQCStackScreens}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name={Constant.ROUTE__PIP_VIEWER}
-          component={PipingViewerStackScreens}
-          options={{ headerShown: false }}
-        />
 
         <Stack.Screen
           name={Constant.ROUTE__STR_CONS}
           component={StructuralCONSStackScreens}
           options={{ headerShown: false }}
         />
-
         <Stack.Screen
-          name={Constant.ROUTE__STR_QCDEPT}
+          name={Constant.ROUTE__STR_QC}
           component={StructuralQCStackScreens}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name={Constant.ROUTE__STR_QCWS}
-          component={StructuralQCStackScreens}
+          name={Constant.ROUTE__EIT_CONS}
+          component={ElectricalCONSStackScreens}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name={Constant.ROUTE__EIT_QC}
+          component={ElectricalQCStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.ROUTE__VIEW_DRAWING}
+          component={ViewerStackScreens}
           options={{ headerShown: false }}
         />
 
