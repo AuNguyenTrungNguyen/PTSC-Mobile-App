@@ -266,17 +266,22 @@ const TimeSheetScreen = ({ route, navigation }) => {
     UpdateTimeSheetListAPI(projectSelected, department, userLogin, Formater.formatDateSQL(currentDate), resultList, token)
       .then(res => {
         if (res.success) {
-          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-          let baseArray = [...workerUpdatedList];
-          workerUpdatedList.map(i => {
-            i.SUBMITED = true;
-            i.ColorWorkOrder = null;
-            i.ColorShift = null;
-            i.ColorHours = null;
-            i.ColorNote = null;
-            return i;
-          });
-          setWorkerUpdatedList(baseArray);
+          if (!res.error) {
+            Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+            let baseArray = [...workerUpdatedList];
+            workerUpdatedList.map(i => {
+              i.SUBMITED = true;
+              i.ColorWorkOrder = null;
+              i.ColorShift = null;
+              i.ColorHours = null;
+              i.ColorNote = null;
+              return i;
+            });
+            setWorkerUpdatedList(baseArray);
+          }
+          else {
+            MessageAlert('WARNING', res.error);
+          }
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
