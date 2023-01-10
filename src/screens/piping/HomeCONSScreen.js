@@ -278,6 +278,15 @@ const HomeCONSScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Pipe Support
+  const _onPressPipeSupport = async () => {
+    navigation.navigate(
+      'PipeSupportList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
 
 
   const RenderItemBox = props => {
@@ -341,11 +350,11 @@ const HomeCONSScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Daily Report'} onPress={_onPressDailyReport} iconName={'ios-stats-chart-sharp'} />
-                <RenderItemBox title={'Pipe Support'} onPress={_onPressOpenPipeSupportDrawing} iconName={'md-document-text'} />
+                <RenderItemBox title={'Pipe Support\nDrawing'} onPress={_onPressOpenPipeSupportDrawing} iconName={'md-document-text'} />
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text'} />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Pipe Support\nControl'} onPress={_onPressPipeSupport} />
               </View>
             </ScrollView>
           </View>

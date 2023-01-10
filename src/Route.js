@@ -46,6 +46,8 @@ import DrawingQCStatusScreen from './screens/piping/drawing/DrawingQCStatusScree
 import QCDrawingListScreen from './screens/piping/qc/QCDrawingListScreen';
 import QCDrawingDetailScreen from './screens/piping/qc/QCDrawingDetailScreen';
 import QCSpendListScreen from './screens/piping/qc/QCSpendListScreen';
+import PipeSupportListScreen from './screens/piping/pipe/PipeSupportListScreen';
+import PipeSupportDetailScreen from './screens/piping/pipe/PipeSupportDetailScreen';
 
 //-- STR
 import StructuralHomeCONSScreen from './screens/structural/home/HomeScreenCONS';
@@ -237,6 +239,26 @@ const PipingCONSStackScreens = () => {
         options={
           {
             title: 'Daily Report Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='PipeSupportList'
+        component={PipeSupportListScreen}
+        options={
+          {
+            title: 'Pipe Support List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='PipeSupportDetail'
+        component={PipeSupportDetailScreen}
+        options={
+          {
+            title: 'Pipe Support Detail',
             headerBackTitle: 'Back',
           }
         }

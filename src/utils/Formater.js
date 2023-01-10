@@ -37,6 +37,12 @@ export default class Formater {
     return Moment(data).format("YYYY-MM-DD");
   };
 
+  static formatDateZero = date => {
+    date = date ? date : new Date();
+    var format = Moment(date).format("YYYY-MM-DD");
+    return new Date(format + 'T00:00:00.000Z')
+  }
+
   static checkFormatNumber = input => {
     const regexNumber = /^\d+(\.\d+)?$/;
     return regexNumber.test(input) && input !== '';
