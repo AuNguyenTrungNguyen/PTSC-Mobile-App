@@ -288,6 +288,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Pipe Spool
+  const _onPressPipeSpool = async () => {
+    navigation.navigate(
+      'PipeSpoolList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -355,6 +365,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text'} />
                 <RenderItemBox title={'Pipe Support\nControl'} onPress={_onPressPipeSupport} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Pipe Spool\nControl'} onPress={_onPressPipeSpool} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>

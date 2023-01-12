@@ -179,14 +179,14 @@ export const GetReweldFromQCAPI = async (projectCode, drawingNo) => {
 };
 
 //-- Pipe Support
-export const GetPipeSupportListAPI = async (projectCode, facilityCode, name) => {
+export const GetPipeSupportListAPI = async (projectCode, facilityCode, supportName) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/piping/GetPipeSupportList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + name,
+    + '&drawingNo=' + supportName,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -195,14 +195,14 @@ export const GetPipeSupportListAPI = async (projectCode, facilityCode, name) => 
     }
   ).then(res => res.json());
 };
-export const GetPipeSupportDetailAPI = async (projectCode, facilityCode, name) => {
+export const GetPipeSupportDetailAPI = async (projectCode, facilityCode, supportName) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/piping/GetPipeSupportDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + name,
+    + '&drawingNo=' + supportName,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -217,6 +217,56 @@ export const UpdatePipeSupportDetailAPI = async (modelUpdate, modelColumnChange)
   return fetch(
     Port_Server
     + '/api/piping/UpdatePipeSupportDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+}
+
+//-- Pipe Spool
+export const GetPipeSpoolListAPI = async (projectCode, facilityCode, spoolNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetPipeSpoolList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + spoolNo,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetPipeSpoolDetailAPI = async (projectCode, facilityCode, spoolNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetPipeSpoolDetail'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + spoolNo,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdatePipeSpoolDetailAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/piping/UpdatePipeSpoolDetail',
     {
       method: 'POST',
       headers: {
