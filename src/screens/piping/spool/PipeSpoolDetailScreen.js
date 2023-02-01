@@ -135,6 +135,11 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
 
   //-- Render
   const RenderDetail = () => {
+    const isFittingLastDate = columnChange.includes('FittingLastDate');
+    const isWeldingLastDate = columnChange.includes('WeldingLastDate');
+    const isReleaseForPaintingDate = columnChange.includes('ReleaseForPaintingDate');
+    const isSpoolOutFromBP = columnChange.includes('SpoolOutFromBP');
+    const isSpoolRigupToSite = columnChange.includes('SpoolRigupToSite');
     return (
       <View style={styles.table}>
         {
@@ -144,8 +149,8 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>FittingLastDate:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => { _onSelectDate('FittingLastDate') }}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(spoolDetail.FittingLastDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isFittingLastDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.FittingLastDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFittingLastDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -153,8 +158,8 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>WeldingLastDate:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('WeldingLastDate')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(spoolDetail.WeldingLastDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isWeldingLastDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.WeldingLastDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isWeldingLastDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -165,8 +170,8 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>ReleaseForPaintingDate:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('ReleaseForPaintingDate')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(spoolDetail.ReleaseForPaintingDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isReleaseForPaintingDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.ReleaseForPaintingDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isReleaseForPaintingDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -177,8 +182,8 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>SpoolOutFromBP:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('SpoolOutFromBP')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolOutFromBP)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isSpoolOutFromBP ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolOutFromBP)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isSpoolOutFromBP ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -186,8 +191,8 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>SpoolRigupToSite:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('SpoolRigupToSite')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolRigupToSite)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isSpoolRigupToSite ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolRigupToSite)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isSpoolRigupToSite ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -247,6 +252,7 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
+const EDITING_COLOR = 'green';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -296,6 +302,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textGreen: {
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    fontWeight: 'bold',
+    color: 'green',
   },
   iconAction: {
     marginLeft: 4,

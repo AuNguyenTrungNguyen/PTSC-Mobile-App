@@ -135,6 +135,15 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
 
   //-- Render
   const RenderDetail = () => {
+    const isFabWS_CuttingDate = columnChange.includes('FabWS_CuttingDate');
+    const isFabWS_FitupDate = columnChange.includes('FabWS_FitupDate');
+    const isFabWS_WeldDate = columnChange.includes('FabWS_WeldDate');
+    const isInstallationPipeSupport_Fitup = columnChange.includes('InstallationPipeSupport_Fitup');
+    const isInstallationPipeSupport_Welding = columnChange.includes('InstallationPipeSupport_Welding');
+    const isSentToPainting = columnChange.includes('SentToPainting');
+    const isCompletedPainting = columnChange.includes('CompletedPainting');
+    const isFitupToSite = columnChange.includes('FitupToSite');
+    const isWeldToSite = columnChange.includes('WeldToSite');
     return (
       <View style={styles.table}>
         {
@@ -144,8 +153,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>FabWS_Cutting:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => { _onSelectDate('FabWS_CuttingDate') }}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.FabWS_CuttingDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isFabWS_CuttingDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.FabWS_CuttingDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFabWS_CuttingDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -153,8 +162,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>FabWS_Fitup:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('FabWS_FitupDate')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.FabWS_FitupDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isFabWS_FitupDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.FabWS_FitupDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFabWS_FitupDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -162,8 +171,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>FabWS_Weld:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('FabWS_WeldDate')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.FabWS_WeldDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isFabWS_WeldDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.FabWS_WeldDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFabWS_WeldDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -174,8 +183,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>Installation_Fitup:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('InstallationPipeSupport_Fitup')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.InstallationPipeSupport_Fitup)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isInstallationPipeSupport_Fitup ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.InstallationPipeSupport_Fitup)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isInstallationPipeSupport_Fitup ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -183,8 +192,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>Installation_Welding:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('InstallationPipeSupport_Welding')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.InstallationPipeSupport_Welding)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isInstallationPipeSupport_Welding ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.InstallationPipeSupport_Welding)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isInstallationPipeSupport_Welding ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -195,8 +204,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>SentToPainting:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('SentToPainting')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.SentToPainting)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isSentToPainting ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.SentToPainting)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isSentToPainting ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -204,8 +213,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>CompletedPainting:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('CompletedPainting')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.CompletedPainting)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isCompletedPainting ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.CompletedPainting)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isCompletedPainting ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -216,8 +225,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>FitupToSite:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('FitupToSite')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.FitupToSite)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isFitupToSite ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.FitupToSite)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFitupToSite ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -225,8 +234,8 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>WeldToSite:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('WeldToSite')}>
-                    <Text style={styles.textAction}>{Formater.formatDateData(supportDetail.WeldToSite)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    <Text style={isWeldToSite ? styles.textGreen : styles.textAction}>{Formater.formatDateData(supportDetail.WeldToSite)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isWeldToSite ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -286,6 +295,7 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
+const EDITING_COLOR = 'green';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -335,6 +345,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textGreen: {
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    fontWeight: 'bold',
+    color: 'green',
   },
   iconAction: {
     marginLeft: 4,
