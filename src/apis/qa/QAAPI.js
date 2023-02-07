@@ -213,6 +213,20 @@ export const GetCertificateListAPI = async (welderId, projectCode) => {
     }
   ).then(res => res.json());
 };
+export const GetQCWelderAvatarAPI = async welderId => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/QA/GetQCWelderAvatar'
+    + '?id=' + welderId,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 export const GetQCWelderImageAPI = async (projectCode, welderId) => {
   const token = await Helper.getData('TOKEN');
   return fetch(

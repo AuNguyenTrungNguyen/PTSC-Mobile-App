@@ -18,6 +18,7 @@ import OpenIsometricDrawingScreen from './screens/general/opendrawing/OpenIsomet
 import OpenStructuralDrawingScreen from './screens/general/opendrawing/OpenStructuralDrawingScreen';
 import QCWelderCardListScreen from './screens/general/weldercard/QCWelderCardListScreen';
 import QCWelderCardDetailScreen from './screens/general/weldercard/QCWelderCardDetailScreen';
+import QCWelderCardAvatarSceen from './screens/general/weldercard/QCWelderCardAvatarSceen';
 import QCWelderCardImageSceen from './screens/general/weldercard/QCWelderCardImageSceen';
 
 //-- TimeSheet
@@ -993,6 +994,16 @@ const CommonStackScreens = () => {
         options={
           {
             title: 'Welder Card',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <CommonStack.Screen
+        name='QCWelderCardAvatar'
+        component={QCWelderCardAvatarSceen}
+        options={
+          {
+            title: 'Welder Avatar',
             headerBackTitle: 'Back',
           }
         }

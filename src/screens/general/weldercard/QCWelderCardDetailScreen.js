@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, Keyboard } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, Keyboard, Platform, PermissionsAndroid, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ImageView from 'react-native-image-viewing';
+import Toast from 'react-native-simple-toast';
+import RNFetchBlob from 'rn-fetch-blob';
+import CameraRoll from '@react-native-community/cameraroll';
 
 import Networker from '../../../utils/Networker';
 import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
 
 import { GetProjectListAPI } from '../../../apis/app/LoginAPI';
-import { GetCertificateListAPI } from '../../../apis/qa/QAAPI';
+import { GetCertificateListAPI, GetQCWelderAvatarAPI, } from '../../../apis/qa/QAAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -29,6 +33,13 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={_onPressAvatar}>
+            <Ionicons
+              size={24}
+              name={'md-happy-outline'} color={iconColor} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={_onPressImage}>
@@ -56,8 +67,10 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
     });
   };
 
-  const callAPI = executedAPI => {
-    setIsSearching(true);
+  const callAPI = (executedAPI, UI = false) => {
+    if (UI) {
+      setIsSearching(true);
+    }
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
   useEffect(
@@ -92,6 +105,111 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
         setIsError(true);
         setIsSearching(false);
       });
+  };
+
+  //-- Avatar
+  const [isOpenImage, setIsOpenImage] = useState(false);
+  const [openImage, setOpenImage] = useState([]);
+  const _onPressAvatar = () => {
+    callAPI(getAvatar, false);
+  };
+  const getAvatar = async () => {
+    GetQCWelderAvatarAPI(welderId)
+      .then(res => {
+        if (res.Success) {
+          if (res.Data) {
+            setOpenImage([{ uri: res.Data }]);
+            setIsOpenImage(true);
+          }
+          else {
+            Toast.show(res.Message.toString(), Toast.SHORT);
+          }
+        }
+      })
+      .catch(() => {
+      });
+  };
+  const _onPressSaveImage = async () => {
+    if (Platform.OS === 'android' && !(await hasAndroidPermissionSaveStorage())) {
+      Alert.alert(
+        'WARNING',
+        'Please accept iamge permissions to continue',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      saveImage();
+    }
+  };
+  const saveImage = async () => {
+    try {
+      let indexFileName = openImage[0].uri.lastIndexOf('/');
+      let imageName = openImage[0].uri.substring(indexFileName);
+      let indexExtension = imageName.lastIndexOf('.');
+      let imageExtension = imageName.substring(indexExtension + 1);
+      let path = RNFetchBlob.fs.dirs.MainBundleDir + imageName;
+      RNFetchBlob
+        .config({
+          fileCache: true,
+          appendExt: imageExtension,
+          path: path,
+        })
+        .fetch('GET', openImage[0].uri)
+        .then((res) => {
+          CameraRoll.save(res.path())
+            .then(() => {
+              Alert.alert(
+                '',
+                'Image saved successfully.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                ],
+              )
+            })
+            .catch(() => {
+              Alert.alert(
+                'ERROR',
+                'An error occured while executing your request.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                ],
+              )
+            });
+        });
+    } catch (error) {
+      Alert.alert(
+        'ERROR',
+        'An error occured while executing your request.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+      )
+    }
+  };
+  const hasAndroidPermissionSaveStorage = async () => {
+    const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+    const hasPermission = await PermissionsAndroid.check(permission);
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(permission);
+    return status === 'granted';
   };
 
   //-- Image
@@ -343,12 +461,27 @@ const QCWelderCardDetailScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleProject(false)}
         onClear={_onClearProjectCode}
         onChangeItem={_onChangeProjectCode} />
-      {/* <SelectPopup
-        visible={isVisibleDeck}
-        data={['CED', 'CLD', 'MND', 'MZD', 'SDD', 'TOD']}
-        onCancel={() => setIsVisibleDeck(false)}
-        onClear={_onClearDeck}
-        onChangeItem={_onChangeDeck} /> */}
+      <ImageView
+        visible={isOpenImage}
+        images={openImage}
+        imageIndex={0}
+        onRequestClose={() => setIsOpenImage(false)}
+        FooterComponent={
+          ({ _ }) => {
+            return (
+              <SafeAreaView style={styles.bottomImageRoot}>
+                <View style={styles.bottomImageContanier}>
+                  <TouchableOpacity
+                    style={styles.bottomSaveButton}
+                    onPress={_onPressSaveImage} >
+                    <Text style={styles.buttonTitleDark}>Save Image</Text>
+                  </TouchableOpacity>
+                </View>
+              </SafeAreaView>
+            );
+          }
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -581,6 +714,23 @@ const styles = StyleSheet.create({
   },
   buttonTitleDark: {
     color: BASE_COLOR,
+  },
+
+  bottomImageRoot: {
+    flex: 1,
+  },
+  bottomImageContanier: {
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  bottomSaveButton: {
+    backgroundColor: OPP_COLOR,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 8,
   },
 });
 
