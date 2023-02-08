@@ -120,7 +120,7 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
   };
 
   const [isVisibleDate, setIsVisibleDate] = useState(false);
-  const [dateDisplay, setDateDisplay] = useState(null);
+  const [dateDisplay, setDateDisplay] = useState(new Date());
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
       supportDetail[keyUpdate] = Formater.formatDateZero(selectedDate);
