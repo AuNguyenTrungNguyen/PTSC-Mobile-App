@@ -9,7 +9,7 @@ import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetPipeSupportDrawingAPI } from '../../../apis/general/GeneralAPI';
+import { GetPipeSupportDrawingNewAPI } from '../../../apis/general/GeneralAPI';
 
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -23,7 +23,6 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [drawingNo, setDrawingNo] = useState('');
   const [drawingList, setDrawingList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
@@ -70,7 +69,7 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
   async function gerDrawingData({ facility = facilityCode, deckFilter = deck } = {}) {
     facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
     deckFilter = (!deckFilter || deckFilter === DECK_DEFAULT) ? '' : deckFilter;
-    GetPipeSupportDrawingAPI(projectCode, facility, drawingNo, deckFilter)
+    GetPipeSupportDrawingNewAPI(projectCode, facility, drawingNo, deckFilter, cuttingPlanItem, ancillary)
       .then(res => {
         if (res.Success && res.Data) {
           setDrawingList(res.Data);
@@ -90,9 +89,22 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
       });
   };
 
-  //-- DrawingNo & WeldNo
-  const _onChangeDrawingNo = no => {
-    setDrawingNo(no);
+  //-- DrawingNo 
+  const [drawingNo, setDrawingNo] = useState('');
+  const _onChangeDrawingNo = value => {
+    setDrawingNo(value);
+  };
+
+  //-- CuttingPlanItem 
+  const [cuttingPlanItem, setCuttingPlanItem] = useState('');
+  const _onChangeCuttingPlanItem = value => {
+    setCuttingPlanItem(value);
+  };
+
+  //-- Ancillary 
+  const [ancillary, setAncillary] = useState('');
+  const _onChangeAncillary = value => {
+    setAncillary(value);
   };
 
   //-- FacilityCode filter
@@ -124,14 +136,12 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
   const _onChangeFacilityCode = data => {
     if (data !== facilityCode) {
       setFacilityCode(data);
-      // callAPI(() => { gerDrawingData({ facility: data }) });
     }
     setIsVisibleFacility(false);
   };
   const _onClearFacilityCode = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
-      // callAPI(() => { gerDrawingData({ facility: FACILITY_CODE_DEFAULT }) });
     }
     setIsVisibleFacility(false);
   };
@@ -143,14 +153,12 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
   const _onChangeDeck = async data => {
     if (data !== deck) {
       setDeck(data);
-      // callAPI(() => { gerDrawingData({ deckFilter: data }) });
     }
     setIsVisibleDeck(false);
   };
   const _onClearDeck = () => {
     if (deck !== DECK_DEFAULT) {
       setDeck(DECK_DEFAULT);
-      // callAPI(() => { gerDrawingData({ deckFilter: DECK_DEFAULT }) });
     }
     setIsVisibleDeck(false);
   };
@@ -159,6 +167,8 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
   const renderItem = ({ _, item }) => {
     const sheet = Formater.formatEmptyData(item.Sheet).toUpperCase();
     const rev = Formater.formatEmptyData(item.Rev).toUpperCase();
+    const cuttingPlanItem = Formater.formatEmptyData(item.CuttingPlanItem).toUpperCase();
+    const ancillary = Formater.formatEmptyData(item.Ancillary).toUpperCase();
     return (
       <View style={styles.box}>
         <View style={styles.row}>
@@ -186,6 +196,22 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
           </View>
           <View style={styles.cellOne}>
             <Text style={styles.textData}>{rev}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>CPItem:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{cuttingPlanItem}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>Ancillary:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{ancillary}</Text>
           </View>
         </View>
       </View>
@@ -244,6 +270,38 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
                         drawingNo == ''
                           ? null
                           : <Icon name='times-circle' onPress={() => _onChangeDrawingNo('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>CPItem:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={cuttingPlanItem}
+                        onChangeText={_onChangeCuttingPlanItem}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        cuttingPlanItem == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeCuttingPlanItem('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>Ancillary:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={ancillary}
+                        onChangeText={_onChangeAncillary}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        ancillary == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeAncillary('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>

@@ -18,6 +18,25 @@ export const GetPipeSupportDrawingAPI = async (projectCode, facilityCode, drawin
     }
   ).then(res => res.json());
 };
+export const GetPipeSupportDrawingNewAPI = async (projectCode, facilityCode, drawingNo, deck, cuttingPlanItem, ancillary) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/GetPipeSupportDrawingNew'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&deck=' + deck
+    + '&cuttingPlanItem=' + cuttingPlanItem
+    + '&ancillary=' + ancillary,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 export const GetIsometricDrawingAPI = async (projectCode, facilityCode, drawingNo) => {
   const token = await Helper.getData('TOKEN');
