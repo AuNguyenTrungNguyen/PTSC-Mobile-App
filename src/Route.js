@@ -8,6 +8,7 @@ import Constant from './utils/Constant';
 import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
 import PDFViewScreen from './screens/pdf/PDFViewScreen';
+// import PDFViewScreen from './screens/pdf/PDFViewScreenNew'; //-- Use for AWS
 
 //-- General
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';

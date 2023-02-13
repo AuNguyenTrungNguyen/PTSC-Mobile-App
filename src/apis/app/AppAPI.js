@@ -215,3 +215,17 @@ export const CreateTempDrawingNoAPI = (url, userLogin, token) =>
       body: JSON.stringify({ url, userLogin }),
     }
   ).then(res => res.json());
+
+export const ReadByteFromURLAPI = (url, token) =>
+  fetch(
+    Port_Server
+    + '/api/App/ReadByteFromURL',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url }),
+    }
+  ).then(res => res.json());
