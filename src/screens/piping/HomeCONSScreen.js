@@ -298,6 +298,34 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Equipment
+  const _onPressManageEquipment = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code\n\nSearch: Search Equipment List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeEquipment },
+        { text: 'Search', onPress: _onPresSearchEquipment },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+    return
+
+  };
+  const _onPressQRCodeEquipment = async () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentCamera',
+    });
+  };
+  const _onPresSearchEquipment = async () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentList',
+    });
+  };
+
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -368,7 +396,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Pipe Spool\nControl'} onPress={_onPressPipeSpool} />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} />
               </View>
             </ScrollView>
           </View>

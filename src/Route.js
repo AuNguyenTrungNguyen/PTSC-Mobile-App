@@ -89,12 +89,17 @@ import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
 
-
 //-- Observation
 import QCObservationOverviewListScreen from './screens/observation/QAObservationOverviewListScreen';
 import QCObservationListScreen from './screens/observation/QAObservationListScreen';
 import QCObservationDetailScreen from './screens/observation/QAObservationDetailScreen';
 import QCObservationImageScreen from './screens/observation/QAObservationImageScreen';
+
+//-- Equipment
+import EquipmentListScreen from './screens/equipment/EquipmentListScreen';
+import EquipmentCameraScreen from './screens/equipment/EquipmentCameraScreen';
+import EquipmentDetailScreen from './screens/equipment/EquipmentDetailScreen';
+import EquipmentTimesheetScreen from './screens/equipment/EquipmentTimesheetScreen';
 
 const Stack = createStackNavigator();
 
@@ -1023,6 +1028,55 @@ const CommonStackScreens = () => {
   );
 };
 
+//-- Common Stacks
+const EquipmentStack = createStackNavigator();
+const EquipmentStackScreens = () => {
+  return (
+    <EquipmentStack.Navigator screenOptions={optionNavigation}>
+      <EquipmentStack.Screen
+        name='EquipmentList'
+        component={EquipmentListScreen}
+        options={
+          {
+            title: 'Equipment List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentCamera'
+        component={EquipmentCameraScreen}
+        options={
+          {
+            title: 'QRCode Scanner',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentDetail'
+        component={EquipmentDetailScreen}
+        options={
+          {
+            title: 'Equipment Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentTimesheet'
+        component={EquipmentTimesheetScreen}
+        options={
+          {
+            title: 'Equipment TimeSheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+    </EquipmentStack.Navigator>
+  );
+};
+
 export default () => {
   return (
     <NavigationContainer>
@@ -1084,6 +1138,12 @@ export default () => {
         <Stack.Screen
           name={Constant.ROUTE__COMMON}
           component={CommonStackScreens}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name={Constant.ROUTE__EQUIPMENT}
+          component={EquipmentStackScreens}
           options={{ headerShown: false }}
         />
 

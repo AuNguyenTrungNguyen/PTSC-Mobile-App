@@ -7,6 +7,7 @@ export default class Constant {
   static ROUTE__CAMERA = 'CAMERA';
   static ROUTE__PDF = 'PDF';
   static ROUTE__COMMON = 'COMMON_STACK';
+  static ROUTE__EQUIPMENT = 'EQUIPMENT_STACK';
 
   static ROUTE__PIPING = 'PIPING';
   static ROUTE__PIP_CONS = 'PIP-CONS';

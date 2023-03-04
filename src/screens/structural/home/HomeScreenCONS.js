@@ -397,6 +397,33 @@ const HomeScreenCONS = ({ route, navigation }) => {
     });
   };
 
+  //-- Equipment
+  const _onPressManageEquipment = async () => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code\n\nSearch: Search Equipment List',
+      [
+        { text: 'Scan', onPress: _onPressQRCodeEquipment },
+        { text: 'Search', onPress: _onPresSearchEquipment },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+    return
+
+  };
+  const _onPressQRCodeEquipment = async () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentCamera',
+    });
+  };
+  const _onPresSearchEquipment = async () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentList',
+    });
+  };
 
 
   const RenderItemBox = props => {
@@ -463,7 +490,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Structure\nDrawing'} onPress={_onPressOpenStructuralDrawing} iconName={'md-document-text'} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} />
             </View>
           </ScrollView>
         </View>

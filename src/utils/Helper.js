@@ -38,6 +38,11 @@ export default class Helper {
     return regexNumber.test(numer) && numer !== '';
   };
 
+  static checkFormatInteger = int => {
+    const regexNumber = /^\d+$/;
+    return regexNumber.test(int) && int !== '';
+  };
+
   static openDrawingPDF = (navigation, link, title) => {
     navigation.navigate(
       Constant.ROUTE__PDF,
