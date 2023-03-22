@@ -86,3 +86,49 @@ export const GetEquipmentWastageReasonListAPI = async () => {
     }
   ).then(res => res.json());
 };
+
+//-- Lifting Plan
+export const GetEquipmentNameListAPI = async name => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetEquipmentNameList'
+    + '?name=' + name,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetEquipmentLiftingPlanListAPI = async name => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetEquipmentLiftingPlanList'
+    + '?name=' + name,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateEquipmentLiftingPlanAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/UpdateEquipmentLiftingPlanAPI',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+};

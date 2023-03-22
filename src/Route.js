@@ -100,6 +100,9 @@ import EquipmentListScreen from './screens/equipment/EquipmentListScreen';
 import EquipmentCameraScreen from './screens/equipment/EquipmentCameraScreen';
 import EquipmentDetailScreen from './screens/equipment/EquipmentDetailScreen';
 import EquipmentTimesheetScreen from './screens/equipment/EquipmentTimesheetScreen';
+import EquipmentNameListScreen from './screens/equipment/EquipmentNameListScreen';
+import EquipmentLiftingPlanListScreen from './screens/equipment/EquipmentLiftingPlanListScreen';
+import EquipmentLiftingPlanDetailScreen from './screens/equipment/EquipmentLiftingPlanDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -1044,6 +1047,16 @@ const EquipmentStackScreens = () => {
         }
       />
       <EquipmentStack.Screen
+        name='EquipmentNameList'
+        component={EquipmentNameListScreen}
+        options={
+          {
+            title: 'Equipment List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
         name='EquipmentCamera'
         component={EquipmentCameraScreen}
         options={
@@ -1069,6 +1082,26 @@ const EquipmentStackScreens = () => {
         options={
           {
             title: 'Equipment TimeSheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentLiftingPlanList'
+        component={EquipmentLiftingPlanListScreen}
+        options={
+          {
+            title: 'Lifting Plan',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentLiftingPlanDetail'
+        component={EquipmentLiftingPlanDetailScreen}
+        options={
+          {
+            title: 'Lifting Plan Detail',
             headerBackTitle: 'Back',
           }
         }

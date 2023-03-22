@@ -405,6 +405,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       [
         { text: 'Scan', onPress: _onPressQRCodeEquipment },
         { text: 'Search', onPress: _onPresSearchEquipment },
+        // { text: 'Lifting Plan', onPress: _onPresLiftingPlan },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -422,6 +423,11 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPresSearchEquipment = async () => {
     navigation.navigate(Constant.ROUTE__EQUIPMENT, {
       screen: 'EquipmentList',
+    });
+  };
+  const _onPresLiftingPlan = async () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentNameList',
     });
   };
 
