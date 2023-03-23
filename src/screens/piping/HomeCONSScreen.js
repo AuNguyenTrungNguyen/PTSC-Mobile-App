@@ -332,6 +332,38 @@ const HomeCONSScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- CONS GRE MANAGERMENT
+  const _onPressManageConsGRE = code => {
+    Alert.alert(
+      '',
+      'Scan: Scan QR Code Fitting\n\nScan: Scan QR Code Curing\n\nSearch: Search GRE Drawing List',
+      [
+        { text: 'Scan Fitting', onPress: () => _onPressQRCodeConsGRE(Constant.CODE_FITUP) },
+        { text: 'Scan Curing', onPress: () => _onPressQRCodeConsGRE(Constant.CODE_VISUAL) },
+        { text: 'Search', onPress: _onPresSearchConsGRE },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPressQRCodeConsGRE = async code => {
+    // const teamLeader = await Helper.getData('USERNAME');
+    // navigation.navigate(
+    //   'Camera',
+    //   {
+    //     code: code,
+    //     source: Constant.CAMERA_PIP_CONS,
+    //     projectCode: projectCode,
+    //     teamLeader: teamLeader,
+    //   }
+    // );
+  };
+  const _onPresSearchConsGRE = async () => {
+    navigation.navigate('GREDrawingList', {
+      projectCode: projectCode
+    });
+  };
+
+
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -403,6 +435,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'Pipe Spool\nControl'} onPress={_onPressPipeSpool} />
                 <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Cons Manage\nGRE'} onPress={_onPressManageConsGRE} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>

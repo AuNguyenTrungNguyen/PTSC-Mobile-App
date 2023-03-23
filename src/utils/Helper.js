@@ -38,6 +38,11 @@ export default class Helper {
     return regexNumber.test(numer) && numer !== '';
   };
 
+  static checkFormatNegativeNumber = numer => {
+    const regex = /^-?\d+(\.\d{1,2})?$/;
+    return regex.test(numer) && numer !== '';
+  };
+
   static checkFormatInteger = int => {
     const regexNumber = /^\d+$/;
     return regexNumber.test(int) && int !== '';

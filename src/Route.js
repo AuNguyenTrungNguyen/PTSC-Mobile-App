@@ -53,6 +53,10 @@ import PipeSupportDetailScreen from './screens/piping/pipe/PipeSupportDetailScre
 import PipeSpoolListScreen from './screens/piping/spool/PipeSpoolListScreen';
 import PipeSpoolDetailScreen from './screens/piping/spool/PipeSpoolDetailScreen';
 
+//-- GRE
+import GREDrawingListScreen from './screens/piping/gre/GREDrawingListScreen';
+import GREDrawingDetailScreen from './screens/piping/gre/GREDrawingDetailScreen';
+
 //-- STR
 import StructuralHomeCONSScreen from './screens/structural/home/HomeScreenCONS';
 import StructuralHomeQCScreen from './screens/structural/home/HomeScreenQC';
@@ -294,6 +298,26 @@ const PipingCONSStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+
+      {/* GRE */}
+      <PipingCONSStack.Screen
+        name='GREDrawingList'
+        component={GREDrawingListScreen}
+        options={
+          {
+            title: 'GRE Drawing List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='GREDrawingDetail'
+        component={GREDrawingDetailScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
     </PipingCONSStack.Navigator>
   );
