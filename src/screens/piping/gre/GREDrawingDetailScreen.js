@@ -571,7 +571,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
     'UserLogin': userLogin,
   };
   const headerAction = () => {
-    Helper.openDrawingPDF(navigation, link, 'PIP CONS Drawing')
+    Helper.openDrawingPDF(navigation, link, 'GRE Drawing')
   };
 
 

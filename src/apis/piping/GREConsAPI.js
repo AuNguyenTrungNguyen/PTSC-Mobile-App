@@ -1,22 +1,7 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-// export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, rev, role, token) =>
-//   fetch(
-//     Port_Server
-//     + '/api/GRE/CheckDrawingRev'
-//     + '?projectCode=' + projectCode
-//     + '&drawingNo=' + drawingNo
-//     + '&sheet=' + sheet
-//     + '&rev=' + rev
-//     + '&role=' + role,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }).then(res => res.json());
-
+//-- Base
 export const GetBatchNoListAPI = async (projectCode) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -32,7 +17,6 @@ export const GetBatchNoListAPI = async (projectCode) => {
     }
   ).then(res => res.json());
 };
-
 export const GetBonderListAPI = async (projectCode) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -49,6 +33,7 @@ export const GetBonderListAPI = async (projectCode) => {
   ).then(res => res.json());
 };
 
+//-- CONS
 export const GetCurrentConstructionInfoAPI = async (projectCode, drawingNo, sheet, rev) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -66,7 +51,6 @@ export const GetCurrentConstructionInfoAPI = async (projectCode, drawingNo, shee
     }
   ).then(res => res.json());
 };
-
 export const GetConstructionListAPI = async (projectCode, facilityCode, drawingNo, jointNo) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -84,7 +68,6 @@ export const GetConstructionListAPI = async (projectCode, facilityCode, drawingN
     }
   ).then(res => res.json());
 };
-
 export const GetConstructionDetailAPI = async (projectCode, facilityCode, drawingNo, sheet, rev, code) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -104,7 +87,6 @@ export const GetConstructionDetailAPI = async (projectCode, facilityCode, drawin
     }
   ).then(res => res.json());
 };
-
 export const UpdateConstructionDetailAPI = async (projectCode, facilityCode, userUpdate, code, listItemUpdate) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -121,49 +103,37 @@ export const UpdateConstructionDetailAPI = async (projectCode, facilityCode, use
   ).then(res => res.json());
 };
 
-// export const GetTeamReportAPI = (projectCode, disciplineCode, team, date, token) =>
-//   fetch(
-//     Port_Server
-//     + '/api/piping/GetTeamReport'
-//     + '?projectCode=' + projectCode
-//     + '&disciplineCode=' + disciplineCode
-//     + '&team=' + team
-//     + '&date=' + date,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }).then(res => res.json());
-
-// export const GetTeamReportDetailAPI = (projectCode, team, date, token) =>
-//   fetch(
-//     Port_Server
-//     + '/api/piping/GetTeamReportDetail'
-//     + '?projectCode=' + projectCode
-//     + '&team=' + team
-//     + '&date=' + date,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }).then(res => res.json());
-
-// export const GetQCStatusListAPI = (projectCode, code, facilityCode, drawingNo, weldNo, filterType, siteLocaion, token) =>
-//   fetch(
-//     Port_Server
-//     + '/api/piping/GetQCStatusList'
-//     + '?projectCode=' + projectCode
-//     + '&code=' + code
-//     + '&facilityCode=' + facilityCode
-//     + '&drawingNo=' + drawingNo
-//     + '&weldNo=' + weldNo
-//     + '&filterType=' + filterType
-//     + '&siteLocation=' + siteLocaion,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }).then(res => res.json());
+//-- QC
+export const GetQCPendingListAPI = async (projectCode, facilityCode, drawingNo, jointNo, code) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/GRE/GetQCPendingList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&jointNo=' + jointNo
+    + '&code=' + code,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateQCPendingListAPI = async (projectCode, facilityCode, userUpdate, code, listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/GRE/UpdateQCPendingList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, facilityCode, userUpdate, code, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};

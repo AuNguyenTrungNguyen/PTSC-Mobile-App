@@ -239,6 +239,31 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- QC GRE MANAGERMENT
+  const _onPressManageQCGRE = () => {
+    Alert.alert(
+      '',
+      'FitUp Pending: FitUp Pending List\n\nVisual Pending: Visual Pending List',
+      [
+        { text: 'FitUp Pending', onPress: () => _onPresQCPendingGRE(Constant.CODE_FITUP) },
+        { text: 'Visual Pending', onPress: () => _onPresQCPendingGRE(Constant.CODE_VISUAL) },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+    );
+  };
+  const _onPresQCPendingGRE = async code => {
+    const userLogin = await Helper.getData('USERNAME');
+    const title = Constant.CODE_FITUP ? 'FitUp Pending' : 'Visual Pending';
+    navigation.navigate(
+      'GREQCPendingList',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+        code: code,
+        title: title,
+      }
+    );
+  };
 
 
   const RenderItemBox = props => {
@@ -302,6 +327,10 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text-outline'} />
                 <RenderItemBox title={'Welder Card'} onPress={_onPressOpenQCWelderCard} iconName={'md-card-outline'} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'QC Manage\nGRE'} onPress={_onPressManageQCGRE} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>

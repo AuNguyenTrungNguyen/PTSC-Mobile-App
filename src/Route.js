@@ -56,6 +56,7 @@ import PipeSpoolDetailScreen from './screens/piping/spool/PipeSpoolDetailScreen'
 //-- GRE
 import GREDrawingListScreen from './screens/piping/gre/GREDrawingListScreen';
 import GREDrawingDetailScreen from './screens/piping/gre/GREDrawingDetailScreen';
+import GREQCPendingListScreen from './screens/piping/gre/GREQCPendingListScreen';
 
 //-- STR
 import StructuralHomeCONSScreen from './screens/structural/home/HomeScreenCONS';
@@ -425,6 +426,14 @@ const PipingQCStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+      <PipingQCStack.Screen
+        name='GREQCPendingList'
+        component={GREQCPendingListScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
     </PipingQCStack.Navigator>
   );
