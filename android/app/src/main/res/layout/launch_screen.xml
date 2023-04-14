@@ -7,7 +7,7 @@
     android:gravity="center">
 
     <ImageView
-        android:src="@drawable/background"
+        android:src="@drawable/background_tct"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

@@ -7,8 +7,8 @@ import Constant from './utils/Constant';
 
 import AuthScreen from './screens/authentication/AuthScreen';
 import LoginScreen from './screens/authentication/LoginScreen';
-import PDFViewScreen from './screens/pdf/PDFViewScreen';
-// import PDFViewScreen from './screens/pdf/PDFViewScreenNew'; //-- Use for AWS
+// import PDFViewScreen from './screens/pdf/PDFViewScreen';
+import PDFViewScreen from './screens/pdf/PDFViewScreenNew'; //-- Use for AWS
 
 //-- General
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
@@ -116,6 +116,9 @@ if (Appearance.getColorScheme() === 'dark') {
   optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
 };
 
+//-- const titleShow = 'PTSC';
+const titleShow = 'PTSC M&C';
+
 //-- PIP Stacks
 const PipingCONSStack = createStackNavigator();
 const PipingCONSStackScreens = () => {
@@ -126,7 +129,7 @@ const PipingCONSStackScreens = () => {
         component={PipingHomeCONSScreen}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />
@@ -333,7 +336,7 @@ const PipingQCStackScreens = () => {
         component={PipingHomeQCScreen}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />
@@ -450,7 +453,7 @@ const StructuralCONSStackScreens = () => {
         component={StructuralHomeCONSScreen}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />
@@ -636,7 +639,7 @@ const StructuralQCStackScreens = () => {
         component={StructuralHomeQCScreen}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />
@@ -768,7 +771,7 @@ const ElectricalCONSStackScreens = () => {
         component={ElectricalHomeScreenCONS}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />
@@ -785,7 +788,7 @@ const ElectricalQCStackScreens = () => {
         component={ElectricalHomeScreenQC}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />
@@ -804,7 +807,7 @@ const ViewerStackScreens = () => {
         component={HomeViewerScreen}
         options={
           {
-            title: 'PTSC M&C',
+            title: titleShow,
           }
         }
       />

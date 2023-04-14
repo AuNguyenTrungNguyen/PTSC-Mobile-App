@@ -130,7 +130,9 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.ptsc_cloud"
+        // applicationId "com.ptsc_cloud"
+        applicationId "com.ptsc.ptscmc"
+        // applicationId "com.ptsc.pms.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 6
