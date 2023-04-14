@@ -135,8 +135,6 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
 
   //-- Render
   const RenderDetail = () => {
-    const isFittingLastDate = columnChange.includes('FittingLastDate');
-    const isWeldingLastDate = columnChange.includes('WeldingLastDate');
     const isReleaseForPaintingDate = columnChange.includes('ReleaseForPaintingDate');
     const isSpoolOutFromBP = columnChange.includes('SpoolOutFromBP');
     const isSpoolRigupToSite = columnChange.includes('SpoolRigupToSite');
@@ -148,19 +146,17 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>FittingLastDate:</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => { _onSelectDate('FittingLastDate') }}>
-                    <Text style={isFittingLastDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.FittingLastDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFittingLastDate ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                  <View style={styles.containerAction}>
+                    <Text style={styles.textBlue}>{Formater.formatDateData(spoolDetail.FittingLastDate)}</Text>
+                  </View>
                 </View>
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>WeldingLastDate:</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('WeldingLastDate')}>
-                    <Text style={isWeldingLastDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.WeldingLastDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isWeldingLastDate ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                  <View style={styles.containerAction}>
+                    <Text style={styles.textBlue}>{Formater.formatDateData(spoolDetail.WeldingLastDate)}</Text>
+                  </View>
                 </View>
               </View>
 
@@ -308,6 +304,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontWeight: 'bold',
     color: 'green',
+  },
+  textBlue: {
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    fontWeight: 'bold',
+    color: 'blue',
   },
   iconAction: {
     marginLeft: 4,
