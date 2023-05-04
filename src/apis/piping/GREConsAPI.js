@@ -122,7 +122,7 @@ export const GetQCPendingListAPI = async (projectCode, facilityCode, drawingNo, 
     }
   ).then(res => res.json());
 };
-export const UpdateQCPendingListAPI = async (projectCode, facilityCode, userUpdate, code, listItemUpdate) => {
+export const UpdateQCPendingListAPI = async (userUpdate, code, listItemUpdate) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -133,7 +133,7 @@ export const UpdateQCPendingListAPI = async (projectCode, facilityCode, userUpda
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ projectCode, facilityCode, userUpdate, code, listItemUpdate }),
+      body: JSON.stringify({ userUpdate, code, listItemUpdate }),
     }
   ).then(res => res.json());
 };

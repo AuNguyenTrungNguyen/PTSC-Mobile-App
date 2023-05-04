@@ -150,7 +150,7 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
   };
   const updatePendingList = async () => {
     const listUpdate = Helper.handleListUpdate(updateSpendList);
-    UpdateQCPendingListAPI(projectCode, userLogin, code, listUpdate)
+    UpdateQCPendingListAPI(userLogin, code, listUpdate)
       .then(res => {
         if (res.Success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -455,24 +455,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              {/* <View style={styles.row}>
-                <View style={styles.cellOne}>
-                  <Text>BatchNo:</Text>
-                </View>
-                <View style={styles.cellTwo}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.AdhesiveBatchNo)}</Text>
-                </View>
-                <View style={styles.cellAction}>
-                  <TouchableOpacity onPress={() => _onPressShowRemark(item.QCFittupRemark, index, 'QCFittupRemark')}>
-                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.buttonReject}
-                    onPress={() => _onPressChangeStatus('REJ', index, 'FitUpResult')}>
-                    <Text style={styles.labelReject}>Reject</Text>
-                  </TouchableOpacity>
-                </View>
-              </View> */}
               <View style={styles.row}>
                 <View style={styles.cellOne}>
                   <Text>FitUpStatus:</Text>
@@ -491,11 +473,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.cellAction}>
-                  {/* <TouchableOpacity
-                    style={styles.buttonClean}
-                    onPress={() => _onPressChangeStatus(null, index, 'FitUpResult')}>
-                    <Text style={styles.labelClean}>Clear</Text>
-                  </TouchableOpacity> */}
                 </View>
               </View>
             </>
@@ -526,26 +503,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              {/* <View style={styles.row}>
-                <View style={styles.cellOne}>
-                  <Text>Size:</Text>
-                </View>
-                <View style={styles.cellOneAction}>
-                  <Text style={styles.textData}>{size + "\""}</Text>
-                  <TouchableOpacity onPress={() => _onPressShowSize(size, index, 'Size')}>
-                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.cellOne}>
-                  <Text>SCH:</Text>
-                </View>
-                <View style={styles.cellOneAction}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Schedule_THK) + ' '}</Text>
-                  <TouchableOpacity onPress={() => _onPressShowSCH(item.Schedule_THK, index, 'Schedule_THK')}>
-                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
-                  </TouchableOpacity>
-                </View>
-              </View> */}
               <View style={styles.row}>
                 <View style={styles.cellOne}>
                   <Text>WPSNo:</Text>
@@ -568,16 +525,13 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                 <View style={styles.cellTwo}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
                 </View>
-                {/* <View style={styles.cellAction}>
-                  <TouchableOpacity onPress={() => _onPressShowRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
-                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
-                  </TouchableOpacity>
+                <View style={styles.cellAction}>
                   <TouchableOpacity
                     style={styles.buttonReject}
                     onPress={() => _onPressChangeStatus('REJ', index, 'VisualResult')}>
                     <Text style={styles.labelReject}>Reject</Text>
                   </TouchableOpacity>
-                </View> */}
+                </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
@@ -597,11 +551,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.cellAction}>
-                  <TouchableOpacity
-                    style={styles.buttonClean}
-                    onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
-                    <Text style={styles.labelClean}>Clear</Text>
-                  </TouchableOpacity>
                 </View>
               </View>
               <View style={styles.row}>

@@ -597,9 +597,9 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
     }
 
     //-- If Visual = ACC, lock UI. 
-    //-- If Visual <> ACC, FitUp ACC also lock UI. 
+    //-- If Visual <> ACC, FitUp <> ACC also lock UI. 
     if (code && code === Constant.CODE_VISUAL) {
-      isDisableItem = isDisableItem || (item['FitUpResult'] === Constant.STATUS_ACCEPT);
+      isDisableItem = isDisableItem || (item['FitUpResult'] !== Constant.STATUS_ACCEPT);
     }
 
     isDisableItem = isReadOnly ? true : isDisableItem;
