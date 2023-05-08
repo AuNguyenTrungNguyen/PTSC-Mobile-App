@@ -1,6 +1,7 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Helper from '../../../utils/Helper';
@@ -139,6 +140,15 @@ const HomeCONSScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Electrical Cable Control
+  const _onElectricalCableControl = async () => {
+    navigation.navigate(
+      'ElectricalCableControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
 
 
   const RenderItemBox = props => {
@@ -153,7 +163,13 @@ const HomeCONSScreen = ({ route, navigation }) => {
           <>
             <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
               <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-              <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+              {
+                props.iconType === 'Material'
+                  ?
+                  <MaterialIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  :
+                  <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+              }
             </TouchableOpacity>
             {
               props.number
@@ -182,6 +198,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Cable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

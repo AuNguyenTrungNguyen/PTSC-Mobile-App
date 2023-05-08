@@ -90,6 +90,8 @@ import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 //-- EIT
 import ElectricalHomeScreenCONS from './screens/electircal/home/HomeCONSScreen';
 import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
+import ElectricalCableControlListScreen from './screens/electircal/cablecontrol/ElectricalCableControlListScreen';
+import ElectricalCableControlDetailScreen from './screens/electircal/cablecontrol/ElectricalCableControlDetailScreen';
 
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
@@ -772,6 +774,26 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: titleShow,
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'ElectricalCableControlList'}
+        component={ElectricalCableControlListScreen}
+        options={
+          {
+            title: 'Cable Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'ElectricalCableControlDetail'}
+        component={ElectricalCableControlDetailScreen}
+        options={
+          {
+            title: 'Cable Control Detail',
+            headerBackTitle: 'Back',
           }
         }
       />
