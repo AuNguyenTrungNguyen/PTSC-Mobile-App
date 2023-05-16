@@ -25,7 +25,9 @@ export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, locatio
     }).then(res => res.json());
 };
 
-export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, isSpending, token) => {
+export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, isSpending) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
@@ -36,13 +38,14 @@ export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev
   if (!rev) {
     rev = '';
   }
-  if(!isSpending){
+  if (!isSpending) {
     isSpending = false;
   }
   return fetch(
     Port_Server
     + '/api/structural/QC/GetQCSpendListQRCode'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + drawingNo
     + '&sheet=' + sheet
     + '&rev=' + rev

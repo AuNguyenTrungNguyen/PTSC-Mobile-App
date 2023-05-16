@@ -19,7 +19,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const ConstructionQCStatusScreen = ({ route, navigation }) => {
 
-  const { projectCode, code, userLogin } = route.params;
+  const { projectCode, subContractor, code, userLogin } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -102,8 +102,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
   };
 
   const getQCStatusList = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type) => {
-    let token = await Helper.getData('TOKEN');
-    GetConstructionQCStatusListAPI(projectCode, drawing, weld, locate, filterType, code, token)
+    GetConstructionQCStatusListAPI(projectCode, drawing, weld, locate, filterType, code)
       .then(res => {
         if (res.success) {
           setQCStatusList(res.data);
@@ -531,9 +530,11 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
               ?
               (<View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
-                  <Text>Project: </Text>
-                  <Text style={styles.infoData}>{projectCode.toUpperCase()}</Text>
-                  <Text> User: </Text>
+                  <Text style={styles.infoTitleAction}>Project:</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
+                </View>
+                <View style={styles.rowInfo}>
+                  <Text style={styles.infoTitleAction}>UserLogin:</Text>
                   <Text style={styles.infoData}>{userLogin}</Text>
                 </View>
                 <View style={styles.rowInfoAction}>
@@ -660,10 +661,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoData: {
-    flex: 2,
+    flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
-    textAlign: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',

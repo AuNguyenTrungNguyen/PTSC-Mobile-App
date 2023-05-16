@@ -14,7 +14,7 @@ import { GetCurrentConstructionInfoAPI } from '../../../apis/structural/Construc
 
 const CameraScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, code, destination } = route.params;
+  const { projectCode, subContractor, userLogin, code, destination } = route.params;
 
   const [isScanned, setIsScanned] = useState(false);
   const isFocused = useIsFocused();
@@ -152,6 +152,7 @@ const CameraScreen = ({ route, navigation }) => {
     else if (destination === Naming.NAME_STR_QC) {
       navigation.navigate(route, {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         sheet: sheet,
         rev: rev,
@@ -203,11 +204,12 @@ const CameraScreen = ({ route, navigation }) => {
               showComfirm('ERROR', 'Please check that you are using the company network!');
             });
         } else if (destination === Naming.NAME_STR_CONSTRUCTION) {
-          GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+          GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev)
             .then(res => {
               if (res.success && res.data != null) {
                 navigation.navigate(route, {
                   projectCode: projectCode,
+                  subContractor: subContractor,
                   facilityCode: res.data,
                   drawingNo: drawingNo,
                   sheet: sheet,

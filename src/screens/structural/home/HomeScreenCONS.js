@@ -15,7 +15,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const HomeScreenCONS = ({ route, navigation }) => {
 
-  const { projectCode, disciplineCode } = route.params;
+  const { projectCode, subContractor, disciplineCode } = route.params;
   const [spendNumbers, setSpendNumbers] = useState({ FitUp: 0, Visual: 0, LamCheck: 0, DimCheck: 0, DimAfterWeld: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -222,6 +222,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         code: code,
         destination: Naming.NAME_STR_CONSTRUCTION
@@ -235,6 +236,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'ConstructionList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         code: code,
         title: title,
@@ -248,6 +250,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'ConstructionQCStatus',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         code: code,
         title: title,
@@ -468,7 +471,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
         <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumber)} />
         :
         <View style={styles.container}>
-          <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+          <Header data={{ 'Project': projectCode + '  -  ' + subContractor, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             {
               (spendNumbers.LamCheck || spendNumbers.DimCheck)

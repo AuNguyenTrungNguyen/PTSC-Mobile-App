@@ -1,11 +1,28 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
-  fetch(
+// export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
+//   fetch(
+//     Port_Server
+//     + '/api/structural/Construction/GetConstructionList'
+//     + '?projectCode=' + projectCode
+//     + '&facilityCode=' + facilityCode
+//     + '&drawingNo=' + drawingNo,
+//     {
+//       headers: {
+//         'Authorization': 'Bearer ' + token,
+//         'Content-Type': 'application/json',
+//       },
+//     }
+//   ).then(res => res.json());
+export const GetConstructionListSubContractorAPI = async (projectCode, facilityCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
-    + '/api/structural/Construction/GetConstructionList'
+    + '/api/structural/Construction/GetConstructionListSubContractor'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo,
     {
@@ -15,12 +32,16 @@ export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, tok
       },
     }
   ).then(res => res.json());
+};
 
-export const GetCurrentConstructionInfoAPI = (projectCode, drawingNo, sheet, rev, token) =>
-  fetch(
+export const GetCurrentConstructionInfoAPI = async (projectCode, drawingNo, sheet, rev) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/Construction/GetCurrentConstructionInfo'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + drawingNo
     + '&sheet=' + sheet
     + '&rev=' + rev,
@@ -30,23 +51,7 @@ export const GetCurrentConstructionInfoAPI = (projectCode, drawingNo, sheet, rev
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-
-export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, token) =>
-  fetch(
-    Port_Server
-    + '/api/structural/Construction/GetConstructionDetail'
-    + '?projectCode=' + projectCode
-    + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
-    + '&sheet=' + sheet
-    + '&rev=' + rev
-    + '&code=' + code,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
+};
 
 export const GetConstructionDetaiFilterlAPI = (projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token) =>
   fetch(
@@ -80,11 +85,14 @@ export const UpdateConstructionDetailAPI = (projectCode, facilityCode, userUpdat
     }
   ).then(res => res.json());
 
-export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, location, type, code, token) =>
-  fetch(
+export const GetConstructionQCStatusListAPI = async (projectCode, drawingNo, jointNo, location, type, code) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/Construction/GetConstructionQCStatusList'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + drawingNo
     + '&jointNo=' + jointNo
     + '&location=' + location
@@ -96,6 +104,7 @@ export const GetConstructionQCStatusListAPI = (projectCode, drawingNo, jointNo, 
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+};
 
 export const GetReweldFromQCAPI = async (projectCode, drawingNo) => {
   const token = await Helper.getData('TOKEN');

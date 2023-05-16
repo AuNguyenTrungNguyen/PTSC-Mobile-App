@@ -3,7 +3,7 @@ import { StyleSheet, SafeAreaView, View, TextInput, Image, Text, TouchableOpacit
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
-import { LoginAPI, GetProjectListAPI, GetModuleListAPI, GetRoleListAPI } from '../../apis/app/LoginAPI';
+import { LoginAPI, GetProjectListAPI, GetRoleListAPI } from '../../apis/app/LoginAPI';
 
 import Constant from '../../utils/Constant';
 import Helper from '../../utils/Helper';
@@ -23,12 +23,6 @@ const LoginScreen = ({ navigation }) => {
   const [projectList, setProjectList] = useState([]);
   const [projectCode, setProjectCode] = useState(PROJECT_CODE_DEFAULT);
   const [isVisibleProject, setIsVisibleProject] = useState(false);
-
-  // const DISCIPLINE_CODE_DEFAULT = 'Select Module';
-  // const [isLoadingDiscipline, setIsLoadingDiscipline] = useState(false);
-  // const [disciplineList, setDisciplineList] = useState([]);
-  // const [disciplineCode, setDisciplineCode] = useState(DISCIPLINE_CODE_DEFAULT);
-  // const [isVisibleDiscipline, setIsVisibleDiscipline] = useState(false);
 
   const ROLE_CODE_DEFAULT = 'Select Role';
   const [isLoadingRole, setIsLoadingRole] = useState(false);
@@ -88,25 +82,6 @@ const LoginScreen = ({ navigation }) => {
         confirmAlert();
       });
   };
-  // const getModuleList = () => {
-  //   GetModuleListAPI()
-  //     .then(res => {
-  //       if (res.success) {
-  //         // setIsLoadingDiscipline(false);
-  //         if (!res.data.length) {
-  //           MessageAlert('ERROR', 'Don\'t have any modules with this account.\nTry entering another account.');
-  //         } else {
-  //           setDisciplineList(res.data);
-  //           setIsVisibleDiscipline(true);
-  //         }
-  //       } else {
-  //         confirmAlert();
-  //       }
-  //     })
-  //     .catch(() => {
-  //       confirmAlert();
-  //     });
-  // };
   const getRoleList = () => {
     GetRoleListAPI(username)
       .then(res => {
@@ -157,11 +132,6 @@ const LoginScreen = ({ navigation }) => {
           setIsLoadingLogin(false);
           return;
         }
-        // if (disciplineCode === DISCIPLINE_CODE_DEFAULT) {
-        //   MessageAlert('ERROR', 'Please select a module.');
-        //   setIsLoadingLogin(false);
-        //   return;
-        // }
         if (roleCode === ROLE_CODE_DEFAULT) {
           MessageAlert('ERROR', 'Please select a role.');
           setIsLoadingLogin(false);
@@ -174,13 +144,13 @@ const LoginScreen = ({ navigation }) => {
               MessageAlert('ERROR', res.error_description);
               setIsLoadingLogin(false);
               setProjectCode(PROJECT_CODE_DEFAULT);
-              // setDisciplineCode(DISCIPLINE_CODE_DEFAULT);
               setRoleCode(ROLE_CODE_DEFAULT);
               return;
             }
             if (res.access_token) {
               Helper.storeData('TOKEN', res.access_token);
               Helper.storeData('USERNAME', res.userName);
+              Helper.storeData('SUB_CONTRACTOR', res.subContractor);
               Helper.storeData('EXPIRES', res['.expires']);
               Helper.storeData('PROJECT_CODE', projectCode);
               Helper.storeData('ROLE_CODE', roleCode);
@@ -207,7 +177,7 @@ const LoginScreen = ({ navigation }) => {
                 Helper.storeData('DISCIPLINE_CODE', disciplineCode);
                 navigation.replace(route, {
                   screen: Constant.ROUTE__HOME,
-                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode, subContractor: res.subContractor }
                 });
                 return;
               }
@@ -232,7 +202,7 @@ const LoginScreen = ({ navigation }) => {
                 Helper.storeData('DISCIPLINE_CODE', disciplineCode);
                 navigation.replace(route, {
                   screen: Constant.ROUTE__HOME,
-                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode, subContractor: res.subContractor }
                 });
                 return;
               }
@@ -257,7 +227,7 @@ const LoginScreen = ({ navigation }) => {
                 Helper.storeData('DISCIPLINE_CODE', disciplineCode);
                 navigation.replace(route, {
                   screen: Constant.ROUTE__HOME,
-                  params: { projectCode: projectCode, disciplineCode: disciplineCode }
+                  params: { projectCode: projectCode, disciplineCode: disciplineCode, subContractor: res.subContractor }
                 });
                 return;
               }
@@ -269,7 +239,7 @@ const LoginScreen = ({ navigation }) => {
                 Helper.storeData('ROLE_CODE', Constant.ROUTE__VIEW_DRAWING);
                 navigation.replace(Constant.ROUTE__VIEW_DRAWING, {
                   screen: Constant.ROUTE__HOME,
-                  params: { projectCode: projectCode }
+                  params: { projectCode: projectCode, subContractor: res.subContractor }
                 });
                 return;
               }
@@ -311,31 +281,6 @@ const LoginScreen = ({ navigation }) => {
     setProjectCode(item);
     setIsVisibleProject(false);
   };
-
-  // const _onPressSelectDiscipline = () => {
-  //   if (username === '' || password === '') {
-  //     MessageAlert('ERROR', 'The user name or password is invalid.');
-  //     return;
-  //   }
-  //   setIsLoadingDiscipline(true);
-  //   LoginAPI(username, password)
-  //     .then(res => {
-  //       res = JSON.parse(res.data);
-  //       if (res.access_token) {
-  //         callAPI(getModuleList, DISCIPLINE_CODE_DEFAULT);
-  //         return;
-  //       }
-  //       setIsLoadingDiscipline(false);
-  //       MessageAlert('ERROR', res.error_description);
-  //     })
-  //     .catch(() => {
-  //       confirmAlert();
-  //     });
-  // };
-  // const _onChangeDisciplineCode = (item) => {
-  //   setDisciplineCode(item);
-  //   setIsVisibleDiscipline(false);
-  // };
 
   const _onPressSelectRole = () => {
     if (username === '' || password === '') {

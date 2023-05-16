@@ -8,7 +8,7 @@ import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionListAPI, GetCurrentConstructionInfoAPI } from '../../../apis/structural/ConstructionAPI';
+import { GetConstructionListSubContractorAPI, GetCurrentConstructionInfoAPI } from '../../../apis/structural/ConstructionAPI';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
 import MessageAlert from '../../../components/MessageAlert';
@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const ConstructionListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, code } = route.params;
+  const { projectCode, subContractor, userLogin, code } = route.params;
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -114,10 +114,9 @@ const ConstructionListScreen = ({ route, navigation }) => {
 
   const searchConstruction = async (facilityCode, drawingNo) => {
     Keyboard.dismiss();
-    let token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo != null ? drawingNo : '';
-    GetConstructionListAPI(projectCode, facilityCode, drawingNo, token)
+    GetConstructionListSubContractorAPI(projectCode, facilityCode, drawingNo)
       .then(res => {
         if (res.success) {
           setConstructionList(res.data);
@@ -170,8 +169,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
         }
       );
     } else {
-      let token = await Helper.getData('TOKEN');
-      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev)
         .then(res => {
           if (res.success) {
             navigation.navigate('ConstructionDetail', {
@@ -215,8 +213,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
         }
       );
     } else {
-      let token = await Helper.getData('TOKEN');
-      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+      GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev)
         .then(res => {
           if (res.success) {
             navigation.navigate('ConstructionMultiDetail', {
@@ -336,7 +333,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>FacilityCode:</Text>

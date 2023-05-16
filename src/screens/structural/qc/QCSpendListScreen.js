@@ -34,7 +34,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const [isVisibleTotal, setIsVisibleTotal] = useState(false);
   const [totalList, setTotalList] = useState([]);
 
-  const { projectCode, sheet, rev, code, userLogin, paramDrawingNo, isSpending } = route.params;
+  const { projectCode, subContractor, sheet, rev, code, userLogin, paramDrawingNo, isSpending } = route.params;
 
   const [weldNo, setWeldNo] = useState('');
   const [drawingNo, setDrawingNo] = useState('');
@@ -113,8 +113,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type) => {
-    let token = await Helper.getData('TOKEN');
-    GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending, token)
+    GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending)
       .then(res => {
         if (res.success) {
           setSpendList(res.data);
@@ -826,6 +825,10 @@ const QCSpendListScreen = ({ route, navigation }) => {
             isShowDescription.show
               ?
               <View style={styles.headerContainer}>
+                <View style={styles.rowInfo}>
+                  <Text>Project:   </Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
+                </View>
                 <View style={styles.rowInfo}>
                   <Text>User:   </Text>
                   <Text style={styles.infoData}>{userLogin}</Text>
