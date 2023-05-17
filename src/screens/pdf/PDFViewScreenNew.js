@@ -33,7 +33,6 @@ export default ({ route, navigation }) => {
     let token = await Helper.getData('TOKEN');
     ReadByteFromURLAPI(link, token)
       .then(res => {
-        console.log(res);
         if (res.success) {
           setURL({ uri: "data:application/pdf;base64," + res.data });
           setIsLoading(false);

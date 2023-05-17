@@ -86,7 +86,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
     GetQCPendingListAPI(projectCode, facilityCode, drawingNo, jointNo, code)
       .then(res => {
         if (res.Success && res.Data) {
-          console.log(res.Data[0]);
           setPendingList(res.Data);
           setIsLoading(false);
           setIsError(false);
