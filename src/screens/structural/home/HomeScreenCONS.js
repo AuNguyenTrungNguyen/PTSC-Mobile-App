@@ -4,7 +4,7 @@ import { useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 
-import { GetNotifyNumberScopeAPI } from '../../../apis/app/AppAPI';
+import { GetSTRNotifyNumberAPI } from '../../../apis/app/AppAPI';
 
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
@@ -52,8 +52,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
     });
   };
   const getNotifyNumber = async () => {
-    let token = await Helper.getData('TOKEN');
-    GetNotifyNumberScopeAPI(projectCode, token)
+    GetSTRNotifyNumberAPI(projectCode)
       .then(res => {
         if (res.success) {
           setSpendNumbers(res.data);

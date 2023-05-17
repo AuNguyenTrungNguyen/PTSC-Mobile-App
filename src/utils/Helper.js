@@ -15,7 +15,11 @@ export default class Helper {
 
   static getData = async (key) => {
     try {
-      return await AsyncStorage.getItem(key);
+      var data = await AsyncStorage.getItem(key);
+      if (key === 'SUB_CONTRACTOR') {
+        return data ? data : '';
+      }
+      return data;
     } catch (e) {
       MessageAlert('ERROR', e.toString());
     };

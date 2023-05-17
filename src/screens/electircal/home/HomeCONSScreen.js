@@ -35,36 +35,6 @@ const HomeCONSScreen = ({ route, navigation }) => {
     }, [isFocused]
   );
 
-  // const callAPI = executedAPI => {
-  //   NetInfo.fetch().then(state => {
-  //     if (!state.isConnected) {
-  //       setIsLoading(false);
-  //       setIsError(true);
-  //       MessageAlert('WARNING', 'Network not available!');
-  //     } else {
-  //       executedAPI();
-  //     }
-  //   });
-  // };
-  // const getNotifyNumber = async () => {
-  //   let token = await Helper.getData('TOKEN');
-  //   GetNotifyNumberScopeAPI(projectCode, token)
-  //     .then(res => {
-  //       if (res.success) {
-  //         setSpendNumbers(res.data);
-  //         setIsLoading(false);
-  //         setIsError(false);
-  //       } else {
-  //         setIsLoading(false);
-  //         setIsError(true);
-  //       }
-  //     })
-  //     .catch(() => {
-  //       setIsLoading(false);
-  //       setIsError(true);
-  //     });
-  // };
-
   const _onPressLogout = () => {
     Alert.alert(
       'Logout',

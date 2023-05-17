@@ -148,23 +148,23 @@ export const GetInspectorListAPI = (projectCode, disciplineCode, filterType, tok
       },
     }).then(res => res.json());
 
-export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
-  let scope = await Helper.getData('QCSCOPE');
-  if (scope == null) {
-    scope = '';
-  }
-  return fetch(
-    Port_Server
-    + '/api/App/GetNotifyNumberScope'
-    + '?projectCode=' + projectCode
-    + '&scope=' + scope,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
-};
+// export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
+//   let scope = await Helper.getData('QCSCOPE');
+//   if (scope == null) {
+//     scope = '';
+//   }
+//   return fetch(
+//     Port_Server
+//     + '/api/App/GetNotifyNumberScope'
+//     + '?projectCode=' + projectCode
+//     + '&scope=' + scope,
+//     {
+//       headers: {
+//         'Authorization': 'Bearer ' + token,
+//         'Content-Type': 'application/json',
+//       },
+//     }).then(res => res.json());
+// };
 
 export const GetPIPNotifyNumberAPI = (projectCode, token) =>
   fetch(
@@ -175,6 +175,25 @@ export const GetPIPNotifyNumberAPI = (projectCode, token) =>
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+export const GetSTRNotifyNumberAPI = async projectCode => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  let scope = await Helper.getData('QCSCOPE');
+  if (scope == null) {
+    scope = '';
+  }
+  return fetch(
+    Port_Server + '/api/App/GetSTRNotifyNumber'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
+    + '&scope=' + scope,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
 
 export const GetFactorTypeAPI = (projectCode, token) =>
   fetch(
