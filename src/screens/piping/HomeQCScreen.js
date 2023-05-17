@@ -253,7 +253,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
   const _onPresQCPendingGRE = async code => {
     const userLogin = await Helper.getData('USERNAME');
-    const title = Constant.CODE_FITUP ? 'FitUp Pending' : 'Visual Pending';
+    const title = code === Constant.CODE_FITUP ? 'FitUp Pending' : 'Visual Pending';
     navigation.navigate(
       'GREQCPendingList',
       {

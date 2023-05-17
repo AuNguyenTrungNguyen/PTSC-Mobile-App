@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-simple-toast';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import CheckBox from '@react-native-community/checkbox';
+import Dialog from 'react-native-dialog';
 
 import Networker from '../../../utils/Networker';
 import Constant from '../../../utils/Constant';
@@ -86,6 +86,7 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
     GetQCPendingListAPI(projectCode, facilityCode, drawingNo, jointNo, code)
       .then(res => {
         if (res.Success && res.Data) {
+          console.log(res.Data[0]);
           setPendingList(res.Data);
           setIsLoading(false);
           setIsError(false);
@@ -228,18 +229,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
     onChangeData(value, index, key, inspectorKey);
   };
 
-  // const _onChangeCheckbox = (index, key, value) => {
-  //   value = value ? 'x' : null;
-  //   onChangeData(value, index, key);
-  // };
-
-  // const [isVisibleWeldType, setIsVisibleWeldType] = useState(false);
-  // const _onPressShowWeldType = (index, key) => {
-  //   setIndexUpdate(index);
-  //   setKeyUpdate(key);
-  //   setIsVisibleWeldType(true);
-  // };
-
   const [isVisibleGlobalInspector, setIsVisibleGlobalInspector] = useState(false);
   const [globalInspector, setGlobalInspector] = useState('');
   const _onPressShowGlobalInspector = () => {
@@ -253,27 +242,27 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
     setIsVisibleGlobalInspector(false);
   };
 
-  // const [isVisibleRemark, setIsVisibleRemark] = useState(false);
-  // const [remarkDisplay, setRemarkDisplay] = useState('');
-  // const _onPressShowRemark = (value, index, key) => {
-  //   setIndexUpdate(index);
-  //   setKeyUpdate(key);
-  //   if (value) {
-  //     setRemarkDisplay(value.toString());
-  //   } else {
-  //     setRemarkDisplay('');
-  //   }
-  //   setIsVisibleRemark(true);
-  // };
-  // const _onChangeRemark = () => {
-  //   let value = remarkDisplay;
-  //   if (!value) {
-  //     value = null;
-  //   }
-  //   setRemarkDisplay(value);
-  //   onChangeData(value);
-  //   setIsVisibleRemark(false);
-  // };
+  const [isVisibleRemark, setIsVisibleRemark] = useState(false);
+  const [remarkDisplay, setRemarkDisplay] = useState('');
+  const _onPressShowRemark = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setRemarkDisplay(value.toString());
+    } else {
+      setRemarkDisplay('');
+    }
+    setIsVisibleRemark(true);
+  };
+  const _onChangeRemark = () => {
+    let value = remarkDisplay;
+    if (!value) {
+      value = null;
+    }
+    setRemarkDisplay(value);
+    onChangeData(value);
+    setIsVisibleRemark(false);
+  };
 
   const [isVisibleInspector, setIsVisibleInspector] = useState(false);
   const [inspectorList, setInspectorList] = useState([]);
@@ -291,51 +280,29 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
     setIsVisibleInspector(false);
   };
 
-  // const [isVisibleSize, setIsVisibleSize] = useState(false);
-  // const [sizeDisplay, setSizeDisplay] = useState('');
-  // const _onPressShowSize = (value, index, key) => {
-  //   setIndexUpdate(index);
-  //   setKeyUpdate(key);
-  //   if (value) {
-  //     setSizeDisplay(value.toString());
-  //   } else {
-  //     setSizeDisplay('');
-  //   }
-  //   setIsVisibleSize(true);
-  // };
-  // const _onChangeSize = () => {
-  //   let value = sizeDisplay;
-  //   if (!value) {
-  //     value = '';
-  //   } else {
-  //     value = value.replace("\"", "");
-  //   }
-  //   setSizeDisplay(value);
-  //   onChangeData(value + "\"");
-  //   setIsVisibleSize(false);
-  // };
-
-  // const [isVisibleSCH, setIsVisibleSCH] = useState(false);
-  // const [SCHDisplay, setSCHDisplay] = useState('');
-  // const _onPressShowSCH = (value, index, key) => {
-  //   setIndexUpdate(index);
-  //   setKeyUpdate(key);
-  //   if (value) {
-  //     setSCHDisplay(value.toString());
-  //   } else {
-  //     setSCHDisplay('');
-  //   }
-  //   setIsVisibleSCH(true);
-  // };
-  // const _onChangeSCH = () => {
-  //   let value = SCHDisplay;
-  //   if (!value) {
-  //     value = null;
-  //   }
-  //   setSCHDisplay(value);
-  //   onChangeData(value);
-  //   setIsVisibleSCH(false);
-  // };
+  const [isVisibleSize, setIsVisibleSize] = useState(false);
+  const [sizeDisplay, setSizeDisplay] = useState('');
+  const _onPressShowSize = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setSizeDisplay(value.toString());
+    } else {
+      setSizeDisplay('');
+    }
+    setIsVisibleSize(true);
+  };
+  const _onChangeSize = () => {
+    let value = sizeDisplay;
+    if (!value) {
+      value = '';
+    } else {
+      value = value.replace("\"", "");
+    }
+    setSizeDisplay(value);
+    onChangeData(value + "\"");
+    setIsVisibleSize(false);
+  };
 
 
   //-- Render List
@@ -448,6 +415,9 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.AdhesiveBatchNo)}</Text>
                 </View>
                 <View style={styles.cellAction}>
+                  <TouchableOpacity onPress={() => _onPressShowRemark(item.QCFitUpRemark, index, 'QCFitUpRemark')}>
+                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.buttonReject}
                     onPress={() => _onPressChangeStatus('REJ', index, 'FitUpResult')}>
@@ -480,17 +450,33 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>WeldDate:</Text>
+                  <Text>StartTime:</Text>
                 </View>
+                <View style={styles.cellTwo}>
+                  <Text style={styles.textData}>{Formater.formatDateDataTime(item.CuringStartTime)}</Text>
+                </View>
+                <View style={styles.cellOne} />
+              </View>
+              <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
+                  <Text>EndTime:</Text>
                 </View>
+                <View style={styles.cellTwo}>
+                  <Text style={styles.textData}>{Formater.formatDateDataTime(item.CuringEndTime)}</Text>
+                </View>
+                <View style={styles.cellOne} />
+              </View>
+              <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>Location:</Text>
+                  <Text>Size:</Text>
                 </View>
-                <View style={styles.cellOne}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SiteLocation)}</Text>
+                <View style={styles.cellOneAction}>
+                  <Text style={styles.textData}>{size + "\""}</Text>
+                  <TouchableOpacity onPress={() => _onPressShowSize(size, index, 'Size')}>
+                    <FontAwesomeIcon name='pencil' size={20} color={BASE_COLOR} />
+                  </TouchableOpacity>
                 </View>
+                <View style={styles.cellTwo} />
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
@@ -505,10 +491,10 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>WPSNo:</Text>
+                  <Text>CICO:</Text>
                 </View>
                 <View style={styles.cellTwo}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WPSNo)}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.CICO)}</Text>
                 </View>
                 <View style={styles.cellAction}>
                   <TouchableOpacity
@@ -520,12 +506,15 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>WelderID:</Text>
+                  <Text>BonderID:</Text>
                 </View>
                 <View style={styles.cellTwo}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WelderID)}</Text>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.BonderID)}</Text>
                 </View>
                 <View style={styles.cellAction}>
+                  <TouchableOpacity onPress={() => _onPressShowRemark(item.QCVisualRemark, index, 'QCVisualRemark')}>
+                    <Ionicons size={24} name={'md-document-text-outline'} color={BASE_COLOR} style={{ marginRight: 4 }} />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.buttonReject}
                     onPress={() => _onPressChangeStatus('REJ', index, 'VisualResult')}>
@@ -550,129 +539,8 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                       <Text style={styles.textData}>{Formater.formatEmptyData(item.VisualResult)}</Text>
                   }
                 </View>
-                <View style={styles.cellAction}>
-                </View>
+                <View style={styles.cellAction} />
               </View>
-              <View style={styles.row}>
-                <View style={styles.cellOne}>
-                  <Text>NDTPercent:</Text>
-                </View>
-                <View style={styles.cellTitleLine}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.NDTPercent)}</Text>
-                </View>
-              </View>
-              {/* <View style={styles.row}>
-                <View style={styles.cellOne}>
-                  <Text>UT:</Text>
-                </View>
-                <View style={styles.cellOne}>
-                  <CheckBox
-                    value={item.UT && item.UT !== null}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'UT', newValue)}
-                    style={styles.checkBox}
-                    boxType='square'
-                    disabled={false}
-                    onCheckColor={OPP_COLOR}
-                    onFillColor={BASE_COLOR}
-                    onTintColor={BASE_COLOR}
-                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                    animationDuration={0.2}
-                    onAnimationType='flat'
-                  />
-                </View>
-                <View style={styles.cellOne}>
-                  <Text>RT:</Text>
-                </View>
-                <View style={styles.cellOne}>
-                  <CheckBox
-                    value={item.RT && item.RT !== null}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'RT', newValue)}
-                    style={styles.checkBox}
-                    boxType='square'
-                    disabled={false}
-                    onCheckColor={OPP_COLOR}
-                    onFillColor={BASE_COLOR}
-                    onTintColor={BASE_COLOR}
-                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                    animationDuration={0.2}
-                    onAnimationType='flat'
-                  />
-                </View>
-                <View style={styles.cellOne}>
-                  <Text>MT:</Text>
-                </View>
-                <View style={styles.cellOne}>
-                  <CheckBox
-                    value={item.MT && item.MT !== null}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'MT', newValue)}
-                    style={styles.checkBox}
-                    boxType='square'
-                    disabled={false}
-                    onCheckColor={OPP_COLOR}
-                    onFillColor={BASE_COLOR}
-                    onTintColor={BASE_COLOR}
-                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                    animationDuration={0.2}
-                    onAnimationType='flat'
-                  />
-                </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellOne}>
-                  <Text>PT:</Text>
-                </View>
-                <View style={styles.cellOne}>
-                  <CheckBox
-                    value={item.PT && item.PT !== null}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'PT', newValue)}
-                    style={styles.checkBox}
-                    boxType='square'
-                    disabled={false}
-                    onCheckColor={OPP_COLOR}
-                    onFillColor={BASE_COLOR}
-                    onTintColor={BASE_COLOR}
-                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                    animationDuration={0.2}
-                    onAnimationType='flat'
-                  />
-                </View>
-                <View style={styles.cellOne}>
-                  <Text>PMI:</Text>
-                </View>
-                <View style={styles.cellOne}>
-                  <CheckBox
-                    value={item.PMI && item.PMI !== null}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'PMI', newValue)}
-                    style={styles.checkBox}
-                    boxType='square'
-                    disabled={false}
-                    onCheckColor={OPP_COLOR}
-                    onFillColor={BASE_COLOR}
-                    onTintColor={BASE_COLOR}
-                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                    animationDuration={0.2}
-                    onAnimationType='flat'
-                  />
-                </View>
-                <View style={styles.cellOne}>
-                  <Text>PAUT:</Text>
-                </View>
-                <View style={styles.cellOne}>
-                  <CheckBox
-                    value={item.PAUT && item.PAUT !== null}
-                    onValueChange={newValue => _onChangeCheckbox(index, 'PAUT', newValue)}
-                    style={styles.checkBox}
-                    boxType='square'
-                    disabled={false}
-                    onCheckColor={OPP_COLOR}
-                    onFillColor={BASE_COLOR}
-                    onTintColor={BASE_COLOR}
-                    tintColors={{ true: BASE_COLOR, false: '#aaaaaa' }}
-                    animationDuration={0.2}
-                    onAnimationType='flat'
-                  />
-                </View>
-              </View> */}
             </>
         }
       </View>
@@ -791,12 +659,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleFacility(false)}
         onClear={_onClearFacilityCode}
         onChangeItem={_onChangeFacilityCode} />
-      {/* <SelectPopup
-        visible={isVisibleNDTFilter}
-        data={[NDT_FILTER_100, NDT_FILTER_OTHERS]}
-        onCancel={() => setIsVisibleNDTFilter(false)}
-        onClear={_onClearNDTFilter}
-        onChangeItem={_onChangeNDTFilter} /> */}
       <SelectPopup
         visible={isVisibleInspector}
         data={inspectorList}
@@ -808,7 +670,7 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
         data={inspectorList}
         onChangeItem={_onChangeGlobalInspector}
         onCancel={() => setIsVisibleGlobalInspector(false)} />
-      {/* <Dialog.Container visible={isVisibleRemark}>
+      <Dialog.Container visible={isVisibleRemark}>
         <Dialog.Title>{'Enter remark:'}</Dialog.Title>
         <Dialog.Input
           value={remarkDisplay}
@@ -828,16 +690,6 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
         <Dialog.Button label='Cancel' onPress={() => { setIsVisibleSize(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeSize} />
       </Dialog.Container>
-      <Dialog.Container visible={isVisibleSCH}>
-        <Dialog.Title>{'Enter SCH:'}</Dialog.Title>
-        <Dialog.Input
-          value={SCHDisplay}
-          onChangeText={(text) => setSCHDisplay(text)}
-          underlineColorAndroid={BASE_COLOR}
-        />
-        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleSCH(false) }} />
-        <Dialog.Button label='OK' onPress={_onChangeSCH} />
-      </Dialog.Container> */}
     </SafeAreaView>
   );
 };

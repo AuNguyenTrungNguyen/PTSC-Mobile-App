@@ -148,9 +148,10 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
         const batchNo = item['AdhesiveBatchNo'];
         const ENVHum = item['ENVHumidity'];
         const ENVTemp = item['ENVTemp'];
+        const ActualInsertionDepth = item['ActualInsertionDepth'];
 
         if ((date && heat01 && heat02 && batchNo && ENVHum && ENVTemp)
-          || (!date && !heat01 && !heat02 && !batchNo && !ENVHum && !ENVTemp)
+          || (!date && !heat01 && !heat02 && !batchNo && !ENVHum && !ENVTemp && !ActualInsertionDepth)
         ) {
           return item;
         }
@@ -177,6 +178,9 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('ENVTemp') >= 0 && !ENVTemp) || (column.indexOf('ENVTemp') < 0 && !oldItem['ENVTemp'])) {
           messages.push('ENVTemp');
+        }
+        if ((column.indexOf('ActualInsertionDepth') >= 0 && !ActualInsertionDepth) || (column.indexOf('ActualInsertionDepth') < 0 && !oldItem['ActualInsertionDepth'])) {
+          messages.push('ActualInsertionDepth');
         }
         return item;
       });
@@ -312,7 +316,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
     setIsVisibleDatetime(false);
   };
 
-  //-- ENV
+  //-- Number
   const [isVisibleNumber, setIsVisibleNumber] = useState(false);
   const [numberDisplay, setNumberDisplay] = useState('');
   const _onPressSelectNumber = (value, index, key) => {
@@ -335,6 +339,26 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
     value = parseFloat(value);
     onChangeData(value);
     setIsVisibleNumber(false);
+  };
+
+  //-- Text
+  const [isVisibleText, setIsVisibleText] = useState(false);
+  const [textDisplay, setTextDisplay] = useState('');
+  const _onPressSelectText = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setTextDisplay(value.toString());
+    } else {
+      setTextDisplay('');
+    }
+    setIsVisibleText(true);
+  };
+  const _onChangeText = () => {
+    const text = textDisplay.trim();
+    setTextDisplay(text);
+    onChangeData(text);
+    setIsVisibleText(false);
   };
 
   //-- HeatNo
@@ -770,7 +794,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity
                     style={styles.itemActionIcon}
-                    onPress={() => _onPressSelectNumber(item.ENVHumidity, index, 'ENVHumidity')}>
+                    onPress={() => _onPressSelectText(item.ENVHumidity, index, 'ENVHumidity')}>
                     <Text style={styles.textData}>{Formater.formatEmptyData(item.ENVHumidity)}</Text>
                     {
                       isDisableItem
@@ -791,7 +815,27 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                   <TouchableOpacity
                     style={styles.itemActionIcon}
                     onPress={() => _onPressSelectNumber(item.ENVTemp, index, 'ENVTemp')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.ENVTemp)}</Text>
+                    <Text style={styles.textData}>{Formater.formatTwoDigits(item.ENVTemp)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.cellPercent} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text style={styles.redText}>{'Insertion\nDepth'}:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressSelectNumber(item.ActualInsertionDepth, index, 'ActualInsertionDepth')}>
+                    <Text style={styles.textData}>{Formater.formatTwoDigits(item.ActualInsertionDepth)}</Text>
                     {
                       isDisableItem
                         ?
@@ -992,6 +1036,17 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
         />
         <Dialog.Button label='Cancel' onPress={() => { setIsVisibleNumber(false) }} />
         <Dialog.Button label='OK' onPress={_onChangeNumber} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleText}>
+        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+        <Dialog.Input
+          value={textDisplay}
+          placeholder={'Enter ' + keyUpdate}
+          onChangeText={(text) => setTextDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleText(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeText} />
       </Dialog.Container>
       <SelectPopupTwoColumns
         visible={isVisibleHeatNo}
