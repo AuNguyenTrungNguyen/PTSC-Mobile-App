@@ -9,7 +9,6 @@ import { GetElectricalCableControlDetailAPI, UpdateElectricalCableControlDetailA
 
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
-import Helper from '../../../utils/Helper';
 
 import Header from '../../../components/Header';
 import MessageAlert from '../../../components/MessageAlert';
@@ -25,6 +24,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
 
   const [columnChange, setColumnChange] = useState([]);
   const [cableDetail, setCableDetail] = useState({});
+  const [disableUpdate, setDisableUpdate] = useState(false);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -71,6 +71,21 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.Success && res.Data) {
           setCableDetail(res.Data);
+
+          const datePulling = res.Data.DatePulling;
+          if (datePulling) {
+            let current = new Date();
+            current.setSeconds(current.getSeconds() - (current.getTimezoneOffset() * 60));
+            let date = new Date(datePulling);
+            date.setSeconds(date.getSeconds() - (date.getTimezoneOffset() * 60));
+            var diffHours = (current.getTime() - date.getTime()) / (1000 * 3600);
+            if (diffHours > 48) {
+              setDisableUpdate(true);
+            }
+          } else {
+            setDisableUpdate(false);
+          }
+
           setIsLoading(false);
           setIsError(false);
           setIsUploading(false);
@@ -94,6 +109,8 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
       .then(res => {
         setIsUploading(false);
         if (res.Success) {
+          cableDetail['ActualLength_m'] = res.Data.ActualLength_m;
+          cableDetail['DeviationCONSAndDE'] = res.Data.DeviationCONSAndDE;
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setColumnChange([]);
         } else {
@@ -166,13 +183,11 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
     const isNewDrumNo = columnChange.includes('NewDrumNo');
     const isFromNo = columnChange.includes('FromNo_m');
     const isToNo = columnChange.includes('ToNo_m');
-    const isActualLength = columnChange.includes('ActualLength_m');
-    const isWasteLength = columnChange.includes('WasteLength_m');
     return (
       <View style={styles.table}>
         {
           <>
-            <View style={styles.box} pointerEvents={isUploading ? 'none' : 'auto'}>
+            <View style={styles.box} pointerEvents={isUploading || disableUpdate ? 'none' : 'auto'}>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>CableFrom:</Text>
                 <View style={styles.cellData}>
@@ -203,7 +218,13 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressText('NewDrumNo')}>
                     <Text style={isNewDrumNo ? styles.textGreen : styles.textAction}>{Formater.formatEmptyData(cableDetail.NewDrumNo)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isNewDrumNo ? EDITING_COLOR : BASE_COLOR} />
+                    {
+                      disableUpdate
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isNewDrumNo ? EDITING_COLOR : BASE_COLOR} />
+                    }
                   </TouchableOpacity>
                 </View>
               </View>
@@ -212,7 +233,13 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressDecimal('FromNo_m')}>
                     <Text style={isFromNo ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(cableDetail.FromNo_m)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFromNo ? EDITING_COLOR : BASE_COLOR} />
+                    {
+                      disableUpdate
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFromNo ? EDITING_COLOR : BASE_COLOR} />
+                    }
                   </TouchableOpacity>
                 </View>
               </View>
@@ -221,26 +248,26 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressDecimal('ToNo_m')}>
                     <Text style={isToNo ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(cableDetail.ToNo_m)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isToNo ? EDITING_COLOR : BASE_COLOR} />
+                    {
+                      disableUpdate
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isToNo ? EDITING_COLOR : BASE_COLOR} />
+                    }
                   </TouchableOpacity>
                 </View>
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>ActualLength:</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressDecimal('ActualLength_m')}>
-                    <Text style={isActualLength ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(cableDetail.ActualLength_m)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isActualLength ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                  <Text style={styles.textBlue}>{Formater.formatTwoDigits(cableDetail.ActualLength_m)}</Text>
                 </View>
               </View>
               <View style={styles.row}>
-                <Text style={styles.cellTitle}>WasteLenght:</Text>
+                <Text style={styles.cellTitle}>{'DeviationLength:\n(Between CONS And DE)'}</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressDecimal('WasteLength_m')}>
-                    <Text style={isWasteLength ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(cableDetail.WasteLength_m)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isWasteLength ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                  <Text style={styles.textBlue}>{Formater.formatTwoDigits(cableDetail.DeviationCONSAndDE)}</Text>
                 </View>
               </View>
             </View>

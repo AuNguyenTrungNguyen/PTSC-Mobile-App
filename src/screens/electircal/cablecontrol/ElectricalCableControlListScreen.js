@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -60,6 +61,12 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
     () => {
       // callAPI(getFacilityList);
     }, []
+  );
+
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    callAPI(getCableList);
+  }, [isFocused]
   );
 
   //-- Facility Code
@@ -146,22 +153,23 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
 
   //-- Render List
   const renderItem = ({ _, item }) => {
+    const textStyle = item.DatePulling ? styles.textUpdated : styles.textData;
     return (
       <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
         <View style={styles.row}>
           <View style={styles.cellOne}>
             <Text>Facility:</Text>
           </View>
-          <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={styles.cellOne}>
             <Text>CableName:</Text>
           </View>
-          <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.CableName)}</Text>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.CableName)}</Text>
           </View>
         </View>
         <SelectPopup
@@ -365,109 +373,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  cellThreeAction: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   cellTwo: {
     flex: 2,
     justifyContent: 'center',
-  },
-  cellThree: {
-    flex: 3,
-    justifyContent: 'center',
-  },
-  cellImageAction: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
   },
-  textAccept: {
+  textUpdated: {
     fontWeight: 'bold',
     color: 'green',
   },
-  textReject: {
-    fontWeight: 'bold',
-    color: 'red',
-  },
-  cellAction: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  buttonAccept: {
-    width: 70,
-    borderColor: 'green',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  labelAccept: {
-    color: 'green',
-  },
-  buttonReject: {
-    width: 70,
-    borderColor: 'red',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  labelReject: {
-    color: 'red',
-  },
-  buttonClean: {
-    width: 70,
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  labelClean: {
-    color: BASE_COLOR,
-  },
 
-
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    backgroundColor: OPP_COLOR,
-  },
-  noDataTitle: {
-    paddingTop: 8,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  noDataText: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-  },
-
-  actionContainer: {
-    marginTop: 12,
-    height: 36,
-    flexDirection: 'row',
-  },
-  buttonAction: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
-  },
   buttonTitle: {
     color: OPP_COLOR,
   },
