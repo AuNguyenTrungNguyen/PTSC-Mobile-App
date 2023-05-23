@@ -2,6 +2,7 @@ import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Helper from '../../../utils/Helper';
@@ -120,6 +121,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Electrical Cable Damage
+  const _onElectricalCableDamage = async () => {
+    navigation.navigate(
+      'ElectricalCableDamageLogList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -138,7 +149,13 @@ const HomeCONSScreen = ({ route, navigation }) => {
                   ?
                   <MaterialIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                   :
-                  <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  (
+                    props.iconType === 'MaterialCommunity'
+                      ?
+                      <MaterialCommunityIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                      :
+                      <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  )
               }
             </TouchableOpacity>
             {
@@ -171,7 +188,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title={'Cable\nDamage Log'} onPress={_onElectricalCableDamage} iconName='relation-only-one-to-zero-or-one' iconType='MaterialCommunity' />
             </View>
           </ScrollView>
         </View>
