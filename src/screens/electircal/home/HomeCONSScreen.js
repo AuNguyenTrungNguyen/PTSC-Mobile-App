@@ -121,6 +121,18 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Electrical Cable Control Report
+  const _onElectricalCableControlReport = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'ElectricalCableControlReport',
+      {
+        projectCode: projectCode,
+        userLogin: userLogin,
+      }
+    );
+  };
+
   //-- Electrical Cable Damage
   const _onElectricalCableDamage = async () => {
     navigation.navigate(
@@ -188,7 +200,11 @@ const HomeCONSScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
               <RenderItemBox title={'Cable\nDamage Log'} onPress={_onElectricalCableDamage} iconName='relation-only-one-to-zero-or-one' iconType='MaterialCommunity' />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

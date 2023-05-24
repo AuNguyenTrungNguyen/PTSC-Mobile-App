@@ -48,6 +48,21 @@ export const UpdateElectricalCableControlDetailAPI = async (modelUpdate, modelCo
     }
   ).then(res => res.json());
 };
+export const GetElectricalCableControlReportAPI = async (projectCode, userLogin) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalCableControlReport'
+    + '?projectCode=' + projectCode
+    + '&userLogin=' + userLogin,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 //-- Cable Damage
 export const GetEITCableDamageLogListAPI = async (projectCode, drumNo) => {

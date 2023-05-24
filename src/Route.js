@@ -92,6 +92,7 @@ import ElectricalHomeScreenCONS from './screens/electircal/home/HomeCONSScreen';
 import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
 import ElectricalCableControlListScreen from './screens/electircal/cablecontrol/ElectricalCableControlListScreen';
 import ElectricalCableControlDetailScreen from './screens/electircal/cablecontrol/ElectricalCableControlDetailScreen';
+import ElectricalCableControlReportScreen from './screens/electircal/cablecontrol/ElectricalCableControlReportScreen';
 import ElectricalCableDamageLogListScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogListScreen';
 import ElectricalCableDamageLogDetailScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDetailScreen';
 import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDataScreen';
@@ -796,6 +797,16 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: 'Cable Control Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'ElectricalCableControlReport'}
+        component={ElectricalCableControlReportScreen}
+        options={
+          {
+            title: 'Cable Control Report',
             headerBackTitle: 'Back',
           }
         }
