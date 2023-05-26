@@ -150,6 +150,7 @@ const LoginScreen = ({ navigation }) => {
             if (res.access_token) {
               Helper.storeData('TOKEN', res.access_token);
               Helper.storeData('USERNAME', res.userName);
+              // Helper.storeData('SUB_CONTRACTOR', '');
               Helper.storeData('SUB_CONTRACTOR', res.subContractor);
               Helper.storeData('EXPIRES', res['.expires']);
               Helper.storeData('PROJECT_CODE', projectCode);

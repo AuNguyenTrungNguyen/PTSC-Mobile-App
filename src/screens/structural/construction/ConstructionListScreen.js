@@ -158,6 +158,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
         'ConstructionDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -174,6 +175,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
           if (res.success) {
             navigation.navigate('ConstructionDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -202,6 +204,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
         'ConstructionMultiDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -218,6 +221,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
           if (res.success) {
             navigation.navigate('ConstructionMultiDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -333,6 +337,7 @@ const ConstructionListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
+                  {/* <Text style={styles.infoData}>{projectCode}</Text> */}
                   <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>

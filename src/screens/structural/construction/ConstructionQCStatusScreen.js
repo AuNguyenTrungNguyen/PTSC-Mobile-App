@@ -531,6 +531,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
               (<View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitleAction}>Project:</Text>
+                  {/* <Text style={styles.infoData}>{projectCode}</Text> */}
                   <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>

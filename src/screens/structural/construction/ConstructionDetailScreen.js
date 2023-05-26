@@ -1437,6 +1437,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
+    // 'Project': projectCode,
     'Project': projectCode + '  -  ' + subContractor,
     'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },

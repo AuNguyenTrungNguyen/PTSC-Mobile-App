@@ -489,6 +489,7 @@ const HomeScreenQC = ({ route, navigation }) => {
         <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumber)} />
         :
         <View style={styles.container}>
+          {/* <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header> */}
           <Header data={{ 'Project': projectCode + '  -  ' + subContractor, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             {
