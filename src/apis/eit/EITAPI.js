@@ -48,13 +48,14 @@ export const UpdateElectricalCableControlDetailAPI = async (modelUpdate, modelCo
     }
   ).then(res => res.json());
 };
-export const GetElectricalCableControlReportAPI = async (projectCode, userLogin) => {
+export const GetElectricalCableControlReportAPI = async (projectCode, userLogin, date) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetElectricalCableControlReport'
     + '?projectCode=' + projectCode
-    + '&userLogin=' + userLogin,
+    + '&userLogin=' + userLogin
+    + '&date=' + date,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

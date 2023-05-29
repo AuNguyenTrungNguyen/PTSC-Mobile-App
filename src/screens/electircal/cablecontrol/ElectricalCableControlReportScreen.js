@@ -1,7 +1,8 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import Moment from 'moment';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import { GetElectricalCableControlReportAPI } from '../../../apis/eit/EITAPI';
 
@@ -56,9 +57,39 @@ const ElectricalCableControlReportScreen = ({ route, navigation }) => {
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true) });
   };
 
+  //-- Date
+  const [isVisibleDate, setIsVisibleDate] = useState(false);
+  const [dateDisplay, setDateDisplay] = useState(new Date());
+  const _onPressSelectDate = () => {
+    if (dateDisplay) {
+      setDateDisplay(new Date(Moment(dateDisplay).format("YYYY-MM-DDT00:00:00")));
+    } else {
+      setDateDisplay(new Date());
+    }
+    setIsVisibleDate(true);
+  };
+  const _onChangeDate = selectedDate => {
+    if (selectedDate) {
+      let date = new Date(selectedDate);
+      date.setSeconds(date.getSeconds() - (date.getTimezoneOffset() * 60));
+      setDateDisplay(date);
+      callAPI(() => { getCableReport(date) }, false);
+    }
+    setIsVisibleDate(false);
+  };
+  const _onCleareDate = () => {
+    setIsVisibleDate(false);
+  };
+
   //-- Get
-  const getCableReport = () => {
-    GetElectricalCableControlReportAPI(projectCode, userLogin)
+  const getCableReport = (selectedDate) => {
+    let temp = new Date();
+    if (selectedDate) {
+      temp = new Date(selectedDate);
+    }
+    temp.setSeconds(temp.getSeconds() - (temp.getTimezoneOffset() * 60));
+    const date = Moment(temp).format('YYYY-MM-DD');
+    GetElectricalCableControlReportAPI(projectCode, userLogin, date)
       .then(res => {
         if (res.Success && res.Data) {
           setCableDetail(res.Data);
@@ -162,11 +193,25 @@ const ElectricalCableControlReportScreen = ({ route, navigation }) => {
           <View style={styles.container}>
             {
               isShowDescription.show &&
-              <Header data={headerData} />
+              <>
+                <Header data={headerData} />
+                <View style={styles.headerRow}>
+                  <Text style={styles.headerCellTitle}>Date:</Text>
+                  <TouchableOpacity style={styles.headerCellSelect} onPress={() => { _onPressSelectDate() }}>
+                    <Text style={styles.buttonTitleDark}>{Formater.formatDateData(dateDisplay)}</Text>
+                  </TouchableOpacity>
+                </View></>
             }
             <RenderDetail />
           </View>
       }
+      <DateTimePickerModal
+        isVisible={isVisibleDate}
+        date={new Date(Moment(dateDisplay).format("YYYY-MM-DDT00:00:00"))}
+        mode={'date'}
+        onConfirm={_onChangeDate}
+        onCancel={_onCleareDate}
+      />
     </SafeAreaView>
   );
 };
@@ -222,6 +267,29 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontWeight: 'bold',
     color: 'blue',
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 36,
+    marginBottom: 4,
+  },
+  headerCellTitle: {
+    flex: 3,
+  },
+  headerCellSelect: {
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 2,
+  },
+  buttonTitleDark: {
+    color: BASE_COLOR,
   },
 });
 
