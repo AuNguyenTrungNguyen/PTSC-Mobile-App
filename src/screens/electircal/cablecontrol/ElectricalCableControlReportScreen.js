@@ -91,7 +91,7 @@ const ElectricalCableControlReportScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>{'Num of\nCables'}:</Text>
                 <View style={styles.cellData}>
-                  <Text style={styles.textBlue}>{Formater.formatZeroDigits(cableDetail.DailyLenght)}</Text>
+                  <Text style={styles.textBlue}>{Formater.formatZeroDigits(cableDetail.DailyCount)}</Text>
                 </View>
                 <Text style={styles.cellTitle}>{'Total\nLength'}:</Text>
                 <View style={styles.cellData}>

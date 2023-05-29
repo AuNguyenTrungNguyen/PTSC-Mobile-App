@@ -54,8 +54,18 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      callAPI(getCableDetail);
-    }, []
+      if (route.params?.drumNoSelected) {
+        _onChangeNewDrumNo(route.params?.drumNoSelected);
+      }
+      else {
+        callAPI(getCableDetail);
+      }
+    }, [route.params?.drumNoSelected]
+  );
+
+  const [isRender, setIsRender] = useState(null);
+  useEffect(
+    () => { }, [isRender]
   );
 
   const callAPI = (executedAPI, loading = true) => {
@@ -130,6 +140,21 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
     callAPI(updateCableDetail, false);
   };
 
+  //-- Select
+  const _onPressSelect = async () => {
+    setKeyUpdate('NewDrumNo');
+    navigation.navigate(
+      'ElectricalCableScheduleList',
+      {
+        projectCode: projectCode
+      }
+    );
+  };
+  const _onChangeNewDrumNo = newDrum => {
+    _onSave(newDrum);
+    setIsRender(new Date());
+  };
+
   //-- KEY
   const [keyUpdate, setKeyUpdate] = useState('');
   const _onSave = value => {
@@ -155,7 +180,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
     setIsVisibleText(false);
   };
 
-  //-- Text
+  //-- Decimal
   const [isVisibleDecimal, setIsVisibleDecimal] = useState(false);
   const [decimalDisplay, setDecimalDisplay] = useState('');
   const _onPressDecimal = key => {
@@ -216,7 +241,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>{'Actual\nDrumNo:'}</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressText('NewDrumNo')}>
+                  <TouchableOpacity style={styles.containerAction} onPress={_onPressSelect}>
                     <Text style={isNewDrumNo ? styles.textGreen : styles.textAction}>{Formater.formatEmptyData(cableDetail.NewDrumNo)}</Text>
                     {
                       disableUpdate

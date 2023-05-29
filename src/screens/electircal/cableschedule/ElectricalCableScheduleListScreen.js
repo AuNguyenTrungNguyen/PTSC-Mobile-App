@@ -1,21 +1,17 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { useIsFocused } from '@react-navigation/native';
 
-import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
 
-import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetElectricalCableControlListAPI } from '../../../apis/eit/EITAPI';
+import { GetEITCableScheduleListAPI } from '../../../apis/eit/EITAPI';
 
-import SelectPopup from '../../../components/SelectPopup';
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const ElectricalCableControlListScreen = ({ route, navigation }) => {
+const ElectricalCableScheduleListScreen = ({ route, navigation }) => {
 
   const { projectCode } = route.params;
 
@@ -23,8 +19,8 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [cablename, setCableName] = useState('');
-  const [cableList, setCableList] = useState(null);
+  const [drumNo, setDrumNo] = useState('');
+  const [drumList, setDrumList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -57,68 +53,23 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
 
+  //-- Get
   useEffect(
     () => {
-      callAPI(getFacilityList);
+      callAPI(getDrumNoList);
     }, []
   );
 
-  const isFocused = useIsFocused();
-  useEffect(() => {
-    callAPI(getCableList);
-  }, [isFocused]
-  );
-
-  //-- Facility Code
-  const FACILITY_CODE_DEFAULT = 'All Facility Code';
-  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
-  const [facilityList, setFacilityList] = useState([]);
-  const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
-  const getFacilityList = async () => {
-    const token = await Helper.getData('TOKEN');
-    GetFacilityListAPI(projectCode, token)
-      .then(res => {
-        if (res.success) {
-          setFacilityList(res.data);
-          setIsLoading(false);
-          setIsError(false);
-          setIsSearching(false);
-        } else {
-          setIsLoading(false);
-          setIsError(true);
-          setIsSearching(false);
-        }
-      })
-      .catch(() => {
-        setIsLoading(false);
-        setIsError(true);
-        setIsSearching(false);
-      });
-  };
-  const _onChangeFacilityCode = code => {
-    if (code !== facilityCode) {
-      setFacilityCode(code);
-    }
-    setIsVisibleFacility(false);
-  };
-  const _onPressClearFacilityCode = () => {
-    if (facilityCode !== FACILITY_CODE_DEFAULT) {
-      setFacilityCode(FACILITY_CODE_DEFAULT);
-    }
-    setIsVisibleFacility(false);
-  };
-
   //-- Search Action
-  const _onPressSearchCable = () => {
+  const _onPressSearchDrumNo = () => {
     Keyboard.dismiss();
-    callAPI(getCableList);
+    callAPI(getDrumNoList);
   };
-  async function getCableList() {
-    const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetElectricalCableControlListAPI(projectCode, facility, cablename)
+  async function getDrumNoList() {
+    GetEITCableScheduleListAPI(projectCode, drumNo)
       .then(res => {
         if (res.Success && res.Data) {
-          setCableList(res.Data);
+          setDrumList(res.Data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -134,51 +85,28 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
         setIsSearching(false);
       });
   };
-  const _onChangeName = name => {
-    setCableName(name);
+  const _onChangeNo = no => {
+    setDrumNo(no);
   };
 
-  //-- Detail
-  const _onPressDetail = async item => {
-    navigation.navigate(
-      'ElectricalCableControlDetail',
-      {
-        projectCode: projectCode,
-        rowIndex: item.RowIndex,
-        facilityCode: item.FacilityCode,
-        cableName: item.CableName,
-      }
-    );
+  //-- Select
+  const _onPressSelecte = item => {
+    navigation.navigate('ElectricalCableControlDetail', { drumNoSelected: item.DrumNo });
   };
 
   //-- Render List
   const renderItem = ({ _, item }) => {
     const textStyle = item.DatePulling ? styles.textUpdated : styles.textData;
     return (
-      <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
+      <TouchableOpacity style={styles.box} onPress={() => _onPressSelecte(item)}>
         <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text>Facility:</Text>
+            <Text>DrumNo:</Text>
           </View>
           <View style={styles.cellTwo}>
-            <Text style={textStyle}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.DrumNo)}</Text>
           </View>
         </View>
-        <View style={styles.row}>
-          <View style={styles.cellOne}>
-            <Text>CableName:</Text>
-          </View>
-          <View style={styles.cellTwo}>
-            <Text style={textStyle}>{Formater.formatEmptyData(item.CableName)}</Text>
-          </View>
-        </View>
-        <SelectPopup
-          visible={isVisibleFacility}
-          data={facilityList}
-          onCancel={() => setIsVisibleFacility(false)}
-          onClear={_onPressClearFacilityCode}
-          onChangeItem={_onChangeFacilityCode}>
-        </SelectPopup>
       </TouchableOpacity>
     );
   };
@@ -186,7 +114,7 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
     {
       if (isSearching) {
         return <ListLoadingData />
-      } else if (!cableList) {
+      } else if (!drumList) {
         return <ListSelectData title={'Please enter Cable Name'} />
       } else {
         return <ListEmptyData />
@@ -199,7 +127,7 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getCableList)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrumNoList)} />
           :
           <View style={styles.container}>
             {
@@ -211,24 +139,18 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
                     <Text style={styles.infoData}>{projectCode}</Text>
                   </View>
                   <View style={styles.rowInfoAction}>
-                    <Text style={styles.infoTitleAction}>FacilityCode:</Text>
-                    <TouchableOpacity style={styles.selectContainer} onPress={() => { setIsVisibleFacility(true) }}>
-                      <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.rowInfoAction}>
-                    <Text style={styles.infoTitleAction}>CableName:</Text>
+                    <Text style={styles.infoTitleAction}>DrumNo:</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
                         style={styles.inputText}
-                        value={cablename}
-                        onChangeText={_onChangeName}
+                        value={drumNo}
+                        onChangeText={_onChangeNo}
                         underlineColorAndroid='transparent'
                       />
                       {
-                        cablename == ''
+                        drumNo == ''
                           ? null
-                          : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
+                          : <Icon name='times-circle' onPress={() => _onChangeNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -236,7 +158,7 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
                     <Text style={styles.infoTitleAction} />
                     <TouchableOpacity
                       style={styles.searchButton}
-                      onPress={_onPressSearchCable}
+                      onPress={_onPressSearchDrumNo}
                       disabled={isSearching}>
                       <Text style={styles.buttonTitle}>Search</Text>
                     </TouchableOpacity>
@@ -246,11 +168,11 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
                 null
             }
             {
-              cableList && cableList.length
+              drumList && drumList.length
                 ?
                 <VirtualizedList
                   style={styles.table}
-                  data={cableList}
+                  data={drumList}
                   getItemCount={data => data.length}
                   getItem={(data, index) => {
                     return data[index];
@@ -366,7 +288,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
-    margin: 4,
+    margin: 10,
     minHeight: 20,
   },
   cellOne: {
@@ -394,4 +316,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ElectricalCableControlListScreen;
+export default ElectricalCableScheduleListScreen;

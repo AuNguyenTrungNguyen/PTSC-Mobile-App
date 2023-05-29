@@ -178,6 +178,7 @@ const ElectricalCableDamageLogDataScreen = ({ route, navigation }) => {
 
   //-- Render
   const RenderDetail = () => {
+    const isDisabled = damageLog.ModifyByUser && userLogin && damageLog.ModifyByUser.toLowerCase() !== userLogin.toLowerCase();
     const isFromNo = columnChange.includes('FromNo_m');
     const isToNo = columnChange.includes('ToNo_m');
     const isRemark = columnChange.includes('Remark');
@@ -185,7 +186,7 @@ const ElectricalCableDamageLogDataScreen = ({ route, navigation }) => {
       <View style={styles.table}>
         {
           <>
-            <View style={styles.box} pointerEvents={isUploading ? 'none' : 'auto'}>
+            <View style={styles.box} pointerEvents={isUploading || isDisabled ? 'none' : 'auto'}>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>DrumNo:</Text>
                 <View style={styles.cellData}>
@@ -200,7 +201,13 @@ const ElectricalCableDamageLogDataScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressDecimal('FromNo_m')}>
                     <Text style={isFromNo ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(damageLog.FromNo_m)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFromNo ? EDITING_COLOR : BASE_COLOR} />
+                    {
+                      isDisabled
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFromNo ? EDITING_COLOR : BASE_COLOR} />
+                    }
                   </TouchableOpacity>
                 </View>
               </View>
@@ -209,7 +216,13 @@ const ElectricalCableDamageLogDataScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressDecimal('ToNo_m')}>
                     <Text style={isToNo ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(damageLog.ToNo_m)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isToNo ? EDITING_COLOR : BASE_COLOR} />
+                    {
+                      isDisabled
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isToNo ? EDITING_COLOR : BASE_COLOR} />
+                    }
                   </TouchableOpacity>
                 </View>
               </View>
@@ -218,7 +231,13 @@ const ElectricalCableDamageLogDataScreen = ({ route, navigation }) => {
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressText('Remark')}>
                     <Text style={isRemark ? styles.textGreen : styles.textAction}>{Formater.formatEmptyData(damageLog.Remark)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isRemark ? EDITING_COLOR : BASE_COLOR} />
+                    {
+                      isDisabled
+                        ?
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={'#a3a3a3'} />
+                        :
+                        <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isRemark ? EDITING_COLOR : BASE_COLOR} />
+                    }
                   </TouchableOpacity>
                 </View>
               </View>
@@ -227,6 +246,15 @@ const ElectricalCableDamageLogDataScreen = ({ route, navigation }) => {
                 <Text style={styles.cellTitle}>ActualLength:</Text>
                 <View style={styles.cellData}>
                   <Text style={styles.textBlue}>{Formater.formatTwoDigits(damageLog.ActualLength_m)}</Text>
+                </View>
+              </View>
+
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>Created by:</Text>
+                <View style={styles.cellData}>
+                  <View style={styles.containerAction}>
+                    <Text style={styles.textRed}>{Formater.formatEmptyData(damageLog.ModifyByUser)}</Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -359,6 +387,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontWeight: 'bold',
     color: 'blue',
+  },
+  textRed: {
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    fontWeight: 'bold',
+    color: 'red',
   },
   iconAction: {
     marginLeft: 4,

@@ -90,6 +90,7 @@ import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 //-- EIT
 import ElectricalHomeScreenCONS from './screens/electircal/home/HomeCONSScreen';
 import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
+import ElectricalCableScheduleListScreen from './screens/electircal/cableschedule/ElectricalCableScheduleListScreen';
 import ElectricalCableControlListScreen from './screens/electircal/cablecontrol/ElectricalCableControlListScreen';
 import ElectricalCableControlDetailScreen from './screens/electircal/cablecontrol/ElectricalCableControlDetailScreen';
 import ElectricalCableControlReportScreen from './screens/electircal/cablecontrol/ElectricalCableControlReportScreen';
@@ -778,6 +779,16 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: titleShow,
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'ElectricalCableScheduleList'}
+        component={ElectricalCableScheduleListScreen}
+        options={
+          {
+            title: 'Cable Schelude',
+            headerBackTitle: 'Back',
           }
         }
       />

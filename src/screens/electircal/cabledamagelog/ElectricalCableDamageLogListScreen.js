@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
 
-import { GetEITCableDamageLogListAPI } from '../../../apis/eit/EITAPI';
+import { GetEITCableScheduleListAPI } from '../../../apis/eit/EITAPI';
 
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -59,7 +59,7 @@ const ElectricalCableDamageLogListScreen = ({ route, navigation }) => {
     callAPI(getDamageLogList);
   };
   async function getDamageLogList() {
-    GetEITCableDamageLogListAPI(projectCode, drumNo)
+    GetEITCableScheduleListAPI(projectCode, drumNo)
       .then(res => {
         if (res.Success && res.Data) {
           setDrumList(res.Data);

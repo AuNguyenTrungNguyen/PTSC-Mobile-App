@@ -65,11 +65,11 @@ export const GetElectricalCableControlReportAPI = async (projectCode, userLogin)
 };
 
 //-- Cable Damage
-export const GetEITCableDamageLogListAPI = async (projectCode, drumNo) => {
+export const GetEITCableScheduleListAPI = async (projectCode, drumNo) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
-    + '/api/eit/GetEITCableDamageLogList'
+    + '/api/eit/GetEITCableScheduleList'
     + '?projectCode=' + projectCode
     + '&drumNo=' + drumNo,
     {
