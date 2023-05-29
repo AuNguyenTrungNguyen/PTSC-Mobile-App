@@ -19,7 +19,7 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
 
   const { projectCode } = route.params;
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -172,13 +172,6 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
             <Text style={textStyle}>{Formater.formatEmptyData(item.CableName)}</Text>
           </View>
         </View>
-        <SelectPopup
-          visible={isVisibleFacility}
-          data={facilityList}
-          onCancel={() => setIsVisibleFacility(false)}
-          onClear={_onPressClearFacilityCode}
-          onChangeItem={_onChangeFacilityCode}>
-        </SelectPopup>
       </TouchableOpacity>
     );
   };
@@ -263,6 +256,13 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
             }
           </View>
       }
+      <SelectPopup
+        visible={isVisibleFacility}
+        data={facilityList}
+        onCancel={() => setIsVisibleFacility(false)}
+        onClear={_onPressClearFacilityCode}
+        onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
     </SafeAreaView>
   );
 };
