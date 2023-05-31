@@ -52,6 +52,8 @@ import PipeSupportListScreen from './screens/piping/pipe/PipeSupportListScreen';
 import PipeSupportDetailScreen from './screens/piping/pipe/PipeSupportDetailScreen';
 import PipeSpoolListScreen from './screens/piping/spool/PipeSpoolListScreen';
 import PipeSpoolDetailScreen from './screens/piping/spool/PipeSpoolDetailScreen';
+import HydrotestPackageListScreen from './screens/piping/hydrotest/HydrotestPackageListScreen';
+import HydrotestPackageDetailScreen from './screens/piping/hydrotest/HydrotestPackageDetailScreen';
 
 //-- GRE
 import GREDrawingListScreen from './screens/piping/gre/GREDrawingListScreen';
@@ -329,6 +331,26 @@ const PipingCONSStackScreens = () => {
           title: route.params.title,
           headerBackTitle: 'Back',
         })}
+      />
+      <PipingCONSStack.Screen
+        name='HydrotestPackageList'
+        component={HydrotestPackageListScreen}
+        options={
+          {
+            title: 'Hydrotest Package List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='HydrotestPackageDetail'
+        component={HydrotestPackageDetailScreen}
+        options={
+          {
+            title: 'Hydrotest Package Detail',
+            headerBackTitle: 'Back',
+          }
+        }
       />
     </PipingCONSStack.Navigator>
   );

@@ -363,6 +363,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Hydrotest Package
+  const _onPressHydrotestPackage = async () => {
+    navigation.navigate(
+      'HydrotestPackageList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
 
 
   const RenderItemBox = props => {
@@ -438,7 +448,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Cons Manage\nGRE'} onPress={_onPressManageConsGRE} />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Hydrotest\nPackage'} onPress={_onPressHydrotestPackage} iconName={'ios-cube-sharp'} />
               </View>
             </ScrollView>
           </View>

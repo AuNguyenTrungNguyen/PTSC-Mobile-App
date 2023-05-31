@@ -277,3 +277,53 @@ export const UpdatePipeSpoolDetailAPI = async (modelUpdate, modelColumnChange) =
     }
   ).then(res => res.json());
 }
+
+//-- Hydrotest Package
+export const GetTestPackageListAPI = async (projectCode, facilityCode, no) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetTestPackageList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&no=' + no,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetTestPackageDetailAPI = async (projectCode, facilityCode, no) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetTestPackageDetail'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&no=' + no,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateTestPackageDetailAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/piping/UpdateTestPackageDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+}

@@ -293,9 +293,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     setIsUploading(true);
     GetReweldFromQCAPI(projectCode, drawingNo)
       .then(res => {
+        setIsUploading(false);
         Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
         callAPI(() => getConstructionDetail());
-        setIsUploading(false);
       }).catch(() => {
         setIsUploading(false);
         Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
@@ -1305,6 +1305,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           </View>
       }
       <AwesomeAlert
+        progressColor={BASE_COLOR}
         show={isUploading}
         showProgress={true}
         closeOnTouchOutside={false}
