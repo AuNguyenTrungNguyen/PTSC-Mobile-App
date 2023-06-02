@@ -16,8 +16,8 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* PTSC_CLOUDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* PTSC_CLOUDTests.m */; };
-		72F9D587747C0FE15E6CBE78 /* libPods-PTSC_CLOUD.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D06C56EC6771F54A80FCF9C /* libPods-PTSC_CLOUD.a */; };
-		F86228CE6419119F266E36A5 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED5E07FCDC587D371F7EEE41 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */; };
+		8DA975E6701E15A742632945 /* libPods-PTSC_CLOUD.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D1EA36F40E39FF941558D2 /* libPods-PTSC_CLOUD.a */; };
+		919F46CD6BCF2BD6521B702E /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 49306E60432CDDE6EBBA33CD /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +42,7 @@
 		00E356EE1AD99517003FC87E /* PTSC_CLOUDTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PTSC_CLOUDTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* PTSC_CLOUDTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTSC_CLOUDTests.m; sourceTree = "<group>"; };
+		00F05DFDEB7F7759CA7B1392 /* Pods-PTSC_CLOUD.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* PTSC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PTSC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = PTSC_CLOUD/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = PTSC_CLOUD/AppDelegate.m; sourceTree = "<group>"; };
@@ -49,16 +50,15 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = PTSC_CLOUD/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PTSC_CLOUD/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PTSC_CLOUD/main.m; sourceTree = "<group>"; };
+		1BF6098308C1818DAC80DE9C /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* PTSC_CLOUD-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PTSC_CLOUD-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* PTSC_CLOUD-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PTSC_CLOUD-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6D9C60FB4F9C7F25206E7C7E /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig"; sourceTree = "<group>"; };
-		70FEF9FC1570686C152AFD55 /* Pods-PTSC_CLOUD.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD.release.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD.release.xcconfig"; sourceTree = "<group>"; };
-		8D06C56EC6771F54A80FCF9C /* libPods-PTSC_CLOUD.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9526B8DA148A5803C47D0D79 /* Pods-PTSC_CLOUD.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD.debug.xcconfig"; sourceTree = "<group>"; };
-		E8E1FE9E81B60EEA1B325403 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig"; sourceTree = "<group>"; };
+		49306E60432CDDE6EBBA33CD /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD-PTSC_CLOUDTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55D1EA36F40E39FF941558D2 /* libPods-PTSC_CLOUD.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7BB6A3099968B285BBBD7C41 /* Pods-PTSC_CLOUD.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD.debug.xcconfig"; sourceTree = "<group>"; };
+		E6A2DA8D73C0D8C0FE1AF2D2 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig"; path = "Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		ED5E07FCDC587D371F7EEE41 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PTSC_CLOUD-PTSC_CLOUDTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F86228CE6419119F266E36A5 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a in Frameworks */,
+				919F46CD6BCF2BD6521B702E /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,7 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72F9D587747C0FE15E6CBE78 /* libPods-PTSC_CLOUD.a in Frameworks */,
+				8DA975E6701E15A742632945 /* libPods-PTSC_CLOUD.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,8 +131,8 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				8D06C56EC6771F54A80FCF9C /* libPods-PTSC_CLOUD.a */,
-				ED5E07FCDC587D371F7EEE41 /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */,
+				55D1EA36F40E39FF941558D2 /* libPods-PTSC_CLOUD.a */,
+				49306E60432CDDE6EBBA33CD /* libPods-PTSC_CLOUD-PTSC_CLOUDTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -140,10 +140,10 @@
 		7E1BC5A1AA4D8AB868A25D42 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				9526B8DA148A5803C47D0D79 /* Pods-PTSC_CLOUD.debug.xcconfig */,
-				70FEF9FC1570686C152AFD55 /* Pods-PTSC_CLOUD.release.xcconfig */,
-				E8E1FE9E81B60EEA1B325403 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */,
-				6D9C60FB4F9C7F25206E7C7E /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */,
+				7BB6A3099968B285BBBD7C41 /* Pods-PTSC_CLOUD.debug.xcconfig */,
+				00F05DFDEB7F7759CA7B1392 /* Pods-PTSC_CLOUD.release.xcconfig */,
+				E6A2DA8D73C0D8C0FE1AF2D2 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */,
+				1BF6098308C1818DAC80DE9C /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -196,12 +196,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "PTSC_CLOUDTests" */;
 			buildPhases = (
-				D8A5A9F628E5FDAFC9040C88 /* [CP] Check Pods Manifest.lock */,
+				33A7DE6CC3B57CFAB89ED22A /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				6B1EE51DDE51BC03896FEA97 /* [CP] Copy Pods Resources */,
-				8E92480CA68750239C4B2C86 /* [CP] Embed Pods Frameworks */,
+				605B27CCD9DC89A185D9C8D1 /* [CP] Embed Pods Frameworks */,
+				08FFCAACCECC82691D31FA75 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -217,14 +217,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "PTSC_CLOUD" */;
 			buildPhases = (
-				C1FEE43D98B4E0AADB00CF18 /* [CP] Check Pods Manifest.lock */,
+				AE9D53A7D44B371FE4BAF855 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				80F234F3317827CDA49F05CE /* [CP] Copy Pods Resources */,
-				5A3436F19A427CBBDC6FA4E2 /* [CP] Embed Pods Frameworks */,
+				BB05D256C7A4DE948AA42310 /* [CP] Embed Pods Frameworks */,
+				ABD2C9BA935F00AED5356FD4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -370,39 +370,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native Code And Images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		5A3436F19A427CBBDC6FA4E2 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6B1EE51DDE51BC03896FEA97 /* [CP] Copy Pods Resources */ = {
+		08FFCAACCECC82691D31FA75 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -456,7 +424,61 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		80F234F3317827CDA49F05CE /* [CP] Copy Pods Resources */ = {
+		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native Code And Images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		33A7DE6CC3B57CFAB89ED22A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PTSC_CLOUD-PTSC_CLOUDTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		605B27CCD9DC89A185D9C8D1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ABD2C9BA935F00AED5356FD4 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -510,25 +532,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8E92480CA68750239C4B2C86 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD-PTSC_CLOUDTests/Pods-PTSC_CLOUD-PTSC_CLOUDTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C1FEE43D98B4E0AADB00CF18 /* [CP] Check Pods Manifest.lock */ = {
+		AE9D53A7D44B371FE4BAF855 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -550,26 +554,22 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D8A5A9F628E5FDAFC9040C88 /* [CP] Check Pods Manifest.lock */ = {
+		BB05D256C7A4DE948AA42310 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
+				"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
 			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PTSC_CLOUD-PTSC_CLOUDTests-checkManifestLockResult.txt",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PTSC_CLOUD/Pods-PTSC_CLOUD-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -677,7 +677,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E8E1FE9E81B60EEA1B325403 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */;
+			baseConfigurationReference = E6A2DA8D73C0D8C0FE1AF2D2 /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -700,7 +700,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6D9C60FB4F9C7F25206E7C7E /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */;
+			baseConfigurationReference = 1BF6098308C1818DAC80DE9C /* Pods-PTSC_CLOUD-PTSC_CLOUDTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -721,22 +721,28 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9526B8DA148A5803C47D0D79 /* Pods-PTSC_CLOUD.debug.xcconfig */;
+			baseConfigurationReference = 7BB6A3099968B285BBBD7C41 /* Pods-PTSC_CLOUD.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconTCT;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = H7UQ729NPW;
+				CURRENT_PROJECT_VERSION = 0;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = H7UQ729NPW;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = PTSC_CLOUD/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "PTSC M&C";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 5;
+				MARKETING_VERSION = 6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -744,7 +750,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ptsc.ptscmc;
 				PRODUCT_NAME = PTSC;
-				PROVISIONING_PROFILE_SPECIFIER = PTSCMC;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Mac Mini App Store";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "PTSC_CLOUD-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -755,17 +765,24 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 70FEF9FC1570686C152AFD55 /* Pods-PTSC_CLOUD.release.xcconfig */;
+			baseConfigurationReference = 00F05DFDEB7F7759CA7B1392 /* Pods-PTSC_CLOUD.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconTCT;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = H7UQ729NPW;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 0;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = H7UQ729NPW;
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = PTSC_CLOUD/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "PTSC M&C";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 5;
+				MARKETING_VERSION = 6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -774,6 +791,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ptsc.ptscmc;
 				PRODUCT_NAME = PTSC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Mac Mini App Store";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "PTSC_CLOUD-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -930,7 +951,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -946,7 +967,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
@@ -992,7 +1013,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1001,7 +1022,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
