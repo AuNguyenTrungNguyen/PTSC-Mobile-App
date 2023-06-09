@@ -125,7 +125,7 @@ if (Appearance.getColorScheme() === 'dark') {
   optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
 };
 
-//-- const titleShow = 'PTSC';
+// const titleShow = 'PTSC';
 const titleShow = 'PTSC M&C';
 
 //-- PIP Stacks
