@@ -182,11 +182,11 @@ const HomeScreenQC = ({ route, navigation }) => {
   const _onPressManageQCFitUp = async () => {
     Alert.alert(
       '',
-      'Spend List: Spend FitUp Request List\n\nScan: Scan QR Code FitUp Request\n\nSearch: Search FitUp Request List',
+      'Spend List: Spend FitUp Request List\n\nScan: Scan QR Code FitUp Request',
       [
         { text: 'Spend List', onPress: () => { _onPressSpendList(Constant.CODE_FITUP) } },
         { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_FITUP) } },
-        { text: 'Search', onPress: () => { _onPressSearchList(Constant.CODE_FITUP) } },
+        // { text: 'Search', onPress: () => { _onPressSearchList(Constant.CODE_FITUP) } },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -197,11 +197,11 @@ const HomeScreenQC = ({ route, navigation }) => {
   const _onPressManageQCVisual = async () => {
     Alert.alert(
       '',
-      'Spend List: Spend Visual Request List\n\nScan: Scan QR Code Visual Request\n\nSearch: Search Visual Request List',
+      'Spend List: Spend Visual Request List\n\nScan: Scan QR Code Visual Request',
       [
         { text: 'Spend List', onPress: () => { _onPressSpendList(Constant.CODE_VISUAL) } },
         { text: 'Scan', onPress: () => { _onPressQRCodeQC(Constant.CODE_VISUAL) } },
-        { text: 'Search', onPress: () => { _onPressSearchList(Constant.CODE_VISUAL) } },
+        // { text: 'Search', onPress: () => { _onPressSearchList(Constant.CODE_VISUAL) } },
         { text: 'Cancel', style: 'cancel' }
       ],
       {

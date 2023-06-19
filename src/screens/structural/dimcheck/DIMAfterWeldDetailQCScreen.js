@@ -321,7 +321,7 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
 
   const headerData = {
     'Project': projectCode,
-    'Facility': facilityCode,
+    // 'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Assembly': assemblyCode,
     'UserLogin': userLogin,

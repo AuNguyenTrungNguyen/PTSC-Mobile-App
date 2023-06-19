@@ -297,7 +297,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
 
   const headerData = {
     'Project': projectCode,
-    'Facility': facilityCode,
+    // 'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Sheet': sheet,
     'Rev': rev,

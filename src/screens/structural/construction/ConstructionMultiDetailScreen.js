@@ -1647,7 +1647,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   const headerData = {
     // 'Project': projectCode,
     'Project': projectCode + '  -  ' + subContractor,
-    'Facility': facilityCode,
+    // 'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Sheet': sheet,
     'Rev': rev,
