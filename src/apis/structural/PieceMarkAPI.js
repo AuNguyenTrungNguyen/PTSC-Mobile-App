@@ -7,7 +7,7 @@ export const GetPieceMarkCutListAPI = (projectCode, facilityCode, drawingNo, tok
     + '/api/structural/PieceMark/GetPieceMarkCutList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -22,7 +22,7 @@ export const GetPieceMarkPaintListAPI = (projectCode, facilityCode, drawingNo, t
     + '/api/structural/PieceMark/GetPieceMarkPaintList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -36,7 +36,7 @@ export const GetCurrentPieceMarkInfoAPI = (projectCode, drawingNo, sheet, rev, c
     Port_Server
     + '/api/structural/PieceMark/GetCurrentPieceMarkInfo'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&code=' + code,
@@ -53,7 +53,7 @@ export const GetPieceMarkDetailAndDIMAPI = (projectCode, facilityCode, drawingNo
     + '/api/structural/PieceMark/GetPieceMarkDetailAndDIM'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&code=' + code

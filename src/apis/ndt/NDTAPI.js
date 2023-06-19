@@ -44,7 +44,7 @@ export const GetNDTIssueListAPI = async (projectCode, jointNo, drawingNo, code, 
     Port_Server
     + '/api/NDTUpdate/GetNDTIssueList?projectCode=' + projectCode
     + '&jointNo=' + jointNo
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&code=' + code,
     {
       headers: {

@@ -6,7 +6,7 @@ export const GetCurrentDimCuttingInfoAPI = (projectCode, drawingNo, sheet, rev, 
     Port_Server
     + '/api/piping/GetCurrentDimCuttingInfo'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -21,7 +21,7 @@ export const GetDimCuttingListAPI = (projectCode, facilityCode, drawingNo, token
     + '/api/piping/GetDimCuttingList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -33,7 +33,7 @@ export const GetDimCuttingDetailAPI = (projectCode, drawingNo, sheet, rev, token
     Port_Server
     + '/api/piping/GetDimCuttingDetail'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -61,7 +61,7 @@ export const GetDimCuttingQCListAPI = (projectCode, drawingNo, weldNo, location,
     Port_Server
     + '/api/piping/GetDimCuttingQCList'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&weldNo=' + weldNo
     + '&location=' + location,
     {

@@ -40,7 +40,7 @@ export const GetCurrentConstructionInfoAPI = async (projectCode, drawingNo, shee
     Port_Server
     + '/api/GRE/GetCurrentConstructionInfo'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -58,7 +58,7 @@ export const GetConstructionListAPI = async (projectCode, facilityCode, drawingN
     + '/api/GRE/GetConstructionList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo,
     {
       headers: {
@@ -75,7 +75,7 @@ export const GetConstructionDetailAPI = async (projectCode, facilityCode, drawin
     + '/api/GRE/GetConstructionDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&code=' + code,
@@ -111,7 +111,7 @@ export const GetQCPendingListAPI = async (projectCode, facilityCode, drawingNo, 
     + '/api/GRE/GetQCPendingList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&code=' + code,
     {

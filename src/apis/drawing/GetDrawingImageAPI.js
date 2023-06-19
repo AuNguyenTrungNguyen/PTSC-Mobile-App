@@ -3,7 +3,7 @@ const GetDrawingImageAPI = async (projectCode, facilityCode, drawingNo, code, to
   fetch(Port_Server
     + '/api/Drawing/GetDrawingImage?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&code=' + code,
     {
       headers: {

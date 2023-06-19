@@ -4,7 +4,7 @@ const GetDrawingListAPI = async (projectCode, facilityCode, drawingNo, token) =>
     Port_Server
     + '/api/Drawing/GetDrawingList?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,

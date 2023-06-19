@@ -5,7 +5,7 @@ export const GetDrawingLinkAPI = (projectCode, drawingNo, sheet, rev, token) =>
   fetch(
     Port_Server
     + '/api/App/GetDrawingLink?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -212,7 +212,7 @@ export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, token) =>
     Port_Server
     + '/api/App/CheckDrawingRev'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet,
     {
       headers: {

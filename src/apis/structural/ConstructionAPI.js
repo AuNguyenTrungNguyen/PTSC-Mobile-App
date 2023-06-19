@@ -1,20 +1,6 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-// export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, token) =>
-//   fetch(
-//     Port_Server
-//     + '/api/structural/Construction/GetConstructionList'
-//     + '?projectCode=' + projectCode
-//     + '&facilityCode=' + facilityCode
-//     + '&drawingNo=' + drawingNo,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }
-//   ).then(res => res.json());
 export const GetConstructionListSubContractorAPI = async (projectCode, facilityCode, drawingNo) => {
   const token = await Helper.getData('TOKEN');
   const subContractor = await Helper.getData('SUB_CONTRACTOR');
@@ -24,7 +10,7 @@ export const GetConstructionListSubContractorAPI = async (projectCode, facilityC
     + '?projectCode=' + projectCode
     + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -42,7 +28,7 @@ export const GetCurrentConstructionInfoAPI = async (projectCode, drawingNo, shee
     + '/api/structural/Construction/GetCurrentConstructionInfo'
     + '?projectCode=' + projectCode
     + '&subContractor=' + subContractor
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -59,7 +45,7 @@ export const GetConstructionDetaiFilterlAPI = (projectCode, facilityCode, drawin
     + '/api/structural/Construction/GetConstructionDetailFilter'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&joint=' + joint
@@ -93,7 +79,7 @@ export const GetConstructionQCStatusListAPI = async (projectCode, drawingNo, joi
     + '/api/structural/Construction/GetConstructionQCStatusList'
     + '?projectCode=' + projectCode
     + '&subContractor=' + subContractor
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&location=' + location
     + '&type=' + type

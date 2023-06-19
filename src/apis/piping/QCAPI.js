@@ -5,7 +5,7 @@ export const GetQCCompletePercentAPI = (projectCode, drawingNo, sheet, rev, toke
     Port_Server
     + '/api/piping/GetQCCompletePercent'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -22,7 +22,7 @@ export const GetQCListAPI = (projectCode, facilityCode, drawingNo, weldNo, token
     + '/api/piping/GetQCList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&weldNo=' + weldNo,
     {
       headers: {
@@ -37,7 +37,7 @@ export const GetCurrentQCInfoAPI = (projectCode, drawingNo, sheet, rev, token) =
     Port_Server
     + '/api/piping/GetCurrentQCInfo'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -53,7 +53,7 @@ export const GetQCDetailAPI = (projectCode, facilityCode, drawingNo, sheet, rev,
     + '/api/piping/GetQCDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&code=' + code,
@@ -84,7 +84,7 @@ export const GetSpendListAPI = (projectCode, facilityCode, drawingNo, weldNo, si
     + '/api/piping/GetSpendList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&weldNo=' + weldNo
     + '&siteLocation=' + siteLocaion
     + '&code=' + code

@@ -20,7 +20,7 @@ export const GetDrawingImageAPI = (projectCode, facilityCode, drawingNo, sheet, 
     + '/api/piping/GetDrawingImage'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&jointNo=' + jointNo
     + '&code=' + code

@@ -6,7 +6,7 @@ export const GetDrawingCompletePercentAPI = (projectCode, drawingNo, sheet, rev,
     Port_Server
     + '/api/piping/GetDrawingCompletePercent'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -22,7 +22,7 @@ export const GetDrawingCompleteAllPercentAPI = (projectCode, drawingNo, sheet, r
     Port_Server
     + '/api/piping/GetDrawingCompleteAllPercent'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -39,7 +39,7 @@ export const GetConstructionListAPI = (projectCode, facilityCode, drawingNo, wel
     + '/api/piping/GetConstructionList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&weldNo=' + weldNo,
     {
       headers: {
@@ -54,7 +54,7 @@ export const GetCurrentConstructionInfoAPI = (projectCode, drawingNo, sheet, rev
     Port_Server
     + '/api/piping/GetCurrentConstructionInfo'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {
@@ -70,7 +70,7 @@ export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, s
     + '/api/piping/GetConstructionDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&code=' + code,
@@ -86,7 +86,7 @@ export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, rev, role, tok
     Port_Server
     + '/api/piping/CheckDrawingRev'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&role=' + role,
@@ -149,7 +149,7 @@ export const GetQCStatusListAPI = (projectCode, code, facilityCode, drawingNo, w
     + '?projectCode=' + projectCode
     + '&code=' + code
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&weldNo=' + weldNo
     + '&filterType=' + filterType
     + '&siteLocation=' + siteLocaion,
@@ -186,7 +186,7 @@ export const GetPipeSupportListAPI = async (projectCode, facilityCode, supportNa
     + '/api/piping/GetPipeSupportList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + supportName,
+    + '&drawingNo=' + encodeURIComponent(supportName),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -202,7 +202,7 @@ export const GetPipeSupportDetailAPI = async (projectCode, facilityCode, support
     + '/api/piping/GetPipeSupportDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + supportName,
+    + '&drawingNo=' + encodeURIComponent(supportName),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -236,7 +236,7 @@ export const GetPipeSpoolListAPI = async (projectCode, facilityCode, spoolNo) =>
     + '/api/piping/GetPipeSpoolList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + spoolNo,
+    + '&drawingNo=' + encodeURIComponent(spoolNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -252,7 +252,7 @@ export const GetPipeSpoolDetailAPI = async (projectCode, facilityCode, spoolNo) 
     + '/api/piping/GetPipeSpoolDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + spoolNo,
+    + '&drawingNo=' + encodeURIComponent(spoolNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,

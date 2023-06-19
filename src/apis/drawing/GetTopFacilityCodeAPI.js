@@ -3,7 +3,7 @@ const GetTopFacilityCodeAPI = async (projectCode, drawingNo, sheet, rev, token) 
   fetch(
     Port_Server
     + '/api/Drawing/GetFacilityCodeByDrawing?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev,
     {

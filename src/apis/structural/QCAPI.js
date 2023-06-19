@@ -11,7 +11,7 @@ export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, locatio
     Port_Server
     + '/api/structural/QC/GetQCSpendList'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&location=' + location
     + '&type=' + type
@@ -46,7 +46,7 @@ export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev
     + '/api/structural/QC/GetQCSpendListQRCode'
     + '?projectCode=' + projectCode
     + '&subContractor=' + subContractor
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&jointNo=' + jointNo

@@ -8,7 +8,7 @@ export const GetPipeSupportDrawingAPI = async (projectCode, facilityCode, drawin
     + '/api/General/GetPipeSupportDrawing'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&location=' + deck,
     {
       headers: {
@@ -25,7 +25,7 @@ export const GetPipeSupportDrawingNewAPI = async (projectCode, facilityCode, dra
     + '/api/General/GetPipeSupportDrawingNew'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&deck=' + deck
     + '&cuttingPlanItem=' + cuttingPlanItem
     + '&ancillary=' + ancillary,
@@ -45,7 +45,7 @@ export const GetIsometricDrawingAPI = async (projectCode, facilityCode, drawingN
     + '/api/General/GetIsometricDrawing'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -76,7 +76,7 @@ export const GetStructureDrawingAPI = async (projectCode, drawingNo, filterType)
     Port_Server
     + '/api/General/GetStructureDrawing'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&filterType=' + filterType,
     {
       headers: {

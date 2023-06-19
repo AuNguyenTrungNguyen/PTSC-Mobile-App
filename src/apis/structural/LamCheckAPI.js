@@ -6,7 +6,7 @@ export const GetLamCheckSpendingListQRCodeAPI = (projectCode, drawingNo, jointNo
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckSpendingListQRCode'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev,
@@ -53,7 +53,7 @@ export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, joint
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckTodoListQRCode'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev
@@ -130,7 +130,7 @@ export const GetLamCheckQCStatusListAPI = (projectCode, drawingNo, jointNo, type
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckQCStatusList'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&type=' + type,
     {

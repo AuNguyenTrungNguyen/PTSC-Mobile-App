@@ -4,7 +4,7 @@ const GetSpoolMatrixListAPI = (projectCode, facilityCode, drawingNo, token) =>
     Port_Server
     + '/api/Drawing/GetSpoolMatrixList?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo,
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
       headers: {
         'Authorization': 'Bearer ' + token,

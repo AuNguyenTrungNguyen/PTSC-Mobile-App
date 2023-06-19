@@ -19,7 +19,7 @@ export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, 
     Port_Server
     + '/api/structural/DimCheck/GetDimCheckListQRCode'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
     + '&rev=' + rev
@@ -115,7 +115,7 @@ export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark,
     Port_Server
     + '/api/structural/DimCheck/GetDimForCuttingList'
     + '?projectCode=' + projectCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&pieceMarkNo=' + pieceMark
     + '&type=' + type
     + '&isSpending=' + isSpending,
@@ -148,7 +148,7 @@ export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingN
     + '/api/structural/DimCheck/GetDIMAfterWeldList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&assemblyCode=' + assemblyCode
     + '&filterType=' + filterType,
     {
@@ -165,7 +165,7 @@ export const GetDIMAfterWeldDetailAPI = async (projectCode, facilityCode, drawin
     + '/api/structural/DimCheck/GetDIMAfterWeldDetail'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&drawingNo=' + drawingNo
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&assemblyCode=' + assemblyCode
     + '&filterType=' + filterType,
     {
