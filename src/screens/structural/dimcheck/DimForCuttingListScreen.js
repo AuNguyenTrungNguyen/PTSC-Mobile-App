@@ -145,10 +145,9 @@ const DimForCuttingListScreen = ({ route, navigation }) => {
 
   const searchDimForCuttingList = async (drawingNo, pieceMarkNo, filterType) => {
     Keyboard.dismiss();
-    let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     pieceMarkNo = pieceMarkNo != null ? pieceMarkNo : '';
-    GetDimForCuttingListAPI(projectCode, drawingNo, pieceMarkNo, filterType, isSpending, token)
+    GetDimForCuttingListAPI(projectCode, drawingNo, pieceMarkNo, filterType, isSpending)
       .then(res => {
         if (res.success) {
           setDimForCuttingList(res.data);

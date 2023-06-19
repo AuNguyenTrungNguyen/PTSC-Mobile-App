@@ -171,12 +171,11 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
   const searchSpendingList = async (drawingNo, jointNo) => {
     Keyboard.dismiss();
-    let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
     let sheetParam = !sheet ? '' : sheet;
     let revParam = !rev ? '' : rev;
-    GetLamCheckSpendingListQRCodeAPI(projectCode, drawingNo, jointNo, sheetParam, revParam, token)
+    GetLamCheckSpendingListQRCodeAPI(projectCode, drawingNo, jointNo, sheetParam, revParam)
       .then(res => {
         if (res.success) {
           setLamCheckSpendingList(res.data);

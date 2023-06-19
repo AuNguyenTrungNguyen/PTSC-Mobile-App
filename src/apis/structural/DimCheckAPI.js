@@ -1,7 +1,9 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, location, token) => {
+export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, location) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
@@ -19,6 +21,7 @@ export const GetDimCheckListQRCodeAPI = async (projectCode, drawingNo, jointNo, 
     Port_Server
     + '/api/structural/DimCheck/GetDimCheckListQRCode'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
@@ -107,7 +110,9 @@ export const EditDimCheckImageAPI = (id, note, token) =>
   ).then(res => res.json());
 
 //-- DIM For Cutting
-export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark, type, isSpending, token) => {
+export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark, type, isSpending) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   if (!isSpending) {
     isSpending = false;
   }
@@ -115,6 +120,7 @@ export const GetDimForCuttingListAPI = async (projectCode, drawingNo, pieceMark,
     Port_Server
     + '/api/structural/DimCheck/GetDimForCuttingList'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&pieceMarkNo=' + pieceMark
     + '&type=' + type
@@ -143,10 +149,12 @@ export const UpdateDimForCuttingListAPI = (userUpdate, listItemUpdate, token) =>
 //-- DIM After Weld
 export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingNo, assemblyCode, filterType) => {
   const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   return fetch(
     Port_Server
     + '/api/structural/DimCheck/GetDIMAfterWeldList'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&assemblyCode=' + assemblyCode

@@ -134,12 +134,11 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
   const searchPieceMark = async (facilityCode, drawingNo, assemblyCode) => {
     setIsSearching(true);
     Keyboard.dismiss();
-    const token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode !== null && facilityCode !== FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo !== null ? drawingNo : '';
     assemblyCode = assemblyCode !== null ? assemblyCode : '';
     const filterType = !isPending ? '' : Constant.STATUS_NOT_YET;
-    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, filterType, token)
+    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, filterType)
       .then(res => {
         if (res.Success) {
           setPieceMarkList(res.Data);
@@ -158,9 +157,8 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
       });
   };
   const updatePieceMark = async (facilityCode, drawingNo, assemblyCode) => {
-    const token = await Helper.getData('TOKEN');
     const filterType = !isPending ? '' : Constant.STATUS_NOT_YET;
-    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, filterType, token)
+    GetDIMAfterWeldListAPI(projectCode, facilityCode, drawingNo, assemblyCode, filterType)
       .then(res => {
         if (res.Success) {
           if (res.Data && res.Data.length == 1) {

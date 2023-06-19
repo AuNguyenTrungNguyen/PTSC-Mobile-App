@@ -125,10 +125,9 @@ const DimForCuttingQCStatusScreen = ({ route, navigation }) => {
 
   const searchDimForCuttingQCStatusList = async (drawingNo, pieceMarkNo, type) => {
     Keyboard.dismiss();
-    let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     pieceMarkNo = pieceMarkNo != null ? pieceMarkNo : '';
-    GetDimForCuttingListAPI(projectCode, drawingNo, pieceMarkNo, type, false, token)
+    GetDimForCuttingListAPI(projectCode, drawingNo, pieceMarkNo, type, false)
       .then(res => {
         if (res.success) {
           setDimForCuttingQCStatusList(res.data);

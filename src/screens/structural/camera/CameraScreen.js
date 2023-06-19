@@ -175,7 +175,7 @@ const CameraScreen = ({ route, navigation }) => {
         showComfirm('ERROR', 'Network not available!');
       } else {
         if (destination === Naming.NAME_STR_PIECE_MARK) {
-          GetCurrentPieceMarkInfoAPI(projectCode, drawingNo, sheet, rev, code, token)
+          GetCurrentPieceMarkInfoAPI(projectCode, drawingNo, sheet, rev, code)
             .then(res => {
               if (res.success && res.data != null) {
                 navigation.navigate(route, {

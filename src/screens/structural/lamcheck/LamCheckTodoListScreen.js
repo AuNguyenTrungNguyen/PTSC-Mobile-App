@@ -150,10 +150,9 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
 
   const searchLamCheckTodoList = async (drawingNo, jointNo, filterType) => {
     Keyboard.dismiss();
-    let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetLamCheckTodoListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, token)
+    GetLamCheckTodoListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending)
       .then(res => {
         if (res.success) {
           setLamCheckTodoList(res.data);

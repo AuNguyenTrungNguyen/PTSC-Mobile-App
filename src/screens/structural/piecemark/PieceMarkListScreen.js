@@ -118,7 +118,7 @@ const PieceMarkListScreen = ({ route, navigation }) => {
     facilityCode = (facilityCode != null && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo != null ? drawingNo : '';
     if (code === Constant.CODE_CUT) {
-      GetPieceMarkCutListAPI(projectCode, facilityCode, drawingNo, token)
+      GetPieceMarkCutListAPI(projectCode, facilityCode, drawingNo)
         .then(res => {
           if (res.success) {
             setPieceMarkList(res.data);
@@ -136,7 +136,7 @@ const PieceMarkListScreen = ({ route, navigation }) => {
           setIsSearching(false);
         });
     } else {
-      GetPieceMarkPaintListAPI(projectCode, facilityCode, drawingNo, token)
+      GetPieceMarkPaintListAPI(projectCode, facilityCode, drawingNo)
         .then(res => {
           if (res.success) {
             setPieceMarkList(res.data);
@@ -191,7 +191,7 @@ const PieceMarkListScreen = ({ route, navigation }) => {
       );
     } else {
       let token = await Helper.getData('TOKEN');
-      GetCurrentPieceMarkInfoAPI(projectCode, drawingNo, sheet, rev, code, token)
+      GetCurrentPieceMarkInfoAPI(projectCode, drawingNo, sheet, rev, code)
         .then(res => {
           if (res.success) {
             navigation.navigate('PieceMarkDetail', {

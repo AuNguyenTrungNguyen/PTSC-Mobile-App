@@ -1,11 +1,15 @@
 
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
-export const GetPieceMarkCutListAPI = (projectCode, facilityCode, drawingNo, token) =>
-  fetch(
+export const GetPieceMarkCutListAPI = async (projectCode, facilityCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/PieceMark/GetPieceMarkCutList'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
@@ -15,12 +19,16 @@ export const GetPieceMarkCutListAPI = (projectCode, facilityCode, drawingNo, tok
       },
     }
   ).then(res => res.json());
+};
 
-export const GetPieceMarkPaintListAPI = (projectCode, facilityCode, drawingNo, token) =>
-  fetch(
+export const GetPieceMarkPaintListAPI = async (projectCode, facilityCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/PieceMark/GetPieceMarkPaintList'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
@@ -30,12 +38,16 @@ export const GetPieceMarkPaintListAPI = (projectCode, facilityCode, drawingNo, t
       },
     }
   ).then(res => res.json());
+};
 
-export const GetCurrentPieceMarkInfoAPI = (projectCode, drawingNo, sheet, rev, code, token) =>
-  fetch(
+export const GetCurrentPieceMarkInfoAPI = async (projectCode, drawingNo, sheet, rev, code) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/PieceMark/GetCurrentPieceMarkInfo'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
@@ -46,6 +58,7 @@ export const GetCurrentPieceMarkInfoAPI = (projectCode, drawingNo, sheet, rev, c
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+};
 
 export const GetPieceMarkDetailAndDIMAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, pieceMarkNo, type, token) =>
   fetch(

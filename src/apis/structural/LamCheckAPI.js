@@ -1,11 +1,14 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-export const GetLamCheckSpendingListQRCodeAPI = (projectCode, drawingNo, jointNo, sheet, rev, token) =>
-  fetch(
+export const GetLamCheckSpendingListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckSpendingListQRCode'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet
@@ -16,6 +19,7 @@ export const GetLamCheckSpendingListQRCodeAPI = (projectCode, drawingNo, jointNo
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+};
 
 export const UpdateLamCheckSpendingListAPI = async (listItemUpdate, token) => {
   let projectCode = await Helper.getData('PROJECT_CODE');
@@ -35,7 +39,9 @@ export const UpdateLamCheckSpendingListAPI = async (listItemUpdate, token) => {
   ).then(res => res.json());
 };
 
-export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, type, isSpending, token) => {
+export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, jointNo, sheet, rev, type, isSpending) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   let scope = await Helper.getData('QCSCOPE');
   if (scope == null) {
     scope = '';
@@ -53,6 +59,7 @@ export const GetLamCheckTodoListQRCodeAPI = async (projectCode, drawingNo, joint
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckTodoListQRCode'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&sheet=' + sheet

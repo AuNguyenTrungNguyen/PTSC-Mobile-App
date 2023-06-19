@@ -176,10 +176,9 @@ const DimCheckListScreen = ({ route, navigation }) => {
   };
   const searchDimCheckList = async (drawingNo, jointNo, filterType, filterLocation) => {
     Keyboard.dismiss();
-    const token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetDimCheckListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, filterLocation, token)
+    GetDimCheckListQRCodeAPI(projectCode, drawingNo, jointNo, sheet, rev, filterType, isSpending, filterLocation)
       .then(res => {
         if (res.Success) {
           setDimCheckList(res.Data);
