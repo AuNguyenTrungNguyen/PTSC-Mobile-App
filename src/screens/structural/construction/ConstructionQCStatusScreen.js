@@ -145,7 +145,7 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
   const _onPressManagePicture = item => {
 
     navigation.navigate(
-      Constant.ROUTE__STR_QCDEPT,
+      Constant.ROUTE__STR_QC,
       {
         screen: 'QCImage',
         params: {
