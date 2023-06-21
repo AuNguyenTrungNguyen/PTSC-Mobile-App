@@ -175,7 +175,6 @@ const DimForCuttingListScreen = ({ route, navigation }) => {
     let listUpdate = Helper.handleListUpdate(dimForCuttingUpdateList);
     UpdateDimForCuttingListAPI(userLogin, listUpdate, token)
       .then(res => {
-        setIsUploading(false);
         if (res.success) {
           setDimForCuttingUpdateList([]);
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
@@ -401,8 +400,8 @@ const DimForCuttingListScreen = ({ route, navigation }) => {
       <AwesomeAlert
         show={isUploading}
         showProgress={true}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
+        closeOnTouchOutside={true}
+        closeOnHardwareBackPress={true}
       />
     </SafeAreaView>
   );

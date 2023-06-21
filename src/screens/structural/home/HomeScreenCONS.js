@@ -474,7 +474,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
           <Header data={{ 'Project': projectCode + '  -  ' + subContractor, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             {
-              (spendNumbers.LamCheck || spendNumbers.DimCheck)
+              (spendNumbers.LamCheck || spendNumbers.DimForCutting)
                 ?
                 <View style={styles.line} />
                 :
