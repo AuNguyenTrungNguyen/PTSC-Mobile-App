@@ -327,8 +327,8 @@ const LoginScreen = ({ navigation }) => {
         </View>
         <View style={styles.safeArea}>
           <View style={styles.titleContainer}>
-            {/* <Text style={styles.title}>PTSC</Text> */}
-            <Text style={styles.title}>PTSC M&C</Text>
+            <Text style={styles.title}>PTSC</Text>
+            {/* <Text style={styles.title}>PTSC M&C</Text> */}
           </View>
           <View style={styles.containerCenter} pointerEvents={isLoadingLogin ? 'none' : 'auto'}>
             <View style={styles.inputContainer}>
