@@ -60,6 +60,10 @@ import GREDrawingListScreen from './screens/piping/gre/GREDrawingListScreen';
 import GREDrawingDetailScreen from './screens/piping/gre/GREDrawingDetailScreen';
 import GREQCPendingListScreen from './screens/piping/gre/GREQCPendingListScreen';
 
+//-- Valve
+import ValveProgressListScreen from './screens/piping/valve/ValveProgressListScreen';
+import ValveProgressDetailScreen from './screens/piping/valve/ValveProgressDetailScreen';
+
 //-- STR
 import StructuralHomeCONSScreen from './screens/structural/home/HomeScreenCONS';
 import StructuralHomeQCScreen from './screens/structural/home/HomeScreenQC';
@@ -332,6 +336,7 @@ const PipingCONSStackScreens = () => {
           headerBackTitle: 'Back',
         })}
       />
+
       <PipingCONSStack.Screen
         name='HydrotestPackageList'
         component={HydrotestPackageListScreen}
@@ -348,6 +353,27 @@ const PipingCONSStackScreens = () => {
         options={
           {
             title: 'Hydrotest Package Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingCONSStack.Screen
+        name='ValveProgressList'
+        component={ValveProgressListScreen}
+        options={
+          {
+            title: 'Valve Progress List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='ValveProgressDetail'
+        component={ValveProgressDetailScreen}
+        options={
+          {
+            title: 'Valve Progress Detail',
             headerBackTitle: 'Back',
           }
         }

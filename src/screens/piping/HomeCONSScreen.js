@@ -1,6 +1,8 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Networker from '../../utils/Networker';
@@ -373,6 +375,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Valve Progress 
+  const _onPressValveProgress = async () => {
+    navigation.navigate(
+      'ValveProgressList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
 
 
   const RenderItemBox = props => {
@@ -387,7 +399,19 @@ const HomeCONSScreen = ({ route, navigation }) => {
           <>
             <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
               <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-              <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+              {
+                props.iconType === 'Material'
+                  ?
+                  <MaterialIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  :
+                  (
+                    props.iconType === 'MaterialCommunity'
+                      ?
+                      <MaterialCommunityIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                      :
+                      <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  )
+              }
             </TouchableOpacity>
             {
               props.number
@@ -449,6 +473,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'Cons Manage\nGRE'} onPress={_onPressManageConsGRE} />
                 <RenderItemBox title={'Hydrotest\nPackage'} onPress={_onPressHydrotestPackage} iconName={'ios-cube-sharp'} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Valve\nProgress'} onPress={_onPressValveProgress} iconName='pipe-valve' iconType='MaterialCommunity' />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>
