@@ -385,6 +385,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Flange Joint Progress 
+  const _onPressFlangeJointProgress = async () => {
+    navigation.navigate(
+      'FlangeJointProgressList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
 
 
   const RenderItemBox = props => {
@@ -476,7 +486,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Valve\nProgress'} onPress={_onPressValveProgress} iconName='pipe-valve' iconType='MaterialCommunity' />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Flange Joint\nProgress'} onPress={_onPressFlangeJointProgress} iconName='circle-double' iconType='MaterialCommunity' />
               </View>
             </ScrollView>
           </View>

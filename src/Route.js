@@ -64,6 +64,10 @@ import GREQCPendingListScreen from './screens/piping/gre/GREQCPendingListScreen'
 import ValveProgressListScreen from './screens/piping/valve/ValveProgressListScreen';
 import ValveProgressDetailScreen from './screens/piping/valve/ValveProgressDetailScreen';
 
+//-- Valve
+import FlangeJointProgressListScreen from './screens/piping/flange/FlangeJointProgressListScreen';
+import FlangeJointProgressDetailScreen from './screens/piping/flange/FlangeJointProgressDetailScreen';
+
 //-- STR
 import StructuralHomeCONSScreen from './screens/structural/home/HomeScreenCONS';
 import StructuralHomeQCScreen from './screens/structural/home/HomeScreenQC';
@@ -129,8 +133,8 @@ if (Appearance.getColorScheme() === 'dark') {
   optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
 };
 
-const titleShow = 'PTSC';
-// const titleShow = 'PTSC M&C';
+// const titleShow = 'PTSC';
+const titleShow = 'PTSC M&C';
 
 //-- PIP Stacks
 const PipingCONSStack = createStackNavigator();
@@ -374,6 +378,27 @@ const PipingCONSStackScreens = () => {
         options={
           {
             title: 'Valve Progress Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      <PipingCONSStack.Screen
+        name='FlangeJointProgressList'
+        component={FlangeJointProgressListScreen}
+        options={
+          {
+            title: 'Flange Joint Progress List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='FlangeJointProgressDetail'
+        component={FlangeJointProgressDetailScreen}
+        options={
+          {
+            title: 'Flange Joint Progress Detail',
             headerBackTitle: 'Back',
           }
         }
