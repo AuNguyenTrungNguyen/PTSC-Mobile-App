@@ -5,6 +5,7 @@ import NetInfo from '@react-native-community/netinfo';
 
 import { LoginAPI, GetProjectListAPI, GetRoleListAPI } from '../../apis/app/LoginAPI';
 
+import AppConfig from '../../utils/AppConfig';
 import Constant from '../../utils/Constant';
 import Helper from '../../utils/Helper';
 import { ENUM_QC_SCOPE } from '../../utils/Enum';
@@ -327,8 +328,7 @@ const LoginScreen = ({ navigation }) => {
         </View>
         <View style={styles.safeArea}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>PTSC</Text>
-            {/* <Text style={styles.title}>PTSC M&C</Text> */}
+            <Text style={styles.title}>{AppConfig.TITLE}</Text>
           </View>
           <View style={styles.containerCenter} pointerEvents={isLoadingLogin ? 'none' : 'auto'}>
             <View style={styles.inputContainer}>

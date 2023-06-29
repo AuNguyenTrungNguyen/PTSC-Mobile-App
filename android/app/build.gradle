@@ -130,12 +130,12 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.ptsc.pms.android"
-        // applicationId "com.ptsc.ptscmc"
+        // applicationId "com.ptsc.pms.android"
+        applicationId "com.ptsc.ptscmc"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "2"
+        versionName "6"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true

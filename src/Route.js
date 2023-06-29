@@ -3,6 +3,7 @@ import { Appearance } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import AppConfig from './utils/AppConfig';
 import Constant from './utils/Constant';
 
 import AuthScreen from './screens/authentication/AuthScreen';
@@ -133,8 +134,7 @@ if (Appearance.getColorScheme() === 'dark') {
   optionNavigation = { headerStyle: { backgroundColor: 'grey' }, headerTintColor: 'white' };
 };
 
-// const titleShow = 'PTSC';
-const titleShow = 'PTSC M&C';
+const titleShow = AppConfig.TITLE;
 
 //-- PIP Stacks
 const PipingCONSStack = createStackNavigator();
