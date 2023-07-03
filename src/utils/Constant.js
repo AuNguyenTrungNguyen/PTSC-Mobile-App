@@ -40,6 +40,7 @@ export default class Constant {
   //-- IMAGE ROLE
   static IMAGE_ROLE_CONS = 'CONS';
   static IMAGE_ROLE_QC = 'QC';
+  static IMAGE_TYPE_FLANGE = 'FLANGE';
 
   // CODE FILTER
   static FILTER_ALL = 'ALL';

@@ -2,14 +2,13 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance } from 'react-native';
 import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import Dialog from "react-native-dialog";
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-simple-toast';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 import Networker from '../../../utils/Networker';
+import Constant from '../../../utils/Constant';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 
@@ -242,25 +241,44 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
     setIsVisibleDate(false);
   };
 
-  //-- Text
-  const [isVisibleText, setIsVisibleText] = useState(false);
-  const [textDisplay, setTextDisplay] = useState('');
-  const _onPressSelectText = (value, index, key) => {
-    setIndexUpdate(index);
-    setKeyUpdate(key);
-    if (value) {
-      setTextDisplay(value.toString());
+  //-- Clear
+  const _onPressClear = (index) => {
+    const valueClear = null;
+
+    let array = [...detailList];
+    array[index]['RequestToQCDate'] = valueClear;
+    array[index]['TightenedDate'] = valueClear;
+    setDetailList(array);
+
+    array = [...updateList];
+    const rowIndex = detailList[index].RowIndex;
+    const objIndex = array.findIndex((obj => obj.RowIndex == rowIndex));
+    if (objIndex < 0) {
+      array.push({
+        RowIndex: rowIndex,
+        ['RequestToQCDate']: valueClear,
+        ['TightenedDate']: valueClear,
+      });
     } else {
-      setTextDisplay('');
+      array[objIndex]['RequestToQCDate'] = valueClear;
+      array[objIndex]['TightenedDate'] = valueClear;
     }
-    setIsVisibleText(true);
+    setUpdateList(array);
   };
-  // const _onChangeText = () => {
-  //   const text = textDisplay.trim();
-  //   setTextDisplay(text);
-  //   onChangeData(text);
-  //   setIsVisibleText(false);
-  // };
+  //-- Image
+  const _onPressImage = async item => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'Image',
+      params: {
+        userLogin: userLogin,
+        projectCode: projectCode,
+        rowIndex: item.RowIndex,
+        jointNo: item.FlangeJointNos,
+        type: Constant.IMAGE_TYPE_FLANGE,
+        title: 'Flange Image'
+      }
+    });
+  };
 
   //-- Render Header
   const headerData = {
@@ -286,12 +304,26 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
       <View style={styles.box} key={item.RowIndex}>
         <View style={styles.row}>
           <View style={styles.cellTitle}>
+          </View>
+          <View style={styles.cellData}>
+            <TouchableOpacity
+              style={styles.itemAction}
+              onPress={() => _onPressImage(item)}>
+              <Text style={styles.itemText}>Image</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.itemAction}
+              onPress={() => _onPressClear(index)}>
+              <Text style={styles.itemText}>Clear</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
             <Text style={styles.titleBaseText}>FlangeJoint:</Text>
           </View>
           <View style={styles.cellData}>
-            <View style={styles.itemActionIcon}>
-              <Text style={styles.textBlue}>{Formater.formatEmptyData(item.FlangeJointNos)}</Text>
-            </View>
+            <Text style={styles.textBlue}>{Formater.formatEmptyData(item.FlangeJointNos)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -299,10 +331,8 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
             <Text style={styles.titleRedText}>{'RequestToQC\nDate'}:</Text>
           </View>
           <View style={styles.cellData}>
-            <TouchableOpacity
-              style={styles.itemActionIcon}
-              onPress={() => _onPressSelectDate(item.RequestToQCDate, index, 'RequestToQCDate')}>
-              <Text style={styles.textData}>{Formater.formatDateData(item.RequestToQCDate)}</Text>
+            <Text style={styles.textData}>{Formater.formatDateData(item.RequestToQCDate)}</Text>
+            <TouchableOpacity onPress={() => _onPressSelectDate(item.RequestToQCDate, index, 'RequestToQCDate')}>
               <AntDesignIcon style={styles.iconAction} name='clockcircleo' size={20} color={BASE_COLOR} />
             </TouchableOpacity>
           </View>
@@ -312,10 +342,8 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
             <Text style={styles.titleRedText}>{'Tightened\nDate'}:</Text>
           </View>
           <View style={styles.cellData}>
-            <TouchableOpacity
-              style={styles.itemActionIcon}
-              onPress={() => _onPressSelectDate(item.TightenedDate, index, 'TightenedDate')}>
-              <Text style={styles.textData}>{Formater.formatDateData(item.TightenedDate)}</Text>
+            <Text style={styles.textData}>{Formater.formatDateData(item.TightenedDate)}</Text>
+            <TouchableOpacity onPress={() => _onPressSelectDate(item.TightenedDate, index, 'TightenedDate')}>
               <AntDesignIcon style={styles.iconAction} name='clockcircleo' size={20} color={BASE_COLOR} />
             </TouchableOpacity>
           </View>
@@ -377,17 +405,6 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
         onConfirm={_onChangeDate}
         onCancel={() => { setIsVisibleDate(false) }}
       />
-      {/* <Dialog.Container visible={isVisibleText}>
-        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
-        <Dialog.Input
-          value={textDisplay}
-          placeholder={'Enter ' + keyUpdate}
-          onChangeText={(text) => setTextDisplay(text)}
-          underlineColorAndroid={BASE_COLOR}
-        />
-        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleText(false) }} />
-        <Dialog.Button label='OK' onPress={_onChangeText} />
-      </Dialog.Container> */}
     </SafeAreaView>
   );
 };
@@ -405,31 +422,6 @@ const styles = StyleSheet.create({
     backgroundColor: OPP_COLOR,
   },
 
-  headerContainer: {
-    marginBottom: 8,
-    padding: 4,
-    paddingBottom: 0,
-  },
-  rowInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 24,
-    marginBottom: 4,
-  },
-  infoTitle: {
-    flex: 3,
-  },
-  infoDataLine: {
-    flex: 7,
-    borderColor: BASE_COLOR,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-  },
-  infoData: {
-    color: BASE_COLOR,
-    flexShrink: 1,
-  },
-
   table: {
     flexGrow: 1,
   },
@@ -441,57 +433,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
-  boxError: {
-    flexDirection: 'column',
-    width: '100%',
-    borderColor: 'red',
-    borderWidth: 2,
-    borderRadius: 4,
-    marginBottom: 8,
-  },
   row: {
     flexDirection: 'row',
-    justifyContent: 'center',
     margin: 4,
     minHeight: 20,
   },
-  cellTitleLine: {
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'center',
-  },
-  checkBox: {
-    fontWeight: 'bold',
-    color: BASE_COLOR,
-    width: 20,
-    height: 20,
-  },
-  itemDone: {
+  itemAction: {
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 4,
     padding: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: 12,
   },
-  textDone: {
+  itemText: {
     color: BASE_COLOR,
     fontWeight: 'bold',
-    fontStyle: 'italic',
-  },
-  itemDisabled: {
-    backgroundColor: '#cccccc',
-    borderColor: '#999999',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
-  },
-  textDisabled: {
-    color: '#666666',
     fontStyle: 'italic',
   },
 
@@ -501,12 +457,9 @@ const styles = StyleSheet.create({
   },
   cellData: {
     flex: 2,
-    justifyContent: 'center',
-    alignItems: 'flex-end'
-  },
-  itemActionIcon: {
     flexDirection: 'row',
-    alignSelf: 'flex-end',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
 
 
@@ -524,57 +477,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'green',
   },
-
-
   iconAction: {
     marginLeft: 4,
     width: 20,
     height: 20,
-  },
-  itemPercent: {
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    marginLeft: 4,
-  },
-  textPercent: {
-    color: BASE_COLOR,
-  },
-  itemPercentDisable: {
-    backgroundColor: '#cccccc',
-    borderColor: '#999999',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 4,
-    marginLeft: 4,
-  },
-  textPercentDisabled: {
-    color: '#666666',
-  },
-
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    backgroundColor: OPP_COLOR,
-  },
-  noDataTitle: {
-    fontSize: 16,
   },
 
   actionContainer: {
     marginTop: 12,
     height: 36,
     flexDirection: 'row',
-  },
-  buttonLeft: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BASE_COLOR,
   },
   button: {
     flex: 1,
@@ -583,17 +495,8 @@ const styles = StyleSheet.create({
     backgroundColor: BASE_COLOR,
     marginLeft: 4,
   },
-  buttonDisabled: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#cccccc',
-  },
   buttonTitle: {
     color: OPP_COLOR,
-  },
-  buttonTitleDark: {
-    color: BASE_COLOR,
   },
 });
 

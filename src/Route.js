@@ -11,6 +11,9 @@ import LoginScreen from './screens/authentication/LoginScreen';
 // import PDFViewScreen from './screens/pdf/PDFViewScreen';
 import PDFViewScreen from './screens/pdf/PDFViewScreenNew'; //-- Use for AWS
 
+//-- Image
+import ImageScreen from './screens/images/ImageScreen';
+
 //-- General
 import ManHoursImpactListScreen from './screens/general/manhoursimpact/ManHoursImpactListScreen';
 import ManHoursImpactDetailScreen from './screens/general/manhoursimpact/ManHoursImpactDetailScreen';
@@ -1210,6 +1213,14 @@ const CommonStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
+      />
+      <CommonStack.Screen
+        name='Image'
+        component={ImageScreen}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitle: 'Back',
+        })}
       />
     </CommonStack.Navigator>
   );
