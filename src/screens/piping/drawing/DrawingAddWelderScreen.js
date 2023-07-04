@@ -6,7 +6,7 @@ import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 
-import { GetWelderListAPI } from '../../../apis/app/AppAPI';
+import { GetWelderListSubContractorAPI } from '../../../apis/app/AppAPI';
 
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
@@ -44,8 +44,7 @@ export default ({ route, navigation }) => {
     callAPI(() => { searchWelder(welderId, welderName) }, false);
   };
   const searchWelder = async (welderId, welderName) => {
-    const token = await Helper.getData('TOKEN');
-    GetWelderListAPI(projectCode, welderId, welderName, token)
+    GetWelderListSubContractorAPI(projectCode, welderId, welderName)
       .then(res => {
         if (res.success) {
           setWelderList(res.data);

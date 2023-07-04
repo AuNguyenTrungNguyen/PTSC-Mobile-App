@@ -12,7 +12,7 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListAPI, GetTeamListAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListSubContractorAPI, GetTeamListSubContractorAPI, GetWPSListSubContractorAPI } from '../../../apis/app/AppAPI';
 import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
@@ -635,9 +635,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   };
   const getLocationList = async () => {
     if (locationList == null) {
-      let token = await Helper.getData('TOKEN');
       let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-      GetLocationListAPI(projectCode, disciplineCode, token)
+      GetLocationListSubContractorAPI(projectCode, disciplineCode)
         .then(res => {
           if (res.success) {
             setLocationList(res.data);
@@ -681,9 +680,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   };
   const getTeamList = async () => {
     if (teamList == null) {
-      let token = await Helper.getData('TOKEN');
       let filterType = code == Constant.CODE_FITUP ? Constant.CODE_FITUP : Constant.CODE_VISUAL;
-      GetTeamListAPI(projectCode, filterType, token)
+      GetTeamListSubContractorAPI(projectCode, filterType)
         .then(res => {
           if (res.success) {
             setTeamList(res.data);
@@ -768,9 +766,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
   };
   const getWPSList = async () => {
     if (wpsList == null) {
-      let token = await Helper.getData('TOKEN');
       let disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-      GetWPSListAPI(projectCode, disciplineCode, token)
+      GetWPSListSubContractorAPI(projectCode, disciplineCode)
         .then(res => {
           if (res.success) {
             setWPSList(res.data);

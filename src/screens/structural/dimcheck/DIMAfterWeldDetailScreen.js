@@ -11,7 +11,7 @@ import {
   GetDIMAfterWeldDetailAPI,
   UpdateDIMAfterWeldDetailAPI
 } from '../../../apis/structural/DimCheckAPI';
-import { GetTeamListFilterAPI } from '../../../apis/app/AppAPI';
+import { GetTeamListFilterSubContractorAPI } from '../../../apis/app/AppAPI';
 
 import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
@@ -78,9 +78,8 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
   };
 
   const getTeamList = async () => {
-    const token = await Helper.getData('TOKEN');
     const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-    GetTeamListFilterAPI(projectCode, disciplineCode, Constant.CODE_VISUAL, token)
+    GetTeamListFilterSubContractorAPI(projectCode, disciplineCode, Constant.CODE_VISUAL)
       .then(res => {
         if (res.Success) {
           setTeamList(res.Data);

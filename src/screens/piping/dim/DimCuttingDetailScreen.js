@@ -12,7 +12,7 @@ import {
   UpdateDimCuttingDetailAPI
 } from '../../../apis/piping/DimAPI';
 
-import { GetLocationListAPI, GetTeamListFilterAPI, GetSerialNoAndHeatNoListAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListSubContractorAPI, GetTeamListFilterSubContractorAPI, GetSerialNoAndHeatNoListAPI } from '../../../apis/app/AppAPI';
 
 import Networker from '../../../utils/Networker';
 import Constant from '../../../utils/Constant';
@@ -89,8 +89,8 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
       const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
       const arrayPromise = [
         GetDimCuttingDetailAPI(projectCode, CPName, CPSheet, CPRev, token),
-        GetLocationListAPI(projectCode, disciplineCode, token),
-        GetTeamListFilterAPI(projectCode, disciplineCode, Constant.CODE_FITUP, token),
+        GetLocationListSubContractorAPI(projectCode, disciplineCode),
+        GetTeamListFilterSubContractorAPI(projectCode, disciplineCode, Constant.CODE_FITUP),
       ];
       await Promise.all(arrayPromise)
         .then(([dimDetailResult, locationResult, teamResult]) => {

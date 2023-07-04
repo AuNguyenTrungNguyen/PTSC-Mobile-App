@@ -7,7 +7,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
 
-import { GetTeamListFilterAPI } from '../../../apis/app/AppAPI';
+import { GetTeamListFilterSubContractorAPI } from '../../../apis/app/AppAPI';
 import { GetTeamReportAPI } from '../../../apis/piping/ConstructionAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
@@ -69,9 +69,8 @@ const DailyReportScreen = ({ route, navigation }) => {
 
   //-- Team
   const getTeamList = async () => {
-    const token = await Helper.getData('TOKEN');
     const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-    GetTeamListFilterAPI(projectCode, disciplineCode, '', token)
+    GetTeamListFilterSubContractorAPI(projectCode, disciplineCode, '')
       .then(res => {
         if (res.Success) {
           setTeamList(res.Data);

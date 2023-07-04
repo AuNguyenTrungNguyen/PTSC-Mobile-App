@@ -17,7 +17,7 @@ import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
 import { GetConstructionDetailAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/piping/ConstructionAPI';
-import { GetLocationListAPI, GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI, GetTeamListFilterAPI, GetWPSListAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListSubContractorAPI, GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI, GetTeamListFilterSubContractorAPI, GetWPSListSubContractorAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -541,9 +541,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const getLocationList = async () => {
     if (locationList == null) {
-      const token = await Helper.getData('TOKEN');
       const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-      GetLocationListAPI(projectCode, disciplineCode, token)
+      GetLocationListSubContractorAPI(projectCode, disciplineCode)
         .then(res => {
           if (res.success) {
             setLocationList(res.data);
@@ -589,10 +588,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const getTeamList = async () => {
     if (teamList == null) {
-      const token = await Helper.getData('TOKEN');
       const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
       const filterType = code == Constant.CODE_FITUP ? Constant.CODE_FITUP : Constant.CODE_VISUAL;
-      GetTeamListFilterAPI(projectCode, disciplineCode, filterType, token)
+      GetTeamListFilterSubContractorAPI(projectCode, disciplineCode, filterType)
         .then(res => {
           if (res.Success) {
             setTeamList(res.Data);
@@ -638,9 +636,8 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const getWPSList = async () => {
     if (wpsList == null) {
-      const token = await Helper.getData('TOKEN');
       const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
-      GetWPSListAPI(projectCode, disciplineCode, token)
+      GetWPSListSubContractorAPI(projectCode, disciplineCode)
         .then(res => {
           if (res.success) {
             setWPSList(res.data);

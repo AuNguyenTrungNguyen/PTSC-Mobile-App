@@ -28,6 +28,7 @@ export const GetFacilityListAPI = (projectCode, token) =>
     }
   ).then(res => res.json());
 
+//-- Remove
 export const GetLocationListAPI = (projectCode, disciplineCode, token) =>
   fetch(
     Port_Server
@@ -40,7 +41,25 @@ export const GetLocationListAPI = (projectCode, disciplineCode, token) =>
         'Content-Type': 'application/json',
       }
     }).then(res => res.json());
+export const GetLocationListSubContractorAPI = async (projectCode, disciplineCode) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetLocationList'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
+//-- Remove
 export const GetTeamListAPI = (projectCode, filterType, token) =>
   fetch(
     Port_Server
@@ -53,7 +72,25 @@ export const GetTeamListAPI = (projectCode, filterType, token) =>
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+export const GetTeamListSubContractorAPI = async (projectCode, filterType) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetTeamList'
+    + '?projectCode=' + projectCode
+    + '&filterType=' + filterType
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
+//-- Remove
 export const GetTeamListFilterAPI = (projectCode, disciplineCode, filterType, token) =>
   fetch(
     Port_Server
@@ -67,6 +104,24 @@ export const GetTeamListFilterAPI = (projectCode, disciplineCode, filterType, to
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+export const GetTeamListFilterSubContractorAPI = async (projectCode, disciplineCode, filterType) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetTeamListFilter'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&filterType=' + filterType
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, token) =>
   fetch(
@@ -107,6 +162,7 @@ export const GetSerialNoAndHeatNoPipeSupportListAPI = (projectCode, token) =>
       },
     }).then(res => res.json());
 
+//-- Remove
 export const GetWelderListAPI = (projectCode, id, name, token) =>
   fetch(
     Port_Server
@@ -120,7 +176,26 @@ export const GetWelderListAPI = (projectCode, id, name, token) =>
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+export const GetWelderListSubContractorAPI = async (projectCode, id, name) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetWelderList'
+    + '?projectCode=' + projectCode
+    + '&id=' + id
+    + '&name=' + name
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
+//-- Remove
 export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
   fetch(
     Port_Server
@@ -133,6 +208,23 @@ export const GetWPSListAPI = (projectCode, disciplineCode, token) =>
         'Content-Type': 'application/json',
       }
     }).then(res => res.json());
+export const GetWPSListSubContractorAPI = async (projectCode, disciplineCode) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetWPSList'
+    + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 export const GetInspectorListAPI = (projectCode, disciplineCode, filterType, token) =>
   fetch(
@@ -147,24 +239,6 @@ export const GetInspectorListAPI = (projectCode, disciplineCode, filterType, tok
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-
-// export const GetNotifyNumberScopeAPI = async (projectCode, token) => {
-//   let scope = await Helper.getData('QCSCOPE');
-//   if (scope == null) {
-//     scope = '';
-//   }
-//   return fetch(
-//     Port_Server
-//     + '/api/App/GetNotifyNumberScope'
-//     + '?projectCode=' + projectCode
-//     + '&scope=' + scope,
-//     {
-//       headers: {
-//         'Authorization': 'Bearer ' + token,
-//         'Content-Type': 'application/json',
-//       },
-//     }).then(res => res.json());
-// };
 
 export const GetPIPNotifyNumberAPI = (projectCode, token) =>
   fetch(

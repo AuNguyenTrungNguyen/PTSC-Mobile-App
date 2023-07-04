@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import NetInfo from '@react-native-community/netinfo';
 
 
-import { GetWelderListAPI } from '../../../apis/app/AppAPI';
+import { GetWelderListSubContractorAPI } from '../../../apis/app/AppAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import Helper from '../../../utils/Helper';
@@ -57,8 +57,7 @@ const AddWelderScreen = ({ route, navigation }) => {
   };
 
   const searchWelder = async (welderId, welderName) => {
-    let token = await Helper.getData('TOKEN');
-    GetWelderListAPI(projectCode, welderId, welderName, token)
+    GetWelderListSubContractorAPI(projectCode, welderId, welderName)
       .then(res => {
         if (res.success) {
           setWelderList(res.data);
