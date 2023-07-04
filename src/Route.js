@@ -68,7 +68,7 @@ import GREQCPendingListScreen from './screens/piping/gre/GREQCPendingListScreen'
 import ValveProgressListScreen from './screens/piping/valve/ValveProgressListScreen';
 import ValveProgressDetailScreen from './screens/piping/valve/ValveProgressDetailScreen';
 
-//-- Valve
+//-- Flange Joint
 import FlangeJointProgressListScreen from './screens/piping/flange/FlangeJointProgressListScreen';
 import FlangeJointProgressDetailScreen from './screens/piping/flange/FlangeJointProgressDetailScreen';
 
@@ -104,13 +104,14 @@ import QCHandBookScreen from './screens/structural/qc/QCHandBookScreen';
 //-- EIT
 import ElectricalHomeScreenCONS from './screens/electircal/home/HomeCONSScreen';
 import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
-import ElectricalCableScheduleListScreen from './screens/electircal/cableschedule/ElectricalCableScheduleListScreen';
 import ElectricalCableControlListScreen from './screens/electircal/cablecontrol/ElectricalCableControlListScreen';
 import ElectricalCableControlDetailScreen from './screens/electircal/cablecontrol/ElectricalCableControlDetailScreen';
-import ElectricalCableControlReportScreen from './screens/electircal/cablecontrol/ElectricalCableControlReportScreen';
 import ElectricalCableDamageLogListScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogListScreen';
 import ElectricalCableDamageLogDetailScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDetailScreen';
 import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDataScreen';
+import DrumNoListScreen from './screens/electircal/drumlibrary/DrumNoListScreen';
+import CableControlReportScreen from './screens/electircal/cablereport/CableControlReportScreen';
+
 
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
@@ -859,11 +860,11 @@ const ElectricalCONSStackScreens = () => {
         }
       />
       <ElectricalCONSStack.Screen
-        name={'ElectricalCableScheduleList'}
-        component={ElectricalCableScheduleListScreen}
+        name={'DrumNoList'}
+        component={DrumNoListScreen}
         options={
           {
-            title: 'Cable Schelude',
+            title: 'Drum List',
             headerBackTitle: 'Back',
           }
         }
@@ -889,8 +890,8 @@ const ElectricalCONSStackScreens = () => {
         }
       />
       <ElectricalCONSStack.Screen
-        name={'ElectricalCableControlReport'}
-        component={ElectricalCableControlReportScreen}
+        name={'CableControlReport'}
+        component={CableControlReportScreen}
         options={
           {
             title: 'Cable Control Report',

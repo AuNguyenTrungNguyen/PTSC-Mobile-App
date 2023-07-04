@@ -48,39 +48,8 @@ export const UpdateElectricalCableControlDetailAPI = async (modelUpdate, modelCo
     }
   ).then(res => res.json());
 };
-export const GetElectricalCableControlReportAPI = async (projectCode, userLogin, date) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/eit/GetElectricalCableControlReport'
-    + '?projectCode=' + projectCode
-    + '&userLogin=' + userLogin
-    + '&date=' + date,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
 
 //-- Cable Damage
-export const GetEITCableScheduleListAPI = async (projectCode, drumNo) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/eit/GetEITCableScheduleList'
-    + '?projectCode=' + projectCode
-    + '&drumNo=' + drumNo,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
 export const GetEITCableDamageLogDetailAPI = async (projectCode, drumNo) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -124,6 +93,41 @@ export const DeleteEITCableDamageLogDataAPI = async rowIndex => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ rowIndex }),
+    }
+  ).then(res => res.json());
+};
+
+//-- DrumNo Library
+export const GetEITDrumNoListAPI = async (projectCode, drumNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetEITDrumNoList'
+    + '?projectCode=' + projectCode
+    + '&drumNo=' + drumNo,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+
+//-- Report
+export const GetElectricalCableControlReportAPI = async (projectCode, userLogin, date) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalCableControlReport'
+    + '?projectCode=' + projectCode
+    + '&userLogin=' + userLogin
+    + '&date=' + date,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
     }
   ).then(res => res.json());
 };

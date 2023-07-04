@@ -144,7 +144,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
   const _onPressSelect = async () => {
     setKeyUpdate('NewDrumNo');
     navigation.navigate(
-      'ElectricalCableScheduleList',
+      'DrumNoList',
       {
         projectCode: projectCode
       }
@@ -188,7 +188,6 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
     if (!cableDetail[key]) {
       cableDetail[key] = 0;
     }
-
     setDecimalDisplay(cableDetail[key].toString());
     setIsVisibleDecimal(true);
   };
@@ -203,6 +202,26 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
     setIsVisibleDecimal(false);
   };
 
+  //-- Clear
+  const _onPressClear = () => {
+    const valueClear = null;
+    if (!columnChange.includes('NewDrumNo')) {
+      columnChange.push('NewDrumNo');
+    }
+    cableDetail['NewDrumNo'] = cableDetail['DrumNo'];
+
+    if (!columnChange.includes('FromNo_m')) {
+      columnChange.push('FromNo_m');
+    }
+    cableDetail['FromNo_m'] = valueClear;
+
+    if (!columnChange.includes('ToNo_m')) {
+      columnChange.push('ToNo_m');
+    }
+    cableDetail['ToNo_m'] = valueClear;
+    setIsRender(new Date());
+  };
+
   //-- Render
   const RenderDetail = () => {
     const isNewDrumNo = columnChange.includes('NewDrumNo');
@@ -213,6 +232,16 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
         {
           <>
             <View style={styles.box} pointerEvents={isUploading || disableUpdate ? 'none' : 'auto'}>
+              <View style={styles.rowAction}>
+                <Text style={styles.cellTitle}></Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={_onPressClear}>
+                    <Text style={styles.itemText}>Clear</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>CableFrom:</Text>
                 <View style={styles.cellData}>
@@ -392,6 +421,11 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     marginHorizontal: 4,
   },
+  rowAction: {
+    flexDirection: 'row',
+    marginVertical: 0,
+    marginHorizontal: 4,
+  },
   line: {
     height: 1,
     width: '100%',
@@ -405,6 +439,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: BASE_COLOR,
     alignItems: 'flex-end'
+  },
+  itemAction: {
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+  },
+  itemText: {
+    color: BASE_COLOR,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
   },
   containerAction: {
     flexDirection: 'row',

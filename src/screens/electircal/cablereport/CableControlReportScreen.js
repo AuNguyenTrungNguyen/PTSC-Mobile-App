@@ -12,7 +12,7 @@ import Networker from '../../../utils/Networker';
 import Header from '../../../components/Header';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const ElectricalCableControlReportScreen = ({ route, navigation }) => {
+const CableControlReportScreen = ({ route, navigation }) => {
 
   const { projectCode, userLogin } = route.params;
 
@@ -293,4 +293,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ElectricalCableControlReportScreen;
+export default CableControlReportScreen;

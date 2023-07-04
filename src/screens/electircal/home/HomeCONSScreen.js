@@ -121,11 +121,11 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
-  //-- Electrical Cable Control Report
+  //-- Cable Control Report
   const _onElectricalCableControlReport = async () => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
-      'ElectricalCableControlReport',
+      'CableControlReport',
       {
         projectCode: projectCode,
         userLogin: userLogin,
