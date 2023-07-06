@@ -22,7 +22,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const DimForCuttingListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, isSpending } = route.params;
+  const { projectCode, subContractor, userLogin, isSpending } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -321,7 +321,7 @@ const DimForCuttingListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>

@@ -17,7 +17,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const DimForCuttingQCStatusScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, subContractor, userLogin } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -244,7 +244,7 @@ const DimForCuttingQCStatusScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>

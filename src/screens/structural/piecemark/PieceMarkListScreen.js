@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const PieceMarkListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, code } = route.params;
+  const { projectCode, subContractor, userLogin, code } = route.params;
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -179,6 +179,7 @@ const PieceMarkListScreen = ({ route, navigation }) => {
         'PieceMarkDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -196,6 +197,7 @@ const PieceMarkListScreen = ({ route, navigation }) => {
           if (res.success) {
             navigation.navigate('PieceMarkDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -290,7 +292,7 @@ const PieceMarkListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>FacilityCode:</Text>

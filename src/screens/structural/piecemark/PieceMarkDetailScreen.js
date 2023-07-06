@@ -24,7 +24,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const PieceMarkDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, userLogin, link } = route.params;
+  const { projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, userLogin, link } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -101,8 +101,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
   };
 
   const getPieceMarkDetail = async (no = filterPieceMarkNo, type = filterType, reset = false) => {
-    let token = await Helper.getData('TOKEN');
-    GetPieceMarkDetailAndDIMAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, no, type, token)
+    GetPieceMarkDetailAndDIMAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, no, type)
       .then(res => {
         if (res.success) {
           setPieceMarkDetailList(res.data);
@@ -296,7 +295,7 @@ const PieceMarkDetailScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
-    'Project': projectCode,
+    'Project': projectCode + '  -  ' + subContractor,
     // 'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Sheet': sheet,
