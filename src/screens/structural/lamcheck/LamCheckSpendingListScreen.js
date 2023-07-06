@@ -96,6 +96,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
       'LamCheckQCStatus',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         paramDrawingNo: data
       }
     );
