@@ -39,16 +39,20 @@ export const GetCurrentConstructionInfoAPI = async (projectCode, drawingNo, shee
     }).then(res => res.json());
 };
 
-export const GetConstructionDetaiFilterlAPI = (projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token) =>
-  fetch(
+export const GetConstructionDetaiFilterlAPI = async (projectCode, facilityCode, drawingNo, sheet, rev, joint, code) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/Construction/GetConstructionDetailFilter'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
     + '&rev=' + rev
     + '&joint=' + joint
+    + '&jointNo=' + joint
     + '&code=' + code,
     {
       headers: {
@@ -56,6 +60,7 @@ export const GetConstructionDetaiFilterlAPI = (projectCode, facilityCode, drawin
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+};
 
 export const UpdateConstructionDetailAPI = (projectCode, facilityCode, userUpdate, code, listItemUpdate, token) =>
   fetch(

@@ -143,9 +143,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   };
 
   const getConstructionDetail = async (joint = '') => {
-    let token = await Helper.getData('TOKEN');
     joint = joint ? joint : '';
-    GetConstructionDetaiFilterlAPI(projectCode, facilityCode, drawingNo, sheet, rev, joint, code, token)
+    GetConstructionDetaiFilterlAPI(projectCode, facilityCode, drawingNo, sheet, rev, joint, code)
       .then(res => {
         if (res.success) {
           setConstructionDetailList(res.data);
