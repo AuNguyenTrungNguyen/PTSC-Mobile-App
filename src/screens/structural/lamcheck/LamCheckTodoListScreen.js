@@ -21,7 +21,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckTodoListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, paramDrawingNo, sheet, rev, isSpending } = route.params;
+  const { projectCode, subContractor, userLogin, paramDrawingNo, sheet, rev, isSpending } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -410,7 +410,7 @@ const LamCheckTodoListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>

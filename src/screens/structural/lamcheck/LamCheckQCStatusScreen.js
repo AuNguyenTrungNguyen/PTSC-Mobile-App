@@ -17,7 +17,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckQCStatusScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, paramDrawingNo } = route.params;
+  const { projectCode, subContractor, userLogin, paramDrawingNo } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -131,10 +131,9 @@ const LamCheckQCStatusScreen = ({ route, navigation }) => {
 
   const searchLamCheckQCStatusList = async (drawingNo, jointNo, type) => {
     Keyboard.dismiss();
-    let token = await Helper.getData('TOKEN');
     drawingNo = drawingNo != null ? drawingNo : '';
     jointNo = jointNo != null ? jointNo : '';
-    GetLamCheckQCStatusListAPI(projectCode, drawingNo, jointNo, type, token)
+    GetLamCheckQCStatusListAPI(projectCode, drawingNo, jointNo, type)
       .then(res => {
         if (res.success) {
           setLamCheckQCStatusList(res.data);
@@ -254,7 +253,7 @@ const LamCheckQCStatusScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>

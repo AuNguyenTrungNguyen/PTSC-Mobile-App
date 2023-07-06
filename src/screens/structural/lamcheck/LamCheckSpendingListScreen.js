@@ -22,7 +22,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const LamCheckSpendingListScreen = ({ route, navigation }) => {
 
-  const { projectCode, paramDrawingNo, sheet, rev } = route.params;
+  const { projectCode, subContractor, paramDrawingNo, sheet, rev } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -447,7 +447,7 @@ const LamCheckSpendingListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>
