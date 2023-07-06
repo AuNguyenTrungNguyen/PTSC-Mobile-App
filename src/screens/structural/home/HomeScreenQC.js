@@ -106,6 +106,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DimForCuttingList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         title: title,
         isSpending: true,
@@ -119,6 +120,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DimForCuttingList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         title: title,
         userLogin: userLogin,
       }
@@ -148,6 +150,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'LamCheckTodoList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         title: title,
         isSpending: true,
@@ -160,6 +163,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         destination: Naming.NAME_STR_LAM_CHECK_TODO
       }
@@ -172,6 +176,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'LamCheckTodoList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         title: title,
         userLogin: userLogin,
       }
@@ -275,6 +280,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DimCheckList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         title: title,
         isSpending: true,
@@ -287,6 +293,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         destination: Naming.NAME_STR_DIM_CHECK
       }
@@ -299,8 +306,9 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DimCheckList',
       {
         projectCode: projectCode,
-        title: title,
+        subContractor: subContractor,
         userLogin: userLogin,
+        title: title,
       }
     );
   };
@@ -327,6 +335,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         destination: Naming.NAME_STR_DIM_AFTER_WELD_QC
       }
@@ -337,6 +346,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DIMAfterWeldListQC',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         isShowDetail: true,
         isPending: false,
       }
@@ -347,6 +357,7 @@ const HomeScreenQC = ({ route, navigation }) => {
       'DIMAfterWeldListQC',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         isShowDetail: true,
         isPending: true,
       }

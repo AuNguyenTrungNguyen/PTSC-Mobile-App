@@ -68,6 +68,7 @@ const CameraScreen = ({ route, navigation }) => {
       } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD) {
         navigation.navigate('DIMAfterWeldList', {
           projectCode: projectCode,
+          subContractor: subContractor,
           paramDrawingNo: drawingNo,
           isShowDetail: false,
           isPending: false,
@@ -75,6 +76,7 @@ const CameraScreen = ({ route, navigation }) => {
       } else if (destination === Naming.NAME_STR_DIM_AFTER_WELD_QC) {
         navigation.navigate('DIMAfterWeldListQC', {
           projectCode: projectCode,
+          subContractor: subContractor,
           paramDrawingNo: drawingNo,
           isShowDetail: true,
           isPending: false,
@@ -141,6 +143,7 @@ const CameraScreen = ({ route, navigation }) => {
       || destination === Naming.NAME_STR_DIM_CHECK) {
       navigation.navigate(route, {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         sheet: sheet,
         rev: rev,
@@ -180,6 +183,7 @@ const CameraScreen = ({ route, navigation }) => {
               if (res.success && res.data != null) {
                 navigation.navigate(route, {
                   projectCode: projectCode,
+                  subContractor: subContractor,
                   facilityCode: res.data,
                   drawingNo: drawingNo,
                   sheet: sheet,

@@ -168,10 +168,12 @@ export const GetDIMAfterWeldListAPI = async (projectCode, facilityCode, drawingN
 };
 export const GetDIMAfterWeldDetailAPI = async (projectCode, facilityCode, drawingNo, assemblyCode, filterType = '') => {
   const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   return fetch(
     Port_Server
     + '/api/structural/DimCheck/GetDIMAfterWeldDetail'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&assemblyCode=' + assemblyCode

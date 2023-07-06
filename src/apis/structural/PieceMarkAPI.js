@@ -60,11 +60,14 @@ export const GetCurrentPieceMarkInfoAPI = async (projectCode, drawingNo, sheet, 
     }).then(res => res.json());
 };
 
-export const GetPieceMarkDetailAndDIMAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, pieceMarkNo, type, token) =>
-  fetch(
+export const GetPieceMarkDetailAndDIMAPI = async (projectCode, facilityCode, drawingNo, sheet, rev, code, pieceMarkNo, type) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/PieceMark/GetPieceMarkDetailAndDIM'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&sheet=' + sheet
@@ -78,6 +81,7 @@ export const GetPieceMarkDetailAndDIMAPI = (projectCode, facilityCode, drawingNo
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+};
 
 export const UpdatePieceMarkDetailAndDIMAPI = (userUpdate, listItemUpdate, token) =>
   fetch(

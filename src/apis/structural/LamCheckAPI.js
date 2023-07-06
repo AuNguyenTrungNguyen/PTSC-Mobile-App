@@ -132,11 +132,14 @@ export const EditLamCheckTodoImageAPI = (id, note, token) =>
     }
   ).then(res => res.json());
 
-export const GetLamCheckQCStatusListAPI = (projectCode, drawingNo, jointNo, type, token) =>
-  fetch(
+export const GetLamCheckQCStatusListAPI = async (projectCode, drawingNo, jointNo, type) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
     Port_Server
     + '/api/structural/LamCheck/GetLamCheckQCStatusList'
     + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&drawingNo=' + encodeURIComponent(drawingNo)
     + '&jointNo=' + jointNo
     + '&type=' + type,
@@ -146,3 +149,4 @@ export const GetLamCheckQCStatusListAPI = (projectCode, drawingNo, jointNo, type
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+};

@@ -115,6 +115,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         code: code,
         destination: Naming.NAME_STR_PIECE_MARK
@@ -128,6 +129,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'PieceMarkList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         code: code,
         title: title,
@@ -139,6 +141,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'DimForCutting',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -165,6 +168,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         destination: Naming.NAME_STR_LAM_CHECK_REQUEST
       }
@@ -175,6 +179,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'LamCheckSpendingList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -183,6 +188,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'LamCheckQCStatus',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -279,6 +285,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       Constant.ROUTE__CAMERA,
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         destination: Naming.NAME_STR_DIM_AFTER_WELD
       }
@@ -289,6 +296,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'DIMAfterWeldList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         isShowDetail: false,
         isPending: false,
       }
@@ -299,6 +307,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
       'DIMAfterWeldList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         isShowDetail: true,
         isPending: false,
         isReadOnly: true,
