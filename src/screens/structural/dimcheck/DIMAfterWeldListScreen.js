@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DIMAfterWeldListScreen = ({ route, navigation }) => {
 
-  const { projectCode, paramDrawingNo, isShowDetail, isPending, isReadOnly } = route.params;
+  const { projectCode, subContractor, paramDrawingNo, isShowDetail, isPending, isReadOnly } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -194,6 +194,7 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
       isShowDetail ? 'DIMAfterWeldDetailQC' : 'DIMAfterWeldDetail',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         facilityCode: item.FacilityCode,
         drawingNo: item.CuttingSheetDrawingNo,
         assemblyCode: item.AssemblyCode,
@@ -280,7 +281,7 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
                 <View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>ProjectCode:</Text>
-                    <Text style={styles.infoData}>{projectCode}</Text>
+                    <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                   </View>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>FacilityCode:</Text>

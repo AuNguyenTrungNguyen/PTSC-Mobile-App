@@ -24,7 +24,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, drawingNo, assemblyCode, userLogin, link } = route.params;
+  const { projectCode, subContractor, facilityCode, drawingNo, assemblyCode, userLogin, link } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -282,7 +282,7 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
-    'Project': projectCode,
+    'Project': projectCode + '  -  ' + subContractor,
     // 'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Assembly': assemblyCode,
