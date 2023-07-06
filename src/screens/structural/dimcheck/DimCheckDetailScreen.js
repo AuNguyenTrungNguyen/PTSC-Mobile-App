@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DimCheckDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, rowIndex, drawingNo, link, jointNo, pieceNo1, pieceNo2, result01, result02 } = route.params;
+  const { projectCode, subContractor, userLogin, rowIndex, drawingNo, link, jointNo, pieceNo1, pieceNo2, result01, result02 } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -285,7 +285,7 @@ const DimCheckDetailScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
-    'ProjectCode': projectCode,
+    'Project': projectCode + '  -  ' + subContractor,
     'UserLogin': userLogin,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'JointNo': jointNo,

@@ -19,7 +19,7 @@ import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DimCheckListScreen = ({ route, navigation }) => {
 
-  const { projectCode, sheet, rev, userLogin, paramDrawingNo, isSpending } = route.params;
+  const { projectCode, subContractor, sheet, rev, userLogin, paramDrawingNo, isSpending } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -204,6 +204,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
       'DimCheckDetail',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         rowIndex: item.RowIndex,
         drawingNo: item.WeldMapDrawingNo,
@@ -329,7 +330,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
               <View style={styles.headerContainer}>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>ProjectCode:</Text>
-                  <Text style={styles.infoData}>{projectCode}</Text>
+                  <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                 </View>
                 <View style={styles.rowInfo}>
                   <Text style={styles.infoTitle}>DrawingNo:</Text>
