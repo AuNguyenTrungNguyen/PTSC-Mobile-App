@@ -121,6 +121,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Instrument Cable Control
+  const _onInstrumentCableControl = async () => {
+    navigation.navigate(
+      'InstrumentCableControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Cable Control Report
   const _onElectricalCableControlReport = async () => {
     const userLogin = await Helper.getData('USERNAME');
@@ -199,12 +209,12 @@ const HomeCONSScreen = ({ route, navigation }) => {
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'Cable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
-              <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Electrical\nCable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nCable Control'} onPress={_onInstrumentCableControl} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
+              <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
               <RenderItemBox title={'Cable\nDamage Log'} onPress={_onElectricalCableDamage} iconName='relation-only-one-to-zero-or-one' iconType='MaterialCommunity' />
-              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>

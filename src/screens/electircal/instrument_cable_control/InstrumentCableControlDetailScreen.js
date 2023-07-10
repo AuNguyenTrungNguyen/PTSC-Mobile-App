@@ -5,7 +5,7 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Dialog from "react-native-dialog";
 import Toast from 'react-native-simple-toast';
 
-import { GetElectricalCableControlDetailAPI, UpdateElectricalCableControlDetailAPI } from '../../../apis/eit/EITAPI';
+import { GetInstrumentCableControlDetailAPI, UpdateInstrumentCableControlDetailAPI } from '../../../apis/eit/EITAPI';
 
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
@@ -14,7 +14,7 @@ import Header from '../../../components/Header';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
+const InstrumentCableControlDetailScreen = ({ route, navigation }) => {
 
   const { projectCode, facilityCode, cableName, rowIndex, userLogin } = route.params;
 
@@ -77,7 +77,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
 
   //-- Get
   async function getCableDetail() {
-    GetElectricalCableControlDetailAPI(rowIndex)
+    GetInstrumentCableControlDetailAPI(rowIndex)
       .then(res => {
         if (res.Success && res.Data) {
           setCableDetail(res.Data);
@@ -115,7 +115,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
   //-- Update
   const updateCableDetail = async () => {
     setIsUploading(true);
-    UpdateElectricalCableControlDetailAPI(cableDetail, columnChange)
+    UpdateInstrumentCableControlDetailAPI(cableDetail, columnChange)
       .then(res => {
         setIsUploading(false);
         if (res.Success) {
@@ -149,7 +149,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
       'DrumNoList',
       {
         projectCode: projectCode,
-        source: 'Electrical'
+        source: 'Instrument'
       }
     );
   };
@@ -517,4 +517,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ElectricalCableControlDetailScreen;
+export default InstrumentCableControlDetailScreen;

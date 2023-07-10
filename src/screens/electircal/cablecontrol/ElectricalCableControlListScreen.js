@@ -140,6 +140,7 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
 
   //-- Detail
   const _onPressDetail = async item => {
+    const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
       'ElectricalCableControlDetail',
       {
@@ -147,6 +148,7 @@ const ElectricalCableControlListScreen = ({ route, navigation }) => {
         rowIndex: item.RowIndex,
         facilityCode: item.FacilityCode,
         cableName: item.CableName,
+        userLogin: userLogin,
       }
     );
   };

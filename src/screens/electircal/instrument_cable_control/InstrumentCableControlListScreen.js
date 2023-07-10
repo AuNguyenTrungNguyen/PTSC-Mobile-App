@@ -1,26 +1,30 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { useIsFocused } from '@react-navigation/native';
 
+import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
 
-import { GetEITDrumNoListAPI } from '../../../apis/eit/EITAPI';
+import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
+import { GetInstrumentCableControlListAPI } from '../../../apis/eit/EITAPI';
 
+import SelectPopup from '../../../components/SelectPopup';
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const DrumNoListScreen = ({ route, navigation }) => {
+const InstrumentCableControlListScreen = ({ route, navigation }) => {
 
-  const { projectCode, source } = route.params;
+  const { projectCode } = route.params;
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [drumNo, setDrumNo] = useState('');
-  const [drumList, setDrumList] = useState(null);
+  const [cablename, setCableName] = useState('');
+  const [cableList, setCableList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
@@ -53,23 +57,29 @@ const DrumNoListScreen = ({ route, navigation }) => {
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
 
-  //-- Get
   useEffect(
     () => {
-      callAPI(getDrumNoList);
+      callAPI(getFacilityList);
     }, []
   );
 
-  //-- Search Action
-  const _onPressSearchDrumNo = () => {
-    Keyboard.dismiss();
-    callAPI(getDrumNoList);
-  };
-  async function getDrumNoList() {
-    GetEITDrumNoListAPI(projectCode, drumNo)
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    callAPI(getCableList);
+  }, [isFocused]
+  );
+
+  //-- Facility Code
+  const FACILITY_CODE_DEFAULT = 'All Facility Code';
+  const [isVisibleFacility, setIsVisibleFacility] = useState(false);
+  const [facilityList, setFacilityList] = useState([]);
+  const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
+  const getFacilityList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetFacilityListAPI(projectCode, token)
       .then(res => {
-        if (res.Success && res.Data) {
-          setDrumList(res.Data);
+        if (res.success) {
+          setFacilityList(res.data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -85,29 +95,83 @@ const DrumNoListScreen = ({ route, navigation }) => {
         setIsSearching(false);
       });
   };
-  const _onChangeNo = no => {
-    setDrumNo(no);
+  const _onChangeFacilityCode = code => {
+    if (code !== facilityCode) {
+      setFacilityCode(code);
+    }
+    setIsVisibleFacility(false);
+  };
+  const _onPressClearFacilityCode = () => {
+    if (facilityCode !== FACILITY_CODE_DEFAULT) {
+      setFacilityCode(FACILITY_CODE_DEFAULT);
+    }
+    setIsVisibleFacility(false);
   };
 
-  //-- Select
-  const _onPressSelecte = item => {
-    const route = source == 'Electrical' ? 'ElectricalCableControlDetail' : 'InstrumentCableControlDetail';
-    navigation.navigate(route, { drumNoSelected: item.DrumNo });
+  //-- Search Action
+  const _onPressSearchCable = () => {
+    Keyboard.dismiss();
+    callAPI(getCableList);
+  };
+  async function getCableList() {
+    const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
+    GetInstrumentCableControlListAPI(projectCode, facility, cablename)
+      .then(res => {
+        if (res.Success && res.Data) {
+          setCableList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+          setIsSearching(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsSearching(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsSearching(false);
+      });
+  };
+  const _onChangeName = name => {
+    setCableName(name);
+  };
+
+  //-- Detail
+  const _onPressDetail = async item => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(
+      'InstrumentCableControlDetail',
+      {
+        projectCode: projectCode,
+        rowIndex: item.RowIndex,
+        facilityCode: item.FacilityCode,
+        cableName: item.CableName,
+        userLogin: userLogin,
+      }
+    );
   };
 
   //-- Render List
   const renderItem = ({ _, item }) => {
+    const textStyle = item.DatePulling ? styles.textUpdated : styles.textData;
     return (
-      <TouchableOpacity style={styles.box} onPress={() => _onPressSelecte(item)}>
+      <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
         <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text>DrumNo:</Text>
+            <Text>Facility:</Text>
           </View>
           <View style={styles.cellTwo}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.DrumNo)}</Text>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
           </View>
+        </View>
+        <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text style={styles.textUpdated}>{Formater.formatTwoDigits(item.RemainLength_m)}</Text>
+            <Text>CableName:</Text>
+          </View>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.CableName)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -117,7 +181,7 @@ const DrumNoListScreen = ({ route, navigation }) => {
     {
       if (isSearching) {
         return <ListLoadingData />
-      } else if (!drumList) {
+      } else if (!cableList) {
         return <ListSelectData title={'Please enter Cable Name'} />
       } else {
         return <ListEmptyData />
@@ -130,7 +194,7 @@ const DrumNoListScreen = ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDrumNoList)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getCableList)} />
           :
           <View style={styles.container}>
             {
@@ -142,18 +206,24 @@ const DrumNoListScreen = ({ route, navigation }) => {
                     <Text style={styles.infoData}>{projectCode}</Text>
                   </View>
                   <View style={styles.rowInfoAction}>
-                    <Text style={styles.infoTitleAction}>DrumNo:</Text>
+                    <Text style={styles.infoTitleAction}>FacilityCode:</Text>
+                    <TouchableOpacity style={styles.selectContainer} onPress={() => { setIsVisibleFacility(true) }}>
+                      <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>CableName:</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
                         style={styles.inputText}
-                        value={drumNo}
-                        onChangeText={_onChangeNo}
+                        value={cablename}
+                        onChangeText={_onChangeName}
                         underlineColorAndroid='transparent'
                       />
                       {
-                        drumNo == ''
+                        cablename == ''
                           ? null
-                          : <Icon name='times-circle' onPress={() => _onChangeNo('')} style={styles.inputIcon} />
+                          : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -161,7 +231,7 @@ const DrumNoListScreen = ({ route, navigation }) => {
                     <Text style={styles.infoTitleAction} />
                     <TouchableOpacity
                       style={styles.searchButton}
-                      onPress={_onPressSearchDrumNo}
+                      onPress={_onPressSearchCable}
                       disabled={isSearching}>
                       <Text style={styles.buttonTitle}>Search</Text>
                     </TouchableOpacity>
@@ -171,11 +241,11 @@ const DrumNoListScreen = ({ route, navigation }) => {
                 null
             }
             {
-              drumList && drumList.length
+              cableList && cableList.length
                 ?
                 <VirtualizedList
                   style={styles.table}
-                  data={drumList}
+                  data={cableList}
                   getItemCount={data => data.length}
                   getItem={(data, index) => {
                     return data[index];
@@ -188,6 +258,13 @@ const DrumNoListScreen = ({ route, navigation }) => {
             }
           </View>
       }
+      <SelectPopup
+        visible={isVisibleFacility}
+        data={facilityList}
+        onCancel={() => setIsVisibleFacility(false)}
+        onClear={_onPressClearFacilityCode}
+        onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
     </SafeAreaView>
   );
 };
@@ -291,7 +368,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
-    margin: 10,
+    margin: 4,
     minHeight: 20,
   },
   cellOne: {
@@ -319,4 +396,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DrumNoListScreen;
+export default InstrumentCableControlListScreen;

@@ -106,6 +106,8 @@ import ElectricalHomeScreenCONS from './screens/electircal/home/HomeCONSScreen';
 import ElectricalHomeScreenQC from './screens/electircal/home/HomeQCScreen';
 import ElectricalCableControlListScreen from './screens/electircal/cablecontrol/ElectricalCableControlListScreen';
 import ElectricalCableControlDetailScreen from './screens/electircal/cablecontrol/ElectricalCableControlDetailScreen';
+import InstrumentCableControlListScreen from './screens/electircal/instrument_cable_control/InstrumentCableControlListScreen';
+import InstrumentCableControlDetailScreen from './screens/electircal/instrument_cable_control/InstrumentCableControlDetailScreen';
 import ElectricalCableDamageLogListScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogListScreen';
 import ElectricalCableDamageLogDetailScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDetailScreen';
 import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDataScreen';
@@ -859,6 +861,7 @@ const ElectricalCONSStackScreens = () => {
           }
         }
       />
+      {/* DrumNo Library */}
       <ElectricalCONSStack.Screen
         name={'DrumNoList'}
         component={DrumNoListScreen}
@@ -869,12 +872,13 @@ const ElectricalCONSStackScreens = () => {
           }
         }
       />
+      {/* Cable Control */}
       <ElectricalCONSStack.Screen
         name={'ElectricalCableControlList'}
         component={ElectricalCableControlListScreen}
         options={
           {
-            title: 'Cable Control',
+            title: 'Electrical Cable Control',
             headerBackTitle: 'Back',
           }
         }
@@ -884,11 +888,33 @@ const ElectricalCONSStackScreens = () => {
         component={ElectricalCableControlDetailScreen}
         options={
           {
-            title: 'Cable Control Detail',
+            title: 'Electrical Cable Control Detail',
             headerBackTitle: 'Back',
           }
         }
       />
+      {/* Instrument Control */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentCableControlList'}
+        component={InstrumentCableControlListScreen}
+        options={
+          {
+            title: 'Instrument Cable Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'InstrumentCableControlDetail'}
+        component={InstrumentCableControlDetailScreen}
+        options={
+          {
+            title: 'Instrument Cable Control Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Report */}
       <ElectricalCONSStack.Screen
         name={'CableControlReport'}
         component={CableControlReportScreen}
@@ -899,6 +925,7 @@ const ElectricalCONSStackScreens = () => {
           }
         }
       />
+      {/* Cable Damage */}
       <ElectricalCONSStack.Screen
         name={'ElectricalCableDamageLogList'}
         component={ElectricalCableDamageLogListScreen}

@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Moment from 'moment';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-import { GetElectricalCableControlReportAPI } from '../../../apis/eit/EITAPI';
+import { GetEITCableControlReportAPI } from '../../../apis/eit/EITAPI';
 
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
@@ -89,7 +89,7 @@ const CableControlReportScreen = ({ route, navigation }) => {
     }
     temp.setSeconds(temp.getSeconds() - (temp.getTimezoneOffset() * 60));
     const date = Moment(temp).format('YYYY-MM-DD');
-    GetElectricalCableControlReportAPI(projectCode, userLogin, date)
+    GetEITCableControlReportAPI(projectCode, userLogin, date)
       .then(res => {
         if (res.Success && res.Data) {
           setCableDetail(res.Data);
