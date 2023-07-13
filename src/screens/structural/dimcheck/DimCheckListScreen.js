@@ -15,7 +15,7 @@ import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../compone
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import SelectPopup from '../../../components/SelectPopup';
-import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
+import SelectPopupLocation from '../../../components/SelectPopupLocation';
 
 const DimCheckListScreen = ({ route, navigation }) => {
 
@@ -404,7 +404,7 @@ const DimCheckListScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleType(false)}
         onChangeItem={_onChangeType}>
       </SelectPopup>
-      <SelectPopupTwoColumns
+      <SelectPopupLocation
         visible={isVisibleLocation}
         leftHeader={'Location'}
         rightHeader={'Total'}

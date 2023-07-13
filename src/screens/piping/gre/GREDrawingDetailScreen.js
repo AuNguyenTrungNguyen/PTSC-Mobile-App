@@ -16,7 +16,7 @@ import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
 import { GetBatchNoListAPI, GetBonderListAPI, GetConstructionDetailAPI, UpdateConstructionDetailAPI } from '../../../apis/piping/GREConsAPI';
-import { GetSerialNoAndHeatNoListAPI } from '../../../apis/app/AppAPI';
+import { GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -398,6 +398,40 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
         setIsVisibleHeatNo(false);
       });
   };
+  const _onPressShowHeatNoPipeSupportPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleHeatNo(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getHeatNoPipeSupportList();
+      }
+    });
+  };
+  const getHeatNoPipeSupportList = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetSerialNoAndHeatNoPipeSupportListAPI(projectCode, token)
+      .then(res => {
+        if (res.Success) {
+          setHeatNoList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsVisibleHeatNo(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsVisibleHeatNo(false);
+      });
+  };
   const _onPressClearHeatNo = () => {
     _onChangeHeatNo(null);
     setIsVisibleHeatNo(false);
@@ -629,6 +663,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
     isDisableItem = isReadOnly ? true : isDisableItem;
 
     const isEnableClear = code === Constant.CODE_FITUP ? fitUpClear : visualClear;
+    const isPipeSupport = item['JointNo'].startsWith('S') && item['ConType'] === 'SP';
 
     return (
       <View style={styles.box} pointerEvents={isDisableItem ? 'none' : 'auto'} key={item.RowIndex}>
@@ -714,7 +749,13 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class01:</Text>
                 </View>
                 <View style={styles.cellData}>
-                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  {
+                    isPipeSupport
+                      ?
+                      <Text style={styles.textBase}>{'PS'}</Text>
+                      :
+                      <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class1)}</Text>
+                  }
                 </View>
                 <View style={styles.cellPercent} />
               </View>
@@ -723,18 +764,35 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                   <Text style={styles.redText}>HeatNo01:</Text>
                 </View>
                 <View style={styles.cellData}>
-                  <TouchableOpacity
-                    style={styles.itemActionIcon}
-                    onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                        :
-                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
+                  {
+                    isPipeSupport
+                      ?
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat01')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                  }
                 </View>
                 <View style={styles.cellPercent} />
               </View>
@@ -743,7 +801,13 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                   <Text>Class02:</Text>
                 </View>
                 <View style={styles.cellData}>
-                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class2)}</Text>
+                  {
+                    isPipeSupport
+                      ?
+                      <Text style={styles.textBase}>{'PS'}</Text>
+                      :
+                      <Text style={styles.textBase}>{Formater.formatEmptyData(item.Class2)}</Text>
+                  }
                 </View>
                 <View style={styles.cellPercent} />
               </View>
@@ -752,18 +816,35 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                   <Text style={styles.redText}>HeatNo02:</Text>
                 </View>
                 <View style={styles.cellData}>
-                  <TouchableOpacity
-                    style={styles.itemActionIcon}
-                    onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
-                    {
-                      isDisableItem
-                        ?
-                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
-                        :
-                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
-                    }
-                  </TouchableOpacity>
+                  {
+                    isPipeSupport
+                      ?
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat02')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                      :
+                      <TouchableOpacity
+                        style={styles.itemActionIcon}
+                        onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        {
+                          isDisableItem
+                            ?
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                            :
+                            <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                        }
+                      </TouchableOpacity>
+                  }
                 </View>
                 <View style={styles.cellPercent} />
               </View>

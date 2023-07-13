@@ -16,7 +16,7 @@ import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import SelectPopup from '../../../components/SelectPopup';
-import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
+import SelectPopupLocation from '../../../components/SelectPopupLocation';
 
 const DrawingQCStatusScreen = ({ route, navigation }) => {
 
@@ -715,7 +715,7 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
         data={[Constant.STATUS_NOT_YET, Constant.STATUS_ACCEPT, Constant.STATUS_REJECT]}
         onCancel={() => setIsVisibleFilterType(false)}
         onChangeItem={_onChangeFilterType} />
-      <SelectPopupTwoColumns
+      <SelectPopupLocation
         visible={isVisibleLocation}
         data={locationList}
         leftHeader={'Location'}

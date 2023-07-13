@@ -1,42 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator, TextInput } from 'react-native';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import React from 'react';
+import { StyleSheet, SafeAreaView, View, ScrollView, Text, TouchableOpacity, Dimensions, Modal, ActivityIndicator } from 'react-native';
 
-const SelectPopupTwoColumns = ({ visible, leftHeader, rightHeader, data, leftKey, rightKey, onChangeItem, onClear, onCancel }) => {
-
-  const [filterList, setFilterList] = useState(null);
-  const [filterString, setFilterString] = useState('');
-  const _onChangeFilter = text => {
-    setFilterString(text);
-  };
-  const _onClearFilter = () => {
-    setFilterString('');
-    setFilterList(data);
-  };
-  const _onSearch = (type) => {
-    //-- Type: 1 is HeatNo, 2 is SeriNo
-    if (filterString && data) {
-      let result = [];
-      if (type == 1) {
-        result = data.filter(i => i.HeatNo_TagNo.includes(filterString));
-      }
-      else {
-        result = data.filter(i => i.SeriNo.includes(filterString));
-      }
-      setFilterList(result);
-    }
-    else {
-      setFilterList(data);
-    }
-  };
-
-  useEffect(
-    () => {
-      setFilterList(data);
-    }, [data]
-  );
-
+const SelectPopupLocation = ({ visible, leftHeader, rightHeader, data, leftKey, rightKey, onChangeItem, onClear, onCancel }) => {
   return (
     <Modal
       animationType='fade'
@@ -45,27 +10,6 @@ const SelectPopupTwoColumns = ({ visible, leftHeader, rightHeader, data, leftKey
       <View style={modals.dim}>
         <SafeAreaView>
           <View style={modals.container}>
-            <View style={styles.searchContainer}>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.inputText}
-                  value={filterString}
-                  onChangeText={_onChangeFilter}
-                  underlineColorAndroid='transparent'
-                />
-                {
-                  !filterString
-                    ? null
-                    : <FontAwesome5Icon name='times-circle' onPress={_onClearFilter} style={styles.inputIcon} />
-                }
-              </View>
-              <TouchableOpacity style={styles.inputButton} onPress={() => { _onSearch(1) }}>
-                <Text style={styles.inputButtonText}>Heat</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.inputButton} onPress={() => { _onSearch(2) }}>
-                <Text style={styles.inputButtonText}>Seri</Text>
-              </TouchableOpacity>
-            </View>
             <View style={modals.list}>
               <View style={modals.row}>
                 <Text style={modals.cellTitleHeader}>{leftHeader}</Text>
@@ -74,15 +18,15 @@ const SelectPopupTwoColumns = ({ visible, leftHeader, rightHeader, data, leftKey
               </View>
               <ScrollView>
                 {
-                  filterList != null
+                  data != null
                     ?
-                    filterList.length
+                    data.length
                       ?
-                      filterList.map((item, index) => {
+                      data.map((item, index) => {
                         const valueLeft = item[leftKey] ? item[leftKey] : '';
                         const valueRight = item[rightKey] ? item[rightKey] : '';
                         return (
-                          <TouchableOpacity style={modals.row} key={index} onPress={() => { onChangeItem(item), _onClearFilter() }}>
+                          <TouchableOpacity style={modals.row} key={index} onPress={() => onChangeItem(item)}>
                             <Text style={modals.cellTitle}>{valueLeft}</Text>
                             <View style={modals.cellLine} />
                             <Text style={modals.cellData}>{valueRight}</Text>
@@ -101,15 +45,15 @@ const SelectPopupTwoColumns = ({ visible, leftHeader, rightHeader, data, leftKey
               </ScrollView>
             </View>
             {
-              filterList != null &&
+              data != null &&
               <View style={modals.action}>
                 {
-                  !!filterList.length && !!onClear &&
-                  <TouchableOpacity style={modals.button} onPress={() => { onClear(), _onClearFilter() }}>
+                  !!data.length && !!onClear &&
+                  <TouchableOpacity style={modals.button} onPress={() => { onClear() }}>
                     <Text style={modals.buttonTitle}>Clear</Text>
                   </TouchableOpacity>
                 }
-                <TouchableOpacity style={modals.button} onPress={() => { onCancel(), _onClearFilter() }}>
+                <TouchableOpacity style={modals.button} onPress={() => { onCancel() }}>
                   <Text style={modals.buttonTitle}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -144,7 +88,7 @@ const modals = StyleSheet.create({
   list: {
     padding: 16,
     width: windowWidth * 0.85,
-    height: (windowHeight * 0.85) - 32 - 76 - 40,
+    maxHeight: windowHeight * 0.85 - 36 - 16,
   },
   row: {
     flexDirection: 'row',
@@ -210,46 +154,5 @@ const modals = StyleSheet.create({
     color: OPP_COLOR,
   },
 });
-const styles = StyleSheet.create({
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 36,
-    marginTop: 4,
-    width: windowWidth * 0.75,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    flex: 1,
-    borderColor: BASE_COLOR,
-    borderWidth: 1,
-    height: '100%',
-    alignItems: 'center',
-    padding: 4,
-  },
-  inputText: {
-    flex: 1,
-    height: '100%',
-    color: BASE_COLOR,
-    paddingVertical: 0,
-  },
-  inputIcon: {
-    marginLeft: 4,
-    fontSize: 20,
-    color: BASE_COLOR,
-  },
-  inputButton: {
-    width: 48,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: BASE_COLOR,
-    padding: 4,
-    marginLeft: 4,
-  },
-  inputButtonText: {
-    color: OPP_COLOR,
-  },
-});
 
-export default SelectPopupTwoColumns;
+export default SelectPopupLocation;
