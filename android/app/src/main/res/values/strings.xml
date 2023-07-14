@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">PTSC</string>
-    <!-- <string name="app_name">PTSC M&amp;C</string> -->
+    <!-- <string name="app_name">PTSC</string> -->
+    <string name="app_name">PTSC M&amp;C</string>
 </resources>
