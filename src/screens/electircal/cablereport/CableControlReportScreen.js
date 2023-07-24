@@ -1,6 +1,7 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance, TextInput } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import Moment from 'moment';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
@@ -73,23 +74,24 @@ const CableControlReportScreen = ({ route, navigation }) => {
       let date = new Date(selectedDate);
       date.setSeconds(date.getSeconds() - (date.getTimezoneOffset() * 60));
       setDateDisplay(date);
-      callAPI(() => { getCableReport(date) }, false);
+      callAPI(() => { getCableReport(date, user) }, false);
     }
     setIsVisibleDate(false);
   };
-  const _onCleareDate = () => {
+  const _onCloseDate = () => {
     setIsVisibleDate(false);
   };
 
   //-- Get
-  const getCableReport = (selectedDate) => {
+  const getCableReport = (selectedDate, selectedUser) => {
     let temp = new Date();
     if (selectedDate) {
       temp = new Date(selectedDate);
     }
     temp.setSeconds(temp.getSeconds() - (temp.getTimezoneOffset() * 60));
     const date = Moment(temp).format('YYYY-MM-DD');
-    GetEITCableControlReportAPI(projectCode, userLogin, date)
+    const user = selectedUser ? selectedUser : '';
+    GetEITCableControlReportAPI(projectCode, user, date)
       .then(res => {
         if (res.Success && res.Data) {
           setCableDetail(res.Data);
@@ -180,7 +182,15 @@ const CableControlReportScreen = ({ route, navigation }) => {
 
   const headerData = {
     'ProjectCode': projectCode,
-    'UserLogin': userLogin,
+    // 'UserLogin': userLogin,
+  };
+
+  const [user, setUser] = useState('');
+  const _onChangeUser = text => {
+    setUser(text);
+  };
+  const _onSearch = () => {
+    callAPI(() => { getCableReport(dateDisplay, user) }, false);
   };
 
   return (
@@ -195,6 +205,23 @@ const CableControlReportScreen = ({ route, navigation }) => {
               isShowDescription.show &&
               <>
                 <Header data={headerData} />
+                <View style={styles.rowInfoAction}>
+                  <Text style={styles.infoTitleAction}>CableName:</Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.inputText}
+                      value={user}
+                      onChangeText={_onChangeUser}
+                      underlineColorAndroid='transparent'
+                    />
+                    {
+                      user == ''
+                        ? null
+                        : <Icon name='times-circle' onPress={() => _onChangeUser('')} style={styles.inputIcon} />
+                    }
+                    <Icon name='search' onPress={() => _onSearch('')} style={styles.inputIcon} />
+                  </View>
+                </View>
                 <View style={styles.headerRow}>
                   <Text style={styles.headerCellTitle}>Date:</Text>
                   <TouchableOpacity style={styles.headerCellSelect} onPress={() => { _onPressSelectDate() }}>
@@ -210,7 +237,7 @@ const CableControlReportScreen = ({ route, navigation }) => {
         date={new Date(Moment(dateDisplay).format("YYYY-MM-DDT00:00:00"))}
         mode={'date'}
         onConfirm={_onChangeDate}
-        onCancel={_onCleareDate}
+        onCancel={_onCloseDate}
       />
     </SafeAreaView>
   );
@@ -227,6 +254,37 @@ const styles = StyleSheet.create({
     padding: 12,
     flex: 1,
     backgroundColor: OPP_COLOR,
+  },
+  rowInfoAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 32,
+    marginBottom: 4,
+  },
+  infoTitleAction: {
+    flex: 3,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    flex: 7,
+    borderColor: BASE_COLOR,
+    borderWidth: 1,
+    height: '100%',
+    padding: 4,
+    borderRadius: 2,
+    alignItems: 'center',
+  },
+  inputText: {
+    flex: 1,
+    height: '100%',
+    color: BASE_COLOR,
+    paddingVertical: 0,
+    justifyContent: 'center'
+  },
+  inputIcon: {
+    marginLeft: 4,
+    fontSize: 20,
+    color: BASE_COLOR,
   },
 
   table: {
