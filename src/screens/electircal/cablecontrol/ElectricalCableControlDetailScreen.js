@@ -244,7 +244,7 @@ const ElectricalCableControlDetailScreen = ({ route, navigation }) => {
                     <View style={styles.cellData}>
                       <TouchableOpacity
                         style={styles.itemActionDisable}
-                        onPress={_onPressClear}>
+                        disabled={true}>
                         <Text style={styles.itemText}>Clear</Text>
                       </TouchableOpacity>
                     </View>
