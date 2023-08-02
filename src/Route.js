@@ -108,6 +108,10 @@ import ElectricalCableControlListScreen from './screens/electircal/cablecontrol/
 import ElectricalCableControlDetailScreen from './screens/electircal/cablecontrol/ElectricalCableControlDetailScreen';
 import InstrumentCableControlListScreen from './screens/electircal/instrument_cable_control/InstrumentCableControlListScreen';
 import InstrumentCableControlDetailScreen from './screens/electircal/instrument_cable_control/InstrumentCableControlDetailScreen';
+import ElectricalGlandControlListScreen from './screens/electircal/electrical_gland_control/ElectricalGlandControlListScreen';
+import ElectricalGlandControlDetailScreen from './screens/electircal/electrical_gland_control/ElectricalGlandControlDetailScreen';
+import InstrumentGlandControlListScreen from './screens/electircal/instrument_gland_control/InstrumentGlandControlListScreen';
+import InstrumentGlandControlDetailScreen from './screens/electircal/instrument_gland_control/InstrumentGlandControlDetailScreen';
 import ElectricalCableDamageLogListScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogListScreen';
 import ElectricalCableDamageLogDetailScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDetailScreen';
 import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDataScreen';
@@ -910,6 +914,48 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: 'Instrument Cable Control Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Electrical Gland Control */}
+      <ElectricalCONSStack.Screen
+        name={'ElectricalGlandControlList'}
+        component={ElectricalGlandControlListScreen}
+        options={
+          {
+            title: 'Electrical Gland Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'ElectricalGlandControlDetail'}
+        component={ElectricalGlandControlDetailScreen}
+        options={
+          {
+            title: 'Electrical Gland Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Gland Control */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentGlandControlList'}
+        component={InstrumentGlandControlListScreen}
+        options={
+          {
+            title: 'Instrument Gland Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'InstrumentGlandControlDetail'}
+        component={InstrumentGlandControlDetailScreen}
+        options={
+          {
+            title: 'Instrument Gland Detail',
             headerBackTitle: 'Back',
           }
         }

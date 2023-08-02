@@ -73,4 +73,10 @@ export default class Helper {
     return result;
   };
 
+  static getDatetimeWithoutTimezone = () => {
+    var data = new Date();
+    data.setSeconds(data.getSeconds() - (data.getTimezoneOffset() * 60));
+    return data;
+  };
+
 };

@@ -179,3 +179,99 @@ export const GetEITCableControlReportAPI = async (projectCode, userLogin, date) 
     }
   ).then(res => res.json());
 };
+
+//-- Electrical Gland Control
+export const GetElectricalGlandControlListAPI = async (projectCode, facilityCode, cableName) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalGlandControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&cableName=' + cableName,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetElectricalGlandControlDetailAPI = async rowIndex => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalGlandControlDetail'
+    + '?rowIndex=' + rowIndex,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateElectricalGlandControlDetailAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateElectricalGlandControlDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+};
+
+//-- Instrument Gland Control
+export const GetInstrumentGlandControlListAPI = async (projectCode, facilityCode, cableName) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetInstrumentGlandControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&cableName=' + cableName,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetInstrumentGlandControlDetailAPI = async rowIndex => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetInstrumentGlandControlDetail'
+    + '?rowIndex=' + rowIndex,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateInstrumentGlandControlDetailAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateInstrumentGlandControlDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+};

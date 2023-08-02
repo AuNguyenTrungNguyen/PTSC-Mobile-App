@@ -131,6 +131,26 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Electrical Gland Control
+  const _onElectricalGlandControl = async () => {
+    navigation.navigate(
+      'ElectricalGlandControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Gland Control
+  const _onInstrumentGlandControl = async () => {
+    navigation.navigate(
+      'InstrumentGlandControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Cable Control Report
   const _onElectricalCableControlReport = async () => {
     const userLogin = await Helper.getData('USERNAME');
@@ -211,6 +231,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nCable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
               <RenderItemBox title={'Instrument\nCable Control'} onPress={_onInstrumentCableControl} iconName='cable-data' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nGland Control'} onPress={_onElectricalGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nGland Control'} onPress={_onInstrumentGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
