@@ -9,13 +9,13 @@ import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetInstrumentTerminationControlListAPI } from '../../../apis/eit/EITAPI';
+import { GetElectricalTerminateControlListAPI } from '../../../apis/eit/EITAPI';
 
 import SelectPopup from '../../../components/SelectPopup';
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
+const ElectricalTerminationControlListScreen = ({ route, navigation }) => {
 
   const { projectCode } = route.params;
 
@@ -28,8 +28,6 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
-
-  // ??????
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -45,8 +43,6 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
       ),
     });
   }, [navigation, isShowDescription]);
-
-  // toggle function in the far upper right corner of the screen
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -56,7 +52,6 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
     });
   };
 
-  
   const callAPI = executedAPI => {
     setIsSearching(true);
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
@@ -120,7 +115,7 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
   };
   async function getCableList() {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetInstrumentTerminationControlListAPI(projectCode, facility, cableName)
+    GetElectricalTerminateControlListAPI(projectCode, facility, cableName)
       .then(res => {
         if (res.Success && res.Data) {
           setCableList(res.Data);
@@ -147,7 +142,7 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
   const _onPressDetail = async item => {
     const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
-      'InstrumentTerminationControlDetail',
+      'ElectricalTerminationControlDetail',
       {
         projectCode: projectCode,
         rowIndex: item.RowIndex,
@@ -160,8 +155,8 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
 
   //-- Render List
   const renderItem = ({ _, item }) => {
-    const fromStatus = item.StatusFromGlandingDate ? 1 : 0;
-    const toStatus = item.StatusToGlandingDate ? 1 : 0;
+    const fromStatus = item.StatusFromTerminationDate ? 1 : 0;
+    const toStatus = item.StatusToTerminationDate ? 1 : 0;
     const status = fromStatus + toStatus;
     const textStyle = status == 2 ? styles.textUpdated : status == 1 ? styles.textPending : styles.textData;
     return (
@@ -408,4 +403,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InstrumentTerminationControlListScreen;
+export default ElectricalTerminationControlListScreen;

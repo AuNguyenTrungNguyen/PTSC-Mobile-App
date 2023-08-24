@@ -228,6 +228,54 @@ export const UpdateElectricalGlandControlDetailAPI = async (modelUpdate, modelCo
   ).then(res => res.json());
 };
 
+//-- Electrical Terminate Control
+export const GetElectricalTerminateControlListAPI = async (projectCode, facilityCode, cableName) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalTerminateControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&cableName=' + cableName,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetElectricalTerminateControlDetailAPI = async rowIndex => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalTerminateControlDetail'
+    + '?rowIndex=' + rowIndex,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateElectricalTerminateControlDetailAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateElectricalTerminateControlDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+};
+
 //-- Instrument Gland Control
 export const GetInstrumentGlandControlListAPI = async (projectCode, facilityCode, cableName) => {
   const token = await Helper.getData('TOKEN');
@@ -265,6 +313,54 @@ export const UpdateInstrumentGlandControlDetailAPI = async (modelUpdate, modelCo
   return fetch(
     Port_Server
     + '/api/eit/UpdateInstrumentGlandControlDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+};
+
+//-- Instrument Termination Control
+export const GetInstrumentTerminationControlListAPI = async (projectCode, facilityCode, cableName) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetInstrumentTerminationControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&cableName=' + cableName,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetInstrumentTerminationControlDetailAPI = async rowIndex => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetInstrumentTerminationControlDetail'
+    + '?rowIndex=' + rowIndex,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateInstrumentTerminationControlDetailAPI = async (modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateInstrumentTerminationControlDetail',
     {
       method: 'POST',
       headers: {

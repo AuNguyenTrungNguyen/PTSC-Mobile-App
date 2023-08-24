@@ -141,10 +141,30 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Electrical Terminate Control
+  const _onElectricalTerminationControl = async () => {
+    navigation.navigate(
+      'ElectricalTerminationControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Instrument Gland Control
   const _onInstrumentGlandControl = async () => {
     navigation.navigate(
       'InstrumentGlandControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Termination Control
+  const _onInstrumentTerminationControl = async () => {
+    navigation.navigate(
+      'InstrumentTerminationControlList',
       {
         projectCode: projectCode,
       }
@@ -235,6 +255,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nGland Control'} onPress={_onElectricalGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
               <RenderItemBox title={'Instrument\nGland Control'} onPress={_onInstrumentGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nTermination Control'} onPress={_onElectricalTerminationControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nTermination Control'} onPress={_onInstrumentTerminationControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />

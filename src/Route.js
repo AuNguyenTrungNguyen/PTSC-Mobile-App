@@ -112,6 +112,10 @@ import ElectricalGlandControlListScreen from './screens/electircal/electrical_gl
 import ElectricalGlandControlDetailScreen from './screens/electircal/electrical_gland_control/ElectricalGlandControlDetailScreen';
 import InstrumentGlandControlListScreen from './screens/electircal/instrument_gland_control/InstrumentGlandControlListScreen';
 import InstrumentGlandControlDetailScreen from './screens/electircal/instrument_gland_control/InstrumentGlandControlDetailScreen';
+import ElectricalTerminationControlListScreen from './screens/electircal/electrical_terminate_control/ElectricalTerminationControlListScreen';
+import ElectricalTerminationControlDetailScreen from './screens/electircal/electrical_terminate_control/ElectricalTerminationControlDetailScreen';
+import InstrumentTerminationControlListScreen from './screens/electircal/instrument_termination_control/InstrumentTerminationControlListScreen';
+import InstrumentTerminationControlDetailScreen from './screens/electircal/instrument_termination_control/InstrumentTerminationControlDetailScreen';
 import ElectricalCableDamageLogListScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogListScreen';
 import ElectricalCableDamageLogDetailScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDetailScreen';
 import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDataScreen';
@@ -532,7 +536,6 @@ const PipingQCStackScreens = () => {
   );
 };
 
-
 //-- STR Stacks
 const StructuralCONSStack = createStackNavigator();
 const StructuralCONSStackScreens = () => {
@@ -939,6 +942,27 @@ const ElectricalCONSStackScreens = () => {
           }
         }
       />
+      {/* Electrical Terminate Control */}
+      <ElectricalCONSStack.Screen
+        name={'ElectricalTerminationControlList'}
+        component={ElectricalTerminationControlListScreen}
+        options={
+          {
+            title: 'Electrical Termination Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'ElectricalTerminationControlDetail'}
+        component={ElectricalTerminationControlDetailScreen}
+        options={
+          {
+            title: 'Electrical Termination Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
       {/* Instrument Gland Control */}
       <ElectricalCONSStack.Screen
         name={'InstrumentGlandControlList'}
@@ -956,6 +980,27 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: 'Instrument Gland Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Termination Control */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentTerminationControlList'}
+        component={InstrumentTerminationControlListScreen}
+        options={
+          {
+            title: 'Instrument Termination Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <ElectricalCONSStack.Screen
+        name={'InstrumentTerminationControlDetail'}
+        component={InstrumentTerminationControlDetailScreen}
+        options={
+          {
+            title: 'Instrument Termination Detail',
             headerBackTitle: 'Back',
           }
         }

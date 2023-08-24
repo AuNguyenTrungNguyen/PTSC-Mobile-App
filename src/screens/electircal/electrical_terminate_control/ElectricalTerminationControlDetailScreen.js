@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import CheckBox from '@react-native-community/checkbox';
 import Toast from 'react-native-simple-toast';
 
-import { GetInstrumentTerminationControlDetailAPI, UpdateInstrumentTerminationControlDetailAPI } from '../../../apis/eit/EITAPI';
+import { GetElectricalTerminateControlDetailAPI, UpdateElectricalTerminateControlDetailAPI } from '../../../apis/eit/EITAPI';
 
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
@@ -14,7 +14,7 @@ import Header from '../../../components/Header';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
+const ElectricalTerminateControlDetailScreen = ({ route, navigation }) => {
 
   const { projectCode, facilityCode, cableName, rowIndex, userLogin } = route.params;
 
@@ -71,7 +71,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
 
   //-- Get
   async function getCableDetail() {
-    GetInstrumentTerminationControlDetailAPI(rowIndex)
+    GetElectricalTerminateControlDetailAPI(rowIndex)
       .then(res => {
         if (res.Success && res.Data) {
           setTerminateDetail(res.Data);
@@ -94,7 +94,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
   //-- Update
   const updateCableDetail = async () => {
     setIsUploading(true);
-    UpdateInstrumentTerminationControlDetailAPI(terminateDetail, columnChange)
+    UpdateElectricalTerminateControlDetailAPI(glandDetail, columnChange)
       .then(res => {
         setIsUploading(false);
         if (res.Success) {
@@ -230,10 +230,10 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.row}>
-                  {/* <Text style={styles.cellTitle}>FromType:</Text> */}
+                  <Text style={styles.cellTitle}>FromType:</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
-                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromTerminateType)}</Text> */}
+                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromGlandType)}</Text> */}
                     </View>
                   </View>
                 </View>
@@ -241,13 +241,13 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {/* <Text style={styles.cellTitle}>FromSize:</Text> */}
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
-                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromTerminateSize)}</Text> */}
+                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromGlandSize)}</Text> */}
                     </View>
                   </View>
                 </View>
                 <View style={styles.line} />
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>To:</Text>
+                  {/* <Text style={styles.cellTitle}>To:</Text> */}
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToEquipmentNo)}</Text> */}
@@ -289,7 +289,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {/* <Text style={styles.cellTitle}>ToType:</Text> */}
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
-                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToTerminateType)}</Text> */}
+                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.ToGlandType)}</Text> */}
                     </View>
                   </View>
                 </View>
@@ -297,7 +297,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {/* <Text style={styles.cellTitle}>ToSize:</Text> */}
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
-                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToTerminateSize)}</Text> */}
+                      {/* <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.ToGlandSize)}</Text> */}
                     </View>
                   </View>
                 </View>
@@ -478,4 +478,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InstrumentTerminationControlDetailScreen;
+export default ElectricalTerminateControlDetailScreen;
