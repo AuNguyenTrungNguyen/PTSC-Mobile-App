@@ -220,10 +220,10 @@ const InstrumentGlandControlDetailScreen = ({ route, navigation }) => {
                         style={styles.checkBoxDisabled}
                         boxType='square'
                         disabled={true}
-                        onCheckColor={OPP_COLOR}
-                        onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                        onCheckColor={'white'}
+                        onFillColor={isFromUpdated ? 'red' : 'red'}
+                        onTintColor={isFromUpdated ? 'red' : 'red'}
+                        tintColors={{ true: 'red', false: 'red' }}
                         animationDuration={0.2}
                         onAnimationType='flat'
                       />
@@ -276,10 +276,10 @@ const InstrumentGlandControlDetailScreen = ({ route, navigation }) => {
                         style={styles.checkBoxDisabled}
                         boxType='square'
                         disabled={true}
-                        onCheckColor={OPP_COLOR}
-                        onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                        onCheckColor={'white'}
+                        onFillColor={isToUpdated ? 'red' : 'red'}
+                        onTintColor={isToUpdated ? 'red' : 'red'}
+                        tintColors={{ true: 'red', false: 'red' }}
                         animationDuration={0.2}
                         onAnimationType='flat'
                       />
@@ -399,14 +399,16 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginLeft: 8,
+    marginRight: 8,
   },
   checkBoxDisabled: {
-    backgroundColor: DISABLE_COLOR,
+    // backgroundColor: DISABLE_COLOR,
     fontWeight: 'bold',
     color: DISABLE_COLOR,
     width: 20,
     height: 20,
     marginLeft: 8,
+    marginRight: 8,
   },
   cellTitle: {
     flex: 1,

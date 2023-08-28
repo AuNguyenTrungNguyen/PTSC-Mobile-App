@@ -122,7 +122,6 @@ import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamage
 import DrumNoListScreen from './screens/electircal/drumlibrary/DrumNoListScreen';
 import CableControlReportScreen from './screens/electircal/cablereport/CableControlReportScreen';
 
-
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
 

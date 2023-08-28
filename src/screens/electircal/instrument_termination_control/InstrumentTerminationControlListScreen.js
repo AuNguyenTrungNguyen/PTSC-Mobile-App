@@ -28,8 +28,6 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
-
-  // ??????
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -160,8 +158,8 @@ const InstrumentTerminationControlListScreen = ({ route, navigation }) => {
 
   //-- Render List
   const renderItem = ({ _, item }) => {
-    const fromStatus = item.StatusFromGlandingDate ? 1 : 0;
-    const toStatus = item.StatusToGlandingDate ? 1 : 0;
+    const fromStatus = item.StatusFromTerminationDate ? 1 : 0;
+    const toStatus = item.StatusToTerminationDate ? 1 : 0;
     const status = fromStatus + toStatus;
     const textStyle = status == 2 ? styles.textUpdated : status == 1 ? styles.textPending : styles.textData;
     return (
