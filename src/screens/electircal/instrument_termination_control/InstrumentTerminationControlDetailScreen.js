@@ -201,33 +201,33 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {
                     // isPulled
                     //   ?
-                      <CheckBox
-                        value={isFromUpdated}
-                        onValueChange={newValue => _onChangeCheckbox('StatusFromTerminationDate', newValue)}
-                        style={styles.checkBox}
-                        boxType='square'
-                        disabled={isFromUpdated}
-                        onCheckColor={OPP_COLOR}
-                        onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                        animationDuration={0.2}
-                        onAnimationType='flat'
-                      />
-                      // :
-                      // <CheckBox
-                      //   value={isFromUpdated}
-                      //   onValueChange={null}
-                      //   style={styles.checkBoxDisabled}
-                      //   boxType='square'
-                      //   disabled={true}
-                      //   onCheckColor={OPP_COLOR}
-                      //   onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                      //   onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                      //   tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                      //   animationDuration={0.2}
-                      //   onAnimationType='flat'
-                      // />
+                    <CheckBox
+                      value={isFromUpdated}
+                      onValueChange={newValue => _onChangeCheckbox('StatusFromTerminationDate', newValue)}
+                      style={styles.checkBox}
+                      boxType='square'
+                      disabled={isFromUpdated}
+                      onCheckColor={OPP_COLOR}
+                      onFillColor={isFromUpdated ? BASE_COLOR : BASE_COLOR}
+                      onTintColor={isFromUpdated ? BASE_COLOR : BASE_COLOR}
+                      tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
+                      animationDuration={0.2}
+                      onAnimationType='flat'
+                    />
+                    // :
+                    // <CheckBox
+                    //   value={isFromUpdated}
+                    //   onValueChange={null}
+                    //   style={styles.checkBoxDisabled}
+                    //   boxType='square'
+                    //   disabled={true}
+                    //   onCheckColor={OPP_COLOR}
+                    //   onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
+                    //   onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
+                    //   tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                    //   animationDuration={0.2}
+                    //   onAnimationType='flat'
+                    // />
                   }
                 </View>
                 {/* <View style={styles.row}>
@@ -259,33 +259,33 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {
                     // isPulled
                     //   ?
-                      <CheckBox
-                        value={isToUpdated}
-                        onValueChange={newValue => _onChangeCheckbox('StatusToTerminationDate', newValue)}
-                        style={styles.checkBox}
-                        boxType='square'
-                        disabled={isToUpdated}
-                        onCheckColor={OPP_COLOR}
-                        onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                        animationDuration={0.2}
-                        onAnimationType='flat'
-                      />
-                      // :
-                      // <CheckBox
-                      //   value={isToUpdated}
-                      //   onValueChange={null}
-                      //   style={styles.checkBoxDisabled}
-                      //   boxType='square'
-                      //   disabled={true}
-                      //   onCheckColor={OPP_COLOR}
-                      //   onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                      //   onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                      //   tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                      //   animationDuration={0.2}
-                      //   onAnimationType='flat'
-                      // />
+                    <CheckBox
+                      value={isToUpdated}
+                      onValueChange={newValue => _onChangeCheckbox('StatusToTerminationDate', newValue)}
+                      style={styles.checkBox}
+                      boxType='square'
+                      disabled={isToUpdated}
+                      onCheckColor={OPP_COLOR}
+                      onFillColor={isToUpdated ? BASE_COLOR : BASE_COLOR}
+                      onTintColor={isToUpdated ? BASE_COLOR : BASE_COLOR}
+                      tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
+                      animationDuration={0.2}
+                      onAnimationType='flat'
+                    />
+                    // :
+                    // <CheckBox
+                    //   value={isToUpdated}
+                    //   onValueChange={null}
+                    //   style={styles.checkBoxDisabled}
+                    //   boxType='square'
+                    //   disabled={true}
+                    //   onCheckColor={OPP_COLOR}
+                    //   onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
+                    //   onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
+                    //   tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                    //   animationDuration={0.2}
+                    //   onAnimationType='flat'
+                    // />
                   }
                 </View>
 
