@@ -10,7 +10,7 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListSubContractorAPI, GetTeamListSubContractorAPI, GetWPSListSubContractorAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListSubContractorAPI, GetTeamListSubContractorAPI, GetWPSListSubContractorAPI, GetWeldingConsumableAPI, GetWeldingMachineAPI } from '../../../apis/app/AppAPI';
 import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
@@ -376,6 +376,12 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
   const [isVisibleWPS, setIsVisibleWPS] = useState(false);
   const [wpsList, setWPSList] = useState(null);
 
+  const [isVisibleLotNo, setIsVisibleLotNo] = useState(false);
+  const [lotNoList, setLotNoList] = useState(null);
+
+  const [isVisibleMachineNo, setIsVisibleMachineNo] = useState(false);
+  const [machineNoList, setMachineNoList] = useState(null);
+
   const [isVisibleCompleteDate, setIsVisibleCompleteDate] = useState(false);
   const [completeDateDisplay, setCompleteDateDisplay] = useState(new Date());
 
@@ -702,6 +708,94 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     setIsVisibleWPS(false);
   };
 
+  const _onPressShowLotNoPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleLotNo(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getLotNoList();
+      }
+    });
+  };
+  const getLotNoList = async () => {
+    if (lotNoList == null) {
+      GetWeldingConsumableAPI(projectCode)
+        .then(res => {
+          if (res.Success) {
+            setLotNoList(res.Data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+            setIsVisibleLotNo(false);
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+          setIsError(true);
+          setIsVisibleLotNo(false);
+        });
+    }
+  };
+  const _onPressClearLotNo = () => {
+    _onChangeLotNo(null);
+    setIsVisibleLotNo(false);
+  };
+  const _onChangeLotNo = data => {
+    _onChangeData(data);
+    setIsVisibleLotNo(false);
+  };
+
+  const _onPressShowMachineNoPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleMachineNo(true);
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        getMachineNoList();
+      }
+    });
+  };
+  const getMachineNoList = async () => {
+    if (machineNoList == null) {
+      GetWeldingMachineAPI(projectCode)
+        .then(res => {
+          if (res.Success) {
+            setMachineNoList(res.Data);
+            setIsLoading(false);
+            setIsError(false);
+          } else {
+            setIsLoading(false);
+            setIsError(true);
+            setIsVisibleMachineNo(false);
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+          setIsError(true);
+          setIsVisibleMachineNo(false);
+        });
+    }
+  };
+  const _onPressClearMachineNo = () => {
+    _onChangeMachineNo(null);
+    setIsVisibleMachineNo(false);
+  };
+  const _onChangeMachineNo = data => {
+    _onChangeData(data);
+    setIsVisibleMachineNo(false);
+  };
+
   const _onPressSelectCompleteDate = (value, index, key) => {
     setIndexUpdate(index);
     setKeyUpdate(key);
@@ -799,6 +893,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
     } else {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
+      array[index]['WeldingConsumableLotNo'] = valueClear;
+      array[index]['WeldingMachineNo'] = valueClear;
       array[index]['VisualRequestByTeam'] = valueClear;
       array[index]['WeldingCompletedDate'] = valueClear;
       array[index]['QCVisualRemark'] = valueClear;
@@ -827,6 +923,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
           [keyPercent]: valueClear,
           ['WelderID']: valueClear,
           ['WPSNo']: valueClear,
+          ['WeldingConsumableLotNo']: valueClear,
+          ['WeldingMachineNo']: valueClear,
           ['VisualRequestByTeam']: valueClear,
           ['WeldingCompletedDate']: valueClear,
           ['QCVisualRemark']: valueClear,
@@ -844,6 +942,8 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       } else {
         array[objIndex]['WelderID'] = valueClear;
         array[objIndex]['WPSNo'] = valueClear;
+        array[objIndex]['WeldingConsumableLotNo'] = valueClear;
+        array[objIndex]['WeldingMachineNo'] = valueClear;
         array[objIndex]['VisualRequestByTeam'] = valueClear;
         array[objIndex]['WeldingCompletedDate'] = valueClear;
         array[objIndex]['QCVisualRemark'] = valueClear;
@@ -1341,6 +1441,44 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
+                  <Text>{'Consumable\nLotNo'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowLotNoPopup(index, 'WeldingConsumableLotNo')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingConsumableLotNo)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>{'MachineNo'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressShowMachineNoPopup(index, 'WeldingMachineNo')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingMachineNo)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
                   <Text style={styles.redText}>Team:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
@@ -1575,6 +1713,22 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
         onChangeItem={_onChangeWPSCode}
         onCancel={() => setIsVisibleWPS(false)}
         onClear={_onPressClearWPS}
+      >
+      </SelectPopup>
+      <SelectPopup
+        visible={isVisibleLotNo}
+        data={lotNoList}
+        onChangeItem={_onChangeLotNo}
+        onCancel={() => setIsVisibleLotNo(false)}
+        onClear={_onPressClearLotNo}
+      >
+      </SelectPopup>
+      <SelectPopup
+        visible={isVisibleMachineNo}
+        data={machineNoList}
+        onChangeItem={_onChangeMachineNo}
+        onCancel={() => setIsVisibleMachineNo(false)}
+        onClear={_onPressClearMachineNo}
       >
       </SelectPopup>
       <Dialog.Container visible={isVisibleTime}>

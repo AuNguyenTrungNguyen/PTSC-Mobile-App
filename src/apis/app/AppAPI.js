@@ -322,3 +322,37 @@ export const ReadByteFromURLAPI = (url, token) =>
       body: JSON.stringify({ url }),
     }
   ).then(res => res.json());
+
+export const GetWeldingConsumableAPI = async projectCode => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetWeldingConsumable'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+
+export const GetWeldingMachineAPI = async projectCode => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetWeldingMachine'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};

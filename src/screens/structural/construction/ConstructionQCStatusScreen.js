@@ -390,6 +390,22 @@ const ConstructionQCStatusScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
+                  <Text>{'Consumable\nLotNo'}:</Text>
+                </View>
+                <View style={styles.cellThreeUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingConsumableLotNo)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>{'MachineNo'}:</Text>
+                </View>
+                <View style={styles.cellThreeUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingMachineNo)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
                   <Text>{'VisualRequest\nDate'}:</Text>
                 </View>
                 <View style={styles.cellTwoUnit}>
