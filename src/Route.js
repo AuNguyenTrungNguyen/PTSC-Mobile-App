@@ -82,6 +82,8 @@ import StructuralConstructionMultiDetailScreen from './screens/structural/constr
 import StructuralConstructionImageScreen from './screens/structural/construction/ConstructionImageScreen';
 import StructuralConstructionQCStatusScreen from './screens/structural/construction/ConstructionQCStatusScreen';
 import StructuralAddWelderScreen from './screens/structural/construction/ConstructionAddWelderScreen';
+import ConstructionAddLotNoScreen from './screens/structural/construction/ConstructionAddLotNoScreen';
+import ConstructionAddMachineNoScreen from './screens/structural/construction/ConstructionAddMachineNoScreen';
 import StructuralAddPieceMarkNoScreen from './screens/structural/construction/ConstructionAddPieceMarkNoScreen';
 import StructuralPieceMarkListScreen from './screens/structural/piecemark/PieceMarkListScreen';
 import StructuralPieceMarkDetailScreen from './screens/structural/piecemark/PieceMarkDetailScreen';
@@ -673,6 +675,26 @@ const StructuralCONSStackScreens = () => {
         options={
           {
             title: 'Select Welders',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionAddLotNo'
+        component={ConstructionAddLotNoScreen}
+        options={
+          {
+            title: 'Select Consumable LotNo',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <StructuralCONSStack.Screen
+        name='ConstructionAddMachineNo'
+        component={ConstructionAddMachineNoScreen}
+        options={
+          {
+            title: 'Select MachineNo',
             headerBackTitle: 'Back',
           }
         }

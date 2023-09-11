@@ -356,3 +356,39 @@ export const GetWeldingMachineAPI = async projectCode => {
     }
   ).then(res => res.json());
 };
+
+export const GetWeldingConsumableListAPI = async (projectCode, no) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetWeldingConsumableList'
+    + '?projectCode=' + projectCode
+    + '&no=' + no
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+
+export const GetWeldingMachineListAPI = async (projectCode, no) => {
+  const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
+  return fetch(
+    Port_Server
+    + '/api/App/GetWeldingMachineList'
+    + '?projectCode=' + projectCode
+    + '&no=' + no
+    + '&subContractor=' + subContractor,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
