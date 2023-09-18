@@ -400,6 +400,14 @@ const QCSpendListScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellOneUnit}>
+                  <Text>SerialNo1:</Text>
+                </View>
+                <View style={styles.cellThreeUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SerialNo1)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
                   <Text>Des1:</Text>
                 </View>
                 <View style={styles.cellThreeUnit}>
@@ -420,6 +428,14 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.cellThreeUnit}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.PieceNo2)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOneUnit}>
+                  <Text>SerialNo2:</Text>
+                </View>
+                <View style={styles.cellThreeUnit}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SerialNo2)}</Text>
                 </View>
               </View>
               <View style={styles.row}>

@@ -175,6 +175,10 @@ const DimCheckDetailScreen = ({ route, navigation }) => {
             <Text style={styles.cellData}>{Formater.formatEmptyData(pieceMark01.HeatNo_TagNo)}</Text>
           </View>
           <View style={styles.row}>
+            <Text style={styles.cellTitle}>SeriNo:</Text>
+            <Text style={styles.cellData}>{Formater.formatEmptyData(pieceMark01.SeriNo)}</Text>
+          </View>
+          <View style={styles.row}>
             <Text style={styles.cellTitle}>TraceNo:</Text>
             <Text style={styles.cellData}>{Formater.formatEmptyData(pieceMark01.TraceNo)}</Text>
           </View>
@@ -232,6 +236,10 @@ const DimCheckDetailScreen = ({ route, navigation }) => {
           <View style={styles.row}>
             <Text style={styles.cellTitle}>HeatNo:</Text>
             <Text style={styles.cellData}>{Formater.formatEmptyData(pieceMark02.HeatNo_TagNo)}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cellTitle}>SeriNo:</Text>
+            <Text style={styles.cellData}>{Formater.formatEmptyData(pieceMark02.SeriNo)}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.cellTitle}>TraceNo:</Text>

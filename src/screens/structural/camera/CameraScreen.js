@@ -105,24 +105,47 @@ const CameraScreen = ({ route, navigation }) => {
           .then(res => {
             if (res.success) {
               if (res.data != null && rev != res.data) {
-                Alert.alert(
-                  'WARNING',
-                  'DrawingNo: ' + drawingNo + '\nSheet: ' + sheet + '\nhas latest Rev: ' + res.data,
-                  [
-                    {
-                      text: 'Back',
-                      onPress: () => {
-                        navigation.goBack();
+                if (projectCode == 'CHW2204') {
+                  Alert.alert(
+                    'WARNING',
+                    // 'DrawingNo: ' + drawingNo + '\nSheet: ' + sheet + '\nhas QRCode Rev: ' + rev + ' and DCC Rev: ' + res.data,
+                    `DrawingNo: ${drawingNo} \nSheet: ${sheet}\n has \n\nQRCode Rev: ${rev}\nData WeldMap Rev: ${res.WMRev}\nDCC Rev: ${res.data}`,
+                    [
+                      {
+                        text: 'Back',
+                        onPress: () => {
+                          navigation.goBack();
+                        },
+                        style: 'cancel'
                       },
-                      style: 'cancel'
-                    },
-                    // {
-                    //   text: 'Skip',
-                    //   onPress: () => { skipDrawingRev(drawingNo, sheet, rev, route, title) }
-                    // }
-                  ],
-                  { cancelable: false },
-                );
+                      {
+                        text: 'Continue',
+                        onPress: () => { skipDrawingRev(drawingNo, sheet, res.WMRev, route, title) }
+                      }
+                    ],
+                    { cancelable: false },
+                  );
+                }
+                else {
+                  Alert.alert(
+                    'WARNING',
+                    'DrawingNo: ' + drawingNo + '\nSheet: ' + sheet + '\nhas latest Rev: ' + res.data,
+                    [
+                      {
+                        text: 'Back',
+                        onPress: () => {
+                          navigation.goBack();
+                        },
+                        style: 'cancel'
+                      },
+                      // {
+                      //   text: 'Skip',
+                      //   onPress: () => { skipDrawingRev(drawingNo, sheet, rev, route, title) }
+                      // }
+                    ],
+                    { cancelable: false },
+                  );
+                }
               } else {
                 skipDrawingRev(drawingNo, sheet, rev, route, title);
               }
