@@ -38,34 +38,19 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      if (route.params?.welderSelected) {
+      if (keyUpdate === 'WelderID') {
         _onChangeWelders(route.params?.welderSelected);
       }
-    }, [route.params?.welderSelected, route.params?.index]
-  );
-
-  useEffect(
-    () => {
-      if (route.params?.pieceMarkNoSelected) {
+      else if (keyUpdate === 'PieceNo2') {
         _onChangePieceMarkNo(route.params?.pieceMarkNoSelected);
       }
-    }, [route.params?.pieceMarkNoSelected, route.params?.index]
-  );
-
-  useEffect(
-    () => {
-      if (route.params?.lotNoSelected) {
+      else if (keyUpdate === 'WeldingConsumableLotNo') {
         _onChangeLotNo(route.params?.lotNoSelected);
       }
-    }, [route.params?.lotNoSelected, route.params?.index]
-  );
-
-  useEffect(
-    () => {
-      if (route.params?.machineNoSelected) {
+      else if (keyUpdate === 'WeldingMachineNo') {
         _onChangeMachineNo(route.params?.machineNoSelected);
       }
-    }, [route.params?.machineNoSelected, route.params?.index]
+    }, [route.params?.welderSelected, route.params?.pieceMarkNoSelected, route.params?.lotNoSelected, route.params?.machineNoSelected, route.params?.index]
   );
 
   useEffect(
