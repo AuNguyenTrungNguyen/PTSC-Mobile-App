@@ -8,6 +8,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import Dialog from "react-native-dialog";
 
 import {
+  GetDimCuttingDetailSubContractorAPI,
   GetDimCuttingDetailAPI,
   UpdateDimCuttingDetailAPI
 } from '../../../apis/piping/DimAPI';
@@ -27,7 +28,7 @@ import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DimCuttingDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, CPName, CPSheet, CPRev, userLogin, link } = route.params;
+  const { projectCode, subContractor, CPName, CPSheet, CPRev, userLogin, link } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -88,7 +89,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
       const token = await Helper.getData('TOKEN');
       const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
       const arrayPromise = [
-        GetDimCuttingDetailAPI(projectCode, CPName, CPSheet, CPRev, token),
+        GetDimCuttingDetailSubContractorAPI(projectCode, subContractor, CPName, CPSheet, CPRev, token),
         GetLocationListSubContractorAPI(projectCode, disciplineCode),
         GetTeamListFilterSubContractorAPI(projectCode, disciplineCode, Constant.CODE_FITUP),
       ];
@@ -385,6 +386,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
 
   //-- Render Header
   const headerData = {
+    'ProjectCode': projectCode + '  ' + '-' + '  ' + subContractor,
     'CPName': { 'CPName': CPName, 'Link': link },
     'CPSheet': CPSheet,
     'CPRev': CPRev,

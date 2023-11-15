@@ -14,7 +14,7 @@ import Header from '../../components/Header';
 
 const HomeScreen = ({ route, navigation }) => {
 
-  const { projectCode, disciplineCode } = route.params;
+  const { projectCode, subContractor, disciplineCode } = route.params;
   const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -303,7 +303,8 @@ const HomeScreen = ({ route, navigation }) => {
           <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
           :
           <View style={styles.container}>
-            <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+            {/* <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header> */}
+            <Header data={{ 'Project': projectCode + '  -  ' + subContractor, 'Module': disciplineCode }}></Header>
             <ScrollView style={styles.table}>
               {
                 (notifyNumbers.DimCutting || notifyNumbers.FitUp)

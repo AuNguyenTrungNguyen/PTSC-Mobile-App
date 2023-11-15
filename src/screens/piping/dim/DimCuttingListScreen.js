@@ -8,7 +8,7 @@ import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetDimCuttingListAPI } from '../../../apis/piping/DimAPI';
+import { GetDimCuttingListAPI, GetDimCuttingListSubContractorAPI } from '../../../apis/piping/DimAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DimCuttingListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, subContractor, userLogin } = route.params;
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -110,7 +110,7 @@ const DimCuttingListScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     CPName = CPName ? CPName : '';
-    GetDimCuttingListAPI(projectCode, facilityCode, CPName, token)
+    GetDimCuttingListSubContractorAPI(projectCode, subContractor, facilityCode, CPName, token)
       .then(res => {
         if (res.Success) {
           setDimCuttingList(res.Data);
@@ -143,6 +143,7 @@ const DimCuttingListScreen = ({ route, navigation }) => {
       'DimCuttingDetail',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
         CPName: item.CuttingPlanName,
         CPSheet: item.CPSheet,
@@ -223,7 +224,7 @@ const DimCuttingListScreen = ({ route, navigation }) => {
                 <View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>ProjectCode:</Text>
-                    <Text style={styles.infoData}>{projectCode}</Text>
+                    <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                   </View>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>FacilityCode:</Text>

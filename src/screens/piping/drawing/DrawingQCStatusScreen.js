@@ -10,7 +10,7 @@ import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetQCStatusListAPI } from '../../../apis/piping/ConstructionAPI';
+import { GetQCStatusListAPI, GetQCStatusListSubContractorAPI,  } from '../../../apis/piping/ConstructionAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
@@ -20,7 +20,7 @@ import SelectPopupLocation from '../../../components/SelectPopupLocation';
 
 const DrawingQCStatusScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, code } = route.params;
+  const { projectCode, subContractor, userLogin, code } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -33,6 +33,7 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -62,6 +63,7 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
       ),
     });
   }, [navigation, isShowDescription]);
+
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -91,7 +93,7 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
 
-    GetQCStatusListAPI(projectCode, code, facility, drawing, weld, filter, locate, token)
+    GetQCStatusListSubContractorAPI(projectCode, subContractor, code, facility, drawing, weld, filter, locate, token)
       .then(res => {
         if (res.Success && res.Data) {
           setDataList(res.Data);
@@ -137,6 +139,7 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
       {
         userLogin: userLogin,
         projectCode: projectCode,
+        subContractor: subContractor,
         facilityCode: item.FacilityCode,
         drawingNo: item.DrawingNo,
         sheet: item.Sheet,
@@ -199,8 +202,6 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
     }
     setIsVisibleLocation(false);
   };
-
-
 
   //-- Render List
   const renderItem = ({ index, item }) => {
@@ -632,10 +633,10 @@ const DrawingQCStatusScreen = ({ route, navigation }) => {
                 ?
                 (<View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
-                    <Text>Project: </Text>
-                    <Text style={[styles.infoData]}>{projectCode}</Text>
-                    <Text>User: </Text>
-                    <Text style={[styles.infoData]}>{userLogin}</Text>
+                    <Text style={[styles.infoTitle]}>Project:</Text>
+                    <Text style={[styles.infoData]}>{projectCode}  -  {subContractor}</Text>
+                    {/* <Text>User: </Text> */}
+                    {/* <Text style={[styles.infoData]}>{userLogin}</Text> */}
                   </View>
                   <View style={styles.rowInfoAction}>
                     <Text style={styles.infoTitleAction}>FacilityCode:</Text>
@@ -753,11 +754,17 @@ const styles = StyleSheet.create({
     minHeight: 24,
     marginBottom: 4,
   },
+  infoTitle: {
+    flex: 3,
+    // fontWeight: 'bold',
+    // color: BASE_COLOR,
+    // textAlign: 'center',
+  },
   infoData: {
-    flex: 1,
+    flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
-    textAlign: 'center',
+    // textAlign: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',

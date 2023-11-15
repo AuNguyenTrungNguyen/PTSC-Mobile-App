@@ -10,15 +10,17 @@ import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetConstructionListAPI, GetCurrentConstructionInfoAPI, GetDrawingCompletePercentAPI } from '../../../apis/piping/ConstructionAPI';
+// import { GetConstructionListAPI, GetCurrentConstructionInfoAPI, GetDrawingCompletePercentAPI } from '../../../apis/piping/ConstructionAPI';
+import { GetConstructionListSubContractorAPI, GetCurrentConstructionInfoAPI, GetDrawingCompletePercentAPI } from '../../../apis/piping/ConstructionAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
 import LoadingRefresh from '../../../components/LoadingRefresh';
+import { sub } from 'react-native-reanimated';
 
 const DrawingListScreen = ({ route, navigation }) => {
 
-  const { projectCode } = route.params;
+  const { projectCode, subContractor } = route.params;
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -39,6 +41,7 @@ const DrawingListScreen = ({ route, navigation }) => {
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
 
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
+
   const toggle = () => {
     setIsShowDescription(prevState => {
       return {
@@ -47,6 +50,7 @@ const DrawingListScreen = ({ route, navigation }) => {
       }
     });
   };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -64,7 +68,6 @@ const DrawingListScreen = ({ route, navigation }) => {
       callAPI(getFacilityList);
     }, []
   );
-
   const callAPI = (executedAPI, loading = true) => {
     if (loading) {
       setIsLoading(true);
@@ -91,6 +94,7 @@ const DrawingListScreen = ({ route, navigation }) => {
         setIsError(true);
       });
   };
+
   const _onChangeFacilityCode = code => {
     if (code !== facilityCode) {
       setFacilityCode(code);
@@ -98,6 +102,7 @@ const DrawingListScreen = ({ route, navigation }) => {
     }
     setIsVisibleFacility(false);
   };
+
   const _onPressClearFacilityCode = () => {
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       setFacilityCode(FACILITY_CODE_DEFAULT);
@@ -122,14 +127,40 @@ const DrawingListScreen = ({ route, navigation }) => {
       setOldWeldNo(weldNo);
       callAPI(() => { searchDrawing(facilityCode, drawingNo, weldNo) }, false);
     }
+
   };
+  // const searchDrawing = async (facilityCode, drawingNo, weldNo) => {
+  //   setIsSearching(true);
+  //   const token = await Helper.getData('TOKEN');
+  //   facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
+  //   drawingNo = drawingNo ? drawingNo : '';
+  //   weldNo = weldNo ? weldNo : '';
+  //   GetConstructionListAPI(projectCode, subContractor, facilityCode, drawingNo, weldNo, token)
+  //     .then(res => {
+  //       if (res.Success) {
+  //         setDrawingList(res.Data);
+  //         setIsLoading(false);
+  //         setIsError(false);
+  //         setIsSearching(false);
+  //       } else {
+  //         setIsLoading(false);
+  //         setIsError(true);
+  //         setIsSearching(false);
+  //       }
+  //     }).catch(() => {
+  //       setIsLoading(false);
+  //       setIsError(true);
+  //       setIsSearching(false);
+  //     });
+  // };
+
   const searchDrawing = async (facilityCode, drawingNo, weldNo) => {
     setIsSearching(true);
     const token = await Helper.getData('TOKEN');
     facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo ? drawingNo : '';
     weldNo = weldNo ? weldNo : '';
-    GetConstructionListAPI(projectCode, facilityCode, drawingNo, weldNo, token)
+    GetConstructionListSubContractorAPI(projectCode, subContractor, facilityCode, drawingNo, weldNo, token)
       .then(res => {
         if (res.Success) {
           setDrawingList(res.Data);
@@ -175,6 +206,7 @@ const DrawingListScreen = ({ route, navigation }) => {
         'DrawingDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -192,6 +224,7 @@ const DrawingListScreen = ({ route, navigation }) => {
           if (res.Success) {
             navigation.navigate('DrawingDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -221,6 +254,7 @@ const DrawingListScreen = ({ route, navigation }) => {
         'DrawingDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -238,6 +272,7 @@ const DrawingListScreen = ({ route, navigation }) => {
           if (res.Success) {
             navigation.navigate('DrawingDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -268,6 +303,7 @@ const DrawingListScreen = ({ route, navigation }) => {
         code: 'FitUp',
         source: 'Drawing',
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
@@ -281,14 +317,11 @@ const DrawingListScreen = ({ route, navigation }) => {
         code: 'Weld',
         source: 'Drawing',
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
   };
-
-
-
-
 
   const renderItem = ({ index, item }) => {
     return (
@@ -377,7 +410,7 @@ const DrawingListScreen = ({ route, navigation }) => {
                 <View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>ProjectCode:</Text>
-                    <Text style={styles.infoData}>{projectCode}</Text>
+                    <Text style={styles.infoData}>{projectCode}  -  {subContractor} </Text>
                   </View>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>FacilityCode:</Text>

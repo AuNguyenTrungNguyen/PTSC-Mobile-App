@@ -6,12 +6,12 @@ import NetInfo from '@react-native-community/netinfo';
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 
-import { GetCurrentDimCuttingInfoAPI } from '../../../apis/piping/DimAPI';
-import { GetCurrentConstructionInfoAPI, CheckDrawingRevAPI } from '../../../apis/piping/ConstructionAPI';
+import { GetCurrentDimCuttingInfoAPI, GetCurrentDimCuttingInfoSubContractorAPI  } from '../../../apis/piping/DimAPI';
+import { GetCurrentConstructionInfoAPI, GetCurrentConstructionInfoSubContractorAPI, CheckDrawingRevAPI} from '../../../apis/piping/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
 
-  const { projectCode, teamLeader, code, source } = route.params;
+  const { projectCode, subContractor, teamLeader, code, source } = route.params;
 
   const [isScanned, setIsScanned] = useState(false);
 
@@ -76,7 +76,7 @@ const CameraScreen = ({ route, navigation }) => {
                   { cancelable: false },
                 );
               } else {
-                _onGoingDetail(drawingNo, sheet, rev);
+              _onGoingDetail(drawingNo, sheet, rev);
               }
             }
             else {
@@ -96,11 +96,12 @@ const CameraScreen = ({ route, navigation }) => {
         showComfirm('ERROR', 'Network not available!');
       } else {
         if (source === Constant.CAMERA_PIP_CONS_DIM) {
-          GetCurrentDimCuttingInfoAPI(projectCode, drawingNo, sheet, rev, token)
+          GetCurrentDimCuttingInfoSubContractorAPI(projectCode, subContractor, drawingNo, sheet, rev, token)
             .then(res => {
               if (res.Success && res.Data != null) {
                 navigation.navigate('DimCuttingDetail', {
                   projectCode: projectCode,
+                  subContractor: subContractor,
                   CPName: drawingNo,
                   CPSheet: sheet,
                   CPRev: rev,
@@ -122,12 +123,13 @@ const CameraScreen = ({ route, navigation }) => {
             });
         }
         else {
-          GetCurrentConstructionInfoAPI(projectCode, drawingNo, sheet, rev, token)
+          GetCurrentConstructionInfoSubContractorAPI(projectCode, subContractor, drawingNo, sheet, rev, token)
             .then(res => {
               if (res.Success && res.Data != null) {
                 if (source == Constant.CAMERA_PIP_CONS) {
                   navigation.navigate('DrawingDetail', {
                     projectCode: projectCode,
+                    subContractor: subContractor,
                     facilityCode: res.Data,
                     drawingNo: drawingNo,
                     sheet: sheet,
@@ -140,6 +142,7 @@ const CameraScreen = ({ route, navigation }) => {
                 } else {
                   navigation.navigate('QCDrawingDetail', {
                     projectCode: projectCode,
+                    subContractor: subContractor,
                     facilityCode: res.Data,
                     drawingNo: drawingNo,
                     sheet: sheet,
