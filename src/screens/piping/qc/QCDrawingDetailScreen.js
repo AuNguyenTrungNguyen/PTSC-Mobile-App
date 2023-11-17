@@ -11,7 +11,7 @@ import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
-import { GetQCDetailAPI, UpdateQCDetailAPI } from '../../../apis/piping/QCAPI';
+import { GetQCDetailAPI, GetQCDetailSubContractorAPI, UpdateQCDetailAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -19,7 +19,7 @@ import Header from '../../../components/Header';
 
 const QCDrawingDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader, link } = route.params;
+  const { projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, teamLeader, link } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -77,7 +77,7 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
   //-- Get Data
   const getData = async () => {
     const token = await Helper.getData('TOKEN');
-    GetQCDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+    GetQCDetailSubContractorAPI (projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, token)
       .then(res => {
         if (res.Success) {
           setDetailDrawingList(res.Data);
@@ -171,7 +171,6 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
       });
   };
 
-
   //-- Manage Picture
   const _onPressManagePicture = () => {
     navigation.navigate(
@@ -191,7 +190,7 @@ const QCDrawingDetailScreen = ({ route, navigation }) => {
 
   //-- Render Header
   const headerData = {
-    'Project': projectCode,
+    'Project': projectCode + '  ' + '-' + '  ' + subContractor,
     'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Sheet': sheet,

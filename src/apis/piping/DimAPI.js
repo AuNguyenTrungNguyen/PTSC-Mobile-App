@@ -115,6 +115,23 @@ export const GetDimCuttingQCListAPI = (projectCode, drawingNo, weldNo, location,
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+
+export const GetDimCuttingQCListSubContractorAPI = (projectCode, subContractor, drawingNo, weldNo, location, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetDimCuttingQCListSubContractor'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
+    + '&weldNo=' + weldNo
+    + '&location=' + location,
+    {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+      }).then(res => res.json());
+
 export const UpdateDimCuttingQCListAPI = (projectCode, userUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server

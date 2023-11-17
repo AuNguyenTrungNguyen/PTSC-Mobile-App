@@ -87,12 +87,13 @@ const HomeScreen = ({ route, navigation }) => {
       'DimCuttingQCList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     );
   };
 
-  //-- QC MANAGERMENT
+  //-- QC MANAGERMENT (QCFitUp and QCVisual)
   const _onPressManageQC = code => {
     Alert.alert(
       '',
@@ -113,13 +114,15 @@ const HomeScreen = ({ route, navigation }) => {
         code: code,
         source: Constant.CAMERA_PIP_QC,
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
   };
   const _onPresSearchQC = async () => {
     navigation.navigate('QCDrawingList', {
-      projectCode: projectCode
+      projectCode: projectCode,
+      subContractor: subContractor
     });
   };
   const _onPressSpedingListQC = async code => {
@@ -127,6 +130,7 @@ const HomeScreen = ({ route, navigation }) => {
     const title = 'QC Spend ' + code;
     navigation.navigate('QCSpendList', {
       projectCode: projectCode,
+      subContractor: subContractor,
       userLogin: userLogin,
       code: code,
       title: title,
@@ -264,7 +268,6 @@ const HomeScreen = ({ route, navigation }) => {
       }
     );
   };
-
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
