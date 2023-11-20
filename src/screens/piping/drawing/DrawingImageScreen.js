@@ -123,6 +123,7 @@ const DrawingImageScreen = ({ route }) => {
       { cancelable: false }
     );
   };
+
   const _onPressOpenGallery = () => {
     setIsLoading(true);
     ImagePicker.openPicker({
@@ -377,7 +378,6 @@ const DrawingImageScreen = ({ route }) => {
     const status = await PermissionsAndroid.request(permission);
     return status === 'granted';
   };
-
 
   const renderItem = ({ item }) => {
     return (

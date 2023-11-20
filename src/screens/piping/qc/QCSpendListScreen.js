@@ -14,7 +14,7 @@ import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI, GetInspectorListAPI } from '../../../apis/app/AppAPI';
-import { GetSpendListAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
+import { GetSpendListAPI, GetSpendListSubContractorAPI, UpdateSpendListAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -23,7 +23,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const QCSpendListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin, code } = route.params;
+  const { projectCode, subContractor, userLogin, code } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -111,7 +111,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
       filter = Constant.PIECE_MARK_UNCHECKED;
     }
 
-    GetSpendListAPI(projectCode, facility, drawing, weld, locate, code, filter, token)
+    GetSpendListSubContractorAPI(projectCode, subContractor, facility, drawing, weld, locate, code, filter, token)
       .then(res => {
         if (res.Success && res.Data) {
           setSpendList(res.Data);
@@ -819,6 +819,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
               isShowDescription.show
                 ?
                 (<View style={styles.headerContainer}>
+                  <View style={styles.rowInfo}>
+                    <Text>ProjectCode:     {projectCode}  -  {subContractor} </Text>
+                  </View>
                   <View style={styles.rowInfo}>
                     <Text>User:   </Text>
                     <Text style={styles.infoData}>{userLogin}</Text>

@@ -16,7 +16,7 @@ import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 import Constant from '../../../utils/Constant';
 
-import { GetConstructionDetailAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/piping/ConstructionAPI';
+import { GetConstructionDetailSubContractorAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/piping/ConstructionAPI';
 import { GetLocationListSubContractorAPI, GetSerialNoAndHeatNoListAPI, GetSerialNoAndHeatNoPipeSupportListAPI, GetTeamListFilterSubContractorAPI, GetWPSListSubContractorAPI } from '../../../apis/app/AppAPI';
 
 import MessageAlert from '../../../components/MessageAlert';
@@ -29,7 +29,7 @@ import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 
 const DrawingDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, drawingNo, sheet, rev, code, teamLeader, link } = route.params;
+  const { projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, teamLeader, link } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -56,7 +56,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       setIsReadOnly(readOnly === Constant.ROUTE__PIP_VIEWER);
     }, []
   );
-
   useEffect(
     () => {
       if (code !== Constant.CODE_FITUP) {
@@ -112,9 +111,28 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
 
   //-- Get Data
+  // const getConstructionDetail = async () => {
+  //   const token = await Helper.getData('TOKEN');
+  //   GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+  //     .then(res => {
+  //       if (res.Success) {
+  //         setDetailDrawingList(res.Data);
+  //         setIsLoading(false);
+  //         setIsError(false);
+  //       } else {
+  //         setIsLoading(false);
+  //         setIsError(true);
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setIsLoading(false);
+  //       setIsError(true);
+  //     });
+  // };
+
   const getConstructionDetail = async () => {
     const token = await Helper.getData('TOKEN');
-    GetConstructionDetailAPI(projectCode, facilityCode, drawingNo, sheet, rev, code, token)
+    GetConstructionDetailSubContractorAPI(projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, token)
       .then(res => {
         if (res.Success) {
           setDetailDrawingList(res.Data);
@@ -130,7 +148,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         setIsError(true);
       });
   };
-
 
   //-- Submit Data
   const checkConstructionDetail = () => {
@@ -230,6 +247,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     });
     return messages;
   };
+
   const updateConstructionDetail = async () => {
     const token = await Helper.getData('TOKEN');
     const listUpdate = Helper.handleListUpdate(updateDrawingList);
@@ -249,6 +267,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         setIsUploading(false);
       });
   };
+
   const _onPressSubmitToServer = async () => {
     let error = [];
     let uniqueError = [];
@@ -286,9 +305,11 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       }
     );
   };
+
   const _onPressGetReweldJointFromQC = () => {
     callAPI(() => getReweldJointFromQC());
   };
+
   const getReweldJointFromQC = useCallback(async () => {
     setIsUploading(true);
     GetReweldFromQCAPI(projectCode, drawingNo)
@@ -309,6 +330,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       {
         userLogin: teamLeader,
         projectCode: projectCode,
+        subContractor: subContractor,
         facilityCode: facilityCode,
         drawingNo: drawingNo,
         sheet: sheet,
@@ -672,6 +694,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       'DrawingAddWelder',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         welders: value,
         index: index,
       }
@@ -773,7 +796,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
 
   //-- Render Header
   const headerData = {
-    'Project': projectCode,
+    'Project': projectCode + '  -  ' + subContractor,
     'Facility': facilityCode,
     'DrawingNo': { 'DrawingNo': drawingNo, 'Link': link },
     'Sheet': sheet,
@@ -783,7 +806,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const headerAction = () => {
     Helper.openDrawingPDF(navigation, link, 'PIP CONS Drawing')
   };
-
 
   //-- Render Detail
   const RenderConstructionDetail = () => {

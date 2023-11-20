@@ -9,7 +9,7 @@ import Formater from '../../../utils/Formater';
 import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
-import { GetDimCuttingQCListAPI, UpdateDimCuttingQCListAPI } from '../../../apis/piping/DimAPI';
+import { GetDimCuttingQCListAPI, GetDimCuttingQCListSubContractorAPI, UpdateDimCuttingQCListAPI } from '../../../apis/piping/DimAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
@@ -17,7 +17,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DimCuttingQCListScreen = ({ route, navigation }) => {
 
-  const { projectCode, userLogin } = route.params;
+  const { projectCode, subContractor, userLogin } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -79,7 +79,7 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
   };
   const getSpendListData = async (drawing = drawingNo, weld = weldNo, loc = location) => {
     const token = await Helper.getData('TOKEN');
-    GetDimCuttingQCListAPI(projectCode, drawing, weld, loc, token)
+    GetDimCuttingQCListSubContractorAPI(projectCode, subContractor, drawing, weld, loc, token)
       .then(res => {
         if (res.Success && res.Data) {
           setSpendList(res.Data);
@@ -332,7 +332,7 @@ const DimCuttingQCListScreen = ({ route, navigation }) => {
                 (<View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
                     <Text>Project: </Text>
-                    <Text style={[styles.infoData]}>{projectCode}</Text>
+                    <Text style={[styles.infoData]}>{projectCode}  -  {subContractor}</Text>
                     <Text>   User: </Text>
                     <Text style={[styles.infoData]}>{userLogin}</Text>
                   </View>

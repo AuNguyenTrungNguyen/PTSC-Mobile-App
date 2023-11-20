@@ -1,3 +1,4 @@
+import { sub } from 'react-native-reanimated';
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
@@ -15,11 +16,40 @@ export const GetCurrentDimCuttingInfoAPI = (projectCode, drawingNo, sheet, rev, 
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+export const GetCurrentDimCuttingInfoSubContractorAPI = (projectCode, subContractor, drawingNo, sheet, rev, token) =>
+    fetch(
+      Port_Server
+      + '/api/piping/GetCurrentDimCuttingInfoSubContractor'
+      + '?projectCode=' + projectCode
+      + '&subContractor=' + subContractor
+      + '&drawingNo=' + encodeURIComponent(drawingNo)
+      + '&sheet=' + sheet
+      + '&rev=' + rev,
+      {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+      }).then(res => res.json());
 export const GetDimCuttingListAPI = (projectCode, facilityCode, drawingNo, token) =>
   fetch(
     Port_Server
     + '/api/piping/GetDimCuttingList'
     + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+export const GetDimCuttingListSubContractorAPI = (projectCode, subContractor, facilityCode, drawingNo, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetDimCuttingSubContractorList'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + encodeURIComponent(drawingNo),
     {
@@ -42,6 +72,21 @@ export const GetDimCuttingDetailAPI = (projectCode, drawingNo, sheet, rev, token
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+  export const GetDimCuttingDetailSubContractorAPI = (projectCode, subContractor, drawingNo, sheet, rev, token) =>
+    fetch(
+      Port_Server
+      + '/api/piping/GetDimCuttingSubContractorDetail'
+      + '?projectCode=' + projectCode
+      + '&subContractor=' + subContractor
+      + '&drawingNo=' + encodeURIComponent(drawingNo)
+      + '&sheet=' + sheet
+      + '&rev=' + rev,
+      {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+      }).then(res => res.json());
 export const UpdateDimCuttingDetailAPI = (projectCode, drawingNo, sheet, rev, userUpdate, listItemUpdate, listSecondUpdate, location, team, token) =>
   fetch(
     Port_Server
@@ -70,6 +115,23 @@ export const GetDimCuttingQCListAPI = (projectCode, drawingNo, weldNo, location,
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
+
+export const GetDimCuttingQCListSubContractorAPI = (projectCode, subContractor, drawingNo, weldNo, location, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetDimCuttingQCListSubContractor'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
+    + '&weldNo=' + weldNo
+    + '&location=' + location,
+    {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+      }).then(res => res.json());
+
 export const UpdateDimCuttingQCListAPI = (projectCode, userUpdate, listItemUpdate, token) =>
   fetch(
     Port_Server

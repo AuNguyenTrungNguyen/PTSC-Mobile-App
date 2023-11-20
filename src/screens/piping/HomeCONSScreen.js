@@ -17,7 +17,7 @@ import SelectActions from '../../components/SelectActions';
 
 const HomeCONSScreen = ({ route, navigation }) => {
 
-  const { projectCode, disciplineCode } = route.params;
+  const { projectCode, subContractor, disciplineCode } = route.params;
   const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -102,6 +102,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       {
         source: Constant.CAMERA_PIP_CONS_DIM,
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     );
@@ -112,6 +113,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'DimCuttingList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     );
@@ -140,13 +142,15 @@ const HomeCONSScreen = ({ route, navigation }) => {
         code: code,
         source: Constant.CAMERA_PIP_CONS,
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
   };
   const _onPresSearchCons = async () => {
     navigation.navigate('DrawingList', {
-      projectCode: projectCode
+      projectCode: projectCode,
+      subContractor: subContractor,
     });
   };
   const _onPressQCStatusCons = async code => {
@@ -154,6 +158,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
     const title = 'QC Status ' + code;
     navigation.navigate('QCStatus', {
       projectCode: projectCode,
+      subContractor: subContractor,
       userLogin: userLogin,
       code: code,
       title: title,
@@ -177,6 +182,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'AllStatusCamera',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -185,6 +191,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'DrawingSearch',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -211,6 +218,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       screen: 'TimeSheet',
       params: {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     });
@@ -221,6 +229,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       screen: 'TimeSheetOT',
       params: {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     });
@@ -231,6 +240,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       screen: 'TimeSheetReport',
       params: {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     });
@@ -243,6 +253,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       screen: 'ManHoursImpact',
       params: {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     });
@@ -254,6 +265,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'DailyReport',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -264,6 +276,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       screen: 'OpenPipeSupportDrawing',
       params: {
         projectCode: projectCode,
+        subContractor: subContractor,
         title: 'Pipe Support'
       }
     });
@@ -275,6 +288,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       screen: 'OpenIsometricDrawing',
       params: {
         projectCode: projectCode,
+        subContractor: subContractor,
         title: 'Isometric'
       }
     });
@@ -286,6 +300,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'PipeSupportList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -296,6 +311,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'PipeSpoolList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -355,13 +371,15 @@ const HomeCONSScreen = ({ route, navigation }) => {
     //     code: code,
     //     source: Constant.CAMERA_PIP_CONS,
     //     projectCode: projectCode,
+    //     subContractor: subContractor,
     //     teamLeader: teamLeader,
     //   }
     // );
   };
   const _onPresSearchConsGRE = async () => {
     navigation.navigate('GREDrawingList', {
-      projectCode: projectCode
+      projectCode: projectCode,
+      subContractor: subContractor
     });
   };
 
@@ -371,6 +389,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'HydrotestPackageList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -381,6 +400,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'ValveProgressList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -391,6 +411,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
       'FlangeJointProgressList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
       }
     );
   };
@@ -446,7 +467,8 @@ const HomeCONSScreen = ({ route, navigation }) => {
           <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
           :
           <View style={styles.container}>
-            <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+            {/* <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header> */}
+            <Header data={{ 'Project': projectCode + '  -  ' + subContractor, 'Module': disciplineCode }}></Header>
             <ScrollView style={styles.table}>
               {
                 (

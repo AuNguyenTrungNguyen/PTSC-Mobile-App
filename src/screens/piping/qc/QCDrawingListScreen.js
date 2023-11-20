@@ -10,7 +10,7 @@ import Constant from '../../../utils/Constant';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetQCListAPI, GetCurrentQCInfoAPI, GetQCCompletePercentAPI } from '../../../apis/piping/QCAPI';
+import { GetQCListAPI, GetQCListSubContractorAPI, GetCurrentQCInfoAPI, GetCurrentQCInfoSubContractorAPI, GetQCCompletePercentAPI } from '../../../apis/piping/QCAPI';
 
 import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../components/HelperUI';
 import SelectPopup from '../../../components/SelectPopup';
@@ -18,7 +18,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const QCDrawingListScreen = ({ route, navigation }) => {
 
-  const { projectCode } = route.params;
+  const { projectCode, subContractor } = route.params;
 
   const FACILITY_CODE_DEFAULT = 'All Facility Code';
 
@@ -129,7 +129,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
     facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo ? drawingNo : '';
     weldNo = weldNo ? weldNo : '';
-    GetQCListAPI(projectCode, facilityCode, drawingNo, weldNo, token)
+    GetQCListSubContractorAPI(projectCode, subContractor, facilityCode, drawingNo, weldNo, token)
       .then(res => {
         if (res.Success) {
           setDrawingList(res.Data);
@@ -147,7 +147,6 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         setIsSearching(false);
       });
   };
-
 
   //-- Item Action
   const _onPressCompletePercent = async (index, drawingNo, sheet, rev) => {
@@ -176,6 +175,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         'QCDrawingDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -188,11 +188,12 @@ const QCDrawingListScreen = ({ route, navigation }) => {
       );
     } else {
       const token = await Helper.getData('TOKEN');
-      GetCurrentQCInfoAPI(projectCode, drawingNo, sheet, rev, token)
+      GetCurrentQCInfoSubContractorAPI(projectCode, subContractor, drawingNo, sheet, rev, token)
         .then(res => {
           if (res.Success) {
             navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -222,6 +223,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         'QCDrawingDetail',
         {
           projectCode: projectCode,
+          subContractor: subContractor,
           facilityCode: facilityCode,
           drawingNo: drawingNo,
           sheet: sheet,
@@ -234,11 +236,12 @@ const QCDrawingListScreen = ({ route, navigation }) => {
       );
     } else {
       let token = await Helper.getData('TOKEN');
-      GetCurrentQCInfoAPI(projectCode, drawingNo, sheet, rev, token)
+      GetCurrentQCInfoSubContractorAPI(projectCode, subContractor, drawingNo, sheet, rev, token)
         .then(res => {
           if (res.Success) {
             navigation.navigate('QCDrawingDetail', {
               projectCode: projectCode,
+              subContractor: subContractor,
               facilityCode: res.Data,
               drawingNo: drawingNo,
               sheet: sheet,
@@ -269,6 +272,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         code: 'FitUp',
         source: 'QCDrawing',
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
@@ -282,15 +286,13 @@ const QCDrawingListScreen = ({ route, navigation }) => {
         code: 'Visual',
         source: 'QCDrawing',
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
   };
 
-
-
-
-
+  
   const renderItem = ({ index, item }) => {
     return (
       <View style={styles.box}>
@@ -378,7 +380,7 @@ const QCDrawingListScreen = ({ route, navigation }) => {
                 <View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>ProjectCode:</Text>
-                    <Text style={styles.infoData}>{projectCode}</Text>
+                    <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                   </View>
                   <View style={styles.rowInfo}>
                     <Text style={styles.infoTitle}>FacilityCode:</Text>

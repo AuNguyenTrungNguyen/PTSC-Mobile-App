@@ -14,7 +14,7 @@ import Header from '../../components/Header';
 
 const HomeScreen = ({ route, navigation }) => {
 
-  const { projectCode, disciplineCode } = route.params;
+  const { projectCode, subContractor, disciplineCode } = route.params;
   const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -87,12 +87,13 @@ const HomeScreen = ({ route, navigation }) => {
       'DimCuttingQCList',
       {
         projectCode: projectCode,
+        subContractor: subContractor,
         userLogin: userLogin,
       }
     );
   };
 
-  //-- QC MANAGERMENT
+  //-- QC MANAGERMENT (QCFitUp and QCVisual)
   const _onPressManageQC = code => {
     Alert.alert(
       '',
@@ -113,13 +114,15 @@ const HomeScreen = ({ route, navigation }) => {
         code: code,
         source: Constant.CAMERA_PIP_QC,
         projectCode: projectCode,
+        subContractor: subContractor,
         teamLeader: teamLeader,
       }
     );
   };
   const _onPresSearchQC = async () => {
     navigation.navigate('QCDrawingList', {
-      projectCode: projectCode
+      projectCode: projectCode,
+      subContractor: subContractor
     });
   };
   const _onPressSpedingListQC = async code => {
@@ -127,6 +130,7 @@ const HomeScreen = ({ route, navigation }) => {
     const title = 'QC Spend ' + code;
     navigation.navigate('QCSpendList', {
       projectCode: projectCode,
+      subContractor: subContractor,
       userLogin: userLogin,
       code: code,
       title: title,
@@ -265,7 +269,6 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
-
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
     if (props.iconName) {
@@ -303,7 +306,8 @@ const HomeScreen = ({ route, navigation }) => {
           <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getNotifyNumbers)} />
           :
           <View style={styles.container}>
-            <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
+            {/* <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header> */}
+            <Header data={{ 'Project': projectCode + '  -  ' + subContractor, 'Module': disciplineCode }}></Header>
             <ScrollView style={styles.table}>
               {
                 (notifyNumbers.DimCutting || notifyNumbers.FitUp)
