@@ -579,10 +579,10 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         'HeatNo_TagNo2': data.HeatNo_TagNo,
       });
     } else {
-      array[indexUpdate]['PieceNo2'] = data.PieceMarkNo;
-      array[indexUpdate]['PieceMarkNo02'] = data.PieceMarkNo;
-      array[indexUpdate]['PieceDescription2'] = data.PieceDescription;
-      array[indexUpdate]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
+      array[objIndex]['PieceNo2'] = data.PieceMarkNo;
+      array[objIndex]['PieceMarkNo02'] = data.PieceMarkNo;
+      array[objIndex]['PieceDescription2'] = data.PieceDescription;
+      array[objIndex]['HeatNo_TagNo2'] = data.HeatNo_TagNo;
     }
     setConstructionUpdateList(array);
 
