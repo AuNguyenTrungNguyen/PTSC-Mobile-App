@@ -83,7 +83,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
-      customArchiveName = "PTSC"
+      customArchiveName = "PTSC M&amp;C"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

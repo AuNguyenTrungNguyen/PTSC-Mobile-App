@@ -318,35 +318,8 @@ const HomeCONSScreen = ({ route, navigation }) => {
 
   //-- Equipment
   const _onPressManageEquipment = async () => {
-    Alert.alert(
-      '',
-      'Scan: Scan QR Code\n\nSearch: Search Equipment List',
-      [
-        { text: 'Scan', onPress: _onPressQRCodeEquipment },
-        { text: 'Search', onPress: _onPresSearchEquipment },
-        // { text: 'Lifting Plan', onPress: _onPresLiftingPlan },
-        { text: 'Cancel', style: 'cancel' }
-      ],
-      {
-        cancelable: true,
-      }
-    );
-    return
-
-  };
-  const _onPressQRCodeEquipment = async () => {
     navigation.navigate(Constant.ROUTE__EQUIPMENT, {
-      screen: 'EquipmentCamera',
-    });
-  };
-  const _onPresSearchEquipment = async () => {
-    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
-      screen: 'EquipmentList',
-    });
-  };
-  const _onPresLiftingPlan = async () => {
-    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
-      screen: 'EquipmentNameList',
+      screen: 'WorkRequestList',
     });
   };
 
@@ -500,7 +473,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Pipe Spool\nControl'} onPress={_onPressPipeSpool} />
-                <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} />
+                <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} />
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Cons Manage\nGRE'} onPress={_onPressManageConsGRE} />

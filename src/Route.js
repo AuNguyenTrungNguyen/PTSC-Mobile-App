@@ -134,11 +134,12 @@ import QCObservationDetailScreen from './screens/observation/QAObservationDetail
 import QCObservationImageScreen from './screens/observation/QAObservationImageScreen';
 
 //-- Equipment
-import EquipmentListScreen from './screens/equipment/EquipmentListScreen';
-import EquipmentCameraScreen from './screens/equipment/EquipmentCameraScreen';
-import EquipmentDetailScreen from './screens/equipment/EquipmentDetailScreen';
-import EquipmentTimesheetScreen from './screens/equipment/EquipmentTimesheetScreen';
-import EquipmentNameListScreen from './screens/equipment/EquipmentNameListScreen';
+import WorkRequestListScreen from './screens/equipment/WorkRequestListScreen';
+import MajorEquipmentGroupCodeScreen from './screens/equipment/MajorEquipmentGroupCodeScreen';
+import MajorEquipmentEquipmentCodeScreen from './screens/equipment/MajorEquipmentEquipmentCodeScreen';
+import EquipmentTimesheetDailyListScreen from './screens/equipment/EquipmentTimesheetDailyListScreen';
+import CreateEquipmentTimesheetDailyScreen from './screens/equipment/CreateEquipmentTimesheetDailyScreen';
+import MajorEquipmentUserListScreen from './screens/equipment/MajorEquipmentUserListScreen';
 import EquipmentLiftingPlanListScreen from './screens/equipment/EquipmentLiftingPlanListScreen';
 import EquipmentLiftingPlanDetailScreen from './screens/equipment/EquipmentLiftingPlanDetailScreen';
 
@@ -1372,6 +1373,66 @@ const EquipmentStackScreens = () => {
   return (
     <EquipmentStack.Navigator screenOptions={optionNavigation}>
       <EquipmentStack.Screen
+        name='WorkRequestList'
+        component={WorkRequestListScreen}
+        options={
+          {
+            title: 'Work Request List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='MajorEquipmentGroupCode'
+        component={MajorEquipmentGroupCodeScreen}
+        options={
+          {
+            title: 'Major Equipment Group Code',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='MajorEquipmentEquipmentCode'
+        component={MajorEquipmentEquipmentCodeScreen}
+        options={
+          {
+            title: 'Major Equipment Code',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentTimesheetDailyList'
+        component={EquipmentTimesheetDailyListScreen}
+        options={
+          {
+            title: 'Major Equipment Timesheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='CreateEquipmentTimesheetDaily'
+        component={CreateEquipmentTimesheetDailyScreen}
+        options={
+          {
+            title: 'Create Major Equipment Timesheet',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='MajorEquipmentUserList'
+        component={MajorEquipmentUserListScreen}
+        options={
+          {
+            title: 'Operator List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* <EquipmentStack.Screen
         name='EquipmentList'
         component={EquipmentListScreen}
         options={
@@ -1440,7 +1501,7 @@ const EquipmentStackScreens = () => {
             headerBackTitle: 'Back',
           }
         }
-      />
+      /> */}
     </EquipmentStack.Navigator>
   );
 };

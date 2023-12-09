@@ -193,6 +193,13 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Equipment
+  const _onPressManageEquipment = async () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'WorkRequestList',
+    });
+  };
+
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -263,6 +270,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
               <RenderItemBox title={'Cable\nDamage Log'} onPress={_onElectricalCableDamage} iconName='relation-only-one-to-zero-or-one' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>
