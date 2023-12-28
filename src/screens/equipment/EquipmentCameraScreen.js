@@ -24,31 +24,36 @@ const EquipmentCameraScreen = ({ route, navigation }) => {
   };
 
   const _onGoDetail = async code => {
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        showComfirm('ERROR', 'Network not available!');
-      } else {
-        GetEquipmentDetailAPI(code)
-          .then(res => {
-            if (res.Success) {
-              if (res.Data) {
-                navigation.navigate('EquipmentDetail', {
-                  code: code,
-                  category: res.Data.EquipmentCategory,
-                });
-              } else {
-                showComfirm('ERROR', 'Not found EquipmentCode: ' + code);
-              }
-            }
-            else {
-              showComfirm('ERROR', res.Message);
-            }
-          }).catch(() => {
-            showComfirm('ERROR', 'Please check that you are using the company network!');
-          });
-      }
+    navigation.navigate('DailyTaskPlan', {
+      equipmentCode: code,
     });
   };
+  // const _onGoDetail = async code => {
+  //   NetInfo.fetch().then(state => {
+  //     if (!state.isConnected) {
+  //       showComfirm('ERROR', 'Network not available!');
+  //     } else {
+  //       GetEquipmentDetailAPI(code)
+  //         .then(res => {
+  //           if (res.Success) {
+  //             if (res.Data) {
+  //               navigation.navigate('DailyTaskPlan', {
+  //                 code: code,
+  //                 category: res.Data.EquipmentCategory,
+  //               });
+  //             } else {
+  //               showComfirm('ERROR', 'Not found EquipmentCode: ' + code);
+  //             }
+  //           }
+  //           else {
+  //             showComfirm('ERROR', res.Message);
+  //           }
+  //         }).catch(() => {
+  //           showComfirm('ERROR', 'Please check that you are using the company network!');
+  //         });
+  //     }
+  //   });
+  // };
 
   const showComfirm = (type, message) => {
     Alert.alert(

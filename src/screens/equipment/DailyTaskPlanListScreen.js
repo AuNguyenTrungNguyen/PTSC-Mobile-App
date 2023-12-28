@@ -1,28 +1,29 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useIsFocused } from '@react-navigation/native';
 
+import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
 import Networker from '../../utils/Networker';
 
-import { GetMajorEquipmentTimesheetDailyListAPI } from '../../apis/equipment/EquipmentAPI';
+import { GetDailyTaskPlanListAPI } from '../../apis/equipment/EquipmentAPI';
 
-import { ListLoadingData, ListEmptyData } from '../../components/HelperUI';
+import { ListSelectData, ListLoadingData, ListEmptyData } from '../../components/HelperUI';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import Header from '../../components/Header';
 
-const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
+const DailyTaskPlanListScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, documentNo, equipmentCode, userLogin } = route.params;
+  const { equipmentCode } = route.params;
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [timesheetList, setTimesheetList] = useState(null);
+  // const [documentNo, setDocumentNo] = useState('');
+  const [dailyTaskPlanListList, setDailyTaskPlanList] = useState(null);
 
-  const [isShowName, setIsShowName] = useState({ show: true, name: 'arrow-up-circle-outline' });
+  const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   const iconColor = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -30,24 +31,17 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={_onPressAddNew}>
-            <Ionicons
-              size={24}
-              name={'add-circle-outline'} color={iconColor} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
-              name={isShowName.name} color={iconColor} />
+              name={isShowDescription.name} color={iconColor} />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation, isShowName]);
+  }, [navigation, isShowDescription]);
   const toggle = () => {
-    setIsShowName(prevState => {
+    setIsShowDescription(prevState => {
       return {
         show: !prevState.show,
         name: prevState.name === 'arrow-up-circle-outline' ? 'arrow-down-circle-outline' : 'arrow-up-circle-outline'
@@ -60,20 +54,23 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
   };
 
-  const isFocused = useIsFocused();
   //-- Init
   useEffect(
     () => {
-      callAPI(getTimesheetList);
-    }, [isFocused]
+      callAPI(getDailyTaskPlanList);
+    }, []
   );
 
-
-  async function getTimesheetList() {
-    GetMajorEquipmentTimesheetDailyListAPI(documentNo, equipmentCode)
+  //-- Search Action
+  // const _onPressSearchWorkRequest = () => {
+  //   Keyboard.dismiss();
+  //   callAPI(getDailyTaskPlanList);
+  // };
+  async function getDailyTaskPlanList() {
+    GetDailyTaskPlanListAPI(equipmentCode, '', '')
       .then(res => {
         if (res.Success && res.Data) {
-          setTimesheetList(res.Data);
+          setDailyTaskPlanList(res.Data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -89,31 +86,21 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         setIsSearching(false);
       });
   };
+  // const _onChangeDocumentNo = no => {
+  //   setDocumentNo(no);
+  // };
 
-  //-- AddNew
-  const _onPressAddNew = async () => {
+  //-- Detail
+  const _onPressDetail = async item => {
+    const userLogin = await Helper.getData('USERNAME');
     navigation.navigate(
-      'CreateEquipmentTimesheetDaily',
+      'EquipmentTimesheetDailyList',
       {
-        projectCode: projectCode,
-        facilityCode: facilityCode,
+        projectCode: item.ProjectCode,
+        facilityCode: item.FacilityCode,
         equipmentCode: equipmentCode,
-        documentNo: documentNo,
-        userLogin: userLogin
-      }
-    );
-  };
-  const _onPressUpdate = async (item) => {
-    navigation.navigate(
-      'CreateEquipmentTimesheetDaily',
-      {
-        rowIndex: item.RowIndex,
-        item: item,
-        projectCode: projectCode,
-        facilityCode: facilityCode,
-        equipmentCode: equipmentCode,
-        documentNo: documentNo,
-        userLogin: userLogin
+        documentNo: item.DocumentNo,
+        userLogin: userLogin,
       }
     );
   };
@@ -121,53 +108,45 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
   //-- Render List
   const renderItem = ({ _, item }) => {
     return (
-      <TouchableOpacity style={styles.box} onPress={() => { _onPressUpdate(item) }}>
+      <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
         <View style={styles.row}>
-          <View style={styles.cellTwo}>
-            <Text>OperatorID:</Text>
+          <View style={styles.cellOne}>
+            <Text>Project:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.OperatorID)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.ProjectCode)}</Text>
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTwo}>
-            <Text>Operator Name:</Text>
+          <View style={styles.cellOne}>
+            <Text>Facility:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.OperatorName)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTwo}>
-            <Text>Plan Start:</Text>
+          <View style={styles.cellOne}>
+            <Text>Doc. No:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatDateDataTime(item.PlanStartDate)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.DocumentNo)}</Text>
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTwo}>
-            <Text>Plan Finish:</Text>
+          <View style={styles.cellOne}>
+            <Text>Doc. Date:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatDateDataTime(item.PlanFinishDate)}</Text>
+            <Text style={styles.textData}>{Formater.formatDateData(item.DocumentDate)}</Text>
           </View>
         </View>
         <View style={styles.row}>
-          <View style={styles.cellTwo}>
-            <Text>Actual Start:</Text>
+          <View style={styles.cellOne}>
+            <Text>Desc:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatDateDataTime(item.ActualStartDate)}</Text>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.cellTwo}>
-            <Text>Actual Finish:</Text>
-          </View>
-          <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatDateDataTime(item.ActualFinishDate)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.RequestDescription)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -177,6 +156,8 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
     {
       if (isSearching) {
         return <ListLoadingData />
+      } else if (!dailyTaskPlanListList) {
+        return <ListSelectData title={'Please enter DocumentNo'} />
       } else {
         return <ListEmptyData />
       }
@@ -184,11 +165,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
-    'Project': projectCode,
-    'Facility': facilityCode,
-    'Doc. No': documentNo,
     'Equip. Code': equipmentCode,
-    'Suppervisor': userLogin,
   };
 
   return (
@@ -196,22 +173,59 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
       {
         isLoading || isError
           ?
-          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getTimesheetList)} />
+          <LoadingRefresh isLoading={isLoading} isError={isError} _onPressRefresh={() => callAPI(getDailyTaskPlanList)} />
           :
           <View style={styles.container}>
             {
-              isShowName.show
+              isShowDescription.show
                 ?
-                <Header data={headerData} />
+                (
+                  <>
+                    <Header data={headerData} />
+                    {/* <View style={styles.headerContainer}>
+                      <View style={styles.rowInfoAction}>
+                        <Text style={styles.infoTitleAction}>Equip. Code:</Text>
+                        <View style={styles.textContainer}>
+                          <Text style={styles.textData}>{equipmentCode}</Text>
+                        </View>
+                      </View>
+                      <View style={styles.rowInfoAction}>
+                        <Text style={styles.infoTitleAction}>DocumentNo:</Text>
+                        <View style={styles.inputContainer}>
+                          <TextInput
+                            style={styles.inputText}
+                            value={documentNo}
+                            onChangeText={_onChangeDocumentNo}
+                            underlineColorAndroid='transparent'
+                          />
+                          {
+                            documentNo == ''
+                              ? null
+                              : <Icon name='times-circle' onPress={() => _onChangeDocumentNo('')} style={styles.inputIcon} />
+                          }
+                        </View>
+                      </View>
+                      <View style={styles.rowInfoAction}>
+                        <Text style={styles.infoTitleAction} />
+                        <TouchableOpacity
+                          style={styles.searchButton}
+                          onPress={_onPressSearchWorkRequest}
+                          disabled={isSearching}>
+                          <Text style={styles.buttonTitle}>Search</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View> */}
+                  </>
+                )
                 :
                 null
             }
             {
-              timesheetList && timesheetList.length
+              dailyTaskPlanListList && dailyTaskPlanListList.length
                 ?
                 <VirtualizedList
                   style={styles.table}
-                  data={timesheetList}
+                  data={dailyTaskPlanListList}
                   getItemCount={data => data.length}
                   getItem={(data, index) => {
                     return data[index];
@@ -261,6 +275,8 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: 2,
     alignItems: 'center',
+    borderColor: BASE_COLOR,
+    borderBottomWidth: 1,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -314,7 +330,7 @@ const styles = StyleSheet.create({
     minHeight: 20,
   },
   cellOne: {
-    flex: 1,
+    flex: 3,
     justifyContent: 'center',
   },
   cellThreeAction: {
@@ -327,7 +343,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cellThree: {
-    flex: 3,
+    flex: 7,
     justifyContent: 'center',
   },
   cellImageAction: {
@@ -428,4 +444,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EquipmentTimesheetDailyListScreen;
+export default DailyTaskPlanListScreen;

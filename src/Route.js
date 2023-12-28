@@ -134,6 +134,8 @@ import QCObservationDetailScreen from './screens/observation/QAObservationDetail
 import QCObservationImageScreen from './screens/observation/QAObservationImageScreen';
 
 //-- Equipment
+import EquipmentCameraScreen from './screens/equipment/EquipmentCameraScreen';
+import DailyTaskPlanListScreen from './screens/equipment/DailyTaskPlanListScreen';
 import WorkRequestListScreen from './screens/equipment/WorkRequestListScreen';
 import MajorEquipmentGroupCodeScreen from './screens/equipment/MajorEquipmentGroupCodeScreen';
 import MajorEquipmentEquipmentCodeScreen from './screens/equipment/MajorEquipmentEquipmentCodeScreen';
@@ -1417,7 +1419,7 @@ const EquipmentStackScreens = () => {
         component={CreateEquipmentTimesheetDailyScreen}
         options={
           {
-            title: 'Create Major Equipment Timesheet',
+            title: 'Major Equipment Timesheet',
             headerBackTitle: 'Back',
           }
         }
@@ -1428,6 +1430,26 @@ const EquipmentStackScreens = () => {
         options={
           {
             title: 'Operator List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentCamera'
+        component={EquipmentCameraScreen}
+        options={
+          {
+            title: 'QRCode Equipment',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='DailyTaskPlan'
+        component={DailyTaskPlanListScreen}
+        options={
+          {
+            title: 'Daily Task Plan',
             headerBackTitle: 'Back',
           }
         }

@@ -3,6 +3,22 @@ import Helper from '../../utils/Helper';
 
 
 //-- NEW
+export const GetDailyTaskPlanListAPI = async (equipmentCode, projectCode, facilityCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetDailyTaskPlanList'
+    + '?equipmentCode=' + equipmentCode
+    + '&projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 export const GetWorkRequestHeaderListAPI = async (documentNo, projectCode) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -75,6 +91,36 @@ export const CreateMajorEquipmentTimesheetDailyAPI = async (userUpdate, modelUpd
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ userUpdate, modelUpdate }),
+    }
+  ).then(res => res.json());
+};
+export const UpdateMajorEquipmentTimesheetDailyAPI = async (userUpdate, modelUpdate, modelColumnChange) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/UpdateMajorEquipmentTimesheetDaily',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, modelUpdate, modelColumnChange }),
+    }
+  ).then(res => res.json());
+};
+export const DeleteMajorEquipmentTimesheetDailyAPI = async (modelUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/DeleteMajorEquipmentTimesheetDaily',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ modelUpdate }),
     }
   ).then(res => res.json());
 };

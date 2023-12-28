@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance, ActivityIndicator } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance, ActivityIndicator, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Toast from 'react-native-simple-toast';
 
-// import { GetTestPackageDetailAPI, UpdateTestPackageDetailAPI } from '../../apis/piping/ConstructionAPI';
-import { CreateMajorEquipmentTimesheetDailyAPI } from '../../apis/equipment/EquipmentAPI';
+import { CreateMajorEquipmentTimesheetDailyAPI, UpdateMajorEquipmentTimesheetDailyAPI, DeleteMajorEquipmentTimesheetDailyAPI } from '../../apis/equipment/EquipmentAPI';
 
+import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
 import Networker from '../../utils/Networker';
 
@@ -17,8 +17,9 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 
 const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
 
-  const { documentNo, equipmentCode, userLogin } = route.params;
+  const { rowIndex, item, projectCode, facilityCode, documentNo, equipmentCode, userLogin } = route.params;
 
+  const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -26,6 +27,8 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
   const [columnChange, setColumnChange] = useState([]);
   const [timesheetDetail, setTimesheetDetail] = useState({
     OperatorID: null,
+    ProjectCode: projectCode,
+    FacilityCode: facilityCode,
     DocumentNo: documentNo,
     EquipmentCode: equipmentCode,
   });
@@ -38,7 +41,14 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
-            style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={_onPressDelete}>
+            <Ionicons
+              size={24}
+              name={'trash-outline'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -47,7 +57,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, isShowDescription]);
+  }, [navigation, isShowDescription, isUpdate]);
 
   const toggle = () => {
     setIsShowDescription(prevState => {
@@ -65,6 +75,14 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsUploading(false) });
   };
 
+  useEffect(
+    () => {
+      if (rowIndex) {
+        setTimesheetDetail(item);
+        setIsUpdate(true);
+      }
+    }, []
+  );
 
   const createTimesheetDetail = async () => {
     setIsUploading(true);
@@ -82,13 +100,62 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
         setIsError(true);
         setIsUploading(false);
       });
-  }
+  };
+  const updateTimesheetDetail = async () => {
+    setIsUploading(true);
+    UpdateMajorEquipmentTimesheetDailyAPI(userLogin, timesheetDetail, columnChange)
+      .then(res => {
+        setIsUploading(false);
+        if (res.Success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          setColumnChange([]);
+        } else {
+          MessageAlert('Lỗi', res.Message.toString());
+        }
+      }).catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsUploading(false);
+      });
+  };
+  const deleteTimesheetDetail = async () => {
+    DeleteMajorEquipmentTimesheetDailyAPI(timesheetDetail)
+      .then(res => {
+        setIsUploading(false);
+        if (res.Success) {
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          navigation.goBack();
+        } else {
+          MessageAlert('Lỗi', res.Message.toString());
+        }
+      }).catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsUploading(false);
+      });
+  };
   const _onPressSubmitToServer = async () => {
     if (columnChange.length == 0) {
       Toast.show('Without any data changes!', Toast.SHORT);
       return;
     }
-    callAPI(createTimesheetDetail, false);
+    if (isUpdate) {
+      callAPI(updateTimesheetDetail, false);
+    }
+    else {
+      callAPI(createTimesheetDetail, false);
+    }
+  };
+  const _onPressDelete = () => {
+    Alert.alert(
+      'Delete',
+      'Are you sure want to delete?',
+      [
+        { text: 'Cancel' },
+        { text: 'Delete', onPress: deleteTimesheetDetail, style: 'destructive' }
+      ],
+      { cancelable: false }
+    );
   };
 
   //-- Update data
@@ -99,7 +166,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     if (!date) {
       date = new Date();
     }
-    setDateDisplay(date);
+    setDateDisplay(new Date(date));
     setIsVisibleDate(true);
 
   };
@@ -108,7 +175,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
   const [dateDisplay, setDateDisplay] = useState(new Date());
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
-      timesheetDetail[keyUpdate] = selectedDate;
+      timesheetDetail[keyUpdate] = Formater.formatDateDataTime(selectedDate);
 
       //-- Save change
       if (!columnChange.includes(keyUpdate)) {
@@ -217,7 +284,9 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
-    'DocumentNo': documentNo,
+    'Project': projectCode,
+    'Facility': facilityCode,
+    'Doc. No': documentNo,
     'Equip. Code': equipmentCode,
     'Suppervisor': userLogin,
   };

@@ -319,7 +319,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
   //-- Equipment
   const _onPressManageEquipment = async () => {
     navigation.navigate(Constant.ROUTE__EQUIPMENT, {
-      screen: 'WorkRequestList',
+      screen: 'EquipmentCamera',
     });
   };
 
