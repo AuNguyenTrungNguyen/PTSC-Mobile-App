@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance, Act
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Dialog from "react-native-dialog";
 import Toast from 'react-native-simple-toast';
 
 import { CreateMajorEquipmentTimesheetDailyAPI, UpdateMajorEquipmentTimesheetDailyAPI, DeleteMajorEquipmentTimesheetDailyAPI } from '../../apis/equipment/EquipmentAPI';
@@ -40,13 +41,16 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
-            onPress={_onPressDelete}>
-            <Ionicons
-              size={24}
-              name={'trash-outline'} color={iconColor} />
-          </TouchableOpacity>
+          {
+            rowIndex &&
+            <TouchableOpacity
+              style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+              onPress={_onPressDelete}>
+              <Ionicons
+                size={24}
+                name={'trash-outline'} color={iconColor} />
+            </TouchableOpacity>
+          }
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -160,6 +164,10 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
 
   //-- Update data
   const [keyUpdate, setKeyUpdate] = useState('');
+
+  //-- Date
+  const [isVisibleDate, setIsVisibleDate] = useState(false);
+  const [dateDisplay, setDateDisplay] = useState(new Date());
   const _onSelectDate = key => {
     setKeyUpdate(key);
     var date = timesheetDetail[key];
@@ -168,11 +176,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     }
     setDateDisplay(new Date(date));
     setIsVisibleDate(true);
-
   };
-
-  const [isVisibleDate, setIsVisibleDate] = useState(false);
-  const [dateDisplay, setDateDisplay] = useState(new Date());
   const _onChangeDate = (selectedDate) => {
     if (selectedDate != undefined) {
       timesheetDetail[keyUpdate] = Formater.formatDateDataTime(selectedDate);
@@ -185,6 +189,65 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     setIsVisibleDate(false);
   };
 
+  //-- Number
+  const [isVisibleNumber, setIsVisibleNumber] = useState(false);
+  const [numberDisplay, setNumberDisplay] = useState('');
+  const _onPressSelectNumber = (key) => {
+    setKeyUpdate(key);
+    var value = timesheetDetail[key];
+    if (value) {
+      value = value.toString();
+    } else {
+      value = '';
+    }
+    setNumberDisplay(value);
+    setIsVisibleNumber(true);
+  };
+  const _onChangeNumber = () => {
+    let value = numberDisplay.replace(/,/g, '.');
+    setNumberDisplay(value);
+    if (!Helper.checkFormatNegativeNumber(value)) {
+      Toast.show('Please enter ' + keyUpdate + ' must be a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    timesheetDetail[keyUpdate] = value;
+
+    //-- Save change
+    if (!columnChange.includes(keyUpdate)) {
+      columnChange.push(keyUpdate);
+    }
+    setIsVisibleNumber(false);
+  };
+
+  //-- Text
+  const [isVisibleText, setIsVisibleText] = useState(false);
+  const [textDisplay, setTextDisplay] = useState('');
+  const _onPressSelectText = (key) => {
+    setKeyUpdate(key);
+    var value = timesheetDetail[key];
+    if (value) {
+      value = value.toString();
+    } else {
+      value = '';
+    }
+    setTextDisplay(value);
+    setIsVisibleText(true);
+  };
+  const _onChangeText = () => {
+    const text = textDisplay.trim();
+    setTextDisplay(text);
+
+    timesheetDetail[keyUpdate] = text;
+
+    //-- Save change
+    if (!columnChange.includes(keyUpdate)) {
+      columnChange.push(keyUpdate);
+    }
+    setIsVisibleText(false);
+  };
+
+  //-- Operator
   const _onSelectOperator = key => {
     setKeyUpdate(key);
     navigation.navigate(
@@ -212,6 +275,10 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     const isPlanFinishDate = columnChange.includes('PlanFinishDate');
     const isActualStartDate = columnChange.includes('ActualStartDate');
     const isActualFinishDate = columnChange.includes('ActualFinishDate');
+    const isStartKms = columnChange.includes('Start_kms');
+    const isFinishKms = columnChange.includes('Finish_kms');
+    const isWastedMinutes = columnChange.includes('Wasted_minutes');
+    const isWastedCause = columnChange.includes('WastedCause');
     return (
       <View style={styles.table}>
         {
@@ -259,6 +326,42 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('ActualFinishDate')}>
                     <Text style={isActualFinishDate ? styles.textGreen : styles.textAction}>{Formater.formatDateDataTime(timesheetDetail.ActualFinishDate)}</Text>
                     <FontAwesomeIcon style={styles.iconAction} name='calendar' size={20} color={isActualFinishDate ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>Kms Start:</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Start_kms')}>
+                    <Text style={isStartKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Start_kms)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isStartKms ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>Kms Finish:</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Finish_kms')}>
+                    <Text style={isFinishKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Finish_kms)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFinishKms ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>Wasted Minute:</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Wasted_minutes')}>
+                    <Text style={isWastedMinutes ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Wasted_minutes)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isWastedMinutes ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>Wasted Cause:</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectText('WastedCause')}>
+                    <Text style={isWastedCause ? styles.textGreen : styles.textAction}>{Formater.formatEmptyData(timesheetDetail.WastedCause)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isWastedCause ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -313,6 +416,29 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
         onConfirm={_onChangeDate}
         onCancel={() => { setIsVisibleDate(false) }}
       />
+      <Dialog.Container visible={isVisibleNumber}>
+        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+        <Dialog.Input
+          value={numberDisplay}
+          placeholder={'Enter ' + keyUpdate}
+          onChangeText={(text) => setNumberDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+          keyboardType={'numeric'}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleNumber(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeNumber} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleText}>
+        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+        <Dialog.Input
+          value={textDisplay}
+          placeholder={'Enter ' + keyUpdate}
+          onChangeText={(text) => setTextDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleText(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeText} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };

@@ -170,6 +170,38 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
             <Text style={styles.textData}>{Formater.formatDateDataTime(item.ActualFinishDate)}</Text>
           </View>
         </View>
+        <View style={styles.row}>
+          <View style={styles.cellTwo}>
+            <Text>Kms Start:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.Start_kms)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTwo}>
+            <Text>Kms Finish:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.Finish_kms)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTwo}>
+            <Text>Wasted Minute:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.Wasted_minutes)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTwo}>
+            <Text>Wasted Cause:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.WastedCause)}</Text>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
