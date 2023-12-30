@@ -8,7 +8,7 @@ import Networker from '../../utils/Networker';
 
 import { GetDailyTaskPlanListAPI } from '../../apis/equipment/EquipmentAPI';
 
-import { ListSelectData, ListLoadingData, ListEmptyData } from '../../components/HelperUI';
+import { ListLoadingData, ListEmptyData } from '../../components/HelperUI';
 import LoadingRefresh from '../../components/LoadingRefresh';
 import Header from '../../components/Header';
 
@@ -101,6 +101,9 @@ const DailyTaskPlanListScreen = ({ route, navigation }) => {
         equipmentCode: equipmentCode,
         documentNo: item.DocumentNo,
         userLogin: userLogin,
+        planStart: Formater.formatDateDataTime(item.RequestPlanStart),
+        planFinish: Formater.formatDateDataTime(item.RequestPlanEnd),
+        constructionSupervisor: item.ConstructionContactTeam,
       }
     );
   };
@@ -109,6 +112,14 @@ const DailyTaskPlanListScreen = ({ route, navigation }) => {
   const renderItem = ({ _, item }) => {
     return (
       <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>{'Cons\nSupervisor:'}</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.ConstructionContactTeam)}</Text>
+          </View>
+        </View>
         <View style={styles.row}>
           <View style={styles.cellOne}>
             <Text>Project:</Text>
@@ -133,12 +144,28 @@ const DailyTaskPlanListScreen = ({ route, navigation }) => {
             <Text style={styles.textData}>{Formater.formatEmptyData(item.DocumentNo)}</Text>
           </View>
         </View>
-        <View style={styles.row}>
+        {/* <View style={styles.row}>
           <View style={styles.cellOne}>
             <Text>Doc. Date:</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatDateData(item.DocumentDate)}</Text>
+          </View>
+        </View> */}
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>Plan Start:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatDateDataTime(item.RequestPlanStart)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>Plan Finish:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatDateDataTime(item.RequestPlanEnd)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -156,8 +183,6 @@ const DailyTaskPlanListScreen = ({ route, navigation }) => {
     {
       if (isSearching) {
         return <ListLoadingData />
-      } else if (!dailyTaskPlanListList) {
-        return <ListSelectData title={'Please enter DocumentNo'} />
       } else {
         return <ListEmptyData />
       }

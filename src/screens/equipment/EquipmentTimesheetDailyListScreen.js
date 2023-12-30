@@ -14,7 +14,7 @@ import Header from '../../components/Header';
 
 const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, documentNo, equipmentCode, userLogin } = route.params;
+  const { projectCode, facilityCode, documentNo, equipmentCode, userLogin, planStart, planFinish, constructionSupervisor } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -99,7 +99,10 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         facilityCode: facilityCode,
         equipmentCode: equipmentCode,
         documentNo: documentNo,
-        userLogin: userLogin
+        userLogin: userLogin,
+        planStart: planStart,
+        planFinish: planFinish,
+        constructionSupervisor: constructionSupervisor,
       }
     );
   };
@@ -113,7 +116,8 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         facilityCode: facilityCode,
         equipmentCode: equipmentCode,
         documentNo: documentNo,
-        userLogin: userLogin
+        userLogin: userLogin,
+        constructionSupervisor: constructionSupervisor,
       }
     );
   };
@@ -172,7 +176,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>Kms Start:</Text>
+            <Text>{'Kms/Hours\nStart:'}</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Start_kms)}</Text>
@@ -180,7 +184,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>Kms Finish:</Text>
+            <Text>{'Kms/Hours\nFinish:'}</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Finish_kms)}</Text>
@@ -216,11 +220,13 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
+    'Cons\nSupervisor': constructionSupervisor,
     'Project': projectCode,
     'Facility': facilityCode,
     'Doc. No': documentNo,
     'Equip. Code': equipmentCode,
-    'Suppervisor': userLogin,
+    'Plan Start': planStart,
+    'Plan Finish': planFinish,
   };
 
   return (

@@ -18,7 +18,7 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 
 const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
 
-  const { rowIndex, item, projectCode, facilityCode, documentNo, equipmentCode, userLogin } = route.params;
+  const { rowIndex, item, projectCode, facilityCode, documentNo, equipmentCode, userLogin, planStart, planFinish, constructionSupervisor } = route.params;
 
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,11 +27,13 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
 
   const [columnChange, setColumnChange] = useState([]);
   const [timesheetDetail, setTimesheetDetail] = useState({
-    OperatorID: null,
+    OperatorID: userLogin,
     ProjectCode: projectCode,
     FacilityCode: facilityCode,
     DocumentNo: documentNo,
     EquipmentCode: equipmentCode,
+    PlanStartDate: planStart,
+    PlanFinishDate: planFinish,
   });
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
@@ -287,28 +289,34 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Operator:</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectOperator('OperatorID')}>
+                  <View style={styles.containerAction}
+                  // onPress={() => _onSelectOperator('OperatorID')}
+                  >
                     <Text style={isOperatorID ? styles.textGreen : styles.textAction}>{Formater.formatEmptyData(timesheetDetail.OperatorID)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isOperatorID ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                    {/* <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isOperatorID ? EDITING_COLOR : BASE_COLOR} /> */}
+                  </View>
                 </View>
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Plan Start:</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('PlanStartDate')}>
+                  <View style={styles.containerAction}
+                  // onPress={() => _onSelectDate('PlanStartDate')}
+                  >
                     <Text style={isPlanStartDate ? styles.textGreen : styles.textAction}>{Formater.formatDateDataTime(timesheetDetail.PlanStartDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='calendar' size={20} color={isPlanStartDate ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                    {/* <FontAwesomeIcon style={styles.iconAction} name='calendar' size={20} color={isPlanStartDate ? EDITING_COLOR : BASE_COLOR} /> */}
+                  </View>
                 </View>
               </View>
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Plan Finish:</Text>
                 <View style={styles.cellData}>
-                  <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('PlanFinishDate')}>
+                  <View style={styles.containerAction}
+                  // onPress={() => _onSelectDate('PlanFinishDate')}
+                  >
                     <Text style={isPlanFinishDate ? styles.textGreen : styles.textAction}>{Formater.formatDateDataTime(timesheetDetail.PlanFinishDate)}</Text>
-                    <FontAwesomeIcon style={styles.iconAction} name='calendar' size={20} color={isPlanFinishDate ? EDITING_COLOR : BASE_COLOR} />
-                  </TouchableOpacity>
+                    {/* <FontAwesomeIcon style={styles.iconAction} name='calendar' size={20} color={isPlanFinishDate ? EDITING_COLOR : BASE_COLOR} /> */}
+                  </View>
                 </View>
               </View>
               <View style={styles.row}>
@@ -330,7 +338,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text style={styles.cellTitle}>Kms Start:</Text>
+                <Text>{'Kms/Hours\nStart:'}</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Start_kms')}>
                     <Text style={isStartKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Start_kms)}</Text>
@@ -339,7 +347,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text style={styles.cellTitle}>Kms Finish:</Text>
+                <Text>{'Kms/Hours\nFinish:'}</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Finish_kms')}>
                     <Text style={isFinishKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Finish_kms)}</Text>
@@ -387,11 +395,12 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
   };
 
   const headerData = {
+    'Cons\nSupervisor': constructionSupervisor,
     'Project': projectCode,
     'Facility': facilityCode,
     'Doc. No': documentNo,
     'Equip. Code': equipmentCode,
-    'Suppervisor': userLogin,
+    // 'Suppervisor': userLogin,
   };
 
   return (
