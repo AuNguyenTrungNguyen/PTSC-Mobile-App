@@ -4,6 +4,9 @@ import { useIsFocused } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import NetInfo from '@react-native-community/netinfo';
+
+import { GetEquipmentNotifyNumberAPI } from '../../../apis/equipment/EquipmentAPI';
 
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
@@ -13,6 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 const HomeCONSScreen = ({ route, navigation }) => {
 
   const { projectCode, disciplineCode } = route.params;
+  const [notifyEquipmentNumbers, setNotifyEquipmentNumbers] = useState({ Pending: 0 });
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -32,9 +36,38 @@ const HomeCONSScreen = ({ route, navigation }) => {
 
   useEffect(
     () => {
-      // callAPI(getNotifyNumber);
+      callAPI(getEquipmentNotifyNumbers);
     }, [isFocused]
   );
+  const callAPI = executedAPI => {
+    NetInfo.fetch().then(state => {
+      if (!state.isConnected) {
+        setIsLoading(false);
+        setIsError(true);
+        MessageAlert('WARNING', 'Network not available!');
+      } else {
+        executedAPI();
+      }
+    });
+  };
+  const getEquipmentNotifyNumbers = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    GetEquipmentNotifyNumberAPI(userLogin)
+      .then(res => {
+        if (res.Success && res.Data) {
+          setNotifyEquipmentNumbers(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
 
   const _onPressLogout = () => {
     Alert.alert(
@@ -195,11 +228,33 @@ const HomeCONSScreen = ({ route, navigation }) => {
 
   //-- Equipment
   const _onPressManageEquipment = async () => {
+    Alert.alert(
+      '',
+      'Daily Task: Create Timesheet Daily Task\n\nApprove Timesheet: Approve Timesheet Daily Task',
+      [
+        { text: 'Daily Task', onPress: _onPressEquipmentDaily },
+        { text: 'Approve Timesheet', onPress: _onPressEquipmentApprove },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressEquipmentDaily = () => {
     navigation.navigate(Constant.ROUTE__EQUIPMENT, {
       screen: 'EquipmentCamera',
     });
   };
-
+  const _onPressEquipmentApprove = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentTimesheetApproveList',
+      params: {
+        userLogin: userLogin,
+      }
+    });
+  };
 
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -272,7 +327,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
               <RenderItemBox title={'Cable\nDamage Log'} onPress={_onElectricalCableDamage} iconName='relation-only-one-to-zero-or-one' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} />
+              <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} number={notifyEquipmentNumbers.Pending} />
               <RenderItemBox disable={true} />
             </View>
           </ScrollView>

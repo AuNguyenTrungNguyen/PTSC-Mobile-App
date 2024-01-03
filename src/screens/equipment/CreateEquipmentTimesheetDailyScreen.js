@@ -18,7 +18,7 @@ import LoadingRefresh from '../../components/LoadingRefresh';
 
 const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
 
-  const { rowIndex, item, projectCode, facilityCode, documentNo, equipmentCode, userLogin, planStart, planFinish, constructionSupervisor } = route.params;
+  const { taskID, rowIndex, item, projectCode, facilityCode, documentNo, equipmentCode, userLogin, planStart, planFinish, constructionSupervisor, constructionSupervisorID } = route.params;
 
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,9 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
 
   const [columnChange, setColumnChange] = useState([]);
   const [timesheetDetail, setTimesheetDetail] = useState({
+    TaskID: taskID,
     OperatorID: userLogin,
+    SuppervisorID: constructionSupervisorID,
     ProjectCode: projectCode,
     FacilityCode: facilityCode,
     DocumentNo: documentNo,
@@ -98,6 +100,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
         if (res.Success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setColumnChange([]);
+          navigation.goBack();
         } else {
           MessageAlert('Lỗi', res.Message.toString());
         }
@@ -115,6 +118,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
         if (res.Success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setColumnChange([]);
+          navigation.goBack();
         } else {
           MessageAlert('Lỗi', res.Message.toString());
         }

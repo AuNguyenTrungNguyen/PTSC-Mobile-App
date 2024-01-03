@@ -14,7 +14,7 @@ import Header from '../../components/Header';
 
 const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, documentNo, equipmentCode, userLogin, planStart, planFinish, constructionSupervisor } = route.params;
+  const { taskID, projectCode, facilityCode, documentNo, equipmentCode, userLogin, planStart, planFinish, constructionSupervisor, constructionSupervisorID } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -70,7 +70,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
 
 
   async function getTimesheetList() {
-    GetMajorEquipmentTimesheetDailyListAPI(documentNo, equipmentCode)
+    GetMajorEquipmentTimesheetDailyListAPI(taskID)
       .then(res => {
         if (res.Success && res.Data) {
           setTimesheetList(res.Data);
@@ -95,6 +95,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
     navigation.navigate(
       'CreateEquipmentTimesheetDaily',
       {
+        taskID: taskID,
         projectCode: projectCode,
         facilityCode: facilityCode,
         equipmentCode: equipmentCode,
@@ -103,6 +104,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         planStart: planStart,
         planFinish: planFinish,
         constructionSupervisor: constructionSupervisor,
+        constructionSupervisorID: constructionSupervisorID,
       }
     );
   };
@@ -110,6 +112,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
     navigation.navigate(
       'CreateEquipmentTimesheetDaily',
       {
+        // taskID: taskID,
         rowIndex: item.RowIndex,
         item: item,
         projectCode: projectCode,
@@ -118,6 +121,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         documentNo: documentNo,
         userLogin: userLogin,
         constructionSupervisor: constructionSupervisor,
+        // constructionSupervisorID: constructionSupervisorID,
       }
     );
   };

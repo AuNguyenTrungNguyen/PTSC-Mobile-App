@@ -3,6 +3,34 @@ import Helper from '../../utils/Helper';
 
 
 //-- NEW
+export const GetEquipmentNotifyNumberAPI = async (userLogin) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetEquipmentNotifyNumber'
+    + '?userLogin=' + userLogin,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const CheckSupervisorPermissionAPI = async (userLogin) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/CheckSupervisorPermission'
+    + '?userLogin=' + userLogin,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 export const GetDailyTaskPlanListAPI = async (equipmentCode, projectCode, facilityCode) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -64,13 +92,12 @@ export const GetMajorEquipmentEquipmentCodeListAPI = async (groupCode, equipment
     }
   ).then(res => res.json());
 };
-export const GetMajorEquipmentTimesheetDailyListAPI = async (documentNo, equipmentCode) => {
+export const GetMajorEquipmentTimesheetDailyListAPI = async (id) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/Equipment/GetMajorEquipmentTimesheetDailyList'
-    + '?documentNo=' + documentNo
-    + '&equipmentCode=' + equipmentCode,
+    + '?id=' + id,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -139,6 +166,40 @@ export const GetMajorEquipmentUserListAPI = async (code, name) => {
     }
   ).then(res => res.json());
 };
+
+export const GetMajorEquipmentTimesheetApproveListAPI = async (userLogin, type, date) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetMajorEquipmentTimesheetApproveList'
+    + '?userLogin=' + userLogin
+    + '&type=' + type
+    + '&date=' + date,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateMajorEquipmentTimesheetApproveListAPI = async (userUpdate, listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/UpdateMajorEquipmentTimesheetApproveList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+
+
 
 //-- OLD
 export const GetEquipmentListAPI = async code => {

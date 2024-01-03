@@ -136,6 +136,7 @@ import QCObservationImageScreen from './screens/observation/QAObservationImageSc
 //-- Equipment
 import EquipmentCameraScreen from './screens/equipment/EquipmentCameraScreen';
 import DailyTaskPlanListScreen from './screens/equipment/DailyTaskPlanListScreen';
+import EquipmentTimesheetApproveListScreen from './screens/equipment/EquipmentTimesheetApproveListScreen';
 import WorkRequestListScreen from './screens/equipment/WorkRequestListScreen';
 import MajorEquipmentGroupCodeScreen from './screens/equipment/MajorEquipmentGroupCodeScreen';
 import MajorEquipmentEquipmentCodeScreen from './screens/equipment/MajorEquipmentEquipmentCodeScreen';
@@ -1450,6 +1451,16 @@ const EquipmentStackScreens = () => {
         options={
           {
             title: 'Daily Task Plan',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentTimesheetApproveList'
+        component={EquipmentTimesheetApproveListScreen}
+        options={
+          {
+            title: 'Timesheet Approve List',
             headerBackTitle: 'Back',
           }
         }

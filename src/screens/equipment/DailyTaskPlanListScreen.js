@@ -96,6 +96,7 @@ const DailyTaskPlanListScreen = ({ route, navigation }) => {
     navigation.navigate(
       'EquipmentTimesheetDailyList',
       {
+        taskID: item.Id,
         projectCode: item.ProjectCode,
         facilityCode: item.FacilityCode,
         equipmentCode: equipmentCode,
@@ -104,6 +105,7 @@ const DailyTaskPlanListScreen = ({ route, navigation }) => {
         planStart: Formater.formatDateDataTime(item.RequestPlanStart),
         planFinish: Formater.formatDateDataTime(item.RequestPlanEnd),
         constructionSupervisor: item.ConstructionContactTeam,
+        constructionSupervisorID: item.ConstructionContactID,
       }
     );
   };

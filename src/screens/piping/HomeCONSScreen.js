@@ -10,6 +10,7 @@ import Helper from '../../utils/Helper';
 import Constant from '../../utils/Constant';
 
 import { GetPIPNotifyNumberAPI } from '../../apis/app/AppAPI';
+import { GetEquipmentNotifyNumberAPI } from '../../apis/equipment/EquipmentAPI';
 
 import LoadingRefresh from '../../components/LoadingRefresh';
 import Header from '../../components/Header';
@@ -19,6 +20,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
 
   const { projectCode, subContractor, disciplineCode } = route.params;
   const [notifyNumbers, setNotifyNumbers] = useState({ FitUp: 0, Visual: 0, DimCutting: 0 });
+  const [notifyEquipmentNumbers, setNotifyEquipmentNumbers] = useState({ Pending: 0 });
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -39,6 +41,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
   useEffect(
     () => {
       callAPI(getNotifyNumbers);
+      callAPI(getEquipmentNotifyNumbers);
     }, [isFocused]
   );
   const callAPI = executedAPI => {
@@ -53,6 +56,24 @@ const HomeCONSScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.Success && res.Data) {
           setNotifyNumbers(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+      });
+  };
+  const getEquipmentNotifyNumbers = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    GetEquipmentNotifyNumberAPI(userLogin)
+      .then(res => {
+        if (res.Success && res.Data) {
+          setNotifyEquipmentNumbers(res.Data);
           setIsLoading(false);
           setIsError(false);
         } else {
@@ -318,8 +339,31 @@ const HomeCONSScreen = ({ route, navigation }) => {
 
   //-- Equipment
   const _onPressManageEquipment = async () => {
+    Alert.alert(
+      '',
+      'Daily Task: Create Timesheet Daily Task\n\nApprove Timesheet: Approve Timesheet Daily Task',
+      [
+        { text: 'Daily Task', onPress: _onPressEquipmentDaily },
+        { text: 'Approve Timesheet', onPress: _onPressEquipmentApprove },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onPressEquipmentDaily = () => {
     navigation.navigate(Constant.ROUTE__EQUIPMENT, {
       screen: 'EquipmentCamera',
+    });
+  };
+  const _onPressEquipmentApprove = async () => {
+    const userLogin = await Helper.getData('USERNAME');
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentTimesheetApproveList',
+      params: {
+        userLogin: userLogin,
+      }
     });
   };
 
@@ -473,7 +517,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Pipe Spool\nControl'} onPress={_onPressPipeSpool} />
-                <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} />
+                <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} number={notifyEquipmentNumbers.Pending} />
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'Cons Manage\nGRE'} onPress={_onPressManageConsGRE} />
