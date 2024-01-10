@@ -166,6 +166,20 @@ export const GetMajorEquipmentUserListAPI = async (code, name) => {
     }
   ).then(res => res.json());
 };
+export const GetEquipmentDataControlListAPI = async (equipmentCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetEquipmentDataControlList'
+    + '?equipmentCode=' + equipmentCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 export const GetMajorEquipmentTimesheetApproveListAPI = async (userLogin, type, date) => {
   const token = await Helper.getData('TOKEN');

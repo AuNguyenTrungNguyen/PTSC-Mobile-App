@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
-import NetInfo from '@react-native-community/netinfo';
-
-import { GetEquipmentDetailAPI } from '../../apis/equipment/EquipmentAPI';
+import Constant from '../../utils/Constant';
 
 const EquipmentCameraScreen = ({ route, navigation }) => {
 
+  const { source } = route.params;
   const [isScanned, setIsScanned] = useState(false);
 
   useEffect(() => {
@@ -24,10 +23,15 @@ const EquipmentCameraScreen = ({ route, navigation }) => {
   };
 
   const _onGoDetail = async code => {
-    navigation.navigate('DailyTaskPlan', {
+    var sceen = 'DailyTaskPlan';
+    if (source == Constant.CAMERA_EQUIPMENT_STATUS) {
+      sceen = 'EquipmentDataControlList'
+    }
+    navigation.navigate(sceen, {
       equipmentCode: code,
     });
   };
+
   // const _onGoDetail = async code => {
   //   NetInfo.fetch().then(state => {
   //     if (!state.isConnected) {
@@ -55,26 +59,26 @@ const EquipmentCameraScreen = ({ route, navigation }) => {
   //   });
   // };
 
-  const showComfirm = (type, message) => {
-    Alert.alert(
-      type,
-      message,
-      [
-        {
-          text: 'Back',
-          onPress: () => {
-            navigation.goBack();
-          },
-          style: 'cancel'
-        },
-        {
-          text: 'Rescan',
-          onPress: () => { setIsScanned(false) }
-        }
-      ],
-      { cancelable: false },
-    );
-  };
+  // const showComfirm = (type, message) => {
+  //   Alert.alert(
+  //     type,
+  //     message,
+  //     [
+  //       {
+  //         text: 'Back',
+  //         onPress: () => {
+  //           navigation.goBack();
+  //         },
+  //         style: 'cancel'
+  //       },
+  //       {
+  //         text: 'Rescan',
+  //         onPress: () => { setIsScanned(false) }
+  //       }
+  //     ],
+  //     { cancelable: false },
+  //   );
+  // };
 
   return (
     <SafeAreaView style={styles.safeArea}>

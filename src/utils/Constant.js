@@ -36,6 +36,7 @@ export default class Constant {
   static CAMERA_PIP_CONS_DIM = 'CAMERA_PIP_CONS_DIM';
   static CAMERA_PIP_CONS = 'CAMERA_PIP_CONS';
   static CAMERA_PIP_QC = 'CAMERA_PIP_QC';
+  static CAMERA_EQUIPMENT_STATUS = 'CAMERA_EQUIPMENT_STATUS';
 
   //-- IMAGE ROLE
   static IMAGE_ROLE_CONS = 'CONS';

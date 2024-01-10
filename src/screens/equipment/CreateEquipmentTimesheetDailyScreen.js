@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Appearance, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -286,7 +286,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     const isWastedMinutes = columnChange.includes('Wasted_minutes');
     const isWastedCause = columnChange.includes('WastedCause');
     return (
-      <View style={styles.table}>
+      <ScrollView style={styles.table}>
         {
           <>
             <View style={styles.box} pointerEvents={isUploading ? 'none' : 'auto'}>
@@ -394,7 +394,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
             </View>
           </>
         }
-      </View>
+      </ScrollView>
     );
   };
 

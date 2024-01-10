@@ -28,6 +28,13 @@ export default class Formater {
       return '0';
     }
   }
+  static formatThousand = number => {
+    try {
+      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    } catch {
+      return '0';
+    }
+  }
 
   static formatDateSQL = data => {
     return Moment(data).format("YYYY-MM-DD HH:mm:ss");

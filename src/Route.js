@@ -143,6 +143,7 @@ import MajorEquipmentEquipmentCodeScreen from './screens/equipment/MajorEquipmen
 import EquipmentTimesheetDailyListScreen from './screens/equipment/EquipmentTimesheetDailyListScreen';
 import CreateEquipmentTimesheetDailyScreen from './screens/equipment/CreateEquipmentTimesheetDailyScreen';
 import MajorEquipmentUserListScreen from './screens/equipment/MajorEquipmentUserListScreen';
+import EquipmentDataControlListScreen from './screens/equipment/EquipmentDataControlListScreen';
 import EquipmentLiftingPlanListScreen from './screens/equipment/EquipmentLiftingPlanListScreen';
 import EquipmentLiftingPlanDetailScreen from './screens/equipment/EquipmentLiftingPlanDetailScreen';
 
@@ -1461,6 +1462,16 @@ const EquipmentStackScreens = () => {
         options={
           {
             title: 'Timesheet Approve List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentDataControlList'
+        component={EquipmentDataControlListScreen}
+        options={
+          {
+            title: 'Equipment Status',
             headerBackTitle: 'Back',
           }
         }

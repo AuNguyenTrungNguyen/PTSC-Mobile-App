@@ -433,10 +433,11 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPressManageEquipment = async () => {
     Alert.alert(
       '',
-      'Daily Task: Create Timesheet Daily Task\n\nApprove Timesheet: Approve Timesheet Daily Task',
+      'Daily Task: Create Timesheet Daily Task\n\nApprove Timesheet: Approve Timesheet Daily Task\n\nEquipment Status: Check Equipment Cert and Inspection',
       [
         { text: 'Daily Task', onPress: _onPressEquipmentDaily },
         { text: 'Approve Timesheet', onPress: _onPressEquipmentApprove },
+        { text: 'Equipment Status', onPress: _onPressEquipmentStatus },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -447,6 +448,9 @@ const HomeScreenCONS = ({ route, navigation }) => {
   const _onPressEquipmentDaily = () => {
     navigation.navigate(Constant.ROUTE__EQUIPMENT, {
       screen: 'EquipmentCamera',
+      params: {
+        source: '',
+      }
     });
   };
   const _onPressEquipmentApprove = async () => {
@@ -455,6 +459,14 @@ const HomeScreenCONS = ({ route, navigation }) => {
       screen: 'EquipmentTimesheetApproveList',
       params: {
         userLogin: userLogin,
+      }
+    });
+  };
+  const _onPressEquipmentStatus = () => {
+    navigation.navigate(Constant.ROUTE__EQUIPMENT, {
+      screen: 'EquipmentCamera',
+      params: {
+        source: Constant.CAMERA_EQUIPMENT_STATUS,
       }
     });
   };
