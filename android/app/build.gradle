@@ -130,7 +130,7 @@ android {
     }
 
     defaultConfig {
-        // applicationId "com.ptsc.pms.android"
+        // applicationId "rn.mobile.pms.ptsc.com"
         applicationId "rn.mobile.pms.ptscmc.com"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
