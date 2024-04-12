@@ -342,7 +342,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text>{'Kms/Hours\nStart:'}</Text>
+                <Text>{'Kms(Hours)\nStart:'}</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Start_kms')}>
                     <Text style={isStartKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Start_kms)}</Text>
@@ -351,7 +351,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text>{'Kms/Hours\nFinish:'}</Text>
+                <Text>{'Kms(Hours)\nFinish:'}</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Finish_kms')}>
                     <Text style={isFinishKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Finish_kms)}</Text>

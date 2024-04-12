@@ -180,7 +180,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>{'Kms/Hours\nStart:'}</Text>
+            <Text>{'Kms(Hours)\nStart:'}</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Start_kms)}</Text>
@@ -188,7 +188,7 @@ const EquipmentTimesheetDailyListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>{'Kms/Hours\nFinish:'}</Text>
+            <Text>{'Kms(Hours)\nFinish:'}</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Finish_kms)}</Text>
