@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, Alert } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Text, Appearance, TouchableOpacity } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import Constant from '../../utils/Constant';
 
 const EquipmentCameraScreen = ({ route, navigation }) => {
@@ -15,6 +17,17 @@ const EquipmentCameraScreen = ({ route, navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
+  let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={_onSearch} style={{ paddingRight: 16 }}>
+          <Ionicons name='search-outline' size={24} color={colorIcon} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   const _onQRCodeRead = scanResult => {
     if (!isScanned) {
       setIsScanned(true);
@@ -22,12 +35,22 @@ const EquipmentCameraScreen = ({ route, navigation }) => {
     }
   };
 
-  const _onGoDetail = async code => {
-    var sceen = 'DailyTaskPlan';
+  const _onSearch = async () => {
+    var screen = 'DailyTaskPlan';
     if (source == Constant.CAMERA_EQUIPMENT_STATUS) {
-      sceen = 'EquipmentDataControlList'
+      screen = 'EquipmentDataControlList'
     }
-    navigation.navigate(sceen, {
+    navigation.navigate('EquipmentList', {
+      screen: screen,
+    });
+  };
+
+  const _onGoDetail = async code => {
+    var screen = 'DailyTaskPlan';
+    if (source == Constant.CAMERA_EQUIPMENT_STATUS) {
+      screen = 'EquipmentDataControlList'
+    }
+    navigation.navigate(screen, {
       equipmentCode: code,
     });
   };
@@ -107,6 +130,7 @@ const EquipmentCameraScreen = ({ route, navigation }) => {
     </SafeAreaView>
   );
 }
+const BASE_COLOR = '#344955';
 const BASE_BORDER_SIZE = 3;
 const styles = StyleSheet.create({
   safeArea: {

@@ -283,6 +283,8 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
     const isActualFinishDate = columnChange.includes('ActualFinishDate');
     const isStartKms = columnChange.includes('Start_kms');
     const isFinishKms = columnChange.includes('Finish_kms');
+    const isStartHours = columnChange.includes('Start_hours');
+    const isFinishHours = columnChange.includes('Finish_hours');
     const isWastedMinutes = columnChange.includes('Wasted_minutes');
     const isWastedCause = columnChange.includes('WastedCause');
     return (
@@ -342,7 +344,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text>{'Kms(Hours)\nStart:'}</Text>
+                <Text>{'Kms Start:'}</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Start_kms')}>
                     <Text style={isStartKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Start_kms)}</Text>
@@ -351,7 +353,7 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text>{'Kms(Hours)\nFinish:'}</Text>
+                <Text>{'Kms Finish:'}</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Finish_kms')}>
                     <Text style={isFinishKms ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Finish_kms)}</Text>
@@ -360,7 +362,25 @@ const CreateEquipmentTimesheetDailyScreen = ({ route, navigation }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <Text style={styles.cellTitle}>Wasted Minute:</Text>
+                <Text>{'Hours Start:'}</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Start_hours')}>
+                    <Text style={isStartHours ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Start_hours)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isStartHours ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text>{'Hours Finish:'}</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Finish_hours')}>
+                    <Text style={isFinishHours ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Finish_hours)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isFinishHours ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>Wasted Time (min):</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onPressSelectNumber('Wasted_minutes')}>
                     <Text style={isWastedMinutes ? styles.textGreen : styles.textAction}>{Formater.formatTwoDigits(timesheetDetail.Wasted_minutes)}</Text>

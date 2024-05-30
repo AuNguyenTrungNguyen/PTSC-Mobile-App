@@ -6,19 +6,21 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Formater from '../../utils/Formater';
 import Networker from '../../utils/Networker';
 
-import { GetEquipmentListAPI } from '../../apis/equipment/EquipmentAPI';
+import { GetMajorEquipmentListAPI } from '../../apis/equipment/EquipmentAPI';
 
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../components/HelperUI';
 import LoadingRefresh from '../../components/LoadingRefresh';
 
-const EquipmentListScreen = ({ _, navigation }) => {
+const EquipmentListScreen = ({ route, navigation }) => {
 
+  const { screen } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [equipmentcode, setEquipmentCode] = useState('');
+  const [code, setCode] = useState('');
+  const [name, setName] = useState('');
   const [equipmentList, setEquipmentList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
@@ -58,7 +60,7 @@ const EquipmentListScreen = ({ _, navigation }) => {
     callAPI(getEquipmentList);
   };
   async function getEquipmentList() {
-    GetEquipmentListAPI(equipmentcode)
+    GetMajorEquipmentListAPI(code, name)
       .then(res => {
         if (res.Success && res.Data) {
           setEquipmentList(res.Data);
@@ -78,16 +80,18 @@ const EquipmentListScreen = ({ _, navigation }) => {
       });
   };
   const _onChangeCode = no => {
-    setEquipmentCode(no);
+    setCode(no);
+  };
+  const _onChangeName = des => {
+    setName(des);
   };
 
   //-- Detail
   const _onPressDetail = async item => {
     navigation.navigate(
-      'EquipmentDetail',
+      screen,
       {
-        code: item.EquipmentCode,
-        category: item.EquipmentCategory,
+        equipmentCode: item.EquipmentCode,
       }
     );
   };
@@ -98,7 +102,7 @@ const EquipmentListScreen = ({ _, navigation }) => {
       <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
         <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text>Code:</Text>
+            <Text>Equip. Code:</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatEmptyData(item.EquipmentCode)}</Text>
@@ -106,10 +110,18 @@ const EquipmentListScreen = ({ _, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text>Category:</Text>
+            <Text>Equip. Name:</Text>
           </View>
           <View style={styles.cellThree}>
-            <Text style={styles.textData}>{Formater.formatEmptyData(item.EquipmentCategory)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.EquipmentName)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>Equip. Des:</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.EquipmentDescription)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -120,7 +132,7 @@ const EquipmentListScreen = ({ _, navigation }) => {
       if (isSearching) {
         return <ListLoadingData />
       } else if (!equipmentList) {
-        return <ListSelectData title={'Please enter Equipment Code'} />
+        return <ListSelectData title={'Please enter Equipment Code / Name'} />
       } else {
         return <ListEmptyData />
       }
@@ -140,18 +152,40 @@ const EquipmentListScreen = ({ _, navigation }) => {
                 ?
                 (<View style={styles.headerContainer}>
                   <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>Type:</Text>
+                    <View style={styles.textContainer}>
+                      <Text style={styles.textData}>Major Equipment</Text>
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
                     <Text style={styles.infoTitleAction}>Code:</Text>
                     <View style={styles.inputContainer}>
                       <TextInput
                         style={styles.inputText}
-                        value={equipmentcode}
+                        value={code}
                         onChangeText={_onChangeCode}
                         underlineColorAndroid='transparent'
                       />
                       {
-                        equipmentcode == ''
+                        code == ''
                           ? null
                           : <Icon name='times-circle' onPress={() => _onChangeCode('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>Name:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={name}
+                        onChangeText={_onChangeName}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        name == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -207,6 +241,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     padding: 4,
     paddingBottom: 0,
+  },
+  textContainer: {
+    flexDirection: 'row',
+    flex: 7,
+    height: '100%',
+    padding: 2,
+    alignItems: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',

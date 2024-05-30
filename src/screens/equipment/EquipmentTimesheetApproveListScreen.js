@@ -273,7 +273,7 @@ const EquipmentTimesheetApproveListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>{'Kms(Hours)\nStart:'}</Text>
+            <Text>{'Kms Start:'}</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Start_kms)}</Text>
@@ -281,7 +281,7 @@ const EquipmentTimesheetApproveListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>{'Kms(Hours)\nFinish:'}</Text>
+            <Text>{'Kms Finish:'}</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Finish_kms)}</Text>
@@ -289,7 +289,23 @@ const EquipmentTimesheetApproveListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellTwo}>
-            <Text>Wasted Minute:</Text>
+            <Text>{'Hours Start:'}</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.Start_hours)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTwo}>
+            <Text>{'Hours Finish:'}</Text>
+          </View>
+          <View style={styles.cellThree}>
+            <Text style={styles.textData}>{Formater.formatTwoDigits(item.Finish_hours)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTwo}>
+            <Text>Wasted Time (min):</Text>
           </View>
           <View style={styles.cellThree}>
             <Text style={styles.textData}>{Formater.formatTwoDigits(item.Wasted_minutes)}</Text>

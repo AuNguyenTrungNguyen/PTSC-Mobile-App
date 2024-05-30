@@ -135,6 +135,7 @@ import QCObservationImageScreen from './screens/observation/QAObservationImageSc
 
 //-- Equipment
 import EquipmentCameraScreen from './screens/equipment/EquipmentCameraScreen';
+import EquipmentListScreen from './screens/equipment/EquipmentListScreen';
 import DailyTaskPlanListScreen from './screens/equipment/DailyTaskPlanListScreen';
 import EquipmentTimesheetApproveListScreen from './screens/equipment/EquipmentTimesheetApproveListScreen';
 import WorkRequestListScreen from './screens/equipment/WorkRequestListScreen';
@@ -144,8 +145,6 @@ import EquipmentTimesheetDailyListScreen from './screens/equipment/EquipmentTime
 import CreateEquipmentTimesheetDailyScreen from './screens/equipment/CreateEquipmentTimesheetDailyScreen';
 import MajorEquipmentUserListScreen from './screens/equipment/MajorEquipmentUserListScreen';
 import EquipmentDataControlListScreen from './screens/equipment/EquipmentDataControlListScreen';
-import EquipmentLiftingPlanListScreen from './screens/equipment/EquipmentLiftingPlanListScreen';
-import EquipmentLiftingPlanDetailScreen from './screens/equipment/EquipmentLiftingPlanDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -1376,7 +1375,7 @@ const EquipmentStack = createStackNavigator();
 const EquipmentStackScreens = () => {
   return (
     <EquipmentStack.Navigator screenOptions={optionNavigation}>
-      <EquipmentStack.Screen
+      {/* <EquipmentStack.Screen
         name='WorkRequestList'
         component={WorkRequestListScreen}
         options={
@@ -1402,6 +1401,26 @@ const EquipmentStackScreens = () => {
         options={
           {
             title: 'Major Equipment Code',
+            headerBackTitle: 'Back',
+          }
+        }
+      /> */}
+      <EquipmentStack.Screen
+        name='EquipmentCamera'
+        component={EquipmentCameraScreen}
+        options={
+          {
+            title: 'QRCode Equipment',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <EquipmentStack.Screen
+        name='EquipmentList'
+        component={EquipmentListScreen}
+        options={
+          {
+            title: 'Equipment List',
             headerBackTitle: 'Back',
           }
         }
@@ -1437,16 +1456,6 @@ const EquipmentStackScreens = () => {
         }
       />
       <EquipmentStack.Screen
-        name='EquipmentCamera'
-        component={EquipmentCameraScreen}
-        options={
-          {
-            title: 'QRCode Equipment',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
         name='DailyTaskPlan'
         component={DailyTaskPlanListScreen}
         options={
@@ -1476,76 +1485,6 @@ const EquipmentStackScreens = () => {
           }
         }
       />
-      {/* <EquipmentStack.Screen
-        name='EquipmentList'
-        component={EquipmentListScreen}
-        options={
-          {
-            title: 'Equipment List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
-        name='EquipmentNameList'
-        component={EquipmentNameListScreen}
-        options={
-          {
-            title: 'Equipment List',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
-        name='EquipmentCamera'
-        component={EquipmentCameraScreen}
-        options={
-          {
-            title: 'QRCode Scanner',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
-        name='EquipmentDetail'
-        component={EquipmentDetailScreen}
-        options={
-          {
-            title: 'Equipment Detail',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
-        name='EquipmentTimesheet'
-        component={EquipmentTimesheetScreen}
-        options={
-          {
-            title: 'Equipment TimeSheet',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
-        name='EquipmentLiftingPlanList'
-        component={EquipmentLiftingPlanListScreen}
-        options={
-          {
-            title: 'Lifting Plan',
-            headerBackTitle: 'Back',
-          }
-        }
-      />
-      <EquipmentStack.Screen
-        name='EquipmentLiftingPlanDetail'
-        component={EquipmentLiftingPlanDetailScreen}
-        options={
-          {
-            title: 'Lifting Plan Detail',
-            headerBackTitle: 'Back',
-          }
-        }
-      /> */}
     </EquipmentStack.Navigator>
   );
 };

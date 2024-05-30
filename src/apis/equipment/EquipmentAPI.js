@@ -1,7 +1,6 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
-
 //-- NEW
 export const GetEquipmentNotifyNumberAPI = async (userLogin) => {
   const token = await Helper.getData('TOKEN');
@@ -17,12 +16,13 @@ export const GetEquipmentNotifyNumberAPI = async (userLogin) => {
     }
   ).then(res => res.json());
 };
-export const CheckSupervisorPermissionAPI = async (userLogin) => {
+export const GetMajorEquipmentListAPI = async (code, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
-    + '/api/Equipment/CheckSupervisorPermission'
-    + '?userLogin=' + userLogin,
+    + '/api/Equipment/GetMajorEquipmentList'
+    + '?equipmentCode=' + code
+    + '&equipmentName=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -47,51 +47,7 @@ export const GetDailyTaskPlanListAPI = async (equipmentCode, projectCode, facili
     }
   ).then(res => res.json());
 };
-export const GetWorkRequestHeaderListAPI = async (documentNo, projectCode) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/Equipment/GetWorkRequestHeaderList'
-    + '?documentNo=' + documentNo
-    + '&projectCode=' + projectCode,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
-export const GetMajorEquipmentGroupCodeListAPI = async (groupCode, equipmentDescription) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/Equipment/GetMajorEquipmentGroupCodeList'
-    + '?groupCode=' + groupCode
-    + '&equipmentDescription=' + equipmentDescription,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
-export const GetMajorEquipmentEquipmentCodeListAPI = async (groupCode, equipmentName) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/Equipment/GetMajorEquipmentEquipmentCodeList'
-    + '?groupCode=' + groupCode
-    + '&equipmentName=' + equipmentName,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
+
 export const GetMajorEquipmentTimesheetDailyListAPI = async (id) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -151,36 +107,21 @@ export const DeleteMajorEquipmentTimesheetDailyAPI = async (modelUpdate) => {
     }
   ).then(res => res.json());
 };
-export const GetMajorEquipmentUserListAPI = async (code, name) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/Equipment/GetMajorEquipmentUserList'
-    + '?code=' + code
-    + '&name=' + name,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
-export const GetEquipmentDataControlListAPI = async (equipmentCode) => {
-  const token = await Helper.getData('TOKEN');
-  return fetch(
-    Port_Server
-    + '/api/Equipment/GetEquipmentDataControlList'
-    + '?equipmentCode=' + equipmentCode,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
 
+export const CheckSupervisorPermissionAPI = async (userLogin) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/CheckSupervisorPermission'
+    + '?userLogin=' + userLogin,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 export const GetMajorEquipmentTimesheetApproveListAPI = async (userLogin, type, date) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -213,9 +154,82 @@ export const UpdateMajorEquipmentTimesheetApproveListAPI = async (userUpdate, li
   ).then(res => res.json());
 };
 
-
+export const GetMajorEquipmentUserListAPI = async (code, name) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetMajorEquipmentUserList'
+    + '?code=' + code
+    + '&name=' + name,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetEquipmentDataControlListAPI = async (equipmentCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetEquipmentDataControlList'
+    + '?equipmentCode=' + equipmentCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 //-- OLD
+export const GetWorkRequestHeaderListAPI = async (documentNo, projectCode) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetWorkRequestHeaderList'
+    + '?documentNo=' + documentNo
+    + '&projectCode=' + projectCode,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetMajorEquipmentGroupCodeListAPI = async (groupCode, equipmentDescription) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetMajorEquipmentGroupCodeList'
+    + '?groupCode=' + groupCode
+    + '&equipmentDescription=' + equipmentDescription,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetMajorEquipmentEquipmentCodeListAPI = async (groupCode, equipmentName) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/Equipment/GetMajorEquipmentEquipmentCodeList'
+    + '?groupCode=' + groupCode
+    + '&equipmentName=' + equipmentName,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 export const GetEquipmentListAPI = async code => {
   const token = await Helper.getData('TOKEN');
   return fetch(
