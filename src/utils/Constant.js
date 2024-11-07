@@ -104,4 +104,15 @@ export default class Constant {
   static NDT_RESULT_EMPTY = null;
 
   static NDT_KEY_RESULT = 'NDTResult';
+
+  //-- SHIFT
+  static SHIFT_P = 'P';
+  static SHIFT_KP = 'KP';
+  static SHIFT_CD = 'CD';
+  static SHIFT_CV = 'CV';
+  static SHIFT_KL = 'KL';
+  static SHIFT_NB = 'NB';
+  static SHIFT_NN = 'NN';
+  static SHIFT_B = 'B';
+  static SHIFT_K = 'Khác';
 };

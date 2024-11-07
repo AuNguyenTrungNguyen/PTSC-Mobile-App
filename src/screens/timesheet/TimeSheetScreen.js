@@ -20,6 +20,7 @@ import { GetProjectListAPI } from '../../apis/app/LoginAPI';
 
 import Helper from '../../utils/Helper';
 import Formater from '../../utils/Formater';
+import Constant from '../../utils/Constant';
 
 import SelectPopup from '../../components/SelectPopup';
 import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
@@ -36,6 +37,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
   const TEMP_COLOR_SPENDING = 1;
   const TEMP_COLOR_UPDATED = 2;
 
+  const normalShift = ['HC', 'Ca1', 'Ca2', 'Ca3', 'Ca Lỡ'];
   const currentDate = new Date();
   const [filter, setFilter] = useState(SPENDING_TEXT);
 
@@ -381,7 +383,13 @@ const TimeSheetScreen = ({ route, navigation }) => {
   };
   const _onPressDeleteUpdated = () => {
     if (workerUpdatedList) {
-      const dataList = workerUpdatedList.filter(i => i.SELECTED && i.WorkOrder && i.WorkOrder.startsWith(projectSelected));
+      // const dataList = workerUpdatedList.filter(i => i.SELECTED && i.WorkOrder && i.WorkOrder.startsWith(projectSelected));
+      const dataList = workerUpdatedList.filter(i =>
+        i.SELECTED && (
+          (i.WorkOrder && i.WorkOrder.startsWith(projectSelected))
+          ||
+          (!i.WorkOrder)
+        ));
       if (dataList.length) {
         const deletedList = dataList.map(i => i.ID);
         callAPI(() => { deleteTimeSheetWorkerDate(deletedList) }, false);
@@ -408,12 +416,28 @@ const TimeSheetScreen = ({ route, navigation }) => {
     if (!workerList.length) {
       return;
     }
-
-    const errorList = workerList.filter(i => (!i.MHR || !i.WorkOrder || !i.Shift) && i.SELECTED);
+    const errorList = workerList.filter(i =>
+      i.SELECTED &&
+      (
+        !i.MHR || !i.Shift
+        || (
+          (!i.WorkOrder && normalShift.includes(i.Shift))
+          // ||
+          // (i.WorkOrder && !normalShift.includes(i.Shift))
+        )
+      )
+    );
     const result = errorList.map(i => i.RowIndex);
     setWorkerErrorList(result);
 
-    const transferList = workerList.filter(i => i.MHR && i.WorkOrder && i.Shift);
+    const transferList = workerList.filter(i =>
+      i.MHR && i.Shift
+      && (
+        (i.WorkOrder && normalShift.includes(i.Shift))
+        ||
+        (!i.WorkOrder && !normalShift.includes(i.Shift))
+      )
+    );
     if (transferList) {
       let addlist = [];
       transferList.forEach(item => {
@@ -463,12 +487,21 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onChangWorkOrderShotcut = (value = workOrder) => {
     const isSpending = filter === SPENDING_TEXT;
-    if (!isSpending && !value && workerUpdatedList.length) {
-      const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+    // if (!isSpending && !value && workerUpdatedList.length) {
+    //   const checkSubmitList = workerUpdatedList.filter(i => i.SELECTED);
+    //   if (checkSubmitList.length) {
+    //     MessageAlert('Chú ý', 'Bắt buộc chọn LSX');
+    //   }
+    //   return;
+    // }
+
+    const selectedList = workerUpdatedList.filter(i => i.SELECTED)
+    if (!isSpending && selectedList.length) {
+      const checkSubmitList = selectedList.filter(i => !value && normalShift.includes(i.Shift));
       if (checkSubmitList.length) {
         MessageAlert('Chú ý', 'Bắt buộc chọn LSX');
+        return;
       }
-      return;
     }
 
     let data = isSpending ? [...workerList] : [...workerUpdatedList];
@@ -571,6 +604,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
     setProjectSeletecd(code);
     setIsVisibleProject(false);
     callAPI(() => { getTimeSheetWorkOrderList(code) }, false);
+  };
+
+  //-- Shift
+  const [isVisibleShift, setIsVisibleShift] = useState(false);
+  const [shift, setShift] = useState(Constant.SHIFT_P);
+  const _onChangeShift = data => {
+    setShift(data);
+    setIsVisibleShift(false);
   };
 
 
@@ -725,6 +766,8 @@ const TimeSheetScreen = ({ route, navigation }) => {
                     style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
                   <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut() }}
                     style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+                  <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut('') }}
+                    style={styles.headerIcon} name='trash-alt' size={20} color={'red'} />
                 </View>
               </View>
               <View style={styles.headerRow}>
@@ -743,6 +786,19 @@ const TimeSheetScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut('Ca Lỡ')}>
                     <Text style={styles.headerShotcutText}>{'Ca Lỡ'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.headerRow}>
+                <View style={styles.headerCellShotcut}>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => setIsVisibleShift(true)}>
+                    <Text style={styles.headerShotcutText}>{'Nghỉ'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.headerShotcutItem} onPress={() => _onChangShiftShotcut(shift)}>
+                    <Text style={styles.headerShotcutText}>{shift}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity disabled={true} style={styles.headerShotcutItemDisabled}>
+                    <Text style={styles.headerShotcutText}>{''}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -909,6 +965,12 @@ const TimeSheetScreen = ({ route, navigation }) => {
         data={projectList}
         onChangeItem={_onChangeProjectCode}
         onCancel={() => setIsVisibleProject(false)} />
+      <SelectPopup
+        visible={isVisibleShift}
+        data={[Constant.SHIFT_P, Constant.SHIFT_KP, Constant.SHIFT_CD, Constant.SHIFT_CV, Constant.SHIFT_KL, Constant.SHIFT_NB, Constant.SHIFT_NN, Constant.SHIFT_B, Constant.SHIFT_K]}
+        onCancel={() => setIsVisibleShift(false)}
+        onChangeItem={_onChangeShift}>
+      </SelectPopup>
     </SafeAreaView>
   );
 };
@@ -976,6 +1038,14 @@ const styles = StyleSheet.create({
     borderColor: BASE_COLOR,
     borderWidth: 1,
     borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  headerShotcutItemDisabled: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: BASE_COLOR,
     marginHorizontal: 4,
   },
   headerShotcutText: {
