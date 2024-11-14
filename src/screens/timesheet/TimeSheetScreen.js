@@ -211,7 +211,6 @@ const TimeSheetScreen = ({ route, navigation }) => {
       await Promise.all(arrayPromise)
         .then(([workerResult, workOrderResult]) => {
           if (workerResult.success && workOrderResult.success) {
-
             let data = [];
             let dataUpdated = [];
             if (workerResult.data) {
@@ -248,6 +247,39 @@ const TimeSheetScreen = ({ route, navigation }) => {
       MessageAlert('ERROR', error.toString());
     }
   };
+  const getWorkers = async () => {
+    const token = await Helper.getData('TOKEN');
+    GetTimeSheetWorkerListAPI(projectSelected, userLogin, token)
+      .then(res => {
+        if (res.success) {
+          let data = [];
+          let dataUpdated = [];
+          if (res.data) {
+            res.data.map(i => {
+              i.SUBMITED = true;
+              return i;
+            });
+            data = res.data.filter(i => i.UPDATED == false);
+            dataUpdated = res.data.filter(i => i.UPDATED == true);
+          }
+          setWorkerList(data);
+          setWorkerUpdatedList(dataUpdated);
+
+          setIsLoading(false);
+          setIsError(false);
+          setIsUploading(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsUploading(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsUploading(false);
+      });
+  };
 
   //-- Send Data
   const _onPressSubmitToServer = async () => {
@@ -269,17 +301,18 @@ const TimeSheetScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.success) {
           if (!res.error) {
-            Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
-            let baseArray = [...workerUpdatedList];
-            workerUpdatedList.map(i => {
-              i.SUBMITED = true;
-              i.ColorWorkOrder = null;
-              i.ColorShift = null;
-              i.ColorHours = null;
-              i.ColorNote = null;
-              return i;
-            });
-            setWorkerUpdatedList(baseArray);
+            getWorkers();
+            Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
+            // let baseArray = [...workerUpdatedList];
+            // workerUpdatedList.map(i => {
+            //   i.SUBMITED = true;
+            //   i.ColorWorkOrder = null;
+            //   i.ColorShift = null;
+            //   i.ColorHours = null;
+            //   i.ColorNote = null;
+            //   return i;
+            // });
+            // setWorkerUpdatedList(baseArray);
           }
           else {
             MessageAlert('WARNING', res.error);
@@ -300,28 +333,29 @@ const TimeSheetScreen = ({ route, navigation }) => {
     DeleteTimeSheetWorkerDateAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
       .then(res => {
         if (res.success) {
-          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
+          getWorkers();
+          Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController', 'UIAlertController']);
           setIsRefreshWorkOrder(new Date());
-          const dataList = workerUpdatedList.filter(item => deletedList.find(id => (id === item.ID)));
-          const updatedList = workerUpdatedList.filter(item => !deletedList.find(id => (id === item.ID)));
-          dataList.map((item) => {
-            item.SUBMITED = true;
-            item.SELECTED = false;
-            item.UPDATED = false;
-            item.ColorWorkOrder = null;
-            item.ColorShift = null;
-            item.ColorHours = null;
-            item.ColorNote = null;
+          // const dataList = workerUpdatedList.filter(item => deletedList.find(id => (id === item.ID)));
+          // const updatedList = workerUpdatedList.filter(item => !deletedList.find(id => (id === item.ID)));
+          // dataList.map((item) => {
+          //   item.SUBMITED = true;
+          //   item.SELECTED = false;
+          //   item.UPDATED = false;
+          //   item.ColorWorkOrder = null;
+          //   item.ColorShift = null;
+          //   item.ColorHours = null;
+          //   item.ColorNote = null;
 
-            item.WorkOrder = '';
-            item.Shift = '';
-            item.MHR = null;
-            item.Note = '';
-            return item;
-          });
-          const data = workerList.concat(dataList).sort((a, b) => (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
-          setWorkerList(data);
-          setWorkerUpdatedList(updatedList);
+          //   item.WorkOrder = '';
+          //   item.Shift = '';
+          //   item.MHR = null;
+          //   item.Note = '';
+          //   return item;
+          // });
+          // const data = workerList.concat(dataList).sort((a, b) => (a.ID > b.ID) ? 1 : ((b.ID > a.ID) ? -1 : 0));
+          // setWorkerList(data);
+          // setWorkerUpdatedList(updatedList);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
         }
@@ -391,7 +425,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
           (!i.WorkOrder)
         ));
       if (dataList.length) {
-        const deletedList = dataList.map(i => i.ID);
+        const deletedList = dataList.map(i => i.WODRowIndex);
         callAPI(() => { deleteTimeSheetWorkerDate(deletedList) }, false);
       }
       else {
@@ -619,7 +653,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
 
   const renderItem = ({ index, item }) => {
-    const isError = workerErrorList.includes(item.RowIndex);
+    const isError = workerErrorList.includes(item.RowIndex) && filter === SPENDING_TEXT;
     return (
       <View style={isError ? styles.errorBox : styles.box}>
         <View style={styles.row}>
