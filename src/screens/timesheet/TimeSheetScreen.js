@@ -23,6 +23,7 @@ import Formater from '../../utils/Formater';
 import Constant from '../../utils/Constant';
 
 import SelectPopup from '../../components/SelectPopup';
+import SelectPopupDynamic from '../../components/SelectPopupDynamic';
 import SelectPopupTimeSheet from '../../components/timesheet/SelectPopupTimeSheet';
 import { ListEmptyData } from '../../components/HelperUI';
 import MessageAlert from '../../components/MessageAlert';
@@ -38,6 +39,17 @@ const TimeSheetScreen = ({ route, navigation }) => {
   const TEMP_COLOR_UPDATED = 2;
 
   const normalShift = ['HC', 'Ca1', 'Ca2', 'Ca3', 'Ca Lỡ'];
+  const offShifts = [
+    { Shift: Constant.SHIFT_P, Name: 'Phép' },
+    { Shift: Constant.SHIFT_KP, Name: 'Không phép' },
+    { Shift: Constant.SHIFT_CD, Name: 'Chế độ' },
+    { Shift: Constant.SHIFT_CV, Name: 'Chờ việc' },
+    { Shift: Constant.SHIFT_KL, Name: 'Không lương' },
+    { Shift: Constant.SHIFT_NB, Name: 'Nghỉ bù' },
+    { Shift: Constant.SHIFT_NN, Name: 'Nước ngoài' },
+    { Shift: Constant.SHIFT_B, Name: 'Biển' },
+    { Shift: Constant.SHIFT_K, Name: 'Khác' },
+  ];
   const currentDate = new Date();
   const [filter, setFilter] = useState(SPENDING_TEXT);
 
@@ -644,7 +656,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
   const [isVisibleShift, setIsVisibleShift] = useState(false);
   const [shift, setShift] = useState(Constant.SHIFT_P);
   const _onChangeShift = data => {
-    setShift(data);
+    setShift(data.Shift);
     setIsVisibleShift(false);
   };
 
@@ -999,12 +1011,22 @@ const TimeSheetScreen = ({ route, navigation }) => {
         data={projectList}
         onChangeItem={_onChangeProjectCode}
         onCancel={() => setIsVisibleProject(false)} />
-      <SelectPopup
+      {/* <SelectPopup
         visible={isVisibleShift}
         data={[Constant.SHIFT_P, Constant.SHIFT_KP, Constant.SHIFT_CD, Constant.SHIFT_CV, Constant.SHIFT_KL, Constant.SHIFT_NB, Constant.SHIFT_NN, Constant.SHIFT_B, Constant.SHIFT_K]}
         onCancel={() => setIsVisibleShift(false)}
         onChangeItem={_onChangeShift}>
-      </SelectPopup>
+      </SelectPopup> */}
+      <SelectPopupDynamic
+        visible={isVisibleShift}
+        leftHeader={'Ca'}
+        rightHeader={'Chú thích'}
+        leftKey={'Shift'}
+        rightKey={'Name'}
+        data={offShifts}
+        onChangeItem={_onChangeShift}
+        onCancel={() => setIsVisibleShift(false)}
+      />
     </SafeAreaView>
   );
 };
