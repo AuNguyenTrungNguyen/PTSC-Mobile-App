@@ -484,6 +484,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
         (!i.WorkOrder && !normalShift.includes(i.Shift))
       )
     );
+
     if (transferList) {
       let addlist = [];
       transferList.forEach(item => {
@@ -541,7 +542,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     //   return;
     // }
 
-    const selectedList = workerUpdatedList.filter(i => i.SELECTED)
+    const selectedList = workerUpdatedList.filter(i => i.SELECTED);
     if (!isSpending && selectedList.length) {
       const checkSubmitList = selectedList.filter(i => !value && normalShift.includes(i.Shift));
       if (checkSubmitList.length) {
@@ -557,6 +558,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     let array = [...data];
     array.map(i => {
       if (i.SELECTED) {
+        i.ProjectCode = projectSelected;
         i.WorkOrder = value;
         i.ColorWorkOrder = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
@@ -576,6 +578,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     let array = [...data];
     array.map(i => {
       if (i.SELECTED) {
+        i.ProjectCode = projectSelected;
         i.Shift = value;
         i.ColorShift = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
@@ -602,6 +605,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     let array = [...data];
     array.map(i => {
       if (i.SELECTED) {
+        i.ProjectCode = projectSelected;
         i.MHR = value;
         i.ColorHours = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
@@ -621,6 +625,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
     let array = [...data];
     array.map(i => {
       if (i.SELECTED) {
+        i.ProjectCode = projectSelected;
         i.Note = value;
         i.ColorNote = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
         i.SUBMITED = false;
