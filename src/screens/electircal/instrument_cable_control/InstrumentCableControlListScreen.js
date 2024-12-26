@@ -24,6 +24,8 @@ const InstrumentCableControlListScreen = ({ route, navigation }) => {
   const [isSearching, setIsSearching] = useState(false);
 
   const [cablename, setCableName] = useState('');
+  const [subSystem, setSubSystem] = useState('');
+  const [drumNo, setDrumNo] = useState('');
   const [cableList, setCableList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
@@ -115,7 +117,7 @@ const InstrumentCableControlListScreen = ({ route, navigation }) => {
   };
   async function getCableList() {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetInstrumentCableControlListAPI(projectCode, facility, cablename)
+    GetInstrumentCableControlListAPI(projectCode, facility, cablename, subSystem, drumNo)
       .then(res => {
         if (res.Success && res.Data) {
           setCableList(res.Data);
@@ -136,6 +138,12 @@ const InstrumentCableControlListScreen = ({ route, navigation }) => {
   };
   const _onChangeName = name => {
     setCableName(name);
+  };
+  const _onChangeSubSystem = value => {
+    setSubSystem(value);
+  };
+  const _onChangeDrumNo = value => {
+    setDrumNo(value);
   };
 
   //-- Detail
@@ -172,6 +180,22 @@ const InstrumentCableControlListScreen = ({ route, navigation }) => {
           </View>
           <View style={styles.cellTwo}>
             <Text style={textStyle}>{Formater.formatEmptyData(item.CableName)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>SubSystem:</Text>
+          </View>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.SubSystemNo)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>DrumNo:</Text>
+          </View>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.DrumNo)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -224,6 +248,38 @@ const InstrumentCableControlListScreen = ({ route, navigation }) => {
                         cablename == ''
                           ? null
                           : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>SubSystem:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={subSystem}
+                        onChangeText={_onChangeSubSystem}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        subSystem == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeSubSystem('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>DrumNo:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={drumNo}
+                        onChangeText={_onChangeDrumNo}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        drumNo == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeDrumNo('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>

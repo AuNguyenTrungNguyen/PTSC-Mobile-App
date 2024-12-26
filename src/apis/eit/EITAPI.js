@@ -2,14 +2,16 @@ import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
 //-- Electrical Cable Control
-export const GetElectricalCableControlListAPI = async (projectCode, facilityCode, cableName) => {
+export const GetElectricalCableControlListAPI = async (projectCode, facilityCode, cableName, subSystem, drumNo) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetElectricalCableControlList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&cableName=' + cableName,
+    + '&cableName=' + cableName
+    + '&subSystem=' + subSystem
+    + '&drumNo=' + drumNo,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -50,14 +52,16 @@ export const UpdateElectricalCableControlDetailAPI = async (modelUpdate, modelCo
 };
 
 //-- Instrument Cable Control
-export const GetInstrumentCableControlListAPI = async (projectCode, facilityCode, cableName) => {
+export const GetInstrumentCableControlListAPI = async (projectCode, facilityCode, cableName, subSystem, drumNo) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetInstrumentCableControlList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&cableName=' + cableName,
+    + '&cableName=' + cableName
+    + '&subSystem=' + subSystem
+    + '&drumNo=' + drumNo,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -181,14 +185,15 @@ export const GetEITCableControlReportAPI = async (projectCode, userLogin, date) 
 };
 
 //-- Electrical Gland Control
-export const GetElectricalGlandControlListAPI = async (projectCode, facilityCode, cableName) => {
+export const GetElectricalGlandControlListAPI = async (projectCode, facilityCode, cableName, subSystem) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetElectricalGlandControlList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&cableName=' + cableName,
+    + '&cableName=' + cableName
+    + '&subSystem=' + subSystem,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -229,14 +234,15 @@ export const UpdateElectricalGlandControlDetailAPI = async (modelUpdate, modelCo
 };
 
 //-- Electrical Terminate Control
-export const GetElectricalTerminateControlListAPI = async (projectCode, facilityCode, cableName) => {
+export const GetElectricalTerminateControlListAPI = async (projectCode, facilityCode, cableName, subSystem) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetElectricalTerminateControlList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&cableName=' + cableName,
+    + '&cableName=' + cableName
+    + '&subSystem=' + subSystem,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -277,14 +283,15 @@ export const UpdateElectricalTerminateControlDetailAPI = async (modelUpdate, mod
 };
 
 //-- Instrument Gland Control
-export const GetInstrumentGlandControlListAPI = async (projectCode, facilityCode, cableName) => {
+export const GetInstrumentGlandControlListAPI = async (projectCode, facilityCode, cableName, subSystem) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetInstrumentGlandControlList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&cableName=' + cableName,
+    + '&cableName=' + cableName
+    + '&subSystem=' + subSystem,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -325,14 +332,15 @@ export const UpdateInstrumentGlandControlDetailAPI = async (modelUpdate, modelCo
 };
 
 //-- Instrument Termination Control
-export const GetInstrumentTerminationControlListAPI = async (projectCode, facilityCode, cableName) => {
+export const GetInstrumentTerminationControlListAPI = async (projectCode, facilityCode, cableName, subSystem) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
     + '/api/eit/GetInstrumentTerminationControlList'
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
-    + '&cableName=' + cableName,
+    + '&cableName=' + cableName
+    + '&subSystem=' + subSystem,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
