@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, cableName, rowIndex, userLogin } = route.params;
+  const { projectCode, facilityCode, cableName, rowIndex, userLogin, isGlandedFrom, isGlandedTo } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -139,16 +139,19 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
   //-- Clear
   const _onPressClear = () => {
     const valueClear = null;
-
-    if (!columnChange.includes('StatusFromTerminationDate')) {
-      columnChange.push('StatusFromTerminationDate');
+    if (isGlandedFrom) {
+      if (!columnChange.includes('StatusFromTerminationDate')) {
+        columnChange.push('StatusFromTerminationDate');
+      }
+      terminateDetail['StatusFromTerminationDate'] = valueClear;
     }
-    terminateDetail['StatusFromTerminationDate'] = valueClear;
 
-    if (!columnChange.includes('StatusToTerminationDate')) {
-      columnChange.push('StatusToTerminationDate');
+    if (isGlandedTo) {
+      if (!columnChange.includes('StatusToTerminationDate') && isGlandedTo) {
+        columnChange.push('StatusToTerminationDate');
+      }
+      terminateDetail['StatusToTerminationDate'] = valueClear;
     }
-    terminateDetail['StatusToTerminationDate'] = valueClear;
     setIsRender(new Date());
   };
 
@@ -157,13 +160,8 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
     const isFromUpdated = !!terminateDetail.StatusFromTerminationDate;
     const isToUpdated = !!terminateDetail.StatusToTerminationDate;
     const disableClear = terminateDetail.TerminatedByUser != userLogin || (!terminateDetail.StatusFromTerminationDate && !terminateDetail.StatusToTerminationDate);
-    // const isPulled = terminateDetail.PullingByUser
     return (
       <>
-        {/* {
-          !isPulled &&
-          <Text style={styles.textInfo}>This cable hasn't been pulled</Text>
-        } */}
         <View style={styles.table}>
           {
             <>
@@ -192,119 +190,98 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                 </View>
 
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>From:</Text>
+                  {
+                    isGlandedFrom
+                      ?
+                      <Text style={styles.cellTitle}>From:</Text>
+                      :
+                      <Text style={styles.cellTitleRed}>From:</Text>
+                  }
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromEquipmentNo)}</Text>
                     </View>
                   </View>
                   {
-                    // isPulled
-                    //   ?
-                    <CheckBox
-                      value={isFromUpdated}
-                      onValueChange={newValue => _onChangeCheckbox('StatusFromTerminationDate', newValue)}
-                      style={styles.checkBox}
-                      boxType='square'
-                      disabled={isFromUpdated}
-                      onCheckColor={OPP_COLOR}
-                      onFillColor={isFromUpdated ? BASE_COLOR : BASE_COLOR}
-                      onTintColor={isFromUpdated ? BASE_COLOR : BASE_COLOR}
-                      tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
-                      animationDuration={0.2}
-                      onAnimationType='flat'
-                    />
-                    // :
-                    // <CheckBox
-                    //   value={isFromUpdated}
-                    //   onValueChange={null}
-                    //   style={styles.checkBoxDisabled}
-                    //   boxType='square'
-                    //   disabled={true}
-                    //   onCheckColor={OPP_COLOR}
-                    //   onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                    //   onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                    //   tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                    //   animationDuration={0.2}
-                    //   onAnimationType='flat'
-                    // />
+                    isGlandedFrom
+                      ?
+                      <CheckBox
+                        value={isFromUpdated}
+                        onValueChange={newValue => _onChangeCheckbox('StatusFromTerminationDate', newValue)}
+                        style={styles.checkBox}
+                        boxType='square'
+                        disabled={isFromUpdated}
+                        onCheckColor={OPP_COLOR}
+                        onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                        animationDuration={0.2}
+                        onAnimationType='flat'
+                      />
+                      :
+                      <CheckBox
+                        value={isFromUpdated}
+                        onValueChange={null}
+                        style={styles.checkBox}
+                        boxType='square'
+                        disabled={true}
+                        onCheckColor={OPP_COLOR}
+                        onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                        animationDuration={0.2}
+                        onAnimationType='flat'
+                      />
                   }
                 </View>
-                {/* <View style={styles.row}>
-                  <Text style={styles.cellTitle}>FromType:</Text>
-                  <View style={styles.cellData}>
-                    <View style={styles.containerAction}>
-                      <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromTerminateType)}</Text>
-                    </View>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.cellTitle}>FromSize:</Text>
-                  <View style={styles.cellData}>
-                    <View style={styles.containerAction}>
-                      <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromTerminateSize)}</Text>
-                    </View>
-                  </View>
-                </View> */}
 
                 <View style={styles.line} />
 
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>To:</Text>
+                  {
+                    isGlandedTo
+                      ?
+                      <Text style={styles.cellTitle}>To:</Text>
+                      :
+                      <Text style={styles.cellTitleRed}>To:</Text>
+                  }
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToEquipmentNo)}</Text>
                     </View>
                   </View>
                   {
-                    // isPulled
-                    //   ?
-                    <CheckBox
-                      value={isToUpdated}
-                      onValueChange={newValue => _onChangeCheckbox('StatusToTerminationDate', newValue)}
-                      style={styles.checkBox}
-                      boxType='square'
-                      disabled={isToUpdated}
-                      onCheckColor={OPP_COLOR}
-                      onFillColor={isToUpdated ? BASE_COLOR : BASE_COLOR}
-                      onTintColor={isToUpdated ? BASE_COLOR : BASE_COLOR}
-                      tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
-                      animationDuration={0.2}
-                      onAnimationType='flat'
-                    />
-                    // :
-                    // <CheckBox
-                    //   value={isToUpdated}
-                    //   onValueChange={null}
-                    //   style={styles.checkBoxDisabled}
-                    //   boxType='square'
-                    //   disabled={true}
-                    //   onCheckColor={OPP_COLOR}
-                    //   onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                    //   onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                    //   tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                    //   animationDuration={0.2}
-                    //   onAnimationType='flat'
-                    // />
+                    isGlandedTo
+                      ?
+                      <CheckBox
+                        value={isToUpdated}
+                        onValueChange={newValue => _onChangeCheckbox('StatusToTerminationDate', newValue)}
+                        style={styles.checkBox}
+                        boxType='square'
+                        disabled={isToUpdated}
+                        onCheckColor={OPP_COLOR}
+                        onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
+                        animationDuration={0.2}
+                        onAnimationType='flat'
+                      />
+                      :
+                      <CheckBox
+                        value={isToUpdated}
+                        onValueChange={null}
+                        style={styles.checkBox}
+                        boxType='square'
+                        disabled={true}
+                        onCheckColor={OPP_COLOR}
+                        onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
+                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                        animationDuration={0.2}
+                        onAnimationType='flat'
+                      />
                   }
                 </View>
-
-                {/* <View style={styles.row}>
-                  <Text style={styles.cellTitle}>ToType:</Text>
-                  <View style={styles.cellData}>
-                    <View style={styles.containerAction}>
-                      <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToTerminateType)}</Text>
-                    </View>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.cellTitle}>ToSize:</Text>
-                  <View style={styles.cellData}>
-                    <View style={styles.containerAction}>
-                      <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToTerminateSize)}</Text>
-                    </View>
-                  </View>
-                </View> */}
               </View>
 
               <View style={styles.actionContainer}>
@@ -418,6 +395,10 @@ const styles = StyleSheet.create({
   },
   cellTitle: {
     flex: 1,
+  },
+  cellTitleRed: {
+    flex: 1,
+    color: 'red',
   },
   cellData: {
     flex: 1,
