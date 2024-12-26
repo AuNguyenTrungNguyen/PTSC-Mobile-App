@@ -24,6 +24,7 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
   const [isSearching, setIsSearching] = useState(false);
 
   const [cableName, setCableName] = useState('');
+  const [subSystem, setSubSystem] = useState('');
   const [cableList, setCableList] = useState(null);
 
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
@@ -115,7 +116,7 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
   };
   async function getCableList() {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetElectricalGlandControlListAPI(projectCode, facility, cableName)
+    GetElectricalGlandControlListAPI(projectCode, facility, cableName, subSystem)
       .then(res => {
         if (res.Success && res.Data) {
           setCableList(res.Data);
@@ -137,6 +138,9 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
   const _onChangeName = name => {
     setCableName(name);
   };
+  const _onChangeSubSystem = value => {
+    setSubSystem(value);
+  };
 
   //-- Detail
   const _onPressDetail = async item => {
@@ -149,6 +153,7 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
         facilityCode: item.FacilityCode,
         cableName: item.CableName,
         userLogin: userLogin,
+        isPulled: item.IsPulled,
       }
     );
   };
@@ -159,8 +164,13 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
     const toStatus = item.StatusToGlandingDate ? 1 : 0;
     const status = fromStatus + toStatus;
     const textStyle = status == 2 ? styles.textUpdated : status == 1 ? styles.textPending : styles.textData;
+    const isPulled = item.IsPulled;
+
     return (
-      <TouchableOpacity style={styles.box} onPress={() => _onPressDetail(item)}>
+      <TouchableOpacity
+        style={isPulled ? styles.box : styles.disabledBox}
+        onPress={() => _onPressDetail(item)}
+        disabled={!isPulled}>
         <View style={styles.row}>
           <View style={styles.cellOne}>
             <Text>Facility:</Text>
@@ -175,6 +185,22 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
           </View>
           <View style={styles.cellTwo}>
             <Text style={textStyle}>{Formater.formatEmptyData(item.CableName)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>SubSystem:</Text>
+          </View>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.SubSystemNo)}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>{'Cable\nPulling Date:'}</Text>
+          </View>
+          <View style={styles.cellTwo}>
+            <Text style={textStyle}>{Formater.formatDateData(item.DatePulling)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -227,6 +253,22 @@ const ElectricalGlandControlListScreen = ({ route, navigation }) => {
                         cableName == ''
                           ? null
                           : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>SubSystem:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={subSystem}
+                        onChangeText={_onChangeSubSystem}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        subSystem == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeSubSystem('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>
@@ -364,6 +406,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     borderColor: BASE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  disabledBox: {
+    backgroundColor: 'lightgray',
+    flexDirection: 'column',
+    borderColor: 'red',
+    width: '100%',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 8,

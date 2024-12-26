@@ -16,7 +16,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const InstrumentGlandControlDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, facilityCode, cableName, rowIndex, userLogin } = route.params;
+  const { projectCode, facilityCode, cableName, rowIndex, userLogin, isPulled } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -157,7 +157,6 @@ const InstrumentGlandControlDetailScreen = ({ route, navigation }) => {
     const isFromUpdated = !!glandDetail.StatusFromGlandingDate;
     const isToUpdated = !!glandDetail.StatusToGlandingDate;
     const disableClear = glandDetail.GlandByUser != userLogin || (!glandDetail.StatusFromGlandingDate && !glandDetail.StatusToGlandingDate);
-    const isPulled = glandDetail.PullingByUser
     return (
       <>
         {
