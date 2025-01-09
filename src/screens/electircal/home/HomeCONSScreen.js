@@ -268,6 +268,27 @@ const HomeCONSScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Electrical Support Register
+  const _onElectricalSupportRegister = async () => {
+    navigation.navigate(
+      'ElectricalSupportRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Support Register
+  const _onInstrumentSupportRegister = async () => {
+    navigation.navigate(
+      'InstrumentSupportRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Item
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
     if (props.iconName) {
@@ -333,6 +354,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nTermination Control'} onPress={_onElectricalTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
               <RenderItemBox title={'Instrument\nTermination Control'} onPress={_onInstrumentTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nSupport Control'} onPress={_onElectricalSupportRegister} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nSupport Control'} onPress={_onInstrumentSupportRegister} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />

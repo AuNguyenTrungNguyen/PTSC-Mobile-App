@@ -123,6 +123,8 @@ import ElectricalCableDamageLogDetailScreen from './screens/electircal/cabledama
 import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamagelog/ElectricalCableDamageLogDataScreen';
 import DrumNoListScreen from './screens/electircal/drumlibrary/DrumNoListScreen';
 import CableControlReportScreen from './screens/electircal/cablereport/CableControlReportScreen';
+import ElectricalSupportRegisterListScreen from './screens/electircal/electrical_support_resigter/ElectricalSupportRegisterListScreen';
+import InstrumentSupportRegisterListScreen from './screens/electircal/instrument_support_resigter/InstrumentSupportRegisterListScreen';
 
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
@@ -1069,6 +1071,28 @@ const ElectricalCONSStackScreens = () => {
           title: route.params.title,
           headerBackTitle: 'Back',
         })}
+      />
+      {/* Electrical Support */}
+      <ElectricalCONSStack.Screen
+        name={'ElectricalSupportRegisterList'}
+        component={ElectricalSupportRegisterListScreen}
+        options={
+          {
+            title: 'Electrical Support Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Support */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentSupportRegisterList'}
+        component={InstrumentSupportRegisterListScreen}
+        options={
+          {
+            title: 'Electrical Support Control',
+            headerBackTitle: 'Back',
+          }
+        }
       />
     </ElectricalCONSStack.Navigator>
   );
