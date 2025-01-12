@@ -308,6 +308,26 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Electrical Equipment Control
+  const _onElectricalEquipmentControl = async () => {
+    navigation.navigate(
+      'ElectricalEquipmentControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Equipment Control
+  const _onInstrumentEquipmentControl = async () => {
+    navigation.navigate(
+      'InstrumentEquipmentControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Item
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -362,6 +382,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nTray Ladder'} onPress={_onElectricalTrayLadderRegister} iconName='electrical-services' iconType='Material' />
               <RenderItemBox title={'Instrument\nTray Ladder'} onPress={_onInstrumentTrayLadderRegister} iconName='cable-data' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nEquipment'} onPress={_onElectricalEquipmentControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nEquipment'} onPress={_onInstrumentEquipmentControl} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />

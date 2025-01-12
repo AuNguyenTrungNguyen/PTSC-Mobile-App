@@ -485,7 +485,7 @@ export const UpdateElectricalTrayLadderRegisterListAPI = async (listItemUpdate) 
   ).then(res => res.json());
 };
 
-//-- Instrument Support Register
+//-- Instrument Tray Ladder Register
 export const GetInstrumentTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
@@ -509,6 +509,76 @@ export const UpdateInstrumentTrayLadderRegisterListAPI = async (listItemUpdate) 
   return fetch(
     Port_Server
     + '/api/eit/UpdateInstrumentTrayLadderRegisterList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+
+//-- Electrical Equipment Control
+export const GetElectricalEquipmentControlListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalEquipmentControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&location=' + location,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateElectricalEquipmentControlListAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateElectricalEquipmentControlList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+
+//-- Instrument Equipment Control
+export const GetInstrumentEquipmentControlListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetInstrumentEquipmentControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&location=' + location,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateInstrumentEquipmentControlListAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateInstrumentEquipmentControlList',
     {
       method: 'POST',
       headers: {

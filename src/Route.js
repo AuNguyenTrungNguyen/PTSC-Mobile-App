@@ -127,6 +127,8 @@ import ElectricalSupportRegisterListScreen from './screens/electircal/electrical
 import InstrumentSupportRegisterListScreen from './screens/electircal/instrument_support_resigter/InstrumentSupportRegisterListScreen';
 import ElectricalTrayLadderRegisterListScreen from './screens/electircal/electrical_tray_ladder_resigter/ElectricalTrayLadderRegisterListScreen';
 import InstrumentTrayLadderRegisterListScreen from './screens/electircal/instrument_tray_ladder_resigter/InstrumentTrayLadderRegisterListScreen';
+import ElectricalEquipmentControlListScreen from './screens/electircal/electrical_equipment_control/ElectricalEquipmentControlListScreen';
+import InstrumentEquipmentControlListScreen from './screens/electircal/instrument_equipment_control/InstrumentEquipmentControlListScreen';
 
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
@@ -1092,7 +1094,7 @@ const ElectricalCONSStackScreens = () => {
         component={InstrumentSupportRegisterListScreen}
         options={
           {
-            title: 'Electrical Support Control',
+            title: 'Instrument Support Control',
             headerBackTitle: 'Back',
           }
         }
@@ -1104,7 +1106,7 @@ const ElectricalCONSStackScreens = () => {
         component={ElectricalTrayLadderRegisterListScreen}
         options={
           {
-            title: 'Electrical Support Control',
+            title: 'Electrical Tray Ladder Control',
             headerBackTitle: 'Back',
           }
         }
@@ -1115,7 +1117,30 @@ const ElectricalCONSStackScreens = () => {
         component={InstrumentTrayLadderRegisterListScreen}
         options={
           {
-            title: 'Electrical Support Control',
+            title: 'Instrument Tray Ladder Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      {/* Electrical Equipment */}
+      <ElectricalCONSStack.Screen
+        name={'ElectricalEquipmentControlList'}
+        component={ElectricalEquipmentControlListScreen}
+        options={
+          {
+            title: 'Electrical Equipment Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Equipment */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentEquipmentControlList'}
+        component={InstrumentEquipmentControlListScreen}
+        options={
+          {
+            title: 'Instrument Equipment Control',
             headerBackTitle: 'Back',
           }
         }
