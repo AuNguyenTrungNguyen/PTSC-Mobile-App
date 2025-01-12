@@ -65,20 +65,20 @@ export const GetCurrentQCInfoAPI = (projectCode, drawingNo, sheet, rev, token) =
     }).then(res => res.json());
 
 export const GetCurrentQCInfoSubContractorAPI = (projectCode, subContractor, drawingNo, sheet, rev, token) =>
-    fetch(
-      Port_Server
-      + '/api/piping/GetCurrentQCInfoSubContractor'
-      + '?projectCode=' + projectCode
-      + '?subContractor=' + subContractor
-      + '&drawingNo=' + encodeURIComponent(drawingNo)
-      + '&sheet=' + sheet
-      + '&rev=' + rev,
-      {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }).then(res => res.json());
+  fetch(
+    Port_Server
+    + '/api/piping/GetCurrentQCInfoSubContractor'
+    + '?projectCode=' + projectCode
+    + '?subContractor=' + subContractor
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
 
 export const GetQCDetailAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, token) =>
   fetch(
@@ -98,22 +98,22 @@ export const GetQCDetailAPI = (projectCode, facilityCode, drawingNo, sheet, rev,
     }).then(res => res.json());
 
 export const GetQCDetailSubContractorAPI = (projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, token) =>
-    fetch(
-      Port_Server
-      + '/api/piping/GetQCDetailSubContractor'
-      + '?projectCode=' + projectCode
-      + '&subContractor=' + subContractor
-      + '&facilityCode=' + facilityCode
-      + '&drawingNo=' + encodeURIComponent(drawingNo)
-      + '&sheet=' + sheet
-      + '&rev=' + rev
-      + '&code=' + code,
-      {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }).then(res => res.json());
+  fetch(
+    Port_Server
+    + '/api/piping/GetQCDetailSubContractor'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
+    + '&sheet=' + sheet
+    + '&rev=' + rev
+    + '&code=' + code,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
 
 export const UpdateQCDetailAPI = (projectCode, facilityCode, userUpdate, code, listItemUpdate, token) =>
   fetch(

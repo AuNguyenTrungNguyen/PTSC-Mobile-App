@@ -485,6 +485,20 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
+                  <Text>Serial01:</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SerialNo01)}</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text>Serial02:</Text>
+                </View>
+                <View style={styles.cellOne}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.SerialNo02)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
                   <Text>HeatNo01:</Text>
                 </View>
                 <View style={styles.cellOne}>
@@ -820,11 +834,12 @@ const QCSpendListScreen = ({ route, navigation }) => {
                 ?
                 (<View style={styles.headerContainer}>
                   <View style={styles.rowInfo}>
-                    <Text>ProjectCode:     {projectCode}  -  {subContractor} </Text>
+                    <Text style={styles.infoTitle}>ProjectCode:</Text>
+                    <Text style={styles.infoData}>{projectCode}  -  {subContractor}</Text>
                   </View>
                   <View style={styles.rowInfo}>
                     <Text>User:   </Text>
-                    <Text style={styles.infoData}>{userLogin}</Text>
+                    <Text style={styles.textData}>{userLogin}</Text>
                     <Text>   Inspector:   </Text>
                     <View style={styles.cellThreeAction}>
                       <Text style={styles.textData}>{globalInspector}</Text>
@@ -1001,12 +1016,13 @@ const styles = StyleSheet.create({
     minHeight: 24,
     marginBottom: 4,
   },
+  infoTitle: {
+    flex: 3,
+  },
   infoData: {
+    flex: 7,
     fontWeight: 'bold',
     color: BASE_COLOR,
-    textAlign: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   rowInfoAction: {
     flexDirection: 'row',
