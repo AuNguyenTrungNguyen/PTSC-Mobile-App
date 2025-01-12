@@ -288,6 +288,26 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Electrical Tray Ladder Register
+  const _onElectricalTrayLadderRegister = async () => {
+    navigation.navigate(
+      'ElectricalTrayLadderRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Tray Ladder Register
+  const _onInstrumentTrayLadderRegister = async () => {
+    navigation.navigate(
+      'InstrumentTrayLadderRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Item
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -339,6 +359,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nTray Ladder'} onPress={_onElectricalTrayLadderRegister} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nTray Ladder'} onPress={_onInstrumentTrayLadderRegister} iconName='cable-data' iconType='MaterialCommunity' />
+            </View>
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />

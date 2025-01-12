@@ -125,6 +125,8 @@ import DrumNoListScreen from './screens/electircal/drumlibrary/DrumNoListScreen'
 import CableControlReportScreen from './screens/electircal/cablereport/CableControlReportScreen';
 import ElectricalSupportRegisterListScreen from './screens/electircal/electrical_support_resigter/ElectricalSupportRegisterListScreen';
 import InstrumentSupportRegisterListScreen from './screens/electircal/instrument_support_resigter/InstrumentSupportRegisterListScreen';
+import ElectricalTrayLadderRegisterListScreen from './screens/electircal/electrical_tray_ladder_resigter/ElectricalTrayLadderRegisterListScreen';
+import InstrumentTrayLadderRegisterListScreen from './screens/electircal/instrument_tray_ladder_resigter/InstrumentTrayLadderRegisterListScreen';
 
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
@@ -1072,6 +1074,7 @@ const ElectricalCONSStackScreens = () => {
           headerBackTitle: 'Back',
         })}
       />
+
       {/* Electrical Support */}
       <ElectricalCONSStack.Screen
         name={'ElectricalSupportRegisterList'}
@@ -1087,6 +1090,29 @@ const ElectricalCONSStackScreens = () => {
       <ElectricalCONSStack.Screen
         name={'InstrumentSupportRegisterList'}
         component={InstrumentSupportRegisterListScreen}
+        options={
+          {
+            title: 'Electrical Support Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+
+      {/* Electrical Tray Ladder */}
+      <ElectricalCONSStack.Screen
+        name={'ElectricalTrayLadderRegisterList'}
+        component={ElectricalTrayLadderRegisterListScreen}
+        options={
+          {
+            title: 'Electrical Support Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Tray Ladder */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentTrayLadderRegisterList'}
+        component={InstrumentTrayLadderRegisterListScreen}
         options={
           {
             title: 'Electrical Support Control',

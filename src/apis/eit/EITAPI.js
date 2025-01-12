@@ -449,3 +449,73 @@ export const UpdateInstrumentSupportRegisterListAPI = async (listItemUpdate) => 
     }
   ).then(res => res.json());
 };
+
+//-- Electrical Tray Ladder Register
+export const GetElectricalTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetElectricalTrayLadderRegisterList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&location=' + location,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateElectricalTrayLadderRegisterListAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateElectricalTrayLadderRegisterList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+
+//-- Instrument Support Register
+export const GetInstrumentTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetInstrumentTrayLadderRegisterList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + drawingNo
+    + '&location=' + location,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateInstrumentTrayLadderRegisterListAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateInstrumentTrayLadderRegisterList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
