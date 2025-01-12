@@ -380,14 +380,6 @@ const HomeCONSScreen = ({ route, navigation }) => {
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
             <View style={styles.row}>
-              <RenderItemBox title={'Electrical\nTray Ladder'} onPress={_onElectricalTrayLadderRegister} iconName='electrical-services' iconType='Material' />
-              <RenderItemBox title={'Instrument\nTray Ladder'} onPress={_onInstrumentTrayLadderRegister} iconName='cable-data' iconType='MaterialCommunity' />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Electrical\nEquipment'} onPress={_onElectricalEquipmentControl} iconName='electrical-services' iconType='Material' />
-              <RenderItemBox title={'Instrument\nEquipment'} onPress={_onInstrumentEquipmentControl} iconName='cable-data' iconType='MaterialCommunity' />
-            </View>
-            <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
             </View>
@@ -406,6 +398,14 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nSupport Control'} onPress={_onElectricalSupportRegister} iconName='electrical-services' iconType='Material' />
               <RenderItemBox title={'Instrument\nSupport Control'} onPress={_onInstrumentSupportRegister} iconName='cable-data' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nTray Ladder'} onPress={_onElectricalTrayLadderRegister} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nTray Ladder'} onPress={_onInstrumentTrayLadderRegister} iconName='cable-data' iconType='MaterialCommunity' />
+            </View>
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nEquipment'} onPress={_onElectricalEquipmentControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nEquipment'} onPress={_onInstrumentEquipmentControl} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
