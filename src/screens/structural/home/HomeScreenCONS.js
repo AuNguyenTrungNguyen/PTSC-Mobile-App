@@ -330,7 +330,7 @@ const HomeScreenCONS = ({ route, navigation }) => {
         projectCode: projectCode,
         subContractor: subContractor,
         isShowDetail: true,
-        isPending: false,
+        isPending: true,
         isReadOnly: true,
       }
     );

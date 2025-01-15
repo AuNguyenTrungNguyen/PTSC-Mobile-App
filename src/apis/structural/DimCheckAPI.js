@@ -185,7 +185,7 @@ export const GetDIMAfterWeldDetailAPI = async (projectCode, facilityCode, drawin
       },
     }).then(res => res.json());
 };
-export const UpdateDIMAfterWeldDetailAPI = async (team, listItemUpdate) => {
+export const UpdateDIMAfterWeldDetailAPI = async (team, location, remark, listItemUpdate) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -196,7 +196,7 @@ export const UpdateDIMAfterWeldDetailAPI = async (team, listItemUpdate) => {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ team, listItemUpdate }),
+      body: JSON.stringify({ team, location, remark, listItemUpdate }),
     }
   ).then(res => res.json());
 };

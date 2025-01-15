@@ -6,12 +6,13 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Toast from 'react-native-simple-toast';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import Dialog from "react-native-dialog";
 
 import {
   GetDIMAfterWeldDetailAPI,
   UpdateDIMAfterWeldDetailAPI
 } from '../../../apis/structural/DimCheckAPI';
-import { GetTeamListFilterSubContractorAPI } from '../../../apis/app/AppAPI';
+import { GetTeamListFilterSubContractorAPI, GetLocationListSubContractorAPI } from '../../../apis/app/AppAPI';
 
 import Networker from '../../../utils/Networker';
 import Helper from '../../../utils/Helper';
@@ -24,7 +25,7 @@ import SelectPopup from '../../../components/SelectPopup';
 
 const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
 
-  const { projectCode, subContractor, facilityCode, drawingNo, assemblyCode, userLogin, link } = route.params;
+  const { projectCode, subContractor, facilityCode, drawingNo, assemblyCode, teamData, locationData, timeData, userLogin, link } = route.params;
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -74,6 +75,7 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
 
   const getAllData = async () => {
     callAPI(() => { getTeamList() });
+    callAPI(() => { getLocationList() });
     callAPI(() => { getPieceMarkDetail() });
   };
 
@@ -83,6 +85,27 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.Success) {
           setTeamList(res.Data);
+          setIsLoading(false);
+          setIsError(false);
+          setIsSearching(false);
+        } else {
+          setIsLoading(false);
+          setIsError(true);
+          setIsSearching(false);
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        setIsError(true);
+        setIsSearching(false);
+      });
+  };
+  const getLocationList = async () => {
+    const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
+    GetLocationListSubContractorAPI(projectCode, disciplineCode)
+      .then(res => {
+        if (res.success) {
+          setLocationList(res.data);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
@@ -131,7 +154,8 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
   const updatePieceMarkDetail = async () => {
     setIsUploading(true);
     const listUpdate = Helper.handleListUpdate(pieceMarkUpdateList);
-    UpdateDIMAfterWeldDetailAPI(team, listUpdate)
+    const remark = time;
+    UpdateDIMAfterWeldDetailAPI(team, location, remark, listUpdate)
       .then(res => {
         if (res.success) {
           setPieceMarkUpdateList([]);
@@ -177,9 +201,9 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
     searchPieceMarkDetail(filterPieceMarkNo, filterType, true);
   };
 
-
+  //-- Team
   const [isVisibleTeam, setIsVisibleTeam] = useState(false);
-  const [team, setTeam] = useState(null);
+  const [team, setTeam] = useState(teamData);
   const [teamList, setTeamList] = useState([]);
   const _onPressClearTeam = () => {
     setTeam(null);
@@ -188,6 +212,43 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
   const _onChangeTeam = data => {
     setTeam(data);
     setIsVisibleTeam(false);
+  };
+
+  //-- Location
+  const [isVisibleLocation, setIsVisibleLocation] = useState(false);
+  const [location, setLocation] = useState(locationData);
+  const [locationList, setLocationList] = useState([]);
+  const _onPressClearLocation = () => {
+    setLocation(null);
+    setIsVisibleLocation(false);
+  };
+  const _onChangeLocation = data => {
+    setLocation(data);
+    setIsVisibleLocation(false);
+  };
+
+  //-- Time
+  const [isVisibleTime, setIsVisibleTime] = useState(false);
+  const [time, setTime] = useState(timeData);
+  const [timeDisplay, setTimeDisplay] = useState(timeData);
+
+  const _onPressOpenTime = () => {
+    if (time) {
+      setTimeDisplay(time.toString());
+    } else {
+      setTimeDisplay('');
+    }
+    setIsVisibleTime(true);
+  };
+  const _onChangeTime = () => {
+    // let value = timeDisplay.trim();
+    // setTimeDisplay(value);
+    // if (!timeDisplay || !timeDisplay.trim()) {
+    //   Toast.show('Please enter time!', Toast.SHORT, ['RCTModalHostViewController']);
+    //   return;
+    // }
+    setTime(timeDisplay);
+    setIsVisibleTime(false);
   };
 
 
@@ -269,9 +330,9 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
               boxType='square'
               disabled={isDisabled}
               onCheckColor={OPP_COLOR}
-              onFillColor={isDisabled ? DISABLE_COLOR : BASE_COLOR}
-              onTintColor={isDisabled ? DISABLE_COLOR : BASE_COLOR}
-              tintColors={{ true: isDisabled ? DISABLE_COLOR : BASE_COLOR, false: '#aaaaaa' }}
+              onFillColor={isDisabled ? ACC_COLOR : BASE_COLOR}
+              onTintColor={isDisabled ? ACC_COLOR : BASE_COLOR}
+              tintColors={{ true: isDisabled ? ACC_COLOR : BASE_COLOR, false: '#aaaaaa' }}
               animationDuration={0.2}
               onAnimationType='flat'
             />
@@ -315,6 +376,23 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
                   style={styles.dataIcon} name='pencil' size={24} color={BASE_COLOR} />
               </View>
             </View>
+            <View style={styles.dataContainer}>
+              <Text style={styles.dataTitle}>Location:</Text>
+              <View style={styles.dataItem}>
+                <Text style={styles.dataText}>{location}</Text>
+                <FontAwesomeIcon onPress={() => { setIsVisibleLocation(true) }}
+                  style={styles.dataIcon} name='pencil' size={24} color={BASE_COLOR} />
+              </View>
+            </View>
+            <View style={styles.dataContainer}>
+              <Text style={styles.dataTitle}>Time:</Text>
+              <View style={styles.dataItem}>
+                <Text style={styles.dataText}>{time}</Text>
+                <FontAwesomeIcon onPress={() => { _onPressOpenTime() }}
+                  style={styles.dataIcon} name='pencil' size={24} color={BASE_COLOR} />
+              </View>
+            </View>
+
             <View style={styles.headerActionRow}>
               <Text style={styles.headerCellTitle}>PieceMarkNo:</Text>
               <View style={styles.headerActionContainer}>
@@ -397,19 +475,36 @@ const DIMAfterWeldDetailScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleTeam(false)}
         onClear={_onPressClearTeam}
       />
+      <SelectPopup
+        visible={isVisibleLocation}
+        data={locationList}
+        onChangeItem={_onChangeLocation}
+        onCancel={() => setIsVisibleLocation(false)}
+        onClear={_onPressClearLocation}
+      />
       {/* <SelectPopup
         visible={isVisibleFilterType}
         data={[Constant.PIECE_MARK_ALL, Constant.PIECE_MARK_CHECKED, Constant.PIECE_MARK_UNCHECKED]}
         onCancel={() => setIsVisibleFilterType(false)}
         onChangeItem={_onChangeFilterType}>
       </SelectPopup> */}
+      <Dialog.Container visible={isVisibleTime}>
+        <Dialog.Title>{'Enter Time'}</Dialog.Title>
+        <Dialog.Input
+          value={timeDisplay}
+          onChangeText={(text) => setTimeDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleTime(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeTime} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 }
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
-const DISABLE_COLOR = '#aaaaaa';
+const ACC_COLOR = 'green';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

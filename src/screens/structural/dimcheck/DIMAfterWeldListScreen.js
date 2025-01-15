@@ -198,6 +198,9 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
         facilityCode: item.FacilityCode,
         drawingNo: item.CuttingSheetDrawingNo,
         assemblyCode: item.AssemblyCode,
+        teamData: item.DIM_AfterWeldRequestByTeam,
+        locationData: item.DIM_AfterWeldLocation,
+        timeData: item.DIM_AfterWeldRemark,
         userLogin: userLogin,
         isPending: isPending,
         isReadOnly: isReadOnly,
@@ -248,6 +251,14 @@ const DIMAfterWeldListScreen = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.cellTitle}>Assembly:</Text>
           <Text style={styles.cellData}>{item.AssemblyCode}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Location:</Text>
+          <Text style={styles.cellData}>{item.DIM_AfterWeldLocation}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Time:</Text>
+          <Text style={styles.cellData}>{item.DIM_AfterWeldRemark}</Text>
         </View>
         {
           isShowDetail &&
