@@ -129,6 +129,7 @@ import ElectricalTrayLadderRegisterListScreen from './screens/electircal/electri
 import InstrumentTrayLadderRegisterListScreen from './screens/electircal/instrument_tray_ladder_resigter/InstrumentTrayLadderRegisterListScreen';
 import ElectricalEquipmentControlListScreen from './screens/electircal/electrical_equipment_control/ElectricalEquipmentControlListScreen';
 import InstrumentEquipmentControlListScreen from './screens/electircal/instrument_equipment_control/InstrumentEquipmentControlListScreen';
+import TubingControlListScreen from './screens/electircal/tubing_control/TubingControlListScreen';
 
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
@@ -1141,6 +1142,17 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: 'Instrument Equipment Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Equipment */}
+      <ElectricalCONSStack.Screen
+        name={'TubingControlList'}
+        component={TubingControlListScreen}
+        options={
+          {
+            title: 'Tubing Control',
             headerBackTitle: 'Back',
           }
         }

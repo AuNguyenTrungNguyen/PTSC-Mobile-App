@@ -328,6 +328,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Tubing Control
+  const _onTubingControl = async () => {
+    navigation.navigate(
+      'TubingControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Item
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
@@ -413,7 +423,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.row}>
               <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} number={notifyEquipmentNumbers.Pending} />
-              <RenderItemBox disable={true} />
+              <RenderItemBox title={'Tubing Control'} onPress={_onTubingControl} iconName='timeline' iconType='MaterialCommunity' />
             </View>
           </ScrollView>
         </View>

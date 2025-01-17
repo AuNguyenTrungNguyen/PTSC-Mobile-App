@@ -589,3 +589,40 @@ export const UpdateInstrumentEquipmentControlListAPI = async (listItemUpdate) =>
     }
   ).then(res => res.json());
 };
+
+//-- Tubing Control
+export const GetTubingControlListAPI = async (projectCode, facilityCode, subSystem, drawingNo, description) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/eit/GetTubingControlList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&subSystem=' + subSystem
+    + '&drawingNo=' + drawingNo
+    + '&description=' + description,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const UpdateTubingControlListAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateTubingControlList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+
