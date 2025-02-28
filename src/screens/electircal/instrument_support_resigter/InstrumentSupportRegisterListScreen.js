@@ -28,6 +28,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
 
   const [drawingNo, setDrawingNo] = useState('');
   const [location, setLocation] = useState('');
+  const [name, setName] = useState('');
   const [EITItems, setEITItems] = useState(null);
   const [EITUpdateItems, setEITUpdateItems] = useState([]);
 
@@ -120,7 +121,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
   };
   async function getEITItems() {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetInstrumentSupportRegisterListAPI(projectCode, facility, drawingNo, location)
+    GetInstrumentSupportRegisterListAPI(projectCode, facility, drawingNo, location, name)
       .then(res => {
         if (res.Success && res.Data) {
           setEITItems(res.Data);
@@ -144,6 +145,9 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
   };
   const _onChangeLocation = value => {
     setLocation(value);
+  };
+  const _onChangeName = value => {
+    setName(value);
   };
 
   //-- Checkbox
@@ -352,6 +356,22 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
                         location == ''
                           ? null
                           : <Icon name='times-circle' onPress={() => _onChangeLocation('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>Name:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={name}
+                        onChangeText={_onChangeName}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        name == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>

@@ -381,7 +381,7 @@ export const UpdateInstrumentTerminationControlDetailAPI = async (modelUpdate, m
 };
 
 //-- Electrical Support Register
-export const GetElectricalSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+export const GetElectricalSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -389,7 +389,8 @@ export const GetElectricalSupportRegisterListAPI = async (projectCode, facilityC
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&location=' + location,
+    + '&location=' + location
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -416,7 +417,7 @@ export const UpdateElectricalSupportRegisterListAPI = async (listItemUpdate) => 
 };
 
 //-- Instrument Support Register
-export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -424,7 +425,8 @@ export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityC
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&location=' + location,
+    + '&location=' + location
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -451,7 +453,7 @@ export const UpdateInstrumentSupportRegisterListAPI = async (listItemUpdate) => 
 };
 
 //-- Electrical Tray Ladder Register
-export const GetElectricalTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+export const GetElectricalTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -459,7 +461,8 @@ export const GetElectricalTrayLadderRegisterListAPI = async (projectCode, facili
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&location=' + location,
+    + '&location=' + location
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -486,7 +489,7 @@ export const UpdateElectricalTrayLadderRegisterListAPI = async (listItemUpdate) 
 };
 
 //-- Instrument Tray Ladder Register
-export const GetInstrumentTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+export const GetInstrumentTrayLadderRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -494,7 +497,8 @@ export const GetInstrumentTrayLadderRegisterListAPI = async (projectCode, facili
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&location=' + location,
+    + '&location=' + location
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -521,7 +525,7 @@ export const UpdateInstrumentTrayLadderRegisterListAPI = async (listItemUpdate) 
 };
 
 //-- Electrical Equipment Control
-export const GetElectricalEquipmentControlListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+export const GetElectricalEquipmentControlListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -529,7 +533,8 @@ export const GetElectricalEquipmentControlListAPI = async (projectCode, facility
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&location=' + location,
+    + '&location=' + location
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -556,7 +561,7 @@ export const UpdateElectricalEquipmentControlListAPI = async (listItemUpdate) =>
 };
 
 //-- Instrument Equipment Control
-export const GetInstrumentEquipmentControlListAPI = async (projectCode, facilityCode, drawingNo, location) => {
+export const GetInstrumentEquipmentControlListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -564,7 +569,8 @@ export const GetInstrumentEquipmentControlListAPI = async (projectCode, facility
     + '?projectCode=' + projectCode
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
-    + '&location=' + location,
+    + '&location=' + location
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -591,7 +597,7 @@ export const UpdateInstrumentEquipmentControlListAPI = async (listItemUpdate) =>
 };
 
 //-- Tubing Control
-export const GetTubingControlListAPI = async (projectCode, facilityCode, subSystem, drawingNo, description) => {
+export const GetTubingControlListAPI = async (projectCode, facilityCode, subSystem, drawingNo, description, name) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -600,7 +606,8 @@ export const GetTubingControlListAPI = async (projectCode, facilityCode, subSyst
     + '&facilityCode=' + facilityCode
     + '&subSystem=' + subSystem
     + '&drawingNo=' + drawingNo
-    + '&description=' + description,
+    + '&description=' + description
+    + '&name=' + name,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

@@ -29,6 +29,7 @@ const TubingControlListScreen = ({ route, navigation }) => {
   const [subsystem, setSubSystem] = useState('');
   const [drawingNo, setDrawingNo] = useState('');
   const [service, setService] = useState('');
+  const [name, setName] = useState('');
 
   const [EITItems, setEITItems] = useState(null);
   const [EITUpdateItems, setEITUpdateItems] = useState([]);
@@ -114,7 +115,6 @@ const TubingControlListScreen = ({ route, navigation }) => {
     }
     setIsVisibleFacility(false);
   };
-
   //-- Search Action
   const _onPressSearchCable = () => {
     Keyboard.dismiss();
@@ -122,7 +122,7 @@ const TubingControlListScreen = ({ route, navigation }) => {
   };
   async function getEITItems() {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetTubingControlListAPI(projectCode, facility, subsystem, drawingNo, service)
+    GetTubingControlListAPI(projectCode, facility, subsystem, drawingNo, service, name)
       .then(res => {
         if (res.Success && res.Data) {
           setEITItems(res.Data);
@@ -149,6 +149,9 @@ const TubingControlListScreen = ({ route, navigation }) => {
   };
   const _onChangeService = value => {
     setService(value);
+  };
+  const _onChangeName = value => {
+    setName(value);
   };
 
   //-- Checkbox
@@ -376,6 +379,22 @@ const TubingControlListScreen = ({ route, navigation }) => {
                         service == ''
                           ? null
                           : <Icon name='times-circle' onPress={() => _onChangeService('')} style={styles.inputIcon} />
+                      }
+                    </View>
+                  </View>
+                  <View style={styles.rowInfoAction}>
+                    <Text style={styles.infoTitleAction}>Name:</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={name}
+                        onChangeText={_onChangeName}
+                        underlineColorAndroid='transparent'
+                      />
+                      {
+                        name == ''
+                          ? null
+                          : <Icon name='times-circle' onPress={() => _onChangeName('')} style={styles.inputIcon} />
                       }
                     </View>
                   </View>

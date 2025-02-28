@@ -1013,7 +1013,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>HeatNo01:</Text>
+                  <Text style={styles.redText}>{'HeatNo01\nSerialNo01'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   {
@@ -1022,7 +1022,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                       <TouchableOpacity
                         style={styles.itemActionIcon}
                         onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat01')}>
-                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01) + '   |   ' + Formater.formatEmptyData(item.SerialNo01)}</Text>
                         {
                           isDisableItem
                             ?
@@ -1035,7 +1035,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                       <TouchableOpacity
                         style={styles.itemActionIcon}
                         onPress={() => _onPressShowHeatNoPopup(item.ItemCode01, index, 'Heat01')}>
-                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01) + '   |   ' + Formater.formatEmptyData(item.SerialNo01)}</Text>
                         {
                           isDisableItem
                             ?
@@ -1063,7 +1063,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>HeatNo02:</Text>
+                  <Text style={styles.redText}>{'HeatNo02\nSerialNo02'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   {
@@ -1072,7 +1072,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                       <TouchableOpacity
                         style={styles.itemActionIcon}
                         onPress={() => _onPressShowHeatNoPipeSupportPopup(index, 'Heat02')}>
-                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02) + '   |   ' + Formater.formatEmptyData(item.SerialNo02)}</Text>
                         {
                           isDisableItem
                             ?
@@ -1085,7 +1085,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                       <TouchableOpacity
                         style={styles.itemActionIcon}
                         onPress={() => _onPressShowHeatNoPopup(item.ItemCode02, index, 'Heat02')}>
-                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02) + '   |   ' + Formater.formatEmptyData(item.SerialNo02)}</Text>
                         {
                           isDisableItem
                             ?
