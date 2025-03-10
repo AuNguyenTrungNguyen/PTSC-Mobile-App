@@ -12,7 +12,7 @@ import Toast from 'react-native-simple-toast';
 import NetInfo from '@react-native-community/netinfo';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { GetLocationListSubContractorAPI, GetTeamListSubContractorAPI, GetWPSListSubContractorAPI, GetWeldingConsumableAPI, GetWeldingMachineAPI } from '../../../apis/app/AppAPI';
+import { GetLocationListSubContractorAPI, GetTeamListSubContractorAPI, GetWPSListSubContractorAPI } from '../../../apis/app/AppAPI';
 import { GetConstructionDetaiFilterlAPI, UpdateConstructionDetailAPI, GetReweldFromQCAPI } from '../../../apis/structural/ConstructionAPI';
 
 import Helper from '../../../utils/Helper';
@@ -842,8 +842,8 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
       {
         projectCode: projectCode,
         currentLotNo: value,
+        currentRoute: 'ConstructionMultiDetail',
         index: index,
-        isMultiple: true,
       }
     );
   };
@@ -860,7 +860,7 @@ const ConstructionMultiDetailScreen = ({ route, navigation }) => {
         projectCode: projectCode,
         currentMachineNo: value,
         index: index,
-        isMultiple: true,
+        currentRoute: 'ConstructionMultiDetail',
       }
     );
   };

@@ -323,47 +323,16 @@ export const ReadByteFromURLAPI = (url, token) =>
     }
   ).then(res => res.json());
 
-export const GetWeldingConsumableAPI = async projectCode => {
-  const token = await Helper.getData('TOKEN');
-  const subContractor = await Helper.getData('SUB_CONTRACTOR');
-  return fetch(
-    Port_Server
-    + '/api/App/GetWeldingConsumable'
-    + '?projectCode=' + projectCode
-    + '&subContractor=' + subContractor,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
-
-export const GetWeldingMachineAPI = async projectCode => {
-  const token = await Helper.getData('TOKEN');
-  const subContractor = await Helper.getData('SUB_CONTRACTOR');
-  return fetch(
-    Port_Server
-    + '/api/App/GetWeldingMachine'
-    + '?projectCode=' + projectCode
-    + '&subContractor=' + subContractor,
-    {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then(res => res.json());
-};
-
 export const GetWeldingConsumableListAPI = async (projectCode, no) => {
   const token = await Helper.getData('TOKEN');
+  const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
   const subContractor = await Helper.getData('SUB_CONTRACTOR');
+
   return fetch(
     Port_Server
     + '/api/App/GetWeldingConsumableList'
     + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
     + '&no=' + no
     + '&subContractor=' + subContractor,
     {
@@ -377,11 +346,13 @@ export const GetWeldingConsumableListAPI = async (projectCode, no) => {
 
 export const GetWeldingMachineListAPI = async (projectCode, no) => {
   const token = await Helper.getData('TOKEN');
+  const disciplineCode = await Helper.getData('DISCIPLINE_CODE');
   const subContractor = await Helper.getData('SUB_CONTRACTOR');
   return fetch(
     Port_Server
     + '/api/App/GetWeldingMachineList'
     + '?projectCode=' + projectCode
+    + '&disciplineCode=' + disciplineCode
     + '&no=' + no
     + '&subContractor=' + subContractor,
     {

@@ -48,6 +48,21 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       }
     }, [route.params?.welderSelected, route.params?.heatNoSelected, route.params?.index]
   );
+  useEffect(
+    () => {
+      if (keyUpdate === 'WeldingConsumableLotNo') {
+        _onChangeLotNo(route.params?.lotNoSelected);
+      }
+    }, [route.params?.lotNoSelected, route.params?.index]
+  );
+
+  useEffect(
+    () => {
+      if (keyUpdate === 'WeldingMachineNo') {
+        _onChangeMachineNo(route.params?.machineNoSelected);
+      }
+    }, [route.params?.machineNoSelected, route.params?.index]
+  );
 
   const [isReadOnly, setIsReadOnly] = useState(false);
   useEffect(
@@ -704,6 +719,62 @@ const DrawingDetailScreen = ({ route, navigation }) => {
     onChangeData(welderSelected);
   };
 
+  //-- CompleteDate
+  const [isVisibleCompleteDate, setIsVisibleCompleteDate] = useState(false);
+  const [completeDateDisplay, setCompleteDateDisplay] = useState(new Date());
+  const _onPressSelectCompleteDate = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setCompleteDateDisplay(new Date(Moment(value).format("YYYY-MM-DDTHH:mm:00.000Z")));
+    } else {
+      setCompleteDateDisplay(new Date());
+    }
+    setIsVisibleCompleteDate(true);
+  };
+  const _onChangeCompleteDate = (selectedDate) => {
+    if (selectedDate != undefined) {
+      onChangeData(selectedDate);
+    }
+    setIsVisibleCompleteDate(false);
+  };
+
+  const _onPressSelectLotNo = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    navigation.navigate(
+      'ConstructionAddLotNo',
+      {
+        projectCode: projectCode,
+        currentLotNo: value,
+        currentRoute: 'DrawingDetail',
+        index: index,
+      }
+    );
+  };
+  const _onChangeLotNo = selected => {
+    onChangeData(selected);
+    // navigation.setParams({ lotNoSelected: null });
+  };
+
+  const _onPressSelectMachineNo = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    navigation.navigate(
+      'ConstructionAddMachineNo',
+      {
+        projectCode: projectCode,
+        currentMachineNo: value,
+        currentRoute: 'DrawingDetail',
+        index: index,
+      }
+    );
+  };
+  const _onChangeMachineNo = selected => {
+    onChangeData(selected);
+  };
+
+  //-- Action
   const _onPressClearNow = (index) => {
     const keyDate = code == Constant.CODE_FITUP ? 'FittingDate' : 'WeldingDate';
     const keyPercent = code == Constant.CODE_FITUP ? 'FitPercentage' : 'WeldPercentage';
@@ -723,6 +794,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       array[index]['WelderID'] = valueClear;
       array[index]['WPSNo'] = valueClear;
       array[index]['WelderTeam'] = valueClear;
+      array[index]['WeldingCompletedDate'] = valueClear;
+      array[index]['WeldingConsumableLotNo'] = valueClear;
+      array[index]['WeldingMachineNo'] = valueClear;
     }
     setDetailDrawingList(array);
 
@@ -750,6 +824,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
           ['WelderID']: valueClear,
           ['WPSNo']: valueClear,
           ['WelderTeam']: valueClear,
+          ['WeldingCompletedDate']: valueClear,
+          ['WeldingConsumableLotNo']: valueClear,
+          ['WeldingMachineNo']: valueClear,
         });
       }
     } else {
@@ -766,6 +843,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         array[objIndex]['WelderID'] = valueClear;
         array[objIndex]['WPSNo'] = valueClear;
         array[objIndex]['WelderTeam'] = valueClear;
+        array[objIndex]['WeldingCompletedDate'] = valueClear;
+        array[objIndex]['WeldingConsumableLotNo'] = valueClear;
+        array[objIndex]['WeldingMachineNo'] = valueClear;
       }
     }
     setUpdateDrawingList(array);
@@ -1268,6 +1348,64 @@ const DrawingDetailScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
+
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>{'Welding\nCompleted\nDate'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemAction}
+                    onPress={() => _onPressSelectCompleteDate(item.WeldingCompletedDate, index, 'WeldingCompletedDate')}>
+                    <Text style={styles.textData}>{Formater.formatDateDataTime(item.WeldingCompletedDate)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={'#a3a3a3'} />
+                        :
+                        <AntDesignIcon style={styles.iconAction} name='calendar' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>{'Consumable\nLotNo'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressSelectLotNo(item.WeldingConsumableLotNo, index, 'WeldingConsumableLotNo')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingConsumableLotNo)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>{'MachineNo'}:</Text>
+                </View>
+                <View style={styles.cellDataLine}>
+                  <TouchableOpacity
+                    style={styles.itemActionIcon}
+                    onPress={() => _onPressSelectMachineNo(item.WeldingMachineNo, index, 'WeldingMachineNo')}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingMachineNo)}</Text>
+                    {
+                      isDisableItem
+                        ?
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={'#a3a3a3'} />
+                        :
+                        <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
             </>
         }
       </View>
@@ -1385,6 +1523,14 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         onChangeItem={_onChangeWPSCode}
         onCancel={() => setIsVisibleWPS(false)}
         onClear={_onPressClearWPS}
+      />
+      <DateTimePickerModal
+        isVisible={isVisibleCompleteDate}
+        headerTextIOS={'Update ' + keyUpdate + ':'}
+        date={completeDateDisplay}
+        mode={'datetime'}
+        onConfirm={_onChangeCompleteDate}
+        onCancel={() => { setIsVisibleCompleteDate(false) }}
       />
     </SafeAreaView>
   );

@@ -247,6 +247,26 @@ const PipingCONSStackScreens = () => {
         }
       />
       <PipingCONSStack.Screen
+        name='ConstructionAddLotNo'
+        component={ConstructionAddLotNoScreen}
+        options={
+          {
+            title: 'Select Consumable LotNo',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
+        name='ConstructionAddMachineNo'
+        component={ConstructionAddMachineNoScreen}
+        options={
+          {
+            title: 'Select MachineNo',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingCONSStack.Screen
         name='QCStatus'
         component={DrawingQCStatusScreen}
         options={({ route }) => ({
@@ -885,7 +905,6 @@ const StructuralQCStackScreens = () => {
   );
 };
 
-
 //-- EIT Stacks
 const ElectricalCONSStack = createStackNavigator();
 const ElectricalCONSStackScreens = () => {
@@ -1457,7 +1476,7 @@ const CommonStackScreens = () => {
   );
 };
 
-//-- Common Stacks
+//-- Equipment Stacks
 const EquipmentStack = createStackNavigator();
 const EquipmentStackScreens = () => {
   return (

@@ -12,7 +12,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const ConstructionAddMachineNoScreen = ({ route, navigation }) => {
 
-  const { projectCode, currentMachineNo, index, isMultiple } = route.params;
+  const { projectCode, currentMachineNo, index, currentRoute } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -88,8 +88,8 @@ const ConstructionAddMachineNoScreen = ({ route, navigation }) => {
   };
 
   const _onPressAddMachineNo = () => {
-    let route = isMultiple ? 'ConstructionMultiDetail' : 'ConstructionDetail';
-    navigation.navigate(route, { machineNoSelected: machineNoSelected, index: index });
+    let route = currentRoute;
+    navigation.navigate(route, { machineNoSelected: machineNoSelected, index: Math.random() });
   };
 
   const RenderMachineNoList = () => {

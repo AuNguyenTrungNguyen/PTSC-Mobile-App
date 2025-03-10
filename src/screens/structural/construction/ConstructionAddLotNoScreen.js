@@ -12,7 +12,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const ConstructionAddLotNoScreen = ({ route, navigation }) => {
 
-  const { projectCode, currentLotNo, index, isMultiple } = route.params;
+  const { projectCode, currentLotNo, index, currentRoute } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -88,8 +88,8 @@ const ConstructionAddLotNoScreen = ({ route, navigation }) => {
   };
 
   const _onPressAddLotNo = () => {
-    let route = isMultiple ? 'ConstructionMultiDetail' : 'ConstructionDetail';
-    navigation.navigate(route, { lotNoSelected: lotNoSelected, index: index });
+    let route = currentRoute;
+    navigation.navigate(route, { lotNoSelected: lotNoSelected, index: Math.random() });
   };
 
   const RenderLotNoList = () => {

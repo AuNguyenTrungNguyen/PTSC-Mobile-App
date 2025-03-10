@@ -760,6 +760,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       {
         projectCode: projectCode,
         currentLotNo: value,
+        currentRoute: 'ConstructionDetail',
         index: index,
       }
     );
@@ -776,6 +777,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       {
         projectCode: projectCode,
         currentMachineNo: value,
+        currentRoute: 'ConstructionDetail',
         index: index,
       }
     );
