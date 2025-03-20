@@ -193,9 +193,9 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {
                     isGlandedFrom
                       ?
-                      <Text style={styles.cellTitle}>From:</Text>
+                      <Text style={styles.cellTitle}>{'From\nEquipment:'}</Text>
                       :
-                      <Text style={styles.cellTitleRed}>From:</Text>
+                      <Text style={styles.cellTitleRed}>{'From\nEquipment:'}</Text>
                   }
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
@@ -214,7 +214,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                         onCheckColor={OPP_COLOR}
                         onFillColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
                         onTintColor={isFromUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                        tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
                         animationDuration={0.2}
                         onAnimationType='flat'
                       />
@@ -222,7 +222,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                       <CheckBox
                         value={isFromUpdated}
                         onValueChange={null}
-                        style={styles.checkBox}
+                        style={styles.checkBoxDisabled}
                         boxType='square'
                         disabled={true}
                         onCheckColor={OPP_COLOR}
@@ -234,6 +234,20 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                       />
                   }
                 </View>
+                <View style={styles.row}>
+                  {
+                    isGlandedFrom
+                      ?
+                      <Text style={styles.cellTitle}>{'From\nDescription:'}</Text>
+                      :
+                      <Text style={styles.cellTitleRed}>{'From\nDescription:'}</Text>
+                  }
+                  <View style={styles.cellData}>
+                    <View style={styles.containerAction}>
+                      <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.FromDescription)}</Text>
+                    </View>
+                  </View>
+                </View>
 
                 <View style={styles.line} />
 
@@ -241,9 +255,9 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                   {
                     isGlandedTo
                       ?
-                      <Text style={styles.cellTitle}>To:</Text>
+                      <Text style={styles.cellTitle}>{'To\nEquipment:'}</Text>
                       :
-                      <Text style={styles.cellTitleRed}>To:</Text>
+                      <Text style={styles.cellTitleRed}>{'To\nEquipment:'}</Text>
                   }
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
@@ -262,7 +276,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                         onCheckColor={OPP_COLOR}
                         onFillColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
                         onTintColor={isToUpdated ? DISABLE_COLOR : BASE_COLOR}
-                        tintColors={{ true: BASE_COLOR, false: BASE_COLOR }}
+                        tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
                         animationDuration={0.2}
                         onAnimationType='flat'
                       />
@@ -270,7 +284,7 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                       <CheckBox
                         value={isToUpdated}
                         onValueChange={null}
-                        style={styles.checkBox}
+                        style={styles.checkBoxDisabled}
                         boxType='square'
                         disabled={true}
                         onCheckColor={OPP_COLOR}
@@ -281,6 +295,20 @@ const InstrumentTerminationControlDetailScreen = ({ route, navigation }) => {
                         onAnimationType='flat'
                       />
                   }
+                </View>
+                <View style={styles.row}>
+                  {
+                    isGlandedTo
+                      ?
+                      <Text style={styles.cellTitle}>{'To\nDescription:'}</Text>
+                      :
+                      <Text style={styles.cellTitleRed}>{'To\nDescription:'}</Text>
+                  }
+                  <View style={styles.cellData}>
+                    <View style={styles.containerAction}>
+                      <Text style={styles.textBlue}>{Formater.formatEmptyData(terminateDetail.ToDescription)}</Text>
+                    </View>
+                  </View>
                 </View>
               </View>
 
@@ -360,8 +388,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   row: {
-    marginTop: 36,
-    marginBottom: 36,
+    // marginTop: 36,
+    // marginBottom: 36,
     flexDirection: 'row',
     marginVertical: 12,
     marginHorizontal: 4,
@@ -401,7 +429,7 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   cellData: {
-    flex: 1,
+    flex: 2,
     fontWeight: 'bold',
     color: BASE_COLOR,
     alignItems: 'flex-end'

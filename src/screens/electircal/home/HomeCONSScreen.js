@@ -389,41 +389,56 @@ const HomeCONSScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
           <ScrollView style={styles.table}>
-            <View style={styles.row}>
-              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
-              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Electrical\nCable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
-              <RenderItemBox title={'Instrument\nCable Control'} onPress={_onInstrumentCableControl} iconName='cable-data' iconType='MaterialCommunity' />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Electrical\nGland Control'} onPress={_onElectricalGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
-              <RenderItemBox title={'Instrument\nGland Control'} onPress={_onInstrumentGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Electrical\nTermination Control'} onPress={_onElectricalTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
-              <RenderItemBox title={'Instrument\nTermination Control'} onPress={_onInstrumentTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
-            </View>
+            {/* Support */}
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nSupport Control'} onPress={_onElectricalSupportRegister} iconName='electrical-services' iconType='Material' />
               <RenderItemBox title={'Instrument\nSupport Control'} onPress={_onInstrumentSupportRegister} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
+
+            {/* Tray Ladder */}
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nTray Ladder'} onPress={_onElectricalTrayLadderRegister} iconName='electrical-services' iconType='Material' />
               <RenderItemBox title={'Instrument\nTray Ladder'} onPress={_onInstrumentTrayLadderRegister} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
+
+            {/* Cable */}
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nCable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nCable Control'} onPress={_onInstrumentCableControl} iconName='cable-data' iconType='MaterialCommunity' />
+            </View>
+
+            {/* Gland */}
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nGland Control'} onPress={_onElectricalGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nGland Control'} onPress={_onInstrumentGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+            </View>
+
+            {/* Termination */}
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nTermination Control'} onPress={_onElectricalTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nTermination Control'} onPress={_onInstrumentTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
+            </View>
+
+            {/* Equipment */}
             <View style={styles.row}>
               <RenderItemBox title={'Electrical\nEquipment'} onPress={_onElectricalEquipmentControl} iconName='electrical-services' iconType='Material' />
               <RenderItemBox title={'Instrument\nEquipment'} onPress={_onInstrumentEquipmentControl} iconName='cable-data' iconType='MaterialCommunity' />
             </View>
+
+            {/* Tubing */}
+            <View style={styles.row}>
+              <RenderItemBox title={'Tubing Control'} onPress={_onTubingControl} iconName='timeline' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} number={notifyEquipmentNumbers.Pending} />
+            </View>
+
+            {/* Other */}
             <View style={styles.row}>
               <RenderItemBox title={'Cable Control\nReport'} onPress={_onElectricalCableControlReport} iconName='chart-timeline-variant-shimmer' iconType='MaterialCommunity' />
               <RenderItemBox title={'Cable\nDamage Log'} onPress={_onElectricalCableDamage} iconName='relation-only-one-to-zero-or-one' iconType='MaterialCommunity' />
             </View>
             <View style={styles.row}>
-              <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} number={notifyEquipmentNumbers.Pending} />
-              <RenderItemBox title={'Tubing Control'} onPress={_onTubingControl} iconName='timeline' iconType='MaterialCommunity' />
+              <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
+              <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
             </View>
           </ScrollView>
         </View>

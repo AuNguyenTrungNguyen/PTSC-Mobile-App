@@ -190,7 +190,7 @@ const ElectricalGlandControlDetailScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>From:</Text>
+                  <Text style={styles.cellTitle}>{'From\nEquipment:'}</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.FromEquipmentNo)}</Text>
@@ -229,7 +229,15 @@ const ElectricalGlandControlDetailScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>FromType:</Text>
+                  <Text style={styles.cellTitle}>{'From\nDescription:'}</Text>
+                  <View style={styles.cellData}>
+                    <View style={styles.containerAction}>
+                      <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.FromDescription)}</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.cellTitle}>From Type:</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.FromGlandType)}</Text>
@@ -237,7 +245,7 @@ const ElectricalGlandControlDetailScreen = ({ route, navigation }) => {
                   </View>
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>FromSize:</Text>
+                  <Text style={styles.cellTitle}>From Size:</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.FromGlandSize)}</Text>
@@ -246,7 +254,7 @@ const ElectricalGlandControlDetailScreen = ({ route, navigation }) => {
                 </View>
                 <View style={styles.line} />
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>To:</Text>
+                  <Text style={styles.cellTitle}>{'To\nEquipment:'}</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.ToEquipmentNo)}</Text>
@@ -285,7 +293,15 @@ const ElectricalGlandControlDetailScreen = ({ route, navigation }) => {
                   }
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>ToType:</Text>
+                  <Text style={styles.cellTitle}>{'To\nDescription:'}</Text>
+                  <View style={styles.cellData}>
+                    <View style={styles.containerAction}>
+                      <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.ToDescription)}</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.cellTitle}>To Type:</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.ToGlandType)}</Text>
@@ -293,7 +309,7 @@ const ElectricalGlandControlDetailScreen = ({ route, navigation }) => {
                   </View>
                 </View>
                 <View style={styles.row}>
-                  <Text style={styles.cellTitle}>ToSize:</Text>
+                  <Text style={styles.cellTitle}>To Size:</Text>
                   <View style={styles.cellData}>
                     <View style={styles.containerAction}>
                       <Text style={styles.textBlue}>{Formater.formatEmptyData(glandDetail.ToGlandSize)}</Text>
@@ -412,7 +428,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cellData: {
-    flex: 1,
+    flex: 2,
     fontWeight: 'bold',
     color: BASE_COLOR,
     alignItems: 'flex-end'
