@@ -585,7 +585,7 @@ const QCSpendListScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>WeldDate:</Text>
+                  <Text>Req.Date:</Text>
                 </View>
                 <View style={styles.cellOne}>
                   <Text style={styles.textData}>{Formater.formatDateData(item.WeldingDate)}</Text>
@@ -684,6 +684,30 @@ const QCSpendListScreen = ({ route, navigation }) => {
                     onPress={() => _onPressChangeStatus(null, index, 'VisualResult')}>
                     <Text style={styles.labelClean}>Clear</Text>
                   </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'Welding\nCompleted\nDate'}:</Text>
+                </View>
+                <View style={styles.cellThree}>
+                  <Text style={styles.textData}>{Formater.formatDateDataTime(item.WeldingCompletedDate)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'Consumable\nLotNo'}:</Text>
+                </View>
+                <View style={styles.cellThree}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingConsumableLotNo)}</Text>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'MachineNo'}:</Text>
+                </View>
+                <View style={styles.cellThree}>
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.WeldingMachineNo)}</Text>
                 </View>
               </View>
               <View style={styles.row}>

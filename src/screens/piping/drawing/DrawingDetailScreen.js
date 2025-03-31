@@ -55,7 +55,6 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       }
     }, [route.params?.lotNoSelected, route.params?.index]
   );
-
   useEffect(
     () => {
       if (keyUpdate === 'WeldingMachineNo') {
@@ -734,7 +733,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const _onChangeCompleteDate = (selectedDate) => {
     if (selectedDate != undefined) {
-      onChangeData(selectedDate);
+      onChangeData(Moment(selectedDate).format("YYYY-MM-DD HH:mm:00"));
     }
     setIsVisibleCompleteDate(false);
   };
@@ -1221,7 +1220,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>WeldingDate:</Text>
+                  <Text style={styles.redText}>Req.Date:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
