@@ -40,13 +40,16 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   const [isShowDescription, setIsShowDescription] = useState({ show: true, name: 'arrow-up-circle-outline' });
   useEffect(
     () => {
+      callAPI(getConstructionDetail);
+    }, []
+  );
+
+  useEffect(
+    () => {
       if (route.params?.welderSelected) {
         _onChangeWelders(route.params?.welderSelected);
       }
-      else {
-        callAPI(getConstructionDetail);
-      }
-    }, [route.params?.welderSelected, route.params?.heatNoSelected, route.params?.index]
+    }, [route.params?.welderSelected, route.params?.index]
   );
   useEffect(
     () => {
