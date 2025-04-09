@@ -83,20 +83,20 @@ export const GetCurrentConstructionInfoAPI = (projectCode, drawingNo, sheet, rev
     }).then(res => res.json());
 
 export const GetCurrentConstructionInfoSubContractorAPI = (projectCode, subContractor, drawingNo, sheet, rev, token) =>
-    fetch(
-      Port_Server
-      + '/api/piping/GetCurrentConstructionInfoSubContractor'
-      + '?projectCode=' + projectCode
-      + '&subContractor=' + subContractor
-      + '&drawingNo=' + encodeURIComponent(drawingNo)
-      + '&sheet=' + sheet
-      + '&rev=' + rev,
-      {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }).then(res => res.json());
+  fetch(
+    Port_Server
+    + '/api/piping/GetCurrentConstructionInfoSubContractor'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
+    + '&sheet=' + sheet
+    + '&rev=' + rev,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
 
 export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, sheet, rev, code, token) =>
   fetch(
@@ -115,23 +115,23 @@ export const GetConstructionDetailAPI = (projectCode, facilityCode, drawingNo, s
       },
     }).then(res => res.json());
 
-    export const GetConstructionDetailSubContractorAPI = (projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, token) =>
-    fetch(
-      Port_Server
-      + '/api/piping/GetConstructionDetailSubContractor'
-      + '?projectCode=' + projectCode
-      + '&subContractor=' + subContractor
-      + '&facilityCode=' + facilityCode
-      + '&drawingNo=' + encodeURIComponent(drawingNo)
-      + '&sheet=' + sheet
-      + '&rev=' + rev
-      + '&code=' + code,
-      {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }).then(res => res.json());
+export const GetConstructionDetailSubContractorAPI = (projectCode, subContractor, facilityCode, drawingNo, sheet, rev, code, token) =>
+  fetch(
+    Port_Server
+    + '/api/piping/GetConstructionDetailSubContractor'
+    + '?projectCode=' + projectCode
+    + '&subContractor=' + subContractor
+    + '&facilityCode=' + facilityCode
+    + '&drawingNo=' + encodeURIComponent(drawingNo)
+    + '&sheet=' + sheet
+    + '&rev=' + rev
+    + '&code=' + code,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
 
 
 export const CheckDrawingRevAPI = (projectCode, drawingNo, sheet, rev, role, token) =>

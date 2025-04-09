@@ -221,9 +221,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         const welderId = item['WelderID'];
         const wspNo = item['WPSNo'];
         const team = item['WelderTeam'];
+        const completeDate = item['WeldingCompletedDate'];
 
-        if ((date && percent && welderId && wspNo && team)
-          || (!date && !percent && !welderId && !wspNo && !team)) {
+        if ((date && percent && welderId && wspNo && team && completeDate)
+          || (!date && !percent && !welderId && !wspNo && !team && !completeDate)) {
           return item;
         }
 
@@ -245,6 +246,9 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         }
         if ((column.indexOf('WelderTeam') >= 0 && !team) || (column.indexOf('WelderTeam') < 0 && !oldItem['WelderTeam'])) {
           messages.push('Team');
+        }
+        if ((column.indexOf('WeldingCompletedDate') >= 0 && !completeDate) || (column.indexOf('WeldingCompletedDate') < 0 && !oldItem['WeldingCompletedDate'])) {
+          messages.push('CompletedDate');
         }
         return item;
       });
@@ -1353,7 +1357,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
 
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text>{'Welding\nCompleted\nDate'}:</Text>
+                  <Text style={styles.redText}>{'Welding\nCompleted\nDate'}:</Text>
                 </View>
                 <View style={styles.cellDataLine}>
                   <TouchableOpacity
