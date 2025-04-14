@@ -163,7 +163,7 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
               <View style={styles.line} />
 
               <View style={styles.row}>
-                <Text style={styles.cellTitle}>ReleaseForPaintingDate:</Text>
+                <Text style={styles.cellTitle}>{'ActualDate\nSpoolSentToBP'}:</Text>
                 <View style={styles.cellData}>
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('ReleaseForPaintingDate')}>
                     <Text style={isReleaseForPaintingDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.ReleaseForPaintingDate)}</Text>
