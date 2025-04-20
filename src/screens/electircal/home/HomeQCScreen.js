@@ -1,13 +1,12 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import NetInfo from '@react-native-community/netinfo';
 
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 import Header from '../../../components/Header';
-import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const HomeQCScreen = ({ route, navigation }) => {
@@ -17,7 +16,6 @@ const HomeQCScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const isFocused = useIsFocused();
 
   let colorIcon = Appearance.getColorScheme() === 'dark' ? 'white' : BASE_COLOR;
   useLayoutEffect(() => {
@@ -29,24 +27,6 @@ const HomeQCScreen = ({ route, navigation }) => {
       ),
     });
   }, [navigation]);
-
-  useEffect(
-    () => {
-      // callAPI(getNotifyNumber);
-    }, [isFocused]
-  );
-
-  const callAPI = executedAPI => {
-    NetInfo.fetch().then(state => {
-      if (!state.isConnected) {
-        setIsLoading(false);
-        setIsError(true);
-        MessageAlert('WARNING', 'Network not available!');
-      } else {
-        executedAPI();
-      }
-    });
-  };
 
   const _onPressLogout = () => {
     Alert.alert(
@@ -64,35 +44,195 @@ const HomeQCScreen = ({ route, navigation }) => {
     navigation.replace(Constant.ROUTE__LOGIN);
   };
 
+  //-- Electrical Support Pending
+  const _onManageElectricalSupportRegisterPending = async () => {
+    Alert.alert(
+      '',
+      'Fabrication: Electrical Support Fabrication\n\nInstallation: Electrical Support Installation',
+      [
+        { text: 'Fabrication', onPress: () => { _onElectricalSupportRegisterPending(Constant.CODE_FAB) } },
+        { text: 'Installation', onPress: () => { _onElectricalSupportRegisterPending(Constant.CODE_INSTALLATION) } },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onElectricalSupportRegisterPending = async code => {
+    navigation.navigate(
+      'ElectricalSupportRegisterPendingList',
+      {
+        projectCode: projectCode,
+        code: code
+      }
+    );
+  };
 
+  //-- Instrument Support Pending
+  const _onManageInstrumentSupportRegisterPending = async () => {
+    Alert.alert(
+      '',
+      'Fabrication: Instrument Support Fabrication\n\nInstallation: Instrument Support Installation',
+      [
+        { text: 'Fabrication', onPress: () => { _onInstrumentSupportRegisterPending(Constant.CODE_FAB) } },
+        { text: 'Installation', onPress: () => { _onInstrumentSupportRegisterPending(Constant.CODE_INSTALLATION) } },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  };
+  const _onInstrumentSupportRegisterPending = async code => {
+    navigation.navigate(
+      'InstrumentSupportRegisterPendingList',
+      {
+        projectCode: projectCode,
+        code: code
+      }
+    );
+  };
+
+  //-- Electrical Cable Control
+  const _onElectricalCableControl = async () => {
+    navigation.navigate(
+      'ElectricalCableControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Cable Control
+  const _onInstrumentCableControl = async () => {
+    navigation.navigate(
+      'InstrumentCableControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Electrical Gland Control
+  const _onElectricalGlandControl = async () => {
+    navigation.navigate(
+      'ElectricalGlandControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Electrical Terminate Control
+  const _onElectricalTerminationControl = async () => {
+    navigation.navigate(
+      'ElectricalTerminationControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Gland Control
+  const _onInstrumentGlandControl = async () => {
+    navigation.navigate(
+      'InstrumentGlandControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Termination Control
+  const _onInstrumentTerminationControl = async () => {
+    navigation.navigate(
+      'InstrumentTerminationControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Electrical Tray Ladder Register
+  const _onElectricalTrayLadderRegister = async () => {
+    navigation.navigate(
+      'ElectricalTrayLadderRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Tray Ladder Register
+  const _onInstrumentTrayLadderRegister = async () => {
+    navigation.navigate(
+      'InstrumentTrayLadderRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Electrical Equipment Control
+  const _onElectricalEquipmentControl = async () => {
+    navigation.navigate(
+      'ElectricalEquipmentControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Instrument Equipment Control
+  const _onInstrumentEquipmentControl = async () => {
+    navigation.navigate(
+      'InstrumentEquipmentControlList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
+  //-- Item
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
     if (props.iconName) {
       iconName = props.iconName;
     }
     return (
-      <>
-        <View style={styles.line} />
-        <View style={styles.cell}>
-          {
-            !props.disable &&
-            <>
-              <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
-                <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-                <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
-              </TouchableOpacity>
+      <View style={styles.cell}>
+        {
+          !props.disable &&
+          <>
+            <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
+              <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
               {
-                props.number
+                props.iconType === 'Material'
                   ?
-                  <View style={styles.badgeContainer}>
-                    <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
-                  </View>
+                  <MaterialIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
                   :
-                  null
+                  (
+                    props.iconType === 'MaterialCommunity'
+                      ?
+                      <MaterialCommunityIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                      :
+                      <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  )
               }
-            </>
-          }
-        </View></>
+            </TouchableOpacity>
+            {
+              props.number
+                ?
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{props.number < 100 ? props.number : '99+'}</Text>
+                </View>
+                :
+                null
+            }
+          </>
+        }
+      </View>
     );
   };
 
@@ -104,35 +244,44 @@ const HomeQCScreen = ({ route, navigation }) => {
         :
         <View style={styles.container}>
           <Header data={{ 'Project': projectCode, 'Module': disciplineCode }}></Header>
-          {/* <ScrollView style={styles.table}>
-            {
-              (spendNumbers.LamCheck || spendNumbers.DimForCutting)
-                ?
-                <View style={styles.line} />
-                :
-                null
-            }
+          <ScrollView style={styles.table}>
+            {/* Support */}
             <View style={styles.row}>
-              <RenderItemBox title={'QC DIM\n Cutting'} onPress={_onPressManageDimForCutting} number={spendNumbers.DimForCutting} />
-              <RenderItemBox title={'Lam Check\nTodo'} onPress={_onPressManageLamCheckTodo} number={spendNumbers.LamCheck} />
+              <RenderItemBox title={'Electrical\nSupport Pending'} onPress={_onManageElectricalSupportRegisterPending} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nSupport Pending'} onPress={_onManageInstrumentSupportRegisterPending} iconName='electrical-services' iconType='Material' />
             </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'QC DIM\n Weld'} onPress={_onPressManageDimCheck} number={spendNumbers.DimCheck} />
-              <RenderItemBox title={'QC FitUp\n'} onPress={_onPressManageQCFitUp} number={spendNumbers.FitUp} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'QC Visual\n'} onPress={_onPressManageQCVisual} number={spendNumbers.Visual} />
-              <RenderItemBox title={'DIM After\nWeld'} onPress={_onPressManageDIMAfterWeld} number={spendNumbers.DimAfterWeld} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'QA\nObservation'} onPress={_onPressQAObservation} />
-              <RenderItemBox title={'QC\nHand Book'} onPress={_onPressQCHandBook} iconName={'md-book-outline'} />
-            </View>
-            <View style={styles.row}>
-              <RenderItemBox title={'Welder Card'} onPress={_onPressOpenQCWelderCard} iconName={'md-card-outline'} />
-              <RenderItemBox title={'Structure\nDrawing'} onPress={_onPressOpenStructuralDrawing} iconName={'md-document-text'} />
-            </View>
-          </ScrollView> */}
+
+            {/* Tray Ladder */}
+            {/* <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nTray Ladder'} onPress={_onElectricalTrayLadderRegister} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nTray Ladder'} onPress={_onInstrumentTrayLadderRegister} iconName='cable-data' iconType='MaterialCommunity' />
+            </View> */}
+
+            {/* Cable */}
+            {/* <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nCable Control'} onPress={_onElectricalCableControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nCable Control'} onPress={_onInstrumentCableControl} iconName='cable-data' iconType='MaterialCommunity' />
+            </View> */}
+
+            {/* Gland */}
+            {/* <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nGland Control'} onPress={_onElectricalGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nGland Control'} onPress={_onInstrumentGlandControl} iconName='page-layout-header-footer' iconType='MaterialCommunity' />
+            </View> */}
+
+            {/* Termination */}
+            {/* <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nTermination Control'} onPress={_onElectricalTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nTermination Control'} onPress={_onInstrumentTerminationControl} iconName='transit-connection-horizontal' iconType='MaterialCommunity' />
+            </View> */}
+
+            {/* Equipment */}
+            {/* <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nEquipment'} onPress={_onElectricalEquipmentControl} iconName='electrical-services' iconType='Material' />
+              <RenderItemBox title={'Instrument\nEquipment'} onPress={_onInstrumentEquipmentControl} iconName='cable-data' iconType='MaterialCommunity' />
+            </View> */}
+
+          </ScrollView>
         </View>
       }
     </SafeAreaView>

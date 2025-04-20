@@ -210,24 +210,12 @@ const LoginScreen = ({ navigation }) => {
               }
 
               if (roleCode === Constant.ROUTE__EIT_CONS
-                || roleCode === Constant.ROUTE__EIT_QCWS
-                || roleCode === Constant.ROUTE__EIT_QCDEPT) {
-
-                if (roleCode === Constant.ROUTE__EIT_QCWS) {
-                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCWS.toString());
-                }
-                if (roleCode === Constant.ROUTE__EIT_QCDEPT) {
-                  Helper.storeData('QCSCOPE', ENUM_QC_SCOPE.QCDEPT.toString());
-                }
+                || roleCode === Constant.ROUTE__EIT_SUP) {
 
                 const disciplineCode = Constant.ROUTE__ELECTRICAL;
-                let route = roleCode;
-                if (roleCode === Constant.ROUTE__EIT_QCWS || roleCode === Constant.ROUTE__EIT_QCDEPT) {
-                  route = Constant.ROUTE__EIT_QC;
-                  Helper.storeData('ROLE_CODE', route);
-                }
+                Helper.storeData('ROLE_CODE', roleCode);
                 Helper.storeData('DISCIPLINE_CODE', disciplineCode);
-                navigation.replace(route, {
+                navigation.replace(roleCode, {
                   screen: Constant.ROUTE__HOME,
                   params: { projectCode: projectCode, disciplineCode: disciplineCode, subContractor: res.subContractor }
                 });

@@ -131,6 +131,10 @@ import ElectricalEquipmentControlListScreen from './screens/electircal/electrica
 import InstrumentEquipmentControlListScreen from './screens/electircal/instrument_equipment_control/InstrumentEquipmentControlListScreen';
 import TubingControlListScreen from './screens/electircal/tubing_control/TubingControlListScreen';
 
+//-- EIT SUP
+import ElectricalSupportRegisterPendingListScreen from './screens/electircal/electrical_support_resigter/ElectricalSupportRegisterPendingListScreen';
+import InstrumentSupportRegisterPendingListScreen from './screens/electircal/instrument_support_resigter/InstrumentSupportRegisterPendingListScreen';
+
 //-- VIEW
 import HomeViewerScreen from './screens/general/viewer/HomeViewerScreen';
 
@@ -1193,6 +1197,28 @@ const ElectricalQCStackScreens = () => {
           }
         }
       />
+      {/* Electrical Support */}
+      <ElectricalQCStack.Screen
+        name={'ElectricalSupportRegisterPendingList'}
+        component={ElectricalSupportRegisterPendingListScreen}
+        options={
+          {
+            title: 'Electrical Support Pending',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Support */}
+      <ElectricalQCStack.Screen
+        name={'InstrumentSupportRegisterPendingList'}
+        component={InstrumentSupportRegisterPendingListScreen}
+        options={
+          {
+            title: 'Instrument Support Pending',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </ElectricalQCStack.Navigator>
   );
 };
@@ -1642,7 +1668,7 @@ export default () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name={Constant.ROUTE__EIT_QC}
+          name={Constant.ROUTE__EIT_SUP}
           component={ElectricalQCStackScreens}
           options={{ headerShown: false }}
         />

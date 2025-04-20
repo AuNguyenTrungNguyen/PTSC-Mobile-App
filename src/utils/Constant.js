@@ -25,9 +25,7 @@ export default class Constant {
 
   static ROUTE__ELECTRICAL = 'ELECTRICAL';
   static ROUTE__EIT_CONS = 'EIT-CONS';
-  static ROUTE__EIT_QC = 'EIT-QC';
-  static ROUTE__EIT_QCDEPT = 'EIT-QCDEPT';
-  static ROUTE__EIT_QCWS = 'EIT-QCWS';
+  static ROUTE__EIT_SUP = 'EIT-SUP';
   static ROUTE__EIT_VIEWER = 'EIT-VIEWER';
 
   static ROUTE__VIEW_DRAWING = 'VIEW-DRAWING';
@@ -57,6 +55,8 @@ export default class Constant {
   static CODE_CUT = 'Cut';
   static CODE_PAINT = 'Paint';
   static CODE_DIM = 'Dim';
+  static CODE_FAB = 'Fabrication';
+  static CODE_INSTALLATION = 'Installation';
 
   // CODE IMAGE
   static CODE_MAN_HOURS_IMPACT = 'WOFactor';
@@ -75,6 +75,11 @@ export default class Constant {
   static STATUS_REJECT = 'REJ';
   static STATUS_NOT_YET = 'NOT_YET';
   static STATUS_ALL = 'ALL';
+
+  //-- RESULT
+  static RESULT_ACCEPT = 'ACC';
+  static RESULT_REJECT = 'REJ';
+  static RESULT_EMPTY = '';
 
   //QA Observation
   static QA_OBSERVATION_DRAFT = 0;

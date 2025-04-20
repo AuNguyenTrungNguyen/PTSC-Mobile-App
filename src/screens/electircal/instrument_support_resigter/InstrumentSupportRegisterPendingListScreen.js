@@ -12,15 +12,15 @@ import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetInstrumentSupportRegisterListAPI, UpdateInstrumentSupportRegisterListAPI } from '../../../apis/eit/EITAPI';
+import { GetInstrumentSupportRegisterPendingListAPI, UpdateInstrumentSupportRegisterPendingListAPI } from '../../../apis/eit/EITAPI';
 
 import SelectPopup from '../../../components/SelectPopup';
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
-const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
+const InstrumentSupportRegisterPendingListScreen = ({ route, navigation }) => {
 
-  const { projectCode } = route.params;
+  const { projectCode, code } = route.params;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -39,6 +39,13 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleResult(true) }}>
+            <Ionicons
+              size={24}
+              name={'md-ellipsis-vertical-circle'} color={iconColor} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
@@ -71,9 +78,10 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
   );
 
   const isFocused = useIsFocused();
-  useEffect(() => {
-    callAPI(getEITItems);
-  }, [isFocused]
+  useEffect(
+    () => {
+      callAPI(getEITItems);
+    }, [isFocused]
   );
 
   //-- Facility Code
@@ -120,9 +128,9 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     callAPI(getEITItems);
   };
-  async function getEITItems() {
+  async function getEITItems(filterResult = result) {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetInstrumentSupportRegisterListAPI(projectCode, facility, drawingNo, location, name)
+    GetInstrumentSupportRegisterPendingListAPI(projectCode, facility, drawingNo, location, name, code, filterResult)
       .then(res => {
         if (res.Success && res.Data) {
           setEITItems(res.Data);
@@ -151,17 +159,24 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
     setName(value);
   };
 
-  //-- Checkbox
-  const _onChangeCheckbox = (index, key, data) => {
-    var temp = null;
-    if (data) {
-      temp = Helper.getDatetimeWithoutTimezone();
+  //-- Result
+  const [result, setResult] = useState(Constant.RESULT_EMPTY);
+  const [isVisibleResult, setIsVisibleResult] = useState(false);
+  const _onChangeResult = data => {
+    if (data != result) {
+      setResult(data);
+      callAPI(() => { getEITItems(data) });
     }
-    updateValue(index, key, temp);
+    setIsVisibleResult(false);
+  };
+  const _onClearResult = () => {
+    setResult(Constant.RESULT_EMPTY);
+    callAPI(() => { getEITItems(Constant.RESULT_EMPTY) });
+    setIsVisibleResult(false);
   };
 
   //-- KEY
-  const updateValue = (index, key, value) => {
+  const _onPressChangeStatus = (index, key, value) => {
 
     //-- Current Data
     setEITItems((prevState) =>
@@ -188,7 +203,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
   const submitToServer = async () => {
     const listUpdate = Helper.handleListUpdate(EITUpdateItems);
     setIsUploading(true);
-    UpdateInstrumentSupportRegisterListAPI(listUpdate)
+    UpdateInstrumentSupportRegisterPendingListAPI(listUpdate)
       .then(res => {
         if (res.success) {
           setEITUpdateItems([]);
@@ -213,9 +228,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
 
   //-- Render List
   const renderItem = ({ _, item }) => {
-    const textStyle = styles.textData;
-    const disableFab = item.CheckedFabResult == Constant.STATUS_ACCEPT || !!item.InstallDate;
-    const disableInstall = item.CheckedInstallResult == Constant.STATUS_ACCEPT || !item.FabDate || (!!item.FabDate && item.CheckedFabResult != Constant.STATUS_ACCEPT);
+    const isDisableResult = !!result;
 
     return (
       <View style={styles.box}>
@@ -224,7 +237,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
             <Text>Facility:</Text>
           </View>
           <View style={styles.cellTwo}>
-            <Text style={textStyle}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.FacilityCode)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -232,7 +245,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
             <Text>DrawingNo:</Text>
           </View>
           <View style={styles.cellTwo}>
-            <Text style={textStyle}>{Formater.formatEmptyData(item.DetailDrawingNo)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.DetailDrawingNo)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -240,7 +253,7 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
             <Text>Location:</Text>
           </View>
           <View style={styles.cellTwo}>
-            <Text style={textStyle}>{Formater.formatEmptyData(item.Location)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.Location)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -248,81 +261,94 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
             <Text>{'Support\nName:'}</Text>
           </View>
           <View style={styles.cellTwo}>
-            <Text style={textStyle}>{Formater.formatEmptyData(item.SupportName)}</Text>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.SupportName)}</Text>
           </View>
         </View>
-
-        {/* Fab */}
-        <View style={styles.row}>
-          <View style={styles.cellOne}>
-            <Text>{'Fab:'}</Text>
-          </View>
-          <View style={styles.cellOne}>
-            {
-              item.CheckedFabResult == Constant.STATUS_ACCEPT
-                ?
-                <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
-                :
-                item.CheckedFabResult == Constant.STATUS_REJECT
-                  ?
-                  <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
-                  :
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
-            }
-          </View>
-          <View style={styles.cellOneRow}>
-            <Text>{'Sent:'}</Text>
-            <CheckBox
-              value={!!item.FabDate}
-              onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'FabDate', newValue)}
-              style={styles.checkBox}
-              boxType='square'
-              disabled={disableFab}
-              onCheckColor={OPP_COLOR}
-              onFillColor={disableFab ? DISABLE_COLOR : BASE_COLOR}
-              onTintColor={disableFab ? DISABLE_COLOR : BASE_COLOR}
-              tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-              animationDuration={0.2}
-              onAnimationType='flat'
-            />
-          </View>
-        </View>
-
-        {/* Install */}
-        <View style={styles.row}>
-          <View style={styles.cellOne}>
-            <Text>{'Install:'}</Text>
-          </View>
-          <View style={styles.cellOne}>
-            {
-              item.CheckedInstallResult == Constant.STATUS_ACCEPT
-                ?
-                <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
-                :
-                item.CheckedInstallResult == Constant.STATUS_REJECT
-                  ?
-                  <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
-                  :
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
-            }
-          </View>
-          <View style={styles.cellOneRow}>
-            <Text>{'Sent:'}</Text>
-            <CheckBox
-              value={!!item.InstallDate}
-              onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'InstallDate', newValue)}
-              style={styles.checkBox}
-              boxType='square'
-              disabled={disableInstall}
-              onCheckColor={OPP_COLOR}
-              onFillColor={disableInstall ? DISABLE_COLOR : BASE_COLOR}
-              onTintColor={disableInstall ? DISABLE_COLOR : BASE_COLOR}
-              tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-              animationDuration={0.2}
-              onAnimationType='flat'
-            />
-          </View>
-        </View>
+        {
+          code == Constant.CODE_FAB
+            ?
+            <>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'FabResult:'}</Text>
+                </View>
+                <View style={styles.cellTwo}>
+                  {
+                    item.CheckedFabResult == Constant.STATUS_ACCEPT
+                      ?
+                      <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
+                      :
+                      item.CheckedFabResult == Constant.STATUS_REJECT
+                        ?
+                        <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
+                        :
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
+                  }
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                </View>
+                <View style={styles.cellOne}>
+                  <TouchableOpacity
+                    disabled={isDisableResult}
+                    style={isDisableResult ? styles.disabledButton : styles.buttonAccept}
+                    onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedFabResult', Constant.STATUS_ACCEPT)}>
+                    <Text style={isDisableResult ? styles.disabledLabel : styles.labelAccept}>Accept</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.cellOne}>
+                  <TouchableOpacity
+                    disabled={isDisableResult}
+                    style={isDisableResult ? styles.disabledButton : styles.buttonReject}
+                    onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedFabResult', Constant.STATUS_REJECT)}>
+                    <Text style={isDisableResult ? styles.disabledLabel : styles.labelReject}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </>
+            :
+            <>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'InstallResult:'}</Text>
+                </View>
+                <View style={styles.cellTwo}>
+                  {
+                    item.CheckedInstallResult == Constant.STATUS_ACCEPT
+                      ?
+                      <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                      :
+                      item.CheckedInstallResult == Constant.STATUS_REJECT
+                        ?
+                        <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                        :
+                        <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                  }
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                </View>
+                <View style={styles.cellOne}>
+                  <TouchableOpacity
+                    disabled={isDisableResult}
+                    style={isDisableResult ? styles.disabledButton : styles.buttonAccept}
+                    onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedInstallResult', Constant.STATUS_ACCEPT)}>
+                    <Text style={isDisableResult ? styles.disabledLabel : styles.labelAccept}>Accept</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.cellOne}>
+                  <TouchableOpacity
+                    disabled={isDisableResult}
+                    style={isDisableResult ? styles.disabledButton : styles.buttonReject}
+                    onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedInstallResult', Constant.STATUS_REJECT)}>
+                    <Text style={isDisableResult ? styles.disabledLabel : styles.labelReject}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </>
+        }
       </View>
     );
   };
@@ -458,6 +484,13 @@ const InstrumentSupportRegisterListScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleFacility(false)}
         onClear={_onPressClearFacilityCode}
         onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
+      <SelectPopup
+        visible={isVisibleResult}
+        data={[Constant.RESULT_ACCEPT, Constant.RESULT_REJECT]}
+        onCancel={() => setIsVisibleResult(false)}
+        onClear={_onClearResult}
+        onChangeItem={_onChangeResult}>
       </SelectPopup>
     </SafeAreaView>
   );
@@ -647,6 +680,43 @@ const styles = StyleSheet.create({
   buttonTitleDark: {
     color: BASE_COLOR,
   },
+
+  disabledButton: {
+    width: 70,
+    borderColor: DISABLE_COLOR,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  disabledLabel: {
+    color: DISABLE_COLOR,
+  },
+  buttonAccept: {
+    width: 70,
+    borderColor: 'green',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelAccept: {
+    color: 'green',
+  },
+  buttonReject: {
+    width: 70,
+    borderColor: 'red',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  labelReject: {
+    color: 'red',
+  },
 });
 
-export default InstrumentSupportRegisterListScreen;
+export default InstrumentSupportRegisterPendingListScreen;

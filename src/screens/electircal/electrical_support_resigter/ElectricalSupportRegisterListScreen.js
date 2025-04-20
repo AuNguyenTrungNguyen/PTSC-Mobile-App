@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useIsFocused } from '@react-navigation/native';
 
 import Helper from '../../../utils/Helper';
+import Constant from '../../../utils/Constant';
 import Formater from '../../../utils/Formater';
 import Networker from '../../../utils/Networker';
 
@@ -191,6 +192,7 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
       .then(res => {
         if (res.success) {
           setEITUpdateItems([]);
+          callAPI(getEITItems);
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
         } else {
           Toast.show('Please check that you are using the company network!', Toast.SHORT, ['RCTModalHostViewController']);
@@ -211,12 +213,9 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
 
   //-- Render List
   const renderItem = ({ _, item }) => {
-    const fabStatus = item.FabDate ? 1 : 0;
-    const installStatus = item.InstallDate ? 1 : 0;
-    const status = fabStatus + installStatus;
-    const textStyle = status == 2 ? styles.textUpdated : status == 1 ? styles.textPending : styles.textData;
-    const disableFab = !!item.InstallDate;
-    const disableInstall = !item.FabDate;
+    const textStyle = styles.textData;
+    const disableFab = item.CheckedFabResult == Constant.STATUS_ACCEPT || !!item.InstallDate;
+    const disableInstall = item.CheckedInstallResult == Constant.STATUS_ACCEPT || !item.FabDate || (!!item.FabDate && item.CheckedFabResult != Constant.STATUS_ACCEPT);
 
     return (
       <View style={styles.box}>
@@ -252,42 +251,76 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
             <Text style={textStyle}>{Formater.formatEmptyData(item.SupportName)}</Text>
           </View>
         </View>
+
+        {/* Fab */}
         <View style={styles.row}>
           <View style={styles.cellOne}>
+            <Text>{'Fab:'}</Text>
           </View>
-          <View style={styles.cellTwoRow}>
-            <View style={styles.cellOneRow}>
-              <Text>Fab:</Text>
-              <CheckBox
-                value={!!item.FabDate}
-                onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'FabDate', newValue)}
-                style={styles.checkBox}
-                boxType='square'
-                disabled={disableFab}
-                onCheckColor={OPP_COLOR}
-                onFillColor={disableFab ? DISABLE_COLOR : BASE_COLOR}
-                onTintColor={disableFab ? DISABLE_COLOR : BASE_COLOR}
-                tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                animationDuration={0.2}
-                onAnimationType='flat'
-              />
-            </View>
-            <View style={styles.cellOneRow}>
-              <Text>Install:</Text>
-              <CheckBox
-                value={!!item.InstallDate}
-                onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'InstallDate', newValue)}
-                style={styles.checkBox}
-                boxType='square'
-                disabled={disableInstall}
-                onCheckColor={OPP_COLOR}
-                onFillColor={disableInstall ? DISABLE_COLOR : BASE_COLOR}
-                onTintColor={disableInstall ? DISABLE_COLOR : BASE_COLOR}
-                tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                animationDuration={0.2}
-                onAnimationType='flat'
-              />
-            </View>
+          <View style={styles.cellOne}>
+            {
+              item.CheckedFabResult == Constant.STATUS_ACCEPT
+                ?
+                <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
+                :
+                item.CheckedFabResult == Constant.STATUS_REJECT
+                  ?
+                  <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
+                  :
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedFabResult)}</Text>
+            }
+          </View>
+          <View style={styles.cellOneRow}>
+            <Text>{'Sent:'}</Text>
+            <CheckBox
+              value={!!item.FabDate}
+              onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'FabDate', newValue)}
+              style={styles.checkBox}
+              boxType='square'
+              disabled={disableFab}
+              onCheckColor={OPP_COLOR}
+              onFillColor={disableFab ? DISABLE_COLOR : BASE_COLOR}
+              onTintColor={disableFab ? DISABLE_COLOR : BASE_COLOR}
+              tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+              animationDuration={0.2}
+              onAnimationType='flat'
+            />
+          </View>
+        </View>
+
+        {/* Install */}
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>{'Install:'}</Text>
+          </View>
+          <View style={styles.cellOne}>
+            {
+              item.CheckedInstallResult == Constant.STATUS_ACCEPT
+                ?
+                <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                :
+                item.CheckedInstallResult == Constant.STATUS_REJECT
+                  ?
+                  <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                  :
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+            }
+          </View>
+          <View style={styles.cellOneRow}>
+            <Text>{'Sent:'}</Text>
+            <CheckBox
+              value={!!item.InstallDate}
+              onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'InstallDate', newValue)}
+              style={styles.checkBox}
+              boxType='square'
+              disabled={disableInstall}
+              onCheckColor={OPP_COLOR}
+              onFillColor={disableInstall ? DISABLE_COLOR : BASE_COLOR}
+              onTintColor={disableInstall ? DISABLE_COLOR : BASE_COLOR}
+              tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+              animationDuration={0.2}
+              onAnimationType='flat'
+            />
           </View>
         </View>
       </View>
@@ -563,6 +596,14 @@ const styles = StyleSheet.create({
   textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textAccept: {
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  textReject: {
+    fontWeight: 'bold',
+    color: 'red',
   },
   textUpdated: {
     fontWeight: 'bold',
