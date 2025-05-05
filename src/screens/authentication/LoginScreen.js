@@ -388,6 +388,9 @@ const LoginScreen = ({ navigation }) => {
                 </TouchableOpacity>
             }
           </View>
+          <View style={styles.versionContainer}>
+            <Text style={styles.version}>{'Release: ' + AppConfig.VERSION}</Text>
+          </View>
         </View>
       </View>
       <SelectPopup
@@ -492,6 +495,17 @@ const styles = StyleSheet.create({
     fontSize: Dimensions.get('window').height > BP_600 ? 16 : 12,
     fontWeight: 'bold',
     fontFamily: FONT
+  },
+  versionContainer: {
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    marginHorizontal: 16,
+  },
+  version: {
+    fontSize: 12,
+    color: BASE_COLOR,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
   },
 });
 
