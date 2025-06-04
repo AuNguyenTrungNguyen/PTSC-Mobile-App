@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, VirtualizedList, Appearance, TextInput, Keyboard, ActivityIndicator } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
+import Dialog from "react-native-dialog";
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-simple-toast';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -159,7 +161,67 @@ const ElectricalTrayLadderRegisterListScreen = ({ route, navigation }) => {
     updateValue(index, key, temp);
   };
 
+  //-- Percentage
+  const [isVisiblePercent, setIsVisiblePercent] = useState(false);
+  const [percentDisplay, setPercentDisplay] = useState('');
+  const _onPressSelectPercent = (index, key, data) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (data) {
+      setPercentDisplay(data.toString());
+    } else {
+      setPercentDisplay('');
+    }
+    setIsVisiblePercent(true);
+  };
+  const _onChangePercent = () => {
+    let value = percentDisplay.replace(/,/g, '.');
+    setPercentDisplay(value);
+    if (!Helper.checkFormatNumber(value)) {
+      Toast.show('Please enter ' + keyUpdate + ' must be a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    if (value && (value < 0 || value > 100)) {
+      Toast.show(keyUpdate + ' must be from 0 to 100.', Toast.SHORT);
+      return;
+    }
+    updateValue(indexUpdate, keyUpdate, value);
+    setIsVisiblePercent(false);
+  };
+
+  //-- Length
+  const [isVisibleLength, setIsVisibleLength] = useState(false);
+  const [lengthDisplay, setLengthDisplay] = useState('');
+  const _onPressSelectLength = (index, key, data) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (data) {
+      setLengthDisplay(data.toString());
+    } else {
+      setLengthDisplay('');
+    }
+    setIsVisibleLength(true);
+  };
+  const _onChangeLength = () => {
+    let value = lengthDisplay.replace(/,/g, '.');
+    setLengthDisplay(value);
+    if (!Helper.checkFormatNumber(value)) {
+      Toast.show('Please enter ' + keyUpdate + ' must be a number.', Toast.SHORT);
+      return;
+    }
+    value = parseFloat(value);
+    if (value && (value < 0)) {
+      Toast.show(keyUpdate + ' must be greater than 0.', Toast.SHORT);
+      return;
+    }
+    updateValue(indexUpdate, keyUpdate, value);
+    setIsVisibleLength(false);
+  };
+
   //-- KEY
+  const [indexUpdate, setIndexUpdate] = useState(-1);
+  const [keyUpdate, setKeyUpdate] = useState('');
   const updateValue = (index, key, value) => {
 
     //-- Current Data
@@ -211,7 +273,7 @@ const ElectricalTrayLadderRegisterListScreen = ({ route, navigation }) => {
 
   //-- Render List
   const renderItem = ({ _, item }) => {
-    const status = item.InstallDay ? 1 : 0;
+    const status = (item.InstallDay || item.InstallPercentage || item.InstallLength_m) ? 1 : 0;
     const textStyle = status == 1 ? styles.textUpdated : styles.textData;
 
     return (
@@ -250,26 +312,73 @@ const ElectricalTrayLadderRegisterListScreen = ({ route, navigation }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.cellOne}>
+            <Text>{'Unit:'}</Text>
           </View>
           <View style={styles.cellTwo}>
-            <View style={styles.cellTwoRow}>
-              <Text>Install:</Text>
-              <CheckBox
-                value={!!item.InstallDay}
-                onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'InstallDay', newValue)}
-                style={styles.checkBox}
-                boxType='square'
-                disabled={false}
-                onCheckColor={OPP_COLOR}
-                onFillColor={false ? DISABLE_COLOR : BASE_COLOR}
-                onTintColor={false ? DISABLE_COLOR : BASE_COLOR}
-                tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
-                animationDuration={0.2}
-                onAnimationType='flat'
-              />
-            </View>
+            <Text style={textStyle}>{Formater.formatEmptyData(item.Unit)}</Text>
           </View>
         </View>
+        {
+          item.Unit == 'm'
+            ?
+            <>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'Percentage:'}</Text>
+                </View>
+                <View style={styles.cellTwoRow}>
+                  <TouchableOpacity
+                    style={styles.cellTwoRow}
+                    onPress={() => _onPressSelectPercent(item.RowIndex, 'InstallPercentage', item.InstallPercentage)}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.InstallPercentage)}</Text>
+                    {
+                      <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                  <Text>{'Length:'}</Text>
+                </View>
+                <View style={styles.cellTwoRow}>
+                  <TouchableOpacity
+                    style={styles.cellTwoRow}
+                    onPress={() => _onPressSelectLength(item.RowIndex, 'InstallLength_m', item.InstallLength_m)}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.InstallLength_m)}</Text>
+                    {
+                      <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </>
+            :
+            <>
+              <View style={styles.row}>
+                <View style={styles.cellOne}>
+                </View>
+                <View style={styles.cellTwo}>
+                  <View style={styles.cellTwoRow}>
+                    <Text>Install:</Text>
+                    <CheckBox
+                      value={!!item.InstallDay}
+                      onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'InstallDay', newValue)}
+                      style={styles.checkBox}
+                      boxType='square'
+                      disabled={false}
+                      onCheckColor={OPP_COLOR}
+                      onFillColor={false ? DISABLE_COLOR : BASE_COLOR}
+                      onTintColor={false ? DISABLE_COLOR : BASE_COLOR}
+                      tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+                      animationDuration={0.2}
+                      onAnimationType='flat'
+                    />
+                  </View>
+                </View>
+              </View>
+            </>
+        }
       </View>
     );
   };
@@ -406,6 +515,30 @@ const ElectricalTrayLadderRegisterListScreen = ({ route, navigation }) => {
         onClear={_onPressClearFacilityCode}
         onChangeItem={_onChangeFacilityCode}>
       </SelectPopup>
+      <Dialog.Container visible={isVisiblePercent}>
+        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+        <Dialog.Input
+          value={percentDisplay}
+          placeholder={'Enter ' + keyUpdate}
+          onChangeText={(text) => setPercentDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+          keyboardType={'numeric'}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisiblePercent(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangePercent} />
+      </Dialog.Container>
+      <Dialog.Container visible={isVisibleLength}>
+        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+        <Dialog.Input
+          value={lengthDisplay}
+          placeholder={'Enter ' + keyUpdate}
+          onChangeText={(text) => setLengthDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+          keyboardType={'numeric'}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleLength(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeLength} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };
