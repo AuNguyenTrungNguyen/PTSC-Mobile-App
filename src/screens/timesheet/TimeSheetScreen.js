@@ -653,6 +653,7 @@ const TimeSheetScreen = ({ route, navigation }) => {
 
   const _onChangeProjectCode = code => {
     setProjectSeletecd(code);
+    setWorkOrder('');
     setIsVisibleProject(false);
     callAPI(() => { getTimeSheetWorkOrderList(code) }, false);
   };

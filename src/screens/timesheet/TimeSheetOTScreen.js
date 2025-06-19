@@ -14,7 +14,7 @@ import {
   GetTimeSheetWorkOrderListAPI,
   GetTimeSheetWorkerListOTAPI,
   UpdateTimeSheetOTAPI,
-  DeleteTimeSheetWorkerDateAPI
+  DeleteTimeSheetWorkerDateOTAPI
 } from '../../apis/timesheet/TimeSheetAPI';
 import { GetProjectListAPI } from '../../apis/app/LoginAPI';
 
@@ -281,8 +281,10 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
   //-- Delete Data
   const deleteTimeSheetWorkerDate = async deletedList => {
     const token = await Helper.getData('TOKEN');
-    DeleteTimeSheetWorkerDateAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
+    DeleteTimeSheetWorkerDateOTAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
       .then(res => {
+        console.log(res);
+
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setIsRefreshWorkOrder(new Date());
@@ -554,6 +556,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
 
   const _onChangeProjectCode = code => {
     setProjectSeletecd(code);
+    setWorkOrder('');
     setIsVisibleProject(false);
     callAPI(() => { getTimeSheetWorkOrderList(code) }, false);
   };
