@@ -308,46 +308,89 @@ const InstrumentSupportRegisterPendingListScreen = ({ route, navigation }) => {
               </View>
             </>
             :
-            <>
-              <View style={styles.row}>
-                <View style={styles.cellOne}>
-                  <Text>{'InstallResult:'}</Text>
-                </View>
-                <View style={styles.cellTwo}>
-                  {
-                    item.CheckedInstallResult == Constant.STATUS_ACCEPT
-                      ?
-                      <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
-                      :
-                      item.CheckedInstallResult == Constant.STATUS_REJECT
+            code == Constant.CODE_FITUP
+              ?
+              <>
+                <View style={styles.row}>
+                  <View style={styles.cellOne}>
+                    <Text>{'InstallResult\n(FitUp):'}</Text>
+                  </View>
+                  <View style={styles.cellTwo}>
+                    {
+                      item.CheckedFitUpResult == Constant.STATUS_ACCEPT
                         ?
-                        <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                        <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedFitUpResult)}</Text>
                         :
-                        <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
-                  }
+                        item.CheckedFitUpResult == Constant.STATUS_REJECT
+                          ?
+                          <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedFitUpResult)}</Text>
+                          :
+                          <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedFitUpResult)}</Text>
+                    }
+                  </View>
                 </View>
-              </View>
-              <View style={styles.row}>
-                <View style={styles.cellOne}>
+                <View style={styles.row}>
+                  <View style={styles.cellOne}>
+                  </View>
+                  <View style={styles.cellOne}>
+                    <TouchableOpacity
+                      disabled={isDisableResult}
+                      style={isDisableResult ? styles.disabledButton : styles.buttonAccept}
+                      onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedFitUpResult', Constant.STATUS_ACCEPT)}>
+                      <Text style={isDisableResult ? styles.disabledLabel : styles.labelAccept}>Accept</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.cellOne}>
+                    <TouchableOpacity
+                      disabled={isDisableResult}
+                      style={isDisableResult ? styles.disabledButton : styles.buttonReject}
+                      onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedFitUpResult', Constant.STATUS_REJECT)}>
+                      <Text style={isDisableResult ? styles.disabledLabel : styles.labelReject}>Reject</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <View style={styles.cellOne}>
-                  <TouchableOpacity
-                    disabled={isDisableResult}
-                    style={isDisableResult ? styles.disabledButton : styles.buttonAccept}
-                    onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedInstallResult', Constant.STATUS_ACCEPT)}>
-                    <Text style={isDisableResult ? styles.disabledLabel : styles.labelAccept}>Accept</Text>
-                  </TouchableOpacity>
+              </>
+              :
+              <>
+                <View style={styles.row}>
+                  <View style={styles.cellOne}>
+                    <Text>{'InstallResult\n(Weld):'}</Text>
+                  </View>
+                  <View style={styles.cellTwo}>
+                    {
+                      item.CheckedInstallResult == Constant.STATUS_ACCEPT
+                        ?
+                        <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                        :
+                        item.CheckedInstallResult == Constant.STATUS_REJECT
+                          ?
+                          <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                          :
+                          <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedInstallResult)}</Text>
+                    }
+                  </View>
                 </View>
-                <View style={styles.cellOne}>
-                  <TouchableOpacity
-                    disabled={isDisableResult}
-                    style={isDisableResult ? styles.disabledButton : styles.buttonReject}
-                    onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedInstallResult', Constant.STATUS_REJECT)}>
-                    <Text style={isDisableResult ? styles.disabledLabel : styles.labelReject}>Reject</Text>
-                  </TouchableOpacity>
+                <View style={styles.row}>
+                  <View style={styles.cellOne}>
+                  </View>
+                  <View style={styles.cellOne}>
+                    <TouchableOpacity
+                      disabled={isDisableResult}
+                      style={isDisableResult ? styles.disabledButton : styles.buttonAccept}
+                      onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedInstallResult', Constant.STATUS_ACCEPT)}>
+                      <Text style={isDisableResult ? styles.disabledLabel : styles.labelAccept}>Accept</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.cellOne}>
+                    <TouchableOpacity
+                      disabled={isDisableResult}
+                      style={isDisableResult ? styles.disabledButton : styles.buttonReject}
+                      onPress={() => _onPressChangeStatus(item.RowIndex, 'CheckedInstallResult', Constant.STATUS_REJECT)}>
+                      <Text style={isDisableResult ? styles.disabledLabel : styles.labelReject}>Reject</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            </>
+              </>
         }
       </View>
     );

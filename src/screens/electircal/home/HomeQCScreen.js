@@ -48,10 +48,11 @@ const HomeQCScreen = ({ route, navigation }) => {
   const _onManageElectricalSupportRegisterPending = async () => {
     Alert.alert(
       '',
-      'Fabrication: Electrical Support Fabrication\n\nInstallation: Electrical Support Installation',
+      'Electrical Support Fabrication\n\nElectrical Support Installation (FitUp)\n\nElectrical Support Installation (Weld)',
       [
         { text: 'Fabrication', onPress: () => { _onElectricalSupportRegisterPending(Constant.CODE_FAB) } },
-        { text: 'Installation', onPress: () => { _onElectricalSupportRegisterPending(Constant.CODE_INSTALLATION) } },
+        { text: 'Installation (FitUp)', onPress: () => { _onElectricalSupportRegisterPending(Constant.CODE_FITUP) } },
+        { text: 'Installation (Weld)', onPress: () => { _onElectricalSupportRegisterPending(Constant.CODE_INSTALLATION) } },
         { text: 'Cancel', style: 'cancel' }
       ],
       {
@@ -73,10 +74,11 @@ const HomeQCScreen = ({ route, navigation }) => {
   const _onManageInstrumentSupportRegisterPending = async () => {
     Alert.alert(
       '',
-      'Fabrication: Instrument Support Fabrication\n\nInstallation: Instrument Support Installation',
+      'Instrument Support Fabrication\n\nInstrument Support Installation (FitUp)\n\nInstrument Support Installation (Weld)',
       [
         { text: 'Fabrication', onPress: () => { _onInstrumentSupportRegisterPending(Constant.CODE_FAB) } },
-        { text: 'Installation', onPress: () => { _onInstrumentSupportRegisterPending(Constant.CODE_INSTALLATION) } },
+        { text: 'Installation (FitUp)', onPress: () => { _onInstrumentSupportRegisterPending(Constant.CODE_FITUP) } },
+        { text: 'Installation (Weld)', onPress: () => { _onInstrumentSupportRegisterPending(Constant.CODE_INSTALLATION) } },
         { text: 'Cancel', style: 'cancel' }
       ],
       {

@@ -381,7 +381,7 @@ export const UpdateInstrumentTerminationControlDetailAPI = async (modelUpdate, m
 };
 
 //-- Electrical Support Register
-export const GetElectricalSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
+export const GetElectricalSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name, result) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -390,7 +390,8 @@ export const GetElectricalSupportRegisterListAPI = async (projectCode, facilityC
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
     + '&location=' + location
-    + '&name=' + name,
+    + '&name=' + name
+    + '&result=' + result,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -453,7 +454,7 @@ export const UpdateElectricalSupportRegisterPendingListAPI = async (listItemUpda
 };
 
 //-- Instrument Support Register
-export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name) => {
+export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name, result) => {
   const token = await Helper.getData('TOKEN');
   return fetch(
     Port_Server
@@ -462,7 +463,8 @@ export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityC
     + '&facilityCode=' + facilityCode
     + '&drawingNo=' + drawingNo
     + '&location=' + location
-    + '&name=' + name,
+    + '&name=' + name
+    + '&result=' + result,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

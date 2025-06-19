@@ -41,6 +41,13 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
             style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => { setIsVisibleResult(true) }}>
+            <Ionicons
+              size={24}
+              name={'md-ellipsis-vertical-circle'} color={iconColor} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: 36, height: 48, alignItems: 'center', justifyContent: 'center' }}
             onPress={toggle}>
             <Ionicons
               size={24}
@@ -115,14 +122,30 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
     setIsVisibleFacility(false);
   };
 
+  //-- Result
+  const [result, setResult] = useState(Constant.RESULT_EMPTY);
+  const [isVisibleResult, setIsVisibleResult] = useState(false);
+  const _onChangeResult = data => {
+    if (data != result) {
+      setResult(data);
+      callAPI(() => { getEITItems(data) });
+    }
+    setIsVisibleResult(false);
+  };
+  const _onClearResult = () => {
+    setResult(Constant.RESULT_EMPTY);
+    callAPI(() => { getEITItems(Constant.RESULT_EMPTY) });
+    setIsVisibleResult(false);
+  };
+
   //-- Search Action
   const _onPressSearchCable = () => {
     Keyboard.dismiss();
     callAPI(getEITItems);
   };
-  async function getEITItems() {
+  async function getEITItems(filterResult = result) {
     const facility = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
-    GetElectricalSupportRegisterListAPI(projectCode, facility, drawingNo, location, name)
+    GetElectricalSupportRegisterListAPI(projectCode, facility, drawingNo, location, name, filterResult)
       .then(res => {
         if (res.Success && res.Data) {
           setEITItems(res.Data);
@@ -214,8 +237,9 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
   //-- Render List
   const renderItem = ({ _, item }) => {
     const textStyle = styles.textData;
-    const disableFab = item.CheckedFabResult == Constant.STATUS_ACCEPT || !!item.InstallDate;
-    const disableInstall = item.CheckedInstallResult == Constant.STATUS_ACCEPT || !item.FabDate || (!!item.FabDate && item.CheckedFabResult != Constant.STATUS_ACCEPT);
+    const disableFab = item.CheckedFabResult == Constant.STATUS_ACCEPT;
+    const disableFitUp = item.CheckedFitUpResult == Constant.STATUS_ACCEPT || (item.CheckedFabResult != Constant.STATUS_ACCEPT);
+    const disableInstall = item.CheckedInstallResult == Constant.STATUS_ACCEPT || (item.CheckedFitUpResult != Constant.STATUS_ACCEPT);
 
     return (
       <View style={styles.box}>
@@ -271,7 +295,13 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
             }
           </View>
           <View style={styles.cellOneRow}>
-            <Text>{'Sent:'}</Text>
+            {
+              disableFab
+                ?
+                <Text style={styles.textDisable}>{'Sent:'}</Text>
+                :
+                <Text>{'Sent:'}</Text>
+            }
             <CheckBox
               value={!!item.FabDate}
               onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'FabDate', newValue)}
@@ -288,10 +318,52 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
           </View>
         </View>
 
+        {/* FitUp */}
+        <View style={styles.row}>
+          <View style={styles.cellOne}>
+            <Text>{'FitUp:'}</Text>
+          </View>
+          <View style={styles.cellOne}>
+            {
+              item.CheckedFitUpResult == Constant.STATUS_ACCEPT
+                ?
+                <Text style={styles.textAccept}>{Formater.formatEmptyData(item.CheckedFitUpResult)}</Text>
+                :
+                item.CheckedFitUpResult == Constant.STATUS_REJECT
+                  ?
+                  <Text style={styles.textReject}>{Formater.formatEmptyData(item.CheckedFitUpResult)}</Text>
+                  :
+                  <Text style={styles.textData}>{Formater.formatEmptyData(item.CheckedFitUpResult)}</Text>
+            }
+          </View>
+          <View style={styles.cellOneRow}>
+            {
+              disableFitUp
+                ?
+                <Text style={styles.textDisable}>{'Sent:'}</Text>
+                :
+                <Text>{'Sent:'}</Text>
+            }
+            <CheckBox
+              value={!!item.FitUpDate}
+              onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'FitUpDate', newValue)}
+              style={styles.checkBox}
+              boxType='square'
+              disabled={disableFitUp}
+              onCheckColor={OPP_COLOR}
+              onFillColor={disableFitUp ? DISABLE_COLOR : BASE_COLOR}
+              onTintColor={disableFitUp ? DISABLE_COLOR : BASE_COLOR}
+              tintColors={{ true: BASE_COLOR, false: DISABLE_COLOR }}
+              animationDuration={0.2}
+              onAnimationType='flat'
+            />
+          </View>
+        </View>
+
         {/* Install */}
         <View style={styles.row}>
           <View style={styles.cellOne}>
-            <Text>{'Install:'}</Text>
+            <Text>{'Weld:'}</Text>
           </View>
           <View style={styles.cellOne}>
             {
@@ -307,7 +379,13 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
             }
           </View>
           <View style={styles.cellOneRow}>
-            <Text>{'Sent:'}</Text>
+            {
+              disableInstall
+                ?
+                <Text style={styles.textDisable}>{'Sent:'}</Text>
+                :
+                <Text>{'Sent:'}</Text>
+            }
             <CheckBox
               value={!!item.InstallDate}
               onValueChange={newValue => _onChangeCheckbox(item.RowIndex, 'InstallDate', newValue)}
@@ -409,7 +487,15 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
                     </View>
                   </View>
                   <View style={styles.rowInfoAction}>
-                    <Text style={styles.infoTitleAction} />
+                    {
+                      result == Constant.RESULT_REJECT
+                        ?
+                        <Text style={styles.infoTitleAction}>
+                          <Text style={styles.textReject}>REJ</Text>
+                        </Text>
+                        :
+                        <Text style={styles.infoTitleAction}></Text>
+                    }
                     <TouchableOpacity
                       style={styles.searchButton}
                       onPress={_onPressSearchCable}
@@ -458,6 +544,13 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
         onCancel={() => setIsVisibleFacility(false)}
         onClear={_onPressClearFacilityCode}
         onChangeItem={_onChangeFacilityCode}>
+      </SelectPopup>
+      <SelectPopup
+        visible={isVisibleResult}
+        data={[Constant.RESULT_REJECT]}
+        onCancel={() => setIsVisibleResult(false)}
+        onClear={_onClearResult}
+        onChangeItem={_onChangeResult}>
       </SelectPopup>
     </SafeAreaView>
   );
@@ -596,6 +689,9 @@ const styles = StyleSheet.create({
   textData: {
     fontWeight: 'bold',
     color: BASE_COLOR,
+  },
+  textDisable: {
+    color: DISABLE_COLOR,
   },
   textAccept: {
     fontWeight: 'bold',
