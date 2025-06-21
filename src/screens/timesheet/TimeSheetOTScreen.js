@@ -283,8 +283,6 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     const token = await Helper.getData('TOKEN');
     DeleteTimeSheetWorkerDateOTAPI(projectSelected, userLogin, Formater.formatDateSQL(currentDate), deletedList, token)
       .then(res => {
-        console.log(res);
-
         if (res.success) {
           Toast.show(res.Message.toString(), Toast.SHORT, ['RCTModalHostViewController']);
           setIsRefreshWorkOrder(new Date());
