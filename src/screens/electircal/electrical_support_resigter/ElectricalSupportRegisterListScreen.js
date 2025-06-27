@@ -239,7 +239,7 @@ const ElectricalSupportRegisterListScreen = ({ route, navigation }) => {
     const textStyle = styles.textData;
     const disableFab = item.CheckedFabResult == Constant.STATUS_ACCEPT;
     const disableFitUp = item.CheckedFitUpResult == Constant.STATUS_ACCEPT || (item.CheckedFabResult != Constant.STATUS_ACCEPT);
-    const disableInstall = item.CheckedInstallResult == Constant.STATUS_ACCEPT || (item.CheckedFitUpResult != Constant.STATUS_ACCEPT);
+    const disableInstall = item.CheckedInstallResult == Constant.STATUS_ACCEPT || (item.CheckedFabResult != Constant.STATUS_ACCEPT);
 
     return (
       <View style={styles.box}>
