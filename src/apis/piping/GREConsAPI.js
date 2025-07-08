@@ -4,11 +4,12 @@ import Helper from '../../utils/Helper';
 //-- Base
 export const GetBatchNoListAPI = async (projectCode) => {
   const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   return fetch(
     Port_Server
     + '/api/GRE/GetBatchNoList'
     + '?projectCode=' + projectCode
-    ,
+    + '&subContractor=' + subContractor,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -19,11 +20,12 @@ export const GetBatchNoListAPI = async (projectCode) => {
 };
 export const GetBonderListAPI = async (projectCode) => {
   const token = await Helper.getData('TOKEN');
+  const subContractor = await Helper.getData('SUB_CONTRACTOR');
   return fetch(
     Port_Server
     + '/api/GRE/GetBonderList'
     + '?projectCode=' + projectCode
-    ,
+    + '&subContractor=' + subContractor,
     {
       headers: {
         'Authorization': 'Bearer ' + token,
