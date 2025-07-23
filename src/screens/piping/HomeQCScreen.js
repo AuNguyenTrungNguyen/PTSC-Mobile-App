@@ -1,6 +1,8 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, Alert, Appearance, Dimensions, ScrollView } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Networker from '../../utils/Networker';
@@ -269,6 +271,17 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Flange Joint Progress 
+  const _onPressFlangeJointProgress = async () => {
+    navigation.navigate(
+      'FlangeJointProgressList',
+      {
+        projectCode: projectCode,
+        subContractor: subContractor,
+      }
+    );
+  };
+
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
     if (props.iconName) {
@@ -281,7 +294,19 @@ const HomeScreen = ({ route, navigation }) => {
           <>
             <TouchableOpacity style={styles.itemContainer} onPress={props.onPress} activeOpacity={1}>
               <Text numberOfLines={2} style={styles.itemTitle}>{props.title}</Text>
-              <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+              {
+                props.iconType === 'Material'
+                  ?
+                  <MaterialIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  :
+                  (
+                    props.iconType === 'MaterialCommunity'
+                      ?
+                      <MaterialCommunityIcons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                      :
+                      <Ionicons name={iconName} size={Dimensions.get('window').height > 700 ? 48 : 36} color={BASE_COLOR} style={styles.itemIcon} />
+                  )
+              }
             </TouchableOpacity>
             {
               props.number
@@ -334,7 +359,7 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <RenderItemBox title={'QC Manage\nGRE'} onPress={_onPressManageQCGRE} />
-                <RenderItemBox disable={true} />
+                <RenderItemBox title={'Flange Joint\nProgress'} onPress={_onPressFlangeJointProgress} iconName='circle-double' iconType='MaterialCommunity' />
               </View>
             </ScrollView>
           </View>

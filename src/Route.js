@@ -568,6 +568,26 @@ const PipingQCStackScreens = () => {
           headerBackTitle: 'Back',
         })}
       />
+      <PipingQCStack.Screen
+        name='FlangeJointProgressList'
+        component={FlangeJointProgressListScreen}
+        options={
+          {
+            title: 'Flange Joint Progress List',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      <PipingQCStack.Screen
+        name='FlangeJointProgressDetail'
+        component={FlangeJointProgressDetailScreen}
+        options={
+          {
+            title: 'Flange Joint Progress Detail',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
     </PipingQCStack.Navigator>
   );
 };
