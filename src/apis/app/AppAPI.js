@@ -176,7 +176,7 @@ export const GetWelderListAPI = (projectCode, id, name, token) =>
         'Content-Type': 'application/json',
       },
     }).then(res => res.json());
-export const GetWelderListSubContractorAPI = async (projectCode, id, name) => {
+export const GetWelderListSubContractorAPI = async (projectCode, id, name, disciplineCode) => {
   const token = await Helper.getData('TOKEN');
   const subContractor = await Helper.getData('SUB_CONTRACTOR');
   return fetch(
@@ -185,6 +185,7 @@ export const GetWelderListSubContractorAPI = async (projectCode, id, name) => {
     + '?projectCode=' + projectCode
     + '&id=' + id
     + '&name=' + name
+    + '&disciplineCode=' + disciplineCode
     + '&subContractor=' + subContractor,
     {
       headers: {

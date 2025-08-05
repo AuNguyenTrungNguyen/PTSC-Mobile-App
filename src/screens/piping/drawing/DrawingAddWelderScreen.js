@@ -13,7 +13,7 @@ import { ListLoadingData, ListSelectData, ListEmptyData } from '../../../compone
 
 export default ({ route, navigation }) => {
 
-  const { projectCode, welders, index } = route.params;
+  const { projectCode, disciplineCode, welders, index } = route.params;
 
   const [welderId, setWelderId] = useState('');
   const [welderName, setWelderName] = useState('');
@@ -44,7 +44,7 @@ export default ({ route, navigation }) => {
     callAPI(() => { searchWelder(welderId, welderName) }, false);
   };
   const searchWelder = async (welderId, welderName) => {
-    GetWelderListSubContractorAPI(projectCode, welderId, welderName)
+    GetWelderListSubContractorAPI(projectCode, welderId, welderName, disciplineCode)
       .then(res => {
         if (res.success) {
           setWelderList(res.data);

@@ -14,7 +14,7 @@ import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const AddWelderScreen = ({ route, navigation }) => {
 
-  const { projectCode, welders, index, isMultiple } = route.params;
+  const { projectCode, disciplineCode, welders, index, isMultiple } = route.params;
 
   const [welderId, setWelderId] = useState('');
   const [welderName, setWelderName] = useState('');
@@ -57,7 +57,7 @@ const AddWelderScreen = ({ route, navigation }) => {
   };
 
   const searchWelder = async (welderId, welderName) => {
-    GetWelderListSubContractorAPI(projectCode, welderId, welderName)
+    GetWelderListSubContractorAPI(projectCode, welderId, welderName, disciplineCode)
       .then(res => {
         if (res.success) {
           setWelderList(res.data);

@@ -743,6 +743,7 @@ const ConstructionDetailScreen = ({ route, navigation }) => {
       'ConstructionAddWelder',
       {
         projectCode: projectCode,
+        disciplineCode: 'STRUCTURE',
         welders: value,
         index: index,
       }

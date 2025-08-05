@@ -716,6 +716,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
       {
         projectCode: projectCode,
         subContractor: subContractor,
+        disciplineCode: 'PIPING',
         welders: value,
         index: index,
       }
