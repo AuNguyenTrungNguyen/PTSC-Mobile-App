@@ -54,6 +54,21 @@ export const GetIsometricDrawingAPI = async (projectCode, facilityCode, drawingN
     }
   ).then(res => res.json());
 };
+export const GetUploadDrawingAPI = async (projectCode, drawingNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/General/GetUploadDrawing'
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + encodeURIComponent(drawingNo),
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
 
 
 export const GetStructureDrawingDataTypeAPI = async (projectCode) => {

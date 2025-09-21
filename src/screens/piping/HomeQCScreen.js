@@ -282,6 +282,18 @@ const HomeScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Open Manual Drawing
+  const _onPressOpenManualDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenManualDrawing',
+      params: {
+        projectCode: projectCode,
+        subContractor: subContractor,
+        title: 'Open Upload Drawing'
+      }
+    });
+  };
+
   const RenderItemBox = props => {
     let iconName = 'qr-code-outline';
     if (props.iconName) {
@@ -360,6 +372,10 @@ const HomeScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'QC Manage\nGRE'} onPress={_onPressManageQCGRE} />
                 <RenderItemBox title={'Flange Joint\nProgress'} onPress={_onPressFlangeJointProgress} iconName='circle-double' iconType='MaterialCommunity' />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Open\nDrawing'} onPress={_onPressOpenManualDrawing} iconName={'md-document-text'} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>

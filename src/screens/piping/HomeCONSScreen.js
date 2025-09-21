@@ -445,6 +445,18 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Open Manual Drawing
+  const _onPressOpenManualDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenManualDrawing',
+      params: {
+        projectCode: projectCode,
+        subContractor: subContractor,
+        title: 'Open Upload Drawing'
+      }
+    });
+  };
+
 
 
   const RenderItemBox = props => {
@@ -538,6 +550,10 @@ const HomeCONSScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'Valve\nProgress'} onPress={_onPressValveProgress} iconName='pipe-valve' iconType='MaterialCommunity' />
                 <RenderItemBox title={'Flange Joint\nProgress'} onPress={_onPressFlangeJointProgress} iconName='circle-double' iconType='MaterialCommunity' />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Open\nDrawing'} onPress={_onPressOpenManualDrawing} iconName={'md-document-text'} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>

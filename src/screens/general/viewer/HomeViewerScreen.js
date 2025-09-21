@@ -165,6 +165,16 @@ const HomeViewerScreen = ({ route, navigation }) => {
     });
   };
 
+  //-- Open Manual Drawing
+  const _onPressOpenManualDrawing = async () => {
+    navigation.navigate(Constant.ROUTE__COMMON, {
+      screen: 'OpenManualDrawing',
+      params: {
+        projectCode: projectCode,
+        title: 'Open Upload Drawing'
+      }
+    });
+  };
 
 
   const RenderItemBox = props => {
@@ -213,6 +223,10 @@ const HomeViewerScreen = ({ route, navigation }) => {
               <View style={styles.row}>
                 <RenderItemBox title={'Isometric'} onPress={_onPressOpenIsometricDrawing} iconName={'md-document-text'} />
                 <RenderItemBox title={'Structure\nDrawing'} onPress={_onPressOpenStructuralDrawing} />
+              </View>
+              <View style={styles.row}>
+                <RenderItemBox title={'Open\nDrawing'} onPress={_onPressOpenManualDrawing} iconName={'md-document-text'} />
+                <RenderItemBox disable={true} />
               </View>
             </ScrollView>
           </View>
