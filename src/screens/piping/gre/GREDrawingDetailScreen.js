@@ -798,6 +798,15 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
+                  <Text>Seri01:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.SerialNo01)}</Text>
+                </View>
+                <View style={styles.cellPercent} />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
                   <Text>Class02:</Text>
                 </View>
                 <View style={styles.cellData}>
@@ -845,6 +854,16 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
                         }
                       </TouchableOpacity>
                   }
+                </View>
+                <View style={styles.cellPercent} />
+              </View>
+
+              <View style={styles.row}>
+                <View style={styles.cellTitle}>
+                  <Text>Seri02:</Text>
+                </View>
+                <View style={styles.cellData}>
+                  <Text style={styles.textBase}>{Formater.formatEmptyData(item.SerialNo02)}</Text>
                 </View>
                 <View style={styles.cellPercent} />
               </View>

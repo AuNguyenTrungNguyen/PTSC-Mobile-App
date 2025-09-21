@@ -354,16 +354,26 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
             <>
               <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>HeatNo01:</Text>
+                  <Text>HeatNo01{"\n"}SeriNo01:</Text>
                 </View>
-                <View style={styles.cellOne}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat01)}</Text>
+                <View style={styles.cellThree}>
+                  <Text style={styles.textData}>
+                    {Formater.formatEmptyData(item.Heat01)}
+                    {"\t"}
+                    {Formater.formatEmptyData(item.SerialNo01)}
+                  </Text>
                 </View>
+              </View>
+              <View style={styles.row}>
                 <View style={styles.cellOne}>
-                  <Text>HeatNo02:</Text>
+                  <Text>HeatNo02{"\n"}SeriNo02:</Text>
                 </View>
-                <View style={styles.cellOne}>
-                  <Text style={styles.textData}>{Formater.formatEmptyData(item.Heat02)}</Text>
+                <View style={styles.cellThree}>
+                  <Text style={styles.textData}>
+                    {Formater.formatEmptyData(item.Heat02)}
+                    {"\t"}
+                    {Formater.formatEmptyData(item.SerialNo02)}
+                  </Text>
                 </View>
               </View>
               <View style={styles.row}>
@@ -374,7 +384,7 @@ const GREQCPendingListScreen = ({ route, navigation }) => {
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.ENVHumidity)}</Text>
                 </View>
                 <View style={styles.cellOne}>
-                  <Text>{'ENVTemp(\u00b0C)'}:</Text>
+                  <Text>{'ENVTemp\n(\u00b0C)'}:</Text>
                 </View>
                 <View style={styles.cellOne}>
                   <Text style={styles.textData}>{Formater.formatEmptyData(item.ENVTemp)}</Text>
