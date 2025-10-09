@@ -277,11 +277,29 @@ const HomeCONSScreen = ({ route, navigation }) => {
       }
     );
   };
+  //-- Electrical Support Painting
+  const _onElectricalSupportPainting = async () => {
+    navigation.navigate(
+      'ElectricalSupportPaintingList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
 
   //-- Instrument Support Register
   const _onInstrumentSupportRegister = async () => {
     navigation.navigate(
       'InstrumentSupportRegisterList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+  //-- Instrument Support Painting
+  const _onInstrumentSupportPainting = async () => {
+    navigation.navigate(
+      'InstrumentSupportPaintingList',
       {
         projectCode: projectCode,
       }
@@ -429,6 +447,12 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'Tubing Control'} onPress={_onTubingControl} iconName='timeline' iconType='MaterialCommunity' />
               <RenderItemBox title={'Equipment Control'} onPress={_onPressManageEquipment} iconName={'construct-outline'} number={notifyEquipmentNumbers.Pending} />
+            </View>
+
+            {/* Painting */}
+            <View style={styles.row}>
+              <RenderItemBox title={'Electrical\nSupport Painting'} onPress={_onElectricalSupportPainting} iconName='brush-variant' iconType='MaterialCommunity' />
+              <RenderItemBox title={'Instrument\nSupport Painting'} onPress={_onInstrumentSupportPainting} iconName='brush-variant' iconType='MaterialCommunity' />
             </View>
 
             {/* Other */}

@@ -125,7 +125,9 @@ import ElectricalCableDamageLogDataScreen from './screens/electircal/cabledamage
 import DrumNoListScreen from './screens/electircal/drumlibrary/DrumNoListScreen';
 import CableControlReportScreen from './screens/electircal/cablereport/CableControlReportScreen';
 import ElectricalSupportRegisterListScreen from './screens/electircal/electrical_support_resigter/ElectricalSupportRegisterListScreen';
+import ElectricalSupportPaintingListScreen from './screens/electircal/electrical_support_resigter/ElectricalSupportPaintingListScreen';
 import InstrumentSupportRegisterListScreen from './screens/electircal/instrument_support_resigter/InstrumentSupportRegisterListScreen';
+import InstrumentSupportPaintingListScreen from './screens/electircal/instrument_support_resigter/InstrumentSupportPaintingListScreen';
 import ElectricalTrayLadderRegisterListScreen from './screens/electircal/electrical_tray_ladder_resigter/ElectricalTrayLadderRegisterListScreen';
 import InstrumentTrayLadderRegisterListScreen from './screens/electircal/instrument_tray_ladder_resigter/InstrumentTrayLadderRegisterListScreen';
 import ElectricalEquipmentControlListScreen from './screens/electircal/electrical_equipment_control/ElectricalEquipmentControlListScreen';
@@ -1133,6 +1135,17 @@ const ElectricalCONSStackScreens = () => {
           }
         }
       />
+      {/* Electrical Support Painting */}
+      <ElectricalCONSStack.Screen
+        name={'ElectricalSupportPaintingList'}
+        component={ElectricalSupportPaintingListScreen}
+        options={
+          {
+            title: 'Electrical Support Painting',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
       {/* Instrument Support */}
       <ElectricalCONSStack.Screen
         name={'InstrumentSupportRegisterList'}
@@ -1140,6 +1153,17 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: 'Instrument Support Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Instrument Support Painting */}
+      <ElectricalCONSStack.Screen
+        name={'InstrumentSupportPaintingList'}
+        component={InstrumentSupportPaintingListScreen}
+        options={
+          {
+            title: 'Instrument Support Painting',
             headerBackTitle: 'Back',
           }
         }
@@ -1190,7 +1214,7 @@ const ElectricalCONSStackScreens = () => {
           }
         }
       />
-      {/* Instrument Equipment */}
+      {/* Tubing */}
       <ElectricalCONSStack.Screen
         name={'TubingControlList'}
         component={TubingControlListScreen}

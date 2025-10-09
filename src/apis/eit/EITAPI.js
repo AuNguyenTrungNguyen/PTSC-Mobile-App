@@ -452,6 +452,22 @@ export const UpdateElectricalSupportRegisterPendingListAPI = async (listItemUpda
     }
   ).then(res => res.json());
 };
+export const UpdateElectricalSupportPaintingAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateElectricalSupportPainting',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
 
 //-- Instrument Support Register
 export const GetInstrumentSupportRegisterListAPI = async (projectCode, facilityCode, drawingNo, location, name, result) => {
@@ -515,6 +531,22 @@ export const UpdateInstrumentSupportRegisterPendingListAPI = async (listItemUpda
   return fetch(
     Port_Server
     + '/api/eit/UpdateInstrumentSupportRegisterPendingList',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+};
+export const UpdateInstrumentSupportPaintingAPI = async (listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  const userUpdate = await Helper.getData('USERNAME');
+  return fetch(
+    Port_Server
+    + '/api/eit/UpdateInstrumentSupportPainting',
     {
       method: 'POST',
       headers: {
