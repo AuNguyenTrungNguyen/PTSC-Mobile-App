@@ -14,8 +14,10 @@ import {
   GetTimeSheetWorkOrderListAPI,
   GetTimeSheetWorkerListOTAPI,
   UpdateTimeSheetOTAPI,
-  DeleteTimeSheetWorkerDateOTAPI
+  DeleteTimeSheetWorkerDateOTAPI,
+  GetOTCategoryTypicalAPI
 } from '../../apis/timesheet/TimeSheetAPI';
+import SelectPopupVertical from '../../components/SelectPopupVertical';
 import { GetProjectListAPI } from '../../apis/app/LoginAPI';
 
 import Helper from '../../utils/Helper';
@@ -126,6 +128,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
           if (Object.keys(res.data).length) {
             setDepartment(res.data[0].DepartmentCode);
             callAPI(getProjectList);
+            callAPI(getOTCategoryTypycal);
             callAPI(getAllData);
           }
           else {
@@ -232,6 +235,14 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
       MessageAlert('ERROR', error.toString());
     }
   };
+  const getOTCategoryTypycal = () => {
+    GetOTCategoryTypicalAPI()
+      .then(res => {
+        if (res.Success) {
+          setCategoryList(res.Data);
+        }
+      });
+  };
 
   //-- Send Data
   const _onPressSubmitToServer = async () => {
@@ -261,6 +272,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
               i.ColorShift = null;
               i.ColorHours = null;
               i.ColorNote = null;
+              i.ColorOTCategory = null;
               return i;
             });
             setWorkerUpdatedList(baseArray);
@@ -296,6 +308,7 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
             item.ColorShift = null;
             item.ColorHours = null;
             item.ColorNote = null;
+            item.ColorOTCategory = null;
 
             item.Overtime = '';
             item.Shift = '';
@@ -394,11 +407,11 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
       return;
     }
 
-    const errorList = workerList.filter(i => (!i.Overtime || !i.WorkOrder || !i.Shift) && i.SELECTED);
+    const errorList = workerList.filter(i => (!i.Overtime || !i.WorkOrder || !i.Shift || !i.OTCategory) && i.SELECTED);
     const result = errorList.map(i => i.RowIndex);
     setWorkerErrorList(result);
 
-    const transferList = workerList.filter(i => i.Overtime && i.WorkOrder && i.Shift);
+    const transferList = workerList.filter(i => i.Overtime && i.WorkOrder && i.Shift && i.OTCategory);
     if (transferList) {
       let addlist = [];
       transferList.forEach(item => {
@@ -536,6 +549,26 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
 
     isSpending ? setWorkerList(array) : setWorkerUpdatedList(array);
   };
+  const _onChangOTCategoryShotcut = () => {
+    const isSpending = filter === SPENDING_TEXT;
+
+    let data = isSpending ? [...workerList] : [...workerUpdatedList];
+    if (!data.length) {
+      return;
+    }
+    let array = [...data];
+    array.map(i => {
+      if (i.SELECTED) {
+        i.OTCategory = category;
+        i.OTSubCategory = subCategory;
+        i.ColorOTCategory = isSpending ? TEMP_COLOR_SPENDING : TEMP_COLOR_UPDATED;
+        i.SUBMITED = false;
+      }
+      return i;
+    });
+
+    isSpending ? setWorkerList(array) : setWorkerUpdatedList(array);
+  };
 
   const [isShowNote, setIsShowNote] = useState(false);
   const [note, setNote] = useState('');
@@ -550,6 +583,17 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
     setNoteDisplay('');
     setNote('');
     setIsShowNote(false);
+  };
+
+
+  const [isVisibleCategory, setIsVisibleCategory] = useState(false);
+  const [categoryList, setCategoryList] = useState([]);
+  const [category, setCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('');
+  const _onChangeCategory = data => {
+    setCategory(data.Category);
+    setSubCategory(data.SubCategory);
+    setIsVisibleCategory(false);
   };
 
   const _onChangeProjectCode = code => {
@@ -669,6 +713,34 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
             :
             null
         }
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}>Lý do OT:</Text>
+          {
+            item.ColorOTCategory
+              ?
+              item.ColorOTCategory == TEMP_COLOR_SPENDING
+                ?
+                <Text style={styles.cellDataGreen}>{Formater.formatEmptyData(item.OTCategory)}</Text>
+                :
+                <Text style={styles.cellDataRed}>{Formater.formatEmptyData(item.OTCategory)}</Text>
+              :
+              <Text style={styles.cellData}>{Formater.formatEmptyData(item.OTCategory)}</Text>
+          }
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.cellTitle}></Text>
+          {
+            item.ColorOTCategory
+              ?
+              item.ColorOTCategory == TEMP_COLOR_SPENDING
+                ?
+                <Text style={styles.cellDataGreen}>{Formater.formatEmptyData(item.OTSubCategory)}</Text>
+                :
+                <Text style={styles.cellDataRed}>{Formater.formatEmptyData(item.OTSubCategory)}</Text>
+              :
+              <Text style={styles.cellData}>{Formater.formatEmptyData(item.OTSubCategory)}</Text>
+          }
+        </View>
       </View>
     );
   };
@@ -710,6 +782,22 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
                   style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
                 <FontAwesome5 onPress={() => { _onChangWorkOrderShotcut() }}
                   style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+              </View>
+            </View>
+            <View style={styles.headerRowMultiLine}>
+              <Text style={styles.headerCellTitle}>Lý do:</Text>
+              <View style={styles.headerCellAction}>
+                <Text style={styles.headerText}>{category}</Text>
+                <Ionicons onPress={() => { setIsVisibleCategory(true); }}
+                  style={styles.headerIcon} name='md-list-outline' size={20} color={BASE_COLOR} />
+                <FontAwesome5 onPress={() => { _onChangOTCategoryShotcut() }}
+                  style={styles.headerIcon} name='clipboard-check' size={20} color={'green'} />
+              </View>
+            </View>
+            <View style={styles.headerRowMultiLine}>
+              <Text style={styles.headerCellTitle}>Chi tiết:</Text>
+              <View style={styles.headerCellAction}>
+                <Text style={styles.headerText}>{subCategory}</Text>
               </View>
             </View>
             <View style={styles.headerRow}>
@@ -880,6 +968,16 @@ const TimeSheetOTScreen = ({ route, navigation }) => {
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
       />
+      <SelectPopupVertical
+        visible={isVisibleCategory}
+        leftHeader={'OT Cat'}
+        rightHeader={'OT SubCat'}
+        leftKey={'Category'}
+        rightKey={'SubCategory'}
+        data={categoryList}
+        onChangeItem={_onChangeCategory}
+        onCancel={() => setIsVisibleCategory(false)}
+      />
       <SelectPopup
         visible={isVisibleProject}
         data={projectList}
@@ -912,7 +1010,6 @@ const styles = StyleSheet.create({
   headerRowMultiLine: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 32,
     marginBottom: 4,
     justifyContent: 'space-between'
   },
@@ -930,6 +1027,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flexShrink: 1,
+    flexWrap: 'wrap',
     fontWeight: 'bold',
     color: BASE_COLOR,
   },

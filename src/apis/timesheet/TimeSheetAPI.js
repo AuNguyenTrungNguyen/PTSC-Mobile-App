@@ -1,4 +1,5 @@
 import { Port_Server } from '../../utils/Core';
+import Helper from '../../utils/Helper';
 
 export const GetTimeSheetTeamLeaderInfoAPI = (userLogin, token) =>
   fetch(
@@ -167,3 +168,17 @@ export const GetTimeSheetReportAPI = (projectCode, userLogin, date, token) =>
         'Content-Type': 'application/json',
       }
     }).then(res => res.json());
+
+export const GetOTCategoryTypicalAPI = async () => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/TimeSheet/GetOTCategoryTypical',
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};

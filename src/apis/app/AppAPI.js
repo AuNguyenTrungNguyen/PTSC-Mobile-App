@@ -150,11 +150,13 @@ export const GetSerialNoAndHeatNoListAPI = (projectCode, itemCode, token) =>
       },
     }).then(res => res.json());
 
-export const GetSerialNoAndHeatNoPipeSupportListAPI = (projectCode, token) =>
+export const GetSerialNoAndHeatNoPipeSupportListAPI = (projectCode, drawingNo, sheet, token) =>
   fetch(
     Port_Server
     + '/api/App/GetSerialNoAndHeatNoPipeSupportList'
-    + '?projectCode=' + projectCode,
+    + '?projectCode=' + projectCode
+    + '&drawingNo=' + drawingNo
+    + '&sheet=' + sheet,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

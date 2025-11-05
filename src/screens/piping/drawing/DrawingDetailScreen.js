@@ -507,7 +507,7 @@ const DrawingDetailScreen = ({ route, navigation }) => {
   };
   const getHeatNoPipeSupportList = async () => {
     const token = await Helper.getData('TOKEN');
-    GetSerialNoAndHeatNoPipeSupportListAPI(projectCode, token)
+    GetSerialNoAndHeatNoPipeSupportListAPI(projectCode, drawingNo, sheet, token)
       .then(res => {
         if (res.Success) {
           setHeatNoList(res.Data);
