@@ -57,6 +57,7 @@ const InstrumentCableControlListScreen = ({ route, navigation }) => {
   const callAPI = executedAPI => {
     setIsSearching(true);
     Networker.callAPI(executedAPI(), () => { setIsLoading(false), setIsError(true), setIsSearching(false) });
+    setIsSearching(false);
   };
 
   useEffect(
