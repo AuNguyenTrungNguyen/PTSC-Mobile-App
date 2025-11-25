@@ -187,7 +187,7 @@ const ElectricalTrayLadderRegisterListScreen = ({ route, navigation }) => {
       Toast.show(keyUpdate + ' must be from 0 to 100.', Toast.SHORT);
       return;
     }
-    updateValue(indexUpdate, keyUpdate, value);
+    updateValue(indexUpdate, keyUpdate, value / 100);
     setIsVisiblePercent(false);
   };
 
@@ -330,8 +330,8 @@ const ElectricalTrayLadderRegisterListScreen = ({ route, navigation }) => {
                 <View style={styles.cellTwoRow}>
                   <TouchableOpacity
                     style={styles.cellTwoRow}
-                    onPress={() => _onPressSelectPercent(item.RowIndex, 'InstallPercentage', item.InstallPercentage)}>
-                    <Text style={styles.textData}>{Formater.formatEmptyData(item.InstallPercentage)}</Text>
+                    onPress={() => _onPressSelectPercent(item.RowIndex, 'InstallPercentage', item.InstallPercentage * 100)}>
+                    <Text style={styles.textData}>{Formater.formatEmptyData(item.InstallPercentage * 100)}</Text>
                     {
                       <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
                     }
