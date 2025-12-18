@@ -6,8 +6,8 @@ import NetInfo from '@react-native-community/netinfo';
 import Helper from '../../../utils/Helper';
 import Constant from '../../../utils/Constant';
 
-import { GetCurrentDimCuttingInfoAPI, GetCurrentDimCuttingInfoSubContractorAPI  } from '../../../apis/piping/DimAPI';
-import { GetCurrentConstructionInfoAPI, GetCurrentConstructionInfoSubContractorAPI, CheckDrawingRevAPI} from '../../../apis/piping/ConstructionAPI';
+import { GetCurrentDimCuttingInfoAPI, GetCurrentDimCuttingInfoSubContractorAPI } from '../../../apis/piping/DimAPI';
+import { GetCurrentConstructionInfoAPI, GetCurrentConstructionInfoSubContractorAPI, CheckDrawingRevAPI } from '../../../apis/piping/ConstructionAPI';
 
 const CameraScreen = ({ route, navigation }) => {
 
@@ -76,7 +76,7 @@ const CameraScreen = ({ route, navigation }) => {
                   { cancelable: false },
                 );
               } else {
-              _onGoingDetail(drawingNo, sheet, rev);
+                _onGoingDetail(drawingNo, sheet, rev);
               }
             }
             else {
@@ -136,7 +136,7 @@ const CameraScreen = ({ route, navigation }) => {
                     rev: rev,
                     code: code,
                     teamLeader: teamLeader,
-                    title: code + ' Detail',
+                    title: 'PIP ' + code + ' Detail',
                     link: res.Link,
                   });
                 } else {

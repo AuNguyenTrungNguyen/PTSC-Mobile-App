@@ -200,7 +200,7 @@ const DrawingListScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     const teamLeader = await Helper.getData('USERNAME');
     const code = Constant.CODE_FITUP;
-    const title = code + ' Detail';
+    const title = 'PIP ' + code + ' Detail';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
         'DrawingDetail',
@@ -248,7 +248,7 @@ const DrawingListScreen = ({ route, navigation }) => {
     Keyboard.dismiss();
     const teamLeader = await Helper.getData('USERNAME');
     const code = Constant.CODE_WELD;
-    const title = code + ' Detail';
+    const title = 'PIP ' + code + ' Detail';
     if (facilityCode !== FACILITY_CODE_DEFAULT) {
       navigation.navigate(
         'DrawingDetail',

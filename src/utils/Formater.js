@@ -50,6 +50,14 @@ export default class Formater {
     return new Date(format + 'T00:00:00.000Z')
   }
 
+  static formatDateValid = date => {
+    if (date != null) {
+      var format = Moment(date).format("YYYY-MM-DD");
+      return new Date(format + 'T00:00:00.000Z')
+    }
+    return null;
+  }
+
   static checkFormatNumber = input => {
     const regexNumber = /^\d+(\.\d+)?$/;
     return regexNumber.test(input) && input !== '';

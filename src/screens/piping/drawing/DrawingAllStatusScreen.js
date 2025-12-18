@@ -131,7 +131,7 @@ const DrawingAllStatusScreen = ({ route, navigation }) => {
       return;
     }
     const teamLeader = await Helper.getData('USERNAME');
-    const title = code + ' Detail';
+    const title = 'PIP ' + code + ' Detail';
     if (facilityCode) {
       navigation.navigate(
         'DrawingDetail',

@@ -107,7 +107,33 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
       Toast.show('Without any data changes!', Toast.SHORT);
       return;
     }
+
+    var error = validateData();
+    if (error.length) {
+      MessageAlert('ERROR', '\n' + error.join('\n'));
+      return;
+    }
     callAPI(updateSpoolDetail, false);
+  };
+
+  const validateData = () => {
+    let messages = [];
+
+    const fitup = spoolDetail['SpoolCompletedFitupToSiteDate'];
+    const weld = spoolDetail['SpoolCompletedWeldedToSiteDate'];
+
+    const fitupDate = Formater.formatDateValid(fitup);
+    const weldDate = Formater.formatDateValid(weld);
+
+    if (fitupDate != null && weldDate != null && fitupDate > weldDate) {
+      messages.push('SpoolCompletedFitupToSiteDate must be earlier than or equal to SpoolCompletedWeldedToSiteDate');
+    }
+
+    if (fitupDate == null && weldDate != null) {
+      messages.push('Please input \n SpoolCompletedFitupToSiteDate \n before \n SpoolCompletedWeldedToSiteDate');
+    }
+
+    return messages;
   };
 
   //-- Update data
@@ -138,6 +164,8 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
     const isReleaseForPaintingDate = columnChange.includes('ReleaseForPaintingDate');
     const isSpoolOutFromBP = columnChange.includes('SpoolOutFromBP');
     const isSpoolRigupToSite = columnChange.includes('SpoolRigupToSite');
+    const isSpoolCompletedFitupToSiteDate = columnChange.includes('SpoolCompletedFitupToSiteDate');
+    const isSpoolCompletedWeldedToSiteDate = columnChange.includes('SpoolCompletedWeldedToSiteDate');
     return (
       <View style={styles.table}>
         {
@@ -189,6 +217,27 @@ const PipeSpoolDetailScreen = ({ route, navigation }) => {
                   <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('SpoolRigupToSite')}>
                     <Text style={isSpoolRigupToSite ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolRigupToSite)}</Text>
                     <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isSpoolRigupToSite ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.line} />
+
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>{'SpoolCompleted\nFitupToSite'}:</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('SpoolCompletedFitupToSiteDate')}>
+                    <Text style={isSpoolCompletedFitupToSiteDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolCompletedFitupToSiteDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isSpoolCompletedFitupToSiteDate ? EDITING_COLOR : BASE_COLOR} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cellTitle}>{'SpoolCompleted\nWeldedToSite'}:</Text>
+                <View style={styles.cellData}>
+                  <TouchableOpacity style={styles.containerAction} onPress={() => _onSelectDate('SpoolCompletedWeldedToSiteDate')}>
+                    <Text style={isSpoolCompletedWeldedToSiteDate ? styles.textGreen : styles.textAction}>{Formater.formatDateData(spoolDetail.SpoolCompletedWeldedToSiteDate)}</Text>
+                    <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isSpoolCompletedWeldedToSiteDate ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
               </View>
