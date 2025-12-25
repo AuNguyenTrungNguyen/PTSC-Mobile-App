@@ -177,7 +177,7 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                 </View>
               </View>
 
-              <View style={styles.line} />
+              {/* <View style={styles.line} />
 
               <View style={styles.row}>
                 <Text style={styles.cellTitle}>Installation_Fitup:</Text>
@@ -196,7 +196,7 @@ const PipeSupportDetailScreen = ({ route, navigation }) => {
                     <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={isInstallationPipeSupport_Welding ? EDITING_COLOR : BASE_COLOR} />
                   </TouchableOpacity>
                 </View>
-              </View>
+              </View> */}
 
               <View style={styles.line} />
 
