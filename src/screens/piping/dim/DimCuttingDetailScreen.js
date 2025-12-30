@@ -114,7 +114,7 @@ const DimCuttingDetailScreen = ({ route, navigation }) => {
             setTeamList(teamResult.Data);
 
             if (dimDetailResult.Data.ItemCode) {
-              GetSerialNoAndHeatNoListAPI(projectCode, dimDetailResult.Data.ItemCode, token)
+              GetSerialNoAndHeatNoListAPI(projectCode, '', dimDetailResult.Data.ItemCode, token)
                 .then(res => {
                   if (res.Success) {
                     setSerialList(res.Data);

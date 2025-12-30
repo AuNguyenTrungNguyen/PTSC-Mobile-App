@@ -380,7 +380,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
   };
   const getHeatNoList = async value => {
     const token = await Helper.getData('TOKEN');
-    GetSerialNoAndHeatNoListAPI(projectCode, value, token)
+    GetSerialNoAndHeatNoListAPI(projectCode, facilityCode, value, token)
       .then(res => {
         if (res.Success) {
           setHeatNoList(res.Data);

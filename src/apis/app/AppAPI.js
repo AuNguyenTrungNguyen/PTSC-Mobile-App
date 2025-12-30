@@ -137,11 +137,12 @@ export const GetPieceMarkNoListAPI = (projectCode, facilityCode, pieceMarkNo, to
       },
     }).then(res => res.json());
 
-export const GetSerialNoAndHeatNoListAPI = (projectCode, itemCode, token) =>
+export const GetSerialNoAndHeatNoListAPI = (projectCode, facilityCode, itemCode, token) =>
   fetch(
     Port_Server
     + '/api/App/GetSerialNoAndHeatNoList'
     + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
     + '&itemCode=' + itemCode,
     {
       headers: {
