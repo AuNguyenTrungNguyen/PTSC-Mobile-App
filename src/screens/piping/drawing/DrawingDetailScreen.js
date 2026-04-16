@@ -241,8 +241,10 @@ const DrawingDetailScreen = ({ route, navigation }) => {
         if ((column.indexOf('WelderID') >= 0 && !welderId) || (column.indexOf('WelderID') < 0 && !oldItem['WelderID'])) {
           messages.push('WelderID');
         }
-        if ((column.indexOf('WPSNo') >= 0 && !wspNo) || (column.indexOf('WPSNo') < 0 && !oldItem['WPSNo'])) {
-          messages.push('WPSNo');
+        const materialCategory = oldItem['MaterialCategory'];
+        const isExemptFromWPS = materialCategory === 'PPR' || materialCategory === 'CPVC';
+        if (!isExemptFromWPS && ((column.indexOf('WPSNo') >= 0 && !wspNo) || (column.indexOf('WPSNo') < 0 && !oldItem['WPSNo']))) {
+          messages.push('WPSNo !!!');
         }
         if ((column.indexOf('WelderTeam') >= 0 && !team) || (column.indexOf('WelderTeam') < 0 && !oldItem['WelderTeam'])) {
           messages.push('Team');
