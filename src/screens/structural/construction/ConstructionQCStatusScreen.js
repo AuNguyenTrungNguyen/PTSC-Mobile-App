@@ -14,7 +14,7 @@ import { GetConstructionQCStatusListAPI } from '../../../apis/structural/Constru
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
-import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
+import TotalLocationModal from '../../../components/Drawing/TotalLocationModal';
 import SelectPopup from '../../../components/SelectPopup';
 
 const ConstructionQCStatusScreen = ({ route, navigation }) => {

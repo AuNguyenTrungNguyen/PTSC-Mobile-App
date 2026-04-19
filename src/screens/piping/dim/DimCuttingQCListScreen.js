@@ -12,7 +12,7 @@ import CoreStyle from '../../../utils/CoreStyle';
 import { GetDimCuttingQCListAPI, GetDimCuttingQCListSubContractorAPI, UpdateDimCuttingQCListAPI } from '../../../apis/piping/DimAPI';
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
-import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
+import TotalLocationModal from '../../../components/Drawing/TotalLocationModal';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 
 const DimCuttingQCListScreen = ({ route, navigation }) => {
