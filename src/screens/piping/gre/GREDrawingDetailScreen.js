@@ -151,7 +151,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
         const ActualInsertionDepth = item['ActualInsertionDepth'];
 
         if ((date && heat01 && heat02 && batchNo && ENVHum && ENVTemp)
-          || (!date && !heat01 && !heat02 && !batchNo && !ENVHum && !ENVTemp && !ActualInsertionDepth)
+          || (!date && !heat01 && !heat02 && !batchNo && !ENVHum && !ENVTemp)
         ) {
           return item;
         }
@@ -179,9 +179,7 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
         if ((column.indexOf('ENVTemp') >= 0 && !ENVTemp) || (column.indexOf('ENVTemp') < 0 && !oldItem['ENVTemp'])) {
           messages.push('ENVTemp');
         }
-        if ((column.indexOf('ActualInsertionDepth') >= 0 && !ActualInsertionDepth) || (column.indexOf('ActualInsertionDepth') < 0 && !oldItem['ActualInsertionDepth'])) {
-          messages.push('ActualInsertionDepth');
-        }
+
         return item;
       });
     }
@@ -332,6 +330,11 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
   const _onChangeNumber = () => {
     let value = numberDisplay.replace(/,/g, '.');
     setNumberDisplay(value);
+    if (keyUpdate === 'ActualInsertionDepth' && value === '') {
+      onChangeData(null);
+      setIsVisibleNumber(false);
+      return;
+    }
     if (!Helper.checkFormatNegativeNumber(value)) {
       Toast.show('Please enter ' + keyUpdate + ' must be a number.', Toast.SHORT);
       return;
@@ -929,13 +932,13 @@ const GREDrawingDetailScreen = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.cellTitle}>
-                  <Text style={styles.redText}>{'Insertion\nDepth'}:</Text>
+                  <Text style={{ color: 'black' }}>{'Insertion\nDepth'}:</Text>
                 </View>
                 <View style={styles.cellData}>
                   <TouchableOpacity
                     style={styles.itemActionIcon}
                     onPress={() => _onPressSelectNumber(item.ActualInsertionDepth, index, 'ActualInsertionDepth')}>
-                    <Text style={styles.textData}>{Formater.formatTwoDigits(item.ActualInsertionDepth)}</Text>
+                    <Text style={styles.textData}>{item.ActualInsertionDepth != null ? Formater.formatTwoDigits(item.ActualInsertionDepth) : ''}</Text>
                     {
                       isDisableItem
                         ?
