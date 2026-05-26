@@ -1,9 +1,22 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, TextInput, Keyboard, Appearance, Dimensions } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, TextInput, Keyboard, Appearance, VirtualizedList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import SelectPopup from '../../../components/SelectPopup';
-import { ListSelectData } from '../../../components/HelperUI';
+import { ListEmptyData } from '../../../components/HelperUI';
+
+const MOCK_DATA = [
+    { RowIndex: 1, ContractorName: 'PTSC M&C', TypeOfWork: 'Glanding And Termination', Name: 'Nguyen Van A', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-001', Remark: '', Check: true },
+    { RowIndex: 2, ContractorName: 'PTSC M&C', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Tran Thi B', Evaluation: 'Excellent', Result: 'Pass', NumberID: 'ID-002', Remark: '', Check: true },
+    { RowIndex: 3, ContractorName: 'SPTS', TypeOfWork: 'Glanding And Termination', Name: 'Le Van C', Evaluation: 'Fair', Result: 'Fail', NumberID: 'ID-003', Remark: 'Re-test', Check: false },
+    { RowIndex: 4, ContractorName: 'SPTS', TypeOfWork: 'Glanding And Termination', Name: 'Pham Thi D', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-004', Remark: '', Check: true },
+    { RowIndex: 5, ContractorName: 'PTSC M&C', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Hoang Van E', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-005', Remark: '', Check: true },
+    { RowIndex: 6, ContractorName: 'VSP', TypeOfWork: 'Glanding And Termination', Name: 'Vu Thi F', Evaluation: 'Poor', Result: 'Fail', NumberID: 'ID-006', Remark: 'Training', Check: false },
+    { RowIndex: 7, ContractorName: 'VSP', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Dang Van G', Evaluation: 'Excellent', Result: 'Pass', NumberID: 'ID-007', Remark: '', Check: true },
+    { RowIndex: 8, ContractorName: 'PTSC M&C', TypeOfWork: 'Glanding And Termination', Name: 'Bui Thi H', Evaluation: 'Fair', Result: 'Pass', NumberID: 'ID-008', Remark: '', Check: true },
+    { RowIndex: 9, ContractorName: 'SPTS', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Do Van I', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-009', Remark: '', Check: true },
+    { RowIndex: 10, ContractorName: 'VSP', TypeOfWork: 'Glanding And Termination', Name: 'Ngo Thi J', Evaluation: 'Excellent', Result: 'Pass', NumberID: 'ID-010', Remark: '', Check: true },
+];
 
 const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
 
@@ -55,16 +68,58 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
     //-- Name
     const [name, setName] = useState('');
 
+    //-- Results
+    const [workerItems, setWorkerItems] = useState(null);
+
     //-- Search
     const _onPressSearch = () => {
         Keyboard.dismiss();
-        // TODO: call search API
+        // TODO: replace with real API call
+        setWorkerItems(MOCK_DATA);
     };
 
     //-- Add Worker Information
     const _onPressAddWorker = () => {
         // TODO: navigate to add worker screen
     };
+
+    //-- Render Item
+    const renderItem = ({ item }) => (
+        <View style={styles.box}>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Contractor Name:</Text>
+                <Text style={styles.cellValue}>{item.ContractorName}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Type Of Work:</Text>
+                <Text style={styles.cellValue}>{item.TypeOfWork}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Name:</Text>
+                <Text style={styles.cellValue}>{item.Name}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Evaluation:</Text>
+                <Text style={styles.cellValue}>{item.Evaluation}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Result:</Text>
+                <Text style={[styles.cellValue, { color: item.Result === 'Pass' ? '#2e7d32' : '#c62828', fontWeight: 'bold' }]}>{item.Result}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Number ID:</Text>
+                <Text style={styles.cellValue}>{item.NumberID}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Remark:</Text>
+                <Text style={styles.cellValue}>{item.Remark || '-'}</Text>
+            </View>
+            <View style={styles.rowData}>
+                <Text style={styles.cellLabel}>Check:</Text>
+                <Text style={[styles.cellValue, { color: item.Check ? '#2e7d32' : '#c62828' }]}>{item.Check ? 'Yes' : 'No'}</Text>
+            </View>
+        </View>
+    );
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -117,7 +172,17 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                     </View>
                 )}
 
-                <ListSelectData title={'Please enter search criteria'} />
+                {workerItems && workerItems.length > 0
+                    ? <VirtualizedList
+                        style={styles.table}
+                        data={workerItems}
+                        getItemCount={data => data.length}
+                        getItem={(data, index) => data[index]}
+                        keyExtractor={item => item.RowIndex.toString()}
+                        renderItem={renderItem}
+                    />
+                    : <ListEmptyData />
+                }
             </View>
 
             <SelectPopup
@@ -216,6 +281,32 @@ const styles = StyleSheet.create({
         color: OPP_COLOR,
         fontWeight: 'bold',
         fontSize: 14,
+    },
+    table: {
+        flex: 1,
+    },
+    box: {
+        margin: 8,
+        marginBottom: 0,
+        padding: 10,
+        borderColor: BASE_COLOR,
+        borderWidth: 1,
+        borderRadius: 8,
+    },
+    rowData: {
+        flexDirection: 'row',
+        paddingVertical: 3,
+    },
+    cellLabel: {
+        width: 130,
+        color: BASE_COLOR,
+        fontWeight: 'bold',
+        fontSize: 13,
+    },
+    cellValue: {
+        flex: 1,
+        color: '#333',
+        fontSize: 13,
     },
 });
 
