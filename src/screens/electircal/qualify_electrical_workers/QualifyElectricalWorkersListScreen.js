@@ -80,7 +80,7 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
 
     //-- Add Worker Information
     const _onPressAddWorker = () => {
-        // TODO: navigate to add worker screen
+        navigation.navigate('QualifyElectricalWorkersAdd', { projectCode });
     };
 
     //-- Render Item
