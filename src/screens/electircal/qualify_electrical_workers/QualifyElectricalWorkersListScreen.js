@@ -39,9 +39,9 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
     };
 
     //-- Type of Work
-    const TYPE_OF_WORK_DEFAULT = 'Select Type of Work';
+    const TYPE_OF_WORK_DEFAULT = 'All';
     const [isVisibleTypeOfWork, setIsVisibleTypeOfWork] = useState(false);
-    const [typeOfWorkList, setTypeOfWorkList] = useState([]);
+    const [typeOfWorkList] = useState(['All', 'Glanding And Termination', 'Cable Testing and Check Sheet Completion']);
     const [typeOfWork, setTypeOfWork] = useState(TYPE_OF_WORK_DEFAULT);
     const _onChangeTypeOfWork = value => {
         setTypeOfWork(value);
