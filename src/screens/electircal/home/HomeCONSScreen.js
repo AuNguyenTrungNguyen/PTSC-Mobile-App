@@ -346,6 +346,16 @@ const HomeCONSScreen = ({ route, navigation }) => {
     );
   };
 
+  //-- Qualify Electrical Workers
+  const _onQualifyElectricalWorkers = async () => {
+    navigation.navigate(
+      'QualifyElectricalWorkersList',
+      {
+        projectCode: projectCode,
+      }
+    );
+  };
+
   //-- Tubing Control
   const _onTubingControl = async () => {
     navigation.navigate(
@@ -463,6 +473,11 @@ const HomeCONSScreen = ({ route, navigation }) => {
             <View style={styles.row}>
               <RenderItemBox title={'TimeSheet\n'} onPress={_onPressManageTimeSheet} />
               <RenderItemBox title={'Man-hours\nImpact'} onPress={_onPressManHoursImpact} />
+            </View>
+            {/* Qualify Electrical Workers */}
+            <View style={styles.row}>
+              <RenderItemBox title={'Qualify Electrical Workers'} onPress={_onQualifyElectricalWorkers} iconName='account-hard-hat' iconType='MaterialCommunity' />
+              <RenderItemBox disable={true} />
             </View>
           </ScrollView>
         </View>
