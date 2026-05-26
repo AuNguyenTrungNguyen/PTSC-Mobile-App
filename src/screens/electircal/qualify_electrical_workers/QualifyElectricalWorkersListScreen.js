@@ -61,6 +61,11 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
         // TODO: call search API
     };
 
+    //-- Add Worker Information
+    const _onPressAddWorker = () => {
+        // TODO: navigate to add worker screen
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
@@ -103,6 +108,10 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                             <Text style={styles.infoTitleAction} />
                             <TouchableOpacity style={styles.searchButton} onPress={_onPressSearch}>
                                 <Text style={styles.buttonTitle}>Search</Text>
+                            </TouchableOpacity>
+                            <View style={{ width: 8 }} />
+                            <TouchableOpacity style={styles.addButton} onPress={_onPressAddWorker}>
+                                <Text style={styles.buttonTitle}>Add Worker Information</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -192,6 +201,13 @@ const styles = StyleSheet.create({
     searchButton: {
         flex: 1,
         backgroundColor: BASE_COLOR,
+        borderRadius: 4,
+        paddingVertical: 8,
+        alignItems: 'center',
+    },
+    addButton: {
+        flex: 2,
+        backgroundColor: '#2e7d32',
         borderRadius: 4,
         paddingVertical: 8,
         alignItems: 'center',
