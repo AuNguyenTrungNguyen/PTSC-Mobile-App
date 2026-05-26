@@ -133,6 +133,7 @@ import InstrumentTrayLadderRegisterListScreen from './screens/electircal/instrum
 import ElectricalEquipmentControlListScreen from './screens/electircal/electrical_equipment_control/ElectricalEquipmentControlListScreen';
 import InstrumentEquipmentControlListScreen from './screens/electircal/instrument_equipment_control/InstrumentEquipmentControlListScreen';
 import TubingControlListScreen from './screens/electircal/tubing_control/TubingControlListScreen';
+import QualifyElectricalWorkersListScreen from './screens/electircal/qualify_electrical_workers/QualifyElectricalWorkersListScreen';
 
 //-- EIT SUP
 import ElectricalSupportRegisterPendingListScreen from './screens/electircal/electrical_support_resigter/ElectricalSupportRegisterPendingListScreen';
@@ -1221,6 +1222,17 @@ const ElectricalCONSStackScreens = () => {
         options={
           {
             title: 'Tubing Control',
+            headerBackTitle: 'Back',
+          }
+        }
+      />
+      {/* Qualify Electrical Workers */}
+      <ElectricalCONSStack.Screen
+        name={'QualifyElectricalWorkersList'}
+        component={QualifyElectricalWorkersListScreen}
+        options={
+          {
+            title: 'Qualify Electrical Workers',
             headerBackTitle: 'Back',
           }
         }
