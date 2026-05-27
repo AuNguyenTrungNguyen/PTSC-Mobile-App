@@ -6,14 +6,44 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
 
     const { projectCode } = route.params;
 
-    //-- Name
-    const [name, setName] = useState('');
+    //-- Glanding Results
+    const [glandingFromResult, setGlandingFromResult] = useState('');
+    const [glandingToResult, setGlandingToResult] = useState('');
 
-    //-- National ID
-    const [nationalID, setNationalID] = useState('');
+    //-- Termination Results
+    const [terminationFromResult, setTerminationFromResult] = useState('');
+    const [terminationToResult, setTerminationToResult] = useState('');
 
-    //-- Employee Code
-    const [employeeCode, setEmployeeCode] = useState('');
+    //-- Glanding From
+    const [glandingFromEmployeeName, setGlandingFromEmployeeName] = useState('');
+    const [glandingFromEmployeeCode, setGlandingFromEmployeeCode] = useState('');
+    const [glandingFromEmployeeNationalId, setGlandingFromEmployeeNationalId] = useState('');
+    const [glandingFromError, setGlandingFromError] = useState('');
+
+    //-- Glanding To
+    const [glandingToEmployeeName, setGlandingToEmployeeName] = useState('');
+    const [glandingToEmployeeCode, setGlandingToEmployeeCode] = useState('');
+    const [glandingToEmployeeNationalId, setGlandingToEmployeeNationalId] = useState('');
+    const [glandingToError, setGlandingToError] = useState('');
+
+    //-- Termination From
+    const [terminationFromEmployeeName, setTerminationFromEmployeeName] = useState('');
+    const [terminationFromEmployeeCode, setTerminationFromEmployeeCode] = useState('');
+    const [terminationFromEmployeeNationalId, setTerminationFromEmployeeNationalId] = useState('');
+    const [terminationFromError, setTerminationFromError] = useState('');
+
+    //-- Termination To
+    const [terminationToEmployeeName, setTerminationToEmployeeName] = useState('');
+    const [terminationToEmployeeCode, setTerminationToEmployeeCode] = useState('');
+    const [terminationToEmployeeNationalId, setTerminationToEmployeeNationalId] = useState('');
+    const [terminationToError, setTerminationToError] = useState('');
+
+    //-- Cable
+    const [cableResult, setCableResult] = useState('');
+    const [cableEmployeeName, setCableEmployeeName] = useState('');
+    const [cableEmployeeCode, setCableEmployeeCode] = useState('');
+    const [cableEmployeeNationalId, setCableEmployeeNationalId] = useState('');
+    const [cableError, setCableError] = useState('');
 
     //-- Save notification
     const [saveMessage, setSaveMessage] = useState('');
@@ -27,63 +57,76 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
         setSaveMessage('Worker information saved successfully!');
     };
 
+    const FieldInput = ({ label, value, onChange }) => (
+        <View style={styles.fieldRow}>
+            <Text style={styles.fieldLabel}>{label}:</Text>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.inputText}
+                    value={value}
+                    onChangeText={onChange}
+                    underlineColorAndroid='transparent'
+                    placeholderTextColor='#aaa'
+                />
+                {value !== '' && (
+                    <Icon name='times-circle' onPress={() => onChange('')} style={styles.inputIcon} />
+                )}
+            </View>
+        </View>
+    );
+
+    const SectionHeader = ({ title }) => (
+        <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>{title}</Text>
+        </View>
+    );
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} keyboardShouldPersistTaps='handled'>
 
-                {/* Name */}
-                <View style={styles.fieldRow}>
-                    <Text style={styles.fieldLabel}>Name:</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.inputText}
-                            value={name}
-                            onChangeText={setName}
-                            underlineColorAndroid='transparent'
-                            placeholder='Enter name'
-                            placeholderTextColor='#aaa'
-                        />
-                        {name !== '' && (
-                            <Icon name='times-circle' onPress={() => setName('')} style={styles.inputIcon} />
-                        )}
-                    </View>
-                </View>
+                {/* Results */}
+                <SectionHeader title='Results' />
+                <FieldInput label='Glanding From Result' value={glandingFromResult} onChange={setGlandingFromResult} />
+                <FieldInput label='Glanding To Result' value={glandingToResult} onChange={setGlandingToResult} />
+                <FieldInput label='Termination From Result' value={terminationFromResult} onChange={setTerminationFromResult} />
+                <FieldInput label='Termination To Result' value={terminationToResult} onChange={setTerminationToResult} />
 
-                {/* National ID */}
-                <View style={styles.fieldRow}>
-                    <Text style={styles.fieldLabel}>National ID:</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.inputText}
-                            value={nationalID}
-                            onChangeText={setNationalID}
-                            underlineColorAndroid='transparent'
-                            placeholder='Enter national ID'
-                            placeholderTextColor='#aaa'
-                        />
-                        {nationalID !== '' && (
-                            <Icon name='times-circle' onPress={() => setNationalID('')} style={styles.inputIcon} />
-                        )}
-                    </View>
-                </View>
+                {/* Glanding From */}
+                <SectionHeader title='Glanding From' />
+                <FieldInput label='Employee Name' value={glandingFromEmployeeName} onChange={setGlandingFromEmployeeName} />
+                <FieldInput label='Employee Code' value={glandingFromEmployeeCode} onChange={setGlandingFromEmployeeCode} />
+                <FieldInput label='Employee National ID' value={glandingFromEmployeeNationalId} onChange={setGlandingFromEmployeeNationalId} />
+                <FieldInput label='Error' value={glandingFromError} onChange={setGlandingFromError} />
 
-                {/* Employee Code */}
-                <View style={styles.fieldRow}>
-                    <Text style={styles.fieldLabel}>Employee Code:</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.inputText}
-                            value={employeeCode}
-                            onChangeText={setEmployeeCode}
-                            underlineColorAndroid='transparent'
-                            placeholder='Enter employee code'
-                            placeholderTextColor='#aaa'
-                        />
-                        {employeeCode !== '' && (
-                            <Icon name='times-circle' onPress={() => setEmployeeCode('')} style={styles.inputIcon} />
-                        )}
-                    </View>
-                </View>
+                {/* Glanding To */}
+                <SectionHeader title='Glanding To' />
+                <FieldInput label='Employee Name' value={glandingToEmployeeName} onChange={setGlandingToEmployeeName} />
+                <FieldInput label='Employee Code' value={glandingToEmployeeCode} onChange={setGlandingToEmployeeCode} />
+                <FieldInput label='Employee National ID' value={glandingToEmployeeNationalId} onChange={setGlandingToEmployeeNationalId} />
+                <FieldInput label='Error' value={glandingToError} onChange={setGlandingToError} />
+
+                {/* Termination From */}
+                <SectionHeader title='Termination From' />
+                <FieldInput label='Employee Name' value={terminationFromEmployeeName} onChange={setTerminationFromEmployeeName} />
+                <FieldInput label='Employee Code' value={terminationFromEmployeeCode} onChange={setTerminationFromEmployeeCode} />
+                <FieldInput label='Employee National ID' value={terminationFromEmployeeNationalId} onChange={setTerminationFromEmployeeNationalId} />
+                <FieldInput label='Error' value={terminationFromError} onChange={setTerminationFromError} />
+
+                {/* Termination To */}
+                <SectionHeader title='Termination To' />
+                <FieldInput label='Employee Name' value={terminationToEmployeeName} onChange={setTerminationToEmployeeName} />
+                <FieldInput label='Employee Code' value={terminationToEmployeeCode} onChange={setTerminationToEmployeeCode} />
+                <FieldInput label='Employee National ID' value={terminationToEmployeeNationalId} onChange={setTerminationToEmployeeNationalId} />
+                <FieldInput label='Error' value={terminationToError} onChange={setTerminationToError} />
+
+                {/* Cable */}
+                <SectionHeader title='Cable' />
+                <FieldInput label='Cable Result' value={cableResult} onChange={setCableResult} />
+                <FieldInput label='Employee Name' value={cableEmployeeName} onChange={setCableEmployeeName} />
+                <FieldInput label='Employee Code' value={cableEmployeeCode} onChange={setCableEmployeeCode} />
+                <FieldInput label='Employee National ID' value={cableEmployeeNationalId} onChange={setCableEmployeeNationalId} />
+                <FieldInput label='Error' value={cableError} onChange={setCableError} />
 
                 {/* Notification area */}
                 {saveMessage !== '' && (
@@ -115,28 +158,29 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: OPP_COLOR,
     },
-    fieldRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 12,
+    sectionHeader: {
+        backgroundColor: BASE_COLOR,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 4,
+        marginBottom: 10,
+        marginTop: 4,
     },
-    fieldLabel: {
-        width: 130,
-        color: BASE_COLOR,
+    sectionTitle: {
+        color: OPP_COLOR,
         fontWeight: 'bold',
         fontSize: 13,
     },
-    selectContainer: {
-        flex: 1,
-        borderColor: BASE_COLOR,
-        borderWidth: 1,
-        borderRadius: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
+    fieldRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
     },
-    selectText: {
+    fieldLabel: {
+        width: 140,
         color: BASE_COLOR,
-        fontSize: 13,
+        fontWeight: 'bold',
+        fontSize: 12,
     },
     inputContainer: {
         flex: 1,
@@ -183,6 +227,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         alignItems: 'center',
         marginBottom: 24,
+        marginTop: 8,
     },
     saveButtonText: {
         color: OPP_COLOR,

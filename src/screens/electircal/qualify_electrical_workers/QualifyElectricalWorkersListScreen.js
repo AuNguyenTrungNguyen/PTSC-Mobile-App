@@ -78,8 +78,8 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
         setWorkerItems(MOCK_DATA);
     };
 
-    //-- Add Worker Information
-    const _onPressAddWorker = () => {
+    //-- Add Result
+    const _onPressAddResult = () => {
         navigation.navigate('QualifyElectricalWorkersAdd', { projectCode });
     };
 
@@ -145,8 +145,8 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                                 <Text style={styles.buttonTitle}>Search</Text>
                             </TouchableOpacity>
                             <View style={{ width: 8 }} />
-                            <TouchableOpacity style={styles.addButton} onPress={_onPressAddWorker}>
-                                <Text style={styles.buttonTitle}>Add Worker Information</Text>
+                            <TouchableOpacity style={styles.addButton} onPress={_onPressAddResult}>
+                                <Text style={styles.buttonTitle}>Add Result</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
