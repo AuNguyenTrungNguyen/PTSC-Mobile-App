@@ -476,7 +476,7 @@ const HomeCONSScreen = ({ route, navigation }) => {
             </View>
             {/* Qualify Electrical Workers */}
             <View style={styles.row}>
-              <RenderItemBox title={'Qualify Electrical Workers'} onPress={_onQualifyElectricalWorkers} iconName='account-hard-hat' iconType='MaterialCommunity' />
+              <RenderItemBox title={'List Results'} onPress={_onQualifyElectricalWorkers} iconName='account-hard-hat' iconType='MaterialCommunity' />
               <RenderItemBox disable={true} />
             </View>
           </ScrollView>

@@ -1233,7 +1233,7 @@ const ElectricalCONSStackScreens = () => {
         component={QualifyElectricalWorkersListScreen}
         options={
           {
-            title: 'Qualify Electrical Workers',
+            title: 'List Results',
             headerBackTitle: 'Back',
           }
         }
