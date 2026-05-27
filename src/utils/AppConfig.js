@@ -1,5 +1,5 @@
 export default class AppConfig {
     // static TITLE = 'PTSC';
     static TITLE = 'PTSC M&C';
-    static VERSION = '25-Dec-2025';
+    static VERSION = '27-May-2026';
 }
