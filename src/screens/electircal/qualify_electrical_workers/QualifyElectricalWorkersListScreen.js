@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, TextInput, Keyb
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import SelectPopup from '../../../components/SelectPopup';
+import MultiSelectPopup from '../../../components/MultiSelectPopup';
 import { ListEmptyData } from '../../../components/HelperUI';
 
 const MOCK_DATA = [
@@ -61,19 +62,11 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
         });
     }, [navigation, isShowFilter]);
 
-    //-- Type of Work
-    const TYPE_OF_WORK_DEFAULT = 'All';
+    //-- Type of Work (multi-select)
+    const TYPE_OF_WORK_OPTIONS = ['Glanding', 'Termination', 'Cable'];
     const [isVisibleTypeOfWork, setIsVisibleTypeOfWork] = useState(false);
-    const [typeOfWorkList] = useState(['All', 'Glanding', 'Termination', 'Cable']);
-    const [typeOfWork, setTypeOfWork] = useState(TYPE_OF_WORK_DEFAULT);
-    const _onChangeTypeOfWork = value => {
-        setTypeOfWork(value);
-        setIsVisibleTypeOfWork(false);
-    };
-    const _onClearTypeOfWork = () => {
-        setTypeOfWork(TYPE_OF_WORK_DEFAULT);
-        setIsVisibleTypeOfWork(false);
-    };
+    const [typeOfWorkSelected, setTypeOfWorkSelected] = useState([]);
+    const typeOfWorkDisplayText = typeOfWorkSelected.length === 0 ? 'All' : typeOfWorkSelected.join(', ');
 
     //-- Employee Name
     const [employeeName, setEmployeeName] = useState('');
@@ -185,7 +178,7 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                         <View style={styles.rowInfoAction}>
                             <Text style={styles.infoTitleAction}>Type of Work:</Text>
                             <TouchableOpacity style={styles.selectContainer} onPress={() => setIsVisibleTypeOfWork(true)}>
-                                <Text style={styles.buttonTitleDark}>{typeOfWork}</Text>
+                                <Text style={styles.buttonTitleDark}>{typeOfWorkDisplayText}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -252,7 +245,7 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 )}
 
                 {workerItems ? (() => {
-                    const show = type => typeOfWork === 'All' || typeOfWork === type;
+                    const show = type => typeOfWorkSelected.length === 0 || typeOfWorkSelected.includes(type);
                     const glandingItems = show('Glanding') ? workerItems.filter(i => i.TypeOfWork === 'Glanding') : [];
                     const terminationItems = show('Termination') ? workerItems.filter(i => i.TypeOfWork === 'Termination') : [];
                     const cableItems = show('Cable') ? workerItems.filter(i => i.TypeOfWork === 'Cable') : [];
@@ -284,12 +277,13 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 })() : <ListEmptyData />}
             </View>
 
-            <SelectPopup
+            <MultiSelectPopup
                 visible={isVisibleTypeOfWork}
-                data={typeOfWorkList}
+                title='Type of Work'
+                options={TYPE_OF_WORK_OPTIONS}
+                selected={typeOfWorkSelected}
+                onConfirm={values => { setTypeOfWorkSelected(values); setIsVisibleTypeOfWork(false); }}
                 onCancel={() => setIsVisibleTypeOfWork(false)}
-                onClear={_onClearTypeOfWork}
-                onChangeItem={_onChangeTypeOfWork}
             />
             <SelectPopup
                 visible={isVisibleAddResult}
