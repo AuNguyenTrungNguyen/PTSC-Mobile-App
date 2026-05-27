@@ -102,7 +102,8 @@ const SelectPopupTimeSheet = ({ projectCode, data, visible, onChangeItem, onCanc
                       ?
                       workOrderList.map(item => {
                         return (
-                          <TouchableOpacity style={styles.box} key={item.WorkOrder} onPress={() => onChangeItem(item.WorkOrder)}>
+                          //<TouchableOpacity style={styles.box} key={item.WorkOrder} onPress={() => onChangeItem(item.WorkOrder)}>
+                          <TouchableOpacity style={[styles.box, item.RemainMHRS != null && item.RemainMHRS < 2 ? styles.boxWarning : null]} key={item.WorkOrder} onPress={() => onChangeItem(item.WorkOrder)}>
                             <View style={styles.row}>
                               <Text style={styles.cellTitle}>{Formater.formatEmptyData(item.WorkOrder)}</Text>
                             </View>
@@ -259,6 +260,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 4,
   },
+
+  boxWarning: {
+    backgroundColor: '#FFD700',
+  },
+
   row: {
     flexDirection: 'row',
     alignItems: 'center',
