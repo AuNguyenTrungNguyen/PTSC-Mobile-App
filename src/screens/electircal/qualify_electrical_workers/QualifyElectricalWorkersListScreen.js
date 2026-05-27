@@ -6,16 +6,16 @@ import SelectPopup from '../../../components/SelectPopup';
 import { ListEmptyData } from '../../../components/HelperUI';
 
 const MOCK_DATA = [
-    { RowIndex: 1, ContractorName: 'PTSC M&C', TypeOfWork: 'Glanding And Termination', Name: 'Nguyen Van A', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-001', Remark: '', Check: true },
-    { RowIndex: 2, ContractorName: 'PTSC M&C', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Tran Thi B', Evaluation: 'Excellent', Result: 'Pass', NumberID: 'ID-002', Remark: '', Check: true },
-    { RowIndex: 3, ContractorName: 'SPTS', TypeOfWork: 'Glanding And Termination', Name: 'Le Van C', Evaluation: 'Fair', Result: 'Fail', NumberID: 'ID-003', Remark: 'Re-test', Check: false },
-    { RowIndex: 4, ContractorName: 'SPTS', TypeOfWork: 'Glanding And Termination', Name: 'Pham Thi D', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-004', Remark: '', Check: true },
-    { RowIndex: 5, ContractorName: 'PTSC M&C', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Hoang Van E', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-005', Remark: '', Check: true },
-    { RowIndex: 6, ContractorName: 'VSP', TypeOfWork: 'Glanding And Termination', Name: 'Vu Thi F', Evaluation: 'Poor', Result: 'Fail', NumberID: 'ID-006', Remark: 'Training', Check: false },
-    { RowIndex: 7, ContractorName: 'VSP', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Dang Van G', Evaluation: 'Excellent', Result: 'Pass', NumberID: 'ID-007', Remark: '', Check: true },
-    { RowIndex: 8, ContractorName: 'PTSC M&C', TypeOfWork: 'Glanding And Termination', Name: 'Bui Thi H', Evaluation: 'Fair', Result: 'Pass', NumberID: 'ID-008', Remark: '', Check: true },
-    { RowIndex: 9, ContractorName: 'SPTS', TypeOfWork: 'Cable Testing and Check Sheet Completion', Name: 'Do Van I', Evaluation: 'Good', Result: 'Pass', NumberID: 'ID-009', Remark: '', Check: true },
-    { RowIndex: 10, ContractorName: 'VSP', TypeOfWork: 'Glanding And Termination', Name: 'Ngo Thi J', Evaluation: 'Excellent', Result: 'Pass', NumberID: 'ID-010', Remark: '', Check: true },
+    { RowIndex: 1, Name: 'Nguyen Van A', NationalID: '001234567890', EmployeeCode: 'EMP-001' },
+    { RowIndex: 2, Name: 'Tran Thi B', NationalID: '001234567891', EmployeeCode: 'EMP-002' },
+    { RowIndex: 3, Name: 'Le Van C', NationalID: '001234567892', EmployeeCode: 'EMP-003' },
+    { RowIndex: 4, Name: 'Pham Thi D', NationalID: '001234567893', EmployeeCode: 'EMP-004' },
+    { RowIndex: 5, Name: 'Hoang Van E', NationalID: '001234567894', EmployeeCode: 'EMP-005' },
+    { RowIndex: 6, Name: 'Vu Thi F', NationalID: '001234567895', EmployeeCode: 'EMP-006' },
+    { RowIndex: 7, Name: 'Dang Van G', NationalID: '001234567896', EmployeeCode: 'EMP-007' },
+    { RowIndex: 8, Name: 'Bui Thi H', NationalID: '001234567897', EmployeeCode: 'EMP-008' },
+    { RowIndex: 9, Name: 'Do Van I', NationalID: '001234567898', EmployeeCode: 'EMP-009' },
+    { RowIndex: 10, Name: 'Ngo Thi J', NationalID: '001234567899', EmployeeCode: 'EMP-010' },
 ];
 
 const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
@@ -87,36 +87,16 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
     const renderItem = ({ item }) => (
         <View style={styles.box}>
             <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Contractor Name:</Text>
-                <Text style={styles.cellValue}>{item.ContractorName}</Text>
-            </View>
-            <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Type Of Work:</Text>
-                <Text style={styles.cellValue}>{item.TypeOfWork}</Text>
-            </View>
-            <View style={styles.rowData}>
                 <Text style={styles.cellLabel}>Name:</Text>
                 <Text style={styles.cellValue}>{item.Name}</Text>
             </View>
             <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Evaluation:</Text>
-                <Text style={styles.cellValue}>{item.Evaluation}</Text>
+                <Text style={styles.cellLabel}>National ID:</Text>
+                <Text style={styles.cellValue}>{item.NationalID}</Text>
             </View>
             <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Result:</Text>
-                <Text style={[styles.cellValue, { color: item.Result === 'Pass' ? '#2e7d32' : '#c62828', fontWeight: 'bold' }]}>{item.Result}</Text>
-            </View>
-            <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Number ID:</Text>
-                <Text style={styles.cellValue}>{item.NumberID}</Text>
-            </View>
-            <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Remark:</Text>
-                <Text style={styles.cellValue}>{item.Remark || '-'}</Text>
-            </View>
-            <View style={styles.rowData}>
-                <Text style={styles.cellLabel}>Check:</Text>
-                <Text style={[styles.cellValue, { color: item.Check ? '#2e7d32' : '#c62828' }]}>{item.Check ? 'Yes' : 'No'}</Text>
+                <Text style={styles.cellLabel}>Employee Code:</Text>
+                <Text style={styles.cellValue}>{item.EmployeeCode}</Text>
             </View>
         </View>
     );
