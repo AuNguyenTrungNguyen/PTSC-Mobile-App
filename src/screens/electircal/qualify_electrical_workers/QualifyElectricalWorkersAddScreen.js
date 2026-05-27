@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
 
-    const { projectCode } = route.params;
+    const { projectCode, type } = route.params;
 
     //-- Glanding Results
     const [glandingFromResult, setGlandingFromResult] = useState('');
@@ -37,6 +37,9 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
     const [terminationToEmployeeCode, setTerminationToEmployeeCode] = useState('');
     const [terminationToEmployeeNationalId, setTerminationToEmployeeNationalId] = useState('');
     const [terminationToError, setTerminationToError] = useState('');
+
+    //-- Cable Name (common)
+    const [cableName, setCableName] = useState('');
 
     //-- Cable
     const [cableResult, setCableResult] = useState('');
@@ -85,48 +88,71 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} keyboardShouldPersistTaps='handled'>
 
+                {/* Cable Name */}
+                <FieldInput label='Cable Name' value={cableName} onChange={setCableName} />
+
                 {/* Results */}
                 <SectionHeader title='Results' />
-                <FieldInput label='Glanding From Result' value={glandingFromResult} onChange={setGlandingFromResult} />
-                <FieldInput label='Glanding To Result' value={glandingToResult} onChange={setGlandingToResult} />
-                <FieldInput label='Termination From Result' value={terminationFromResult} onChange={setTerminationFromResult} />
-                <FieldInput label='Termination To Result' value={terminationToResult} onChange={setTerminationToResult} />
+                {type === 'Glanding' && <FieldInput label='Glanding From Result' value={glandingFromResult} onChange={setGlandingFromResult} />}
+                {type === 'Glanding' && <FieldInput label='Glanding To Result' value={glandingToResult} onChange={setGlandingToResult} />}
+                {type === 'Termination' && <FieldInput label='Termination From Result' value={terminationFromResult} onChange={setTerminationFromResult} />}
+                {type === 'Termination' && <FieldInput label='Termination To Result' value={terminationToResult} onChange={setTerminationToResult} />}
+                {type === 'Cable' && <FieldInput label='Cable Result' value={cableResult} onChange={setCableResult} />}
 
                 {/* Glanding From */}
-                <SectionHeader title='Glanding From' />
-                <FieldInput label='Employee Name' value={glandingFromEmployeeName} onChange={setGlandingFromEmployeeName} />
-                <FieldInput label='Employee Code' value={glandingFromEmployeeCode} onChange={setGlandingFromEmployeeCode} />
-                <FieldInput label='Employee National ID' value={glandingFromEmployeeNationalId} onChange={setGlandingFromEmployeeNationalId} />
-                <FieldInput label='Error' value={glandingFromError} onChange={setGlandingFromError} />
+                {type === 'Glanding' && (
+                    <>
+                        <SectionHeader title='Glanding From' />
+                        <FieldInput label='Employee Name' value={glandingFromEmployeeName} onChange={setGlandingFromEmployeeName} />
+                        <FieldInput label='Employee Code' value={glandingFromEmployeeCode} onChange={setGlandingFromEmployeeCode} />
+                        <FieldInput label='Employee National ID' value={glandingFromEmployeeNationalId} onChange={setGlandingFromEmployeeNationalId} />
+                        <FieldInput label='Error' value={glandingFromError} onChange={setGlandingFromError} />
+                    </>
+                )}
 
                 {/* Glanding To */}
-                <SectionHeader title='Glanding To' />
-                <FieldInput label='Employee Name' value={glandingToEmployeeName} onChange={setGlandingToEmployeeName} />
-                <FieldInput label='Employee Code' value={glandingToEmployeeCode} onChange={setGlandingToEmployeeCode} />
-                <FieldInput label='Employee National ID' value={glandingToEmployeeNationalId} onChange={setGlandingToEmployeeNationalId} />
-                <FieldInput label='Error' value={glandingToError} onChange={setGlandingToError} />
+                {type === 'Glanding' && (
+                    <>
+                        <SectionHeader title='Glanding To' />
+                        <FieldInput label='Employee Name' value={glandingToEmployeeName} onChange={setGlandingToEmployeeName} />
+                        <FieldInput label='Employee Code' value={glandingToEmployeeCode} onChange={setGlandingToEmployeeCode} />
+                        <FieldInput label='Employee National ID' value={glandingToEmployeeNationalId} onChange={setGlandingToEmployeeNationalId} />
+                        <FieldInput label='Error' value={glandingToError} onChange={setGlandingToError} />
+                    </>
+                )}
 
                 {/* Termination From */}
-                <SectionHeader title='Termination From' />
-                <FieldInput label='Employee Name' value={terminationFromEmployeeName} onChange={setTerminationFromEmployeeName} />
-                <FieldInput label='Employee Code' value={terminationFromEmployeeCode} onChange={setTerminationFromEmployeeCode} />
-                <FieldInput label='Employee National ID' value={terminationFromEmployeeNationalId} onChange={setTerminationFromEmployeeNationalId} />
-                <FieldInput label='Error' value={terminationFromError} onChange={setTerminationFromError} />
+                {type === 'Termination' && (
+                    <>
+                        <SectionHeader title='Termination From' />
+                        <FieldInput label='Employee Name' value={terminationFromEmployeeName} onChange={setTerminationFromEmployeeName} />
+                        <FieldInput label='Employee Code' value={terminationFromEmployeeCode} onChange={setTerminationFromEmployeeCode} />
+                        <FieldInput label='Employee National ID' value={terminationFromEmployeeNationalId} onChange={setTerminationFromEmployeeNationalId} />
+                        <FieldInput label='Error' value={terminationFromError} onChange={setTerminationFromError} />
+                    </>
+                )}
 
                 {/* Termination To */}
-                <SectionHeader title='Termination To' />
-                <FieldInput label='Employee Name' value={terminationToEmployeeName} onChange={setTerminationToEmployeeName} />
-                <FieldInput label='Employee Code' value={terminationToEmployeeCode} onChange={setTerminationToEmployeeCode} />
-                <FieldInput label='Employee National ID' value={terminationToEmployeeNationalId} onChange={setTerminationToEmployeeNationalId} />
-                <FieldInput label='Error' value={terminationToError} onChange={setTerminationToError} />
+                {type === 'Termination' && (
+                    <>
+                        <SectionHeader title='Termination To' />
+                        <FieldInput label='Employee Name' value={terminationToEmployeeName} onChange={setTerminationToEmployeeName} />
+                        <FieldInput label='Employee Code' value={terminationToEmployeeCode} onChange={setTerminationToEmployeeCode} />
+                        <FieldInput label='Employee National ID' value={terminationToEmployeeNationalId} onChange={setTerminationToEmployeeNationalId} />
+                        <FieldInput label='Error' value={terminationToError} onChange={setTerminationToError} />
+                    </>
+                )}
 
                 {/* Cable */}
-                <SectionHeader title='Cable' />
-                <FieldInput label='Cable Result' value={cableResult} onChange={setCableResult} />
-                <FieldInput label='Employee Name' value={cableEmployeeName} onChange={setCableEmployeeName} />
-                <FieldInput label='Employee Code' value={cableEmployeeCode} onChange={setCableEmployeeCode} />
-                <FieldInput label='Employee National ID' value={cableEmployeeNationalId} onChange={setCableEmployeeNationalId} />
-                <FieldInput label='Error' value={cableError} onChange={setCableError} />
+                {type === 'Cable' && (
+                    <>
+                        <SectionHeader title='Cable' />
+                        <FieldInput label='Employee Name' value={cableEmployeeName} onChange={setCableEmployeeName} />
+                        <FieldInput label='Employee Code' value={cableEmployeeCode} onChange={setCableEmployeeCode} />
+                        <FieldInput label='Employee National ID' value={cableEmployeeNationalId} onChange={setCableEmployeeNationalId} />
+                        <FieldInput label='Error' value={cableError} onChange={setCableError} />
+                    </>
+                )}
 
                 {/* Notification area */}
                 {saveMessage !== '' && (

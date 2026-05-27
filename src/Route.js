@@ -1243,7 +1243,7 @@ const ElectricalCONSStackScreens = () => {
         component={QualifyElectricalWorkersAddScreen}
         options={
           {
-            title: 'Add Worker Information',
+            title: 'Add Information',
             headerBackTitle: 'Back',
           }
         }

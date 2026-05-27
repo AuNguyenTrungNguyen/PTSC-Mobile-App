@@ -79,8 +79,14 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
     };
 
     //-- Add Result
+    const [isVisibleAddResult, setIsVisibleAddResult] = useState(false);
+    const ADD_RESULT_TYPES = ['Glanding', 'Termination', 'Cable'];
     const _onPressAddResult = () => {
-        navigation.navigate('QualifyElectricalWorkersAdd', { projectCode });
+        setIsVisibleAddResult(true);
+    };
+    const _onSelectAddResultType = type => {
+        setIsVisibleAddResult(false);
+        navigation.navigate('QualifyElectricalWorkersAdd', { projectCode, type });
     };
 
     //-- Render Item
@@ -178,6 +184,12 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 onCancel={() => setIsVisibleTypeOfWork(false)}
                 onClear={_onClearTypeOfWork}
                 onChangeItem={_onChangeTypeOfWork}
+            />
+            <SelectPopup
+                visible={isVisibleAddResult}
+                data={ADD_RESULT_TYPES}
+                onCancel={() => setIsVisibleAddResult(false)}
+                onChangeItem={_onSelectAddResultType}
             />
         </SafeAreaView>
     );
