@@ -501,10 +501,14 @@ const TimeSheetScreen = ({ route, navigation }) => {
   //-- Header Action
   const [isShowWorkOrder, setIsShowWorkOrder] = useState(false);
   const [workOrder, setWorkOrder] = useState('');
-  const _onChangeWorkOrder = data => {
+  const [isShowRemainWarning, setIsShowRemainWarning] = useState(false);
+  const _onChangeWorkOrder = (data, remainMHRS) => {
     setWorkOrder(data);
     // _onChangWorkOrderShotcut(data);
     setIsShowWorkOrder(false);
+    if (remainMHRS != null && remainMHRS < 1) {
+      setTimeout(() => setIsShowRemainWarning(true), 300);
+    }
   };
   const _onReloadWorkOrder = data => {
     setWorkOrderList(data);
@@ -983,6 +987,11 @@ const TimeSheetScreen = ({ route, navigation }) => {
         onCancel={() => setIsShowWorkOrder(false)}
         onReload={_onReloadWorkOrder}
       />
+      <Dialog.Container visible={isShowRemainWarning}>
+        <Dialog.Title>{'Lưu ý'}</Dialog.Title>
+        <Dialog.Description>{'Remain < 1'}</Dialog.Description>
+        <Dialog.Button label='Đóng' onPress={() => setIsShowRemainWarning(false)} />
+      </Dialog.Container>
       <Dialog.Container visible={isShowHours}>
         <Dialog.Title>{'Enter hours:'}</Dialog.Title>
         <Dialog.Input
