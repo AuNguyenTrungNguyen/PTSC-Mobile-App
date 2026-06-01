@@ -55,9 +55,56 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
     //-- Save
     const _onPressSave = () => {
         Keyboard.dismiss();
+        const errors = [];
+
+        // Cable Name - always required
+        if (!cableName.trim()) {
+            errors.push('• Cable Name is required.');
+        }
+
+        if (type === 'Glanding') {
+            if (glandingFromResult.trim()) {
+                if (!glandingFromEmployeeName.trim()) errors.push('• Glanding From: Employee Name is required.');
+                if (!glandingFromEmployeeCode.trim()) errors.push('• Glanding From: Employee Code is required.');
+                if (!glandingFromEmployeeNationalId.trim()) errors.push('• Glanding From: Employee National ID is required.');
+            }
+            if (glandingToResult.trim()) {
+                if (!glandingToEmployeeName.trim()) errors.push('• Glanding To: Employee Name is required.');
+                if (!glandingToEmployeeCode.trim()) errors.push('• Glanding To: Employee Code is required.');
+                if (!glandingToEmployeeNationalId.trim()) errors.push('• Glanding To: Employee National ID is required.');
+            }
+        }
+
+        if (type === 'Termination') {
+            if (terminationFromResult.trim()) {
+                if (!terminationFromEmployeeName.trim()) errors.push('• Termination From: Employee Name is required.');
+                if (!terminationFromEmployeeCode.trim()) errors.push('• Termination From: Employee Code is required.');
+                if (!terminationFromEmployeeNationalId.trim()) errors.push('• Termination From: Employee National ID is required.');
+            }
+            if (terminationToResult.trim()) {
+                if (!terminationToEmployeeName.trim()) errors.push('• Termination To: Employee Name is required.');
+                if (!terminationToEmployeeCode.trim()) errors.push('• Termination To: Employee Code is required.');
+                if (!terminationToEmployeeNationalId.trim()) errors.push('• Termination To: Employee National ID is required.');
+            }
+        }
+
+        if (type === 'Cable') {
+            if (cableResult.trim()) {
+                if (!cableEmployeeName.trim()) errors.push('• Cable: Employee Name is required.');
+                if (!cableEmployeeCode.trim()) errors.push('• Cable: Employee Code is required.');
+                if (!cableEmployeeNationalId.trim()) errors.push('• Cable: Employee National ID is required.');
+            }
+        }
+
+        if (errors.length > 0) {
+            setSaveSuccess(false);
+            setSaveMessage(errors.join('\n'));
+            return;
+        }
+
         // TODO: call save API
         setSaveSuccess(true);
-        setSaveMessage('Worker information saved successfully!');
+        setSaveMessage('Saved successfully!');
     };
 
     const FieldInput = ({ label, value, onChange }) => (
