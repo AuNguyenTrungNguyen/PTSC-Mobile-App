@@ -63,6 +63,9 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
         }
 
         if (type === 'Glanding') {
+            if (!glandingFromResult.trim() && !glandingToResult.trim()) {
+                errors.push('• At least one of Glanding From Result or Glanding To Result is required.');
+            }
             if (glandingFromResult.trim()) {
                 if (!glandingFromEmployeeName.trim()) errors.push('• Glanding From: Employee Name is required.');
                 if (!glandingFromEmployeeCode.trim()) errors.push('• Glanding From: Employee Code is required.');
@@ -76,6 +79,9 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
         }
 
         if (type === 'Termination') {
+            if (!terminationFromResult.trim() && !terminationToResult.trim()) {
+                errors.push('• At least one of Termination From Result or Termination To Result is required.');
+            }
             if (terminationFromResult.trim()) {
                 if (!terminationFromEmployeeName.trim()) errors.push('• Termination From: Employee Name is required.');
                 if (!terminationFromEmployeeCode.trim()) errors.push('• Termination From: Employee Code is required.');
@@ -89,6 +95,9 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
         }
 
         if (type === 'Cable') {
+            if (!cableResult.trim()) {
+                errors.push('• Cable Result is required.');
+            }
             if (cableResult.trim()) {
                 if (!cableEmployeeName.trim()) errors.push('• Cable: Employee Name is required.');
                 if (!cableEmployeeCode.trim()) errors.push('• Cable: Employee Code is required.');
