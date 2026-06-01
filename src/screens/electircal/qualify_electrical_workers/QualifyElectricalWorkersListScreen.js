@@ -1,10 +1,12 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, TextInput, Keyboard, Appearance, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import SelectPopup from '../../../components/SelectPopup';
 import MultiSelectPopup from '../../../components/MultiSelectPopup';
 import { ListEmptyData } from '../../../components/HelperUI';
+import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
+import Helper from '../../../utils/Helper';
 
 const MOCK_DATA = [
     {
@@ -62,6 +64,30 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
         });
     }, [navigation, isShowFilter]);
 
+    //-- Facility Code
+    const FACILITY_CODE_DEFAULT = 'All Facility Code';
+    const [isVisibleFacility, setIsVisibleFacility] = useState(false);
+    const [facilityList, setFacilityList] = useState([]);
+    const [facilityCode, setFacilityCode] = useState(FACILITY_CODE_DEFAULT);
+    useEffect(() => {
+        const loadFacilityList = async () => {
+            try {
+                const token = await Helper.getData('TOKEN');
+                const res = await GetFacilityListAPI(projectCode, token);
+                if (res.success) setFacilityList(res.data);
+            } catch (_) { }
+        };
+        loadFacilityList();
+    }, []);
+    const _onChangeFacilityCode = code => {
+        setFacilityCode(code);
+        setIsVisibleFacility(false);
+    };
+    const _onClearFacilityCode = () => {
+        setFacilityCode(FACILITY_CODE_DEFAULT);
+        setIsVisibleFacility(false);
+    };
+
     //-- Type of Work (multi-select)
     const TYPE_OF_WORK_OPTIONS = ['Glanding', 'Termination', 'Cable'];
     const [isVisibleTypeOfWork, setIsVisibleTypeOfWork] = useState(false);
@@ -88,14 +114,22 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
     };
 
     //-- Add Result
-    const [isVisibleAddResult, setIsVisibleAddResult] = useState(false);
+    const CABLE_TYPES = ['Electric Cable', 'Instrument Cable'];
     const ADD_RESULT_TYPES = ['Glanding', 'Termination', 'Cable'];
+    const [isVisibleCableType, setIsVisibleCableType] = useState(false);
+    const [isVisibleAddResult, setIsVisibleAddResult] = useState(false);
+    const [selectedCableType, setSelectedCableType] = useState('');
     const _onPressAddResult = () => {
+        setIsVisibleCableType(true);
+    };
+    const _onSelectCableType = cableType => {
+        setSelectedCableType(cableType);
+        setIsVisibleCableType(false);
         setIsVisibleAddResult(true);
     };
     const _onSelectAddResultType = type => {
         setIsVisibleAddResult(false);
-        navigation.navigate('QualifyElectricalWorkersAdd', { projectCode, type });
+        navigation.navigate('QualifyElectricalWorkersAdd', { projectCode, cableType: selectedCableType, type });
     };
 
     //-- Render helpers
@@ -174,6 +208,14 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
             <View style={styles.container}>
                 {isShowFilter && (
                     <View style={styles.headerContainer}>
+                        {/* Facility Code */}
+                        <View style={styles.rowInfoAction}>
+                            <Text style={styles.infoTitleAction}>Facility Code:</Text>
+                            <TouchableOpacity style={styles.selectContainer} onPress={() => setIsVisibleFacility(true)}>
+                                <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                            </TouchableOpacity>
+                        </View>
+
                         {/* Type of Work */}
                         <View style={styles.rowInfoAction}>
                             <Text style={styles.infoTitleAction}>Type of Work:</Text>
@@ -277,6 +319,13 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 })() : <ListEmptyData />}
             </View>
 
+            <SelectPopup
+                visible={isVisibleFacility}
+                data={facilityList}
+                onCancel={() => setIsVisibleFacility(false)}
+                onClear={_onClearFacilityCode}
+                onChangeItem={_onChangeFacilityCode}
+            />
             <MultiSelectPopup
                 visible={isVisibleTypeOfWork}
                 title='Type of Work'
@@ -284,6 +333,12 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 selected={typeOfWorkSelected}
                 onConfirm={values => { setTypeOfWorkSelected(values); setIsVisibleTypeOfWork(false); }}
                 onCancel={() => setIsVisibleTypeOfWork(false)}
+            />
+            <SelectPopup
+                visible={isVisibleCableType}
+                data={CABLE_TYPES}
+                onCancel={() => setIsVisibleCableType(false)}
+                onChangeItem={_onSelectCableType}
             />
             <SelectPopup
                 visible={isVisibleAddResult}
