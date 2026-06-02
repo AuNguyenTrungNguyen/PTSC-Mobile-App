@@ -88,6 +88,20 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
         setIsVisibleFacility(false);
     };
 
+    //-- Cable Type
+    const CABLE_TYPE_DEFAULT = 'Electrical';
+    const CABLE_TYPE_LIST = ['Electrical', 'Instrument'];
+    const [isVisibleCableType, setIsVisibleCableType] = useState(false);
+    const [cableType, setCableType] = useState(CABLE_TYPE_DEFAULT);
+    const _onChangeCableType = value => {
+        setCableType(value);
+        setIsVisibleCableType(false);
+    };
+    const _onClearCableType = () => {
+        setCableType(CABLE_TYPE_DEFAULT);
+        setIsVisibleCableType(false);
+    };
+
     //-- Type of Work (multi-select)
     const TYPE_OF_WORK_OPTIONS = ['Glanding', 'Termination', 'Cable'];
     const [isVisibleTypeOfWork, setIsVisibleTypeOfWork] = useState(false);
@@ -116,15 +130,15 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
     //-- Add Result
     const CABLE_TYPES = ['Electric Cable', 'Instrument Cable'];
     const ADD_RESULT_TYPES = ['Glanding', 'Termination', 'Cable'];
-    const [isVisibleCableType, setIsVisibleCableType] = useState(false);
+    const [isVisibleAddCableType, setIsVisibleAddCableType] = useState(false);
     const [isVisibleAddResult, setIsVisibleAddResult] = useState(false);
     const [selectedCableType, setSelectedCableType] = useState('');
     const _onPressAddResult = () => {
-        setIsVisibleCableType(true);
+        setIsVisibleAddCableType(true);
     };
     const _onSelectCableType = cableType => {
         setSelectedCableType(cableType);
-        setIsVisibleCableType(false);
+        setIsVisibleAddCableType(false);
         setIsVisibleAddResult(true);
     };
     const _onSelectAddResultType = type => {
@@ -213,6 +227,14 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                             <Text style={styles.infoTitleAction}>Facility Code:</Text>
                             <TouchableOpacity style={styles.selectContainer} onPress={() => setIsVisibleFacility(true)}>
                                 <Text style={styles.buttonTitleDark}>{facilityCode}</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Cable Type */}
+                        <View style={styles.rowInfoAction}>
+                            <Text style={styles.infoTitleAction}>Cable Type:</Text>
+                            <TouchableOpacity style={styles.selectContainer} onPress={() => setIsVisibleCableType(true)}>
+                                <Text style={styles.buttonTitleDark}>{cableType}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -326,6 +348,13 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 onClear={_onClearFacilityCode}
                 onChangeItem={_onChangeFacilityCode}
             />
+            <SelectPopup
+                visible={isVisibleCableType}
+                data={CABLE_TYPE_LIST}
+                onCancel={() => setIsVisibleCableType(false)}
+                onClear={_onClearCableType}
+                onChangeItem={_onChangeCableType}
+            />
             <MultiSelectPopup
                 visible={isVisibleTypeOfWork}
                 title='Type of Work'
@@ -335,9 +364,9 @@ const QualifyElectricalWorkersListScreen = ({ route, navigation }) => {
                 onCancel={() => setIsVisibleTypeOfWork(false)}
             />
             <SelectPopup
-                visible={isVisibleCableType}
+                visible={isVisibleAddCableType}
                 data={CABLE_TYPES}
-                onCancel={() => setIsVisibleCableType(false)}
+                onCancel={() => setIsVisibleAddCableType(false)}
                 onChangeItem={_onSelectCableType}
             />
             <SelectPopup
