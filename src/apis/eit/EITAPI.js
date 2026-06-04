@@ -1,6 +1,32 @@
 import { Port_Server } from '../../utils/Core';
 import Helper from '../../utils/Helper';
 
+//-- Qualify Electrical Workers
+export const SearchCableControlAPI = async (projectCode, facilityCode, cableType, type, employeeName, employeeCode, nationalId, page = 1, pageSize = 20) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server + 'api/eit/SearchCableControl',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ProjectCode: projectCode,
+        FacilityCode: facilityCode,
+        CableType: cableType,
+        Type: type,
+        EmployeeName: employeeName,
+        EmployeeCode: employeeCode,
+        NationalId: nationalId,
+        Page: page,
+        PageSize: pageSize,
+      }),
+    }
+  ).then(res => res.json());
+};
+
 //-- Electrical Cable Control
 export const GetElectricalCableControlListAPI = async (projectCode, facilityCode, cableName, subSystem, drumNo) => {
   const token = await Helper.getData('TOKEN');
