@@ -69,8 +69,10 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
   async function gerDrawingData({ facility = facilityCode, deckFilter = deck } = {}) {
     facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
     deckFilter = (!deckFilter || deckFilter === DECK_DEFAULT) ? '' : deckFilter;
+    console.log('[PipeSupportDrawing] GetPipeSupportDrawingNewAPI params:', { projectCode, facility, drawingNo, deckFilter, cuttingPlanItem, ancillary });
     GetPipeSupportDrawingNewAPI(projectCode, facility, drawingNo, deckFilter, cuttingPlanItem, ancillary)
       .then(res => {
+        console.log('[PipeSupportDrawing] GetPipeSupportDrawingNewAPI response:', JSON.stringify(res, null, 2));
         if (res.Success && res.Data) {
           setDrawingList(res.Data);
           setIsLoading(false);
@@ -82,7 +84,8 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
           setIsSearching(false);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log('[PipeSupportDrawing] GetPipeSupportDrawingNewAPI error:', err);
         setIsLoading(false);
         setIsError(true);
         setIsSearching(false);
@@ -214,6 +217,22 @@ const OpenPipeSupportDrawingScreen = ({ route, navigation }) => {
             <Text style={styles.textData}>{ancillary}</Text>
           </View>
         </View>
+        {
+          item.WebLink
+            ?
+            <View style={styles.row}>
+              <View style={styles.cellOne}>
+                <Text>WebLink:</Text>
+              </View>
+              <View style={styles.cellThree}>
+                <TouchableOpacity onPress={() => Helper.openDrawingPDF(navigation, item.WebLink, 'Pipe Support')}>
+                  <Text style={CoreStyle.textLinkWithLine}>{item.WebLink.split('/').pop()}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            :
+            null
+        }
       </View>
     );
   };

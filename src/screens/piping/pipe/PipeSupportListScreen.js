@@ -69,8 +69,10 @@ const PipeSupportListScreen = ({ route, navigation }) => {
   };
   async function getSupportData({ facility = facilityCode } = {}) {
     facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
+    console.log('[PipeSupport] GetPipeSupportList params:', { projectCode, facility, supportName });
     GetPipeSupportListAPI(projectCode, facility, supportName)
       .then(res => {
+        console.log('[PipeSupport] GetPipeSupportList response:', JSON.stringify(res, null, 2));
         if (res.Success && res.Data) {
           setSupportList(res.Data);
           setIsLoading(false);
@@ -82,7 +84,8 @@ const PipeSupportListScreen = ({ route, navigation }) => {
           setIsSearching(false);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log('[PipeSupport] GetPipeSupportList error:', err);
         setIsLoading(false);
         setIsError(true);
         setIsSearching(false);

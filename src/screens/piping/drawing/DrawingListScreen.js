@@ -160,8 +160,10 @@ const DrawingListScreen = ({ route, navigation }) => {
     facilityCode = (facilityCode && facilityCode != FACILITY_CODE_DEFAULT) ? facilityCode : '';
     drawingNo = drawingNo ? drawingNo : '';
     weldNo = weldNo ? weldNo : '';
+    console.log('[DrawingList] GetConstructionListSubContractor params:', { projectCode, subContractor, facilityCode, drawingNo, weldNo, token });
     GetConstructionListSubContractorAPI(projectCode, subContractor, facilityCode, drawingNo, weldNo, token)
       .then(res => {
+        console.log('[DrawingList] GetConstructionListSubContractor response:', JSON.stringify(res, null, 2));
         if (res.Success) {
           setDrawingList(res.Data);
           setIsLoading(false);
@@ -172,7 +174,8 @@ const DrawingListScreen = ({ route, navigation }) => {
           setIsError(true);
           setIsSearching(false);
         }
-      }).catch(() => {
+      }).catch((err) => {
+        console.log('[DrawingList] GetConstructionListSubContractor error:', err);
         setIsLoading(false);
         setIsError(true);
         setIsSearching(false);
