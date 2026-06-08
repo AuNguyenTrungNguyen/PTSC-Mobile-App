@@ -27,6 +27,21 @@ export const SearchCableControlAPI = async (projectCode, facilityCode, cableType
   ).then(res => res.json());
 };
 
+export const SaveCableControlAPI = async (body) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server + 'api/eit/SaveCableControl',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }
+  ).then(res => res.json());
+};
+
 //-- Electrical Cable Control
 export const GetElectricalCableControlListAPI = async (projectCode, facilityCode, cableName, subSystem, drumNo) => {
   const token = await Helper.getData('TOKEN');

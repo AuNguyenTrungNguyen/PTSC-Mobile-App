@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, TouchableOpacity, TextInput, ScrollView, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { SaveCableControlAPI } from '../../../apis/eit/EITAPI';
+import Helper from '../../../utils/Helper';
 
 const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
 
-    const { projectCode, type } = route.params;
+    const { projectCode, cableType, type } = route.params;
 
     //-- Glanding Results
     const [glandingFromResult, setGlandingFromResult] = useState('');
@@ -51,9 +53,10 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
     //-- Save notification
     const [saveMessage, setSaveMessage] = useState('');
     const [saveSuccess, setSaveSuccess] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     //-- Save
-    const _onPressSave = () => {
+    const _onPressSave = async () => {
         Keyboard.dismiss();
         const errors = [];
 
@@ -111,34 +114,69 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
             return;
         }
 
-        // TODO: call save API
-        setSaveSuccess(true);
-        setSaveMessage('Saved successfully!');
+        Keyboard.dismiss();
+        setIsSaving(true);
+        setSaveMessage('');
+        try {
+            const ct = cableType === 'Electric Cable' ? 'ElectricalCable' : 'InstrumentCable';
+            const body = {
+                CableType: ct,
+                ResultType: type,
+                CableName: cableName.trim(),
+                ProjectCode: projectCode,
+            };
+            if (type === 'Glanding') {
+                if (glandingFromResult.trim()) {
+                    body.GlandingFrom_Result = glandingFromResult.trim();
+                    body.GlandingFrom_EmployeeName = glandingFromEmployeeName.trim();
+                    body.GlandingFrom_EmployeeCode = glandingFromEmployeeCode.trim();
+                    body.GlandingFrom_EmployeeNationId = glandingFromEmployeeNationalId.trim();
+                    body.GlandingFrom_Error = glandingFromError.trim() || null;
+                }
+                if (glandingToResult.trim()) {
+                    body.GlandingTo_Result = glandingToResult.trim();
+                    body.GlandingTo_EmployeeName = glandingToEmployeeName.trim();
+                    body.GlandingTo_EmployeeCode = glandingToEmployeeCode.trim();
+                    body.GlandingTo_EmployeeNationId = glandingToEmployeeNationalId.trim();
+                    body.GlandingTo_Error = glandingToError.trim() || null;
+                }
+            } else if (type === 'Termination') {
+                if (terminationFromResult.trim()) {
+                    body.TerminationFrom_Result = terminationFromResult.trim();
+                    body.TerminationFrom_EmployeeName = terminationFromEmployeeName.trim();
+                    body.TerminationFrom_EmployeeCode = terminationFromEmployeeCode.trim();
+                    body.TerminationFrom_EmployeeNationId = terminationFromEmployeeNationalId.trim();
+                    body.TerminationFrom_Error = terminationFromError.trim() || null;
+                }
+                if (terminationToResult.trim()) {
+                    body.TerminationTo_Result = terminationToResult.trim();
+                    body.TerminationTo_EmployeeName = terminationToEmployeeName.trim();
+                    body.TerminationTo_EmployeeCode = terminationToEmployeeCode.trim();
+                    body.TerminationTo_EmployeeNationId = terminationToEmployeeNationalId.trim();
+                    body.TerminationTo_Error = terminationToError.trim() || null;
+                }
+            } else if (type === 'Cable') {
+                body.Cable_Result = cableResult.trim();
+                body.Cable_EmployeeName = cableEmployeeName.trim();
+                body.Cable_EmployeeCode = cableEmployeeCode.trim();
+                body.Cable_EmployeeNationId = cableEmployeeNationalId.trim();
+                body.Cable_Error = cableError.trim() || null;
+            }
+            const res = await SaveCableControlAPI(body);
+            if (res.Success) {
+                setSaveSuccess(true);
+                setSaveMessage('Saved successfully!');
+            } else {
+                setSaveSuccess(false);
+                setSaveMessage(res.Message || 'Save failed. Please try again.');
+            }
+        } catch (_) {
+            setSaveSuccess(false);
+            setSaveMessage('Save failed. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
     };
-
-    const FieldInput = ({ label, value, onChange }) => (
-        <View style={styles.fieldRow}>
-            <Text style={styles.fieldLabel}>{label}:</Text>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.inputText}
-                    value={value}
-                    onChangeText={onChange}
-                    underlineColorAndroid='transparent'
-                    placeholderTextColor='#aaa'
-                />
-                {value !== '' && (
-                    <Icon name='times-circle' onPress={() => onChange('')} style={styles.inputIcon} />
-                )}
-            </View>
-        </View>
-    );
-
-    const SectionHeader = ({ title }) => (
-        <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{title}</Text>
-        </View>
-    );
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -218,14 +256,38 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
                 )}
 
                 {/* Save Button */}
-                <TouchableOpacity style={styles.saveButton} onPress={_onPressSave}>
-                    <Text style={styles.saveButtonText}>Save</Text>
+                <TouchableOpacity style={styles.saveButton} onPress={_onPressSave} disabled={isSaving}>
+                    <Text style={styles.saveButtonText}>{isSaving ? 'Saving...' : 'Save'}</Text>
                 </TouchableOpacity>
 
             </ScrollView>
         </SafeAreaView>
     );
 };
+
+const FieldInput = ({ label, value, onChange }) => (
+    <View style={styles.fieldRow}>
+        <Text style={styles.fieldLabel}>{label}:</Text>
+        <View style={styles.inputContainer}>
+            <TextInput
+                style={styles.inputText}
+                value={value}
+                onChangeText={onChange}
+                underlineColorAndroid='transparent'
+                placeholderTextColor='#aaa'
+            />
+            {value !== '' && (
+                <Icon name='times-circle' onPress={() => onChange('')} style={styles.inputIcon} />
+            )}
+        </View>
+    </View>
+);
+
+const SectionHeader = ({ title }) => (
+    <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+    </View>
+);
 
 const BASE_COLOR = '#344955';
 const OPP_COLOR = 'white';
