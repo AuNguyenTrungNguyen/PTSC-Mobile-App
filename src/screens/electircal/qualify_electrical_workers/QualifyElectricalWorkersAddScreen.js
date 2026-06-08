@@ -256,7 +256,7 @@ const QualifyElectricalWorkersAddScreen = ({ route, navigation }) => {
                 )}
 
                 {/* Save Button */}
-                <TouchableOpacity style={styles.saveButton} onPress={_onPressSave} disabled={isSaving}>
+                <TouchableOpacity style={[styles.saveButton, (isSaving || saveSuccess) && styles.saveButtonDisabled]} onPress={_onPressSave} disabled={isSaving || saveSuccess === true}>
                     <Text style={styles.saveButtonText}>{isSaving ? 'Saving...' : 'Save'}</Text>
                 </TouchableOpacity>
 
@@ -372,6 +372,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
         marginTop: 8,
+    },
+    saveButtonDisabled: {
+        backgroundColor: '#aaa',
     },
     saveButtonText: {
         color: OPP_COLOR,
