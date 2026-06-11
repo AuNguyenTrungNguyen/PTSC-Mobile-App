@@ -25,7 +25,7 @@ export const GetQCSpendListAPI = async (projectCode, drawingNo, jointNo, locatio
     }).then(res => res.json());
 };
 
-export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, isSpending) => {
+export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev, jointNo, location, type, code, isSpending, page = 1) => {
   const token = await Helper.getData('TOKEN');
   const subContractor = await Helper.getData('SUB_CONTRACTOR');
   let scope = await Helper.getData('QCSCOPE');
@@ -54,7 +54,8 @@ export const GetQCSpendListQRCodeAPI = async (projectCode, drawingNo, sheet, rev
     + '&type=' + type
     + '&code=' + code
     + '&scope=' + scope
-    + '&isSpending=' + isSpending,
+    + '&isSpending=' + isSpending
+    + '&page=' + page,
     {
       headers: {
         'Authorization': 'Bearer ' + token,

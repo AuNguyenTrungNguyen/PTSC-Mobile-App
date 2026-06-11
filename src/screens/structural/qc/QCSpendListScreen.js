@@ -24,6 +24,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
   const [spendList, setSpendList] = useState([]);
   const [updateSpendList, setUpdateSpendList] = useState([]);
@@ -83,24 +86,34 @@ const QCSpendListScreen = ({ route, navigation }) => {
     });
   };
 
-  useEffect(
-    async () => {
-      callAPI(getInspectorList);
-      const inspector = await Helper.getData('QC_INSPECTOR_STR');
-      setGlobalInspector(inspector);
+  const isMounted = React.useRef(true);
+  useEffect(() => {
+    return () => { isMounted.current = false; };
+  }, []);
 
-      if (paramDrawingNo) {
-        setDrawingNo(paramDrawingNo);
-        callAPI(() => { getSpendListData(paramDrawingNo, weldNo, location, type) });
-      } else {
-        callAPI(getSpendListData);
-      }
+  useEffect(
+    () => {
+      (async () => {
+        callAPI(getInspectorList);
+        const inspector = await Helper.getData('QC_INSPECTOR_STR');
+        if (!isMounted.current) return;
+        setGlobalInspector(inspector);
+
+        if (paramDrawingNo) {
+          setDrawingNo(paramDrawingNo);
+          callAPI(() => { getSpendListData(paramDrawingNo, weldNo, location, type) });
+        } else {
+          callAPI(getSpendListData);
+        }
+      })();
     }, []
   );
 
   const callAPI = executedAPI => {
+    if (!isMounted.current) return;
     setIsSearching(true);
     NetInfo.fetch().then(state => {
+      if (!isMounted.current) return;
       if (!state.isConnected) {
         setIsLoading(false);
         setIsError(true);
@@ -112,26 +125,46 @@ const QCSpendListScreen = ({ route, navigation }) => {
     });
   };
 
-  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type) => {
-    GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending)
+  const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type, page = 1) => {
+    console.log('=== GetQCSpendListQRCodeAPI params ===', { projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending, page });
+    GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending, page)
       .then(res => {
+        console.log('=== GetQCSpendListQRCodeAPI response ===', JSON.stringify(res));
+        if (!isMounted.current) return;
         if (res.success) {
-          setSpendList(res.data);
+          if (page === 1) {
+            setSpendList(res.data);
+          } else {
+            setSpendList(prev => [...prev, ...res.data]);
+          }
           setTotalList(res.total);
+          setCurrentPage(page);
+          setHasMoreData(res.data.length >= 100);
           setIsLoading(false);
           setIsError(false);
           setIsSearching(false);
+          setIsLoadingMore(false);
         } else {
           setIsLoading(false);
           setIsError(true);
           setIsSearching(false);
+          setIsLoadingMore(false);
         }
       })
       .catch(() => {
+        if (!isMounted.current) return;
         setIsLoading(false);
         setIsError(true);
         setIsSearching(false);
+        setIsLoadingMore(false);
       });
+  };
+
+  const _onLoadMore = () => {
+    if (isLoadingMore || !hasMoreData) return;
+    setIsLoadingMore(true);
+    const nextPage = currentPage + 1;
+    callAPI(() => { getSpendListData(drawingNo, weldNo, location, type, nextPage) });
   };
 
   const updateSpendListData = async () => {
@@ -936,6 +969,9 @@ const QCSpendListScreen = ({ route, navigation }) => {
                   return data['RowIndex'];
                 }}
                 renderItem={renderItem}
+                onEndReached={_onLoadMore}
+                onEndReachedThreshold={0.3}
+                ListFooterComponent={isLoadingMore ? <ActivityIndicator size="small" color={BASE_COLOR} style={{ marginVertical: 16 }} /> : null}
               />
               :
               <ListEmptyData />
