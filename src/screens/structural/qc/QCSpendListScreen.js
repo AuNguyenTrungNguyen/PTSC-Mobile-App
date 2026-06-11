@@ -126,10 +126,8 @@ const QCSpendListScreen = ({ route, navigation }) => {
   };
 
   const getSpendListData = async (drawing = drawingNo, weld = weldNo, locate = location, filterType = type, page = 1) => {
-    console.log('=== GetQCSpendListQRCodeAPI params ===', { projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending, page });
     GetQCSpendListQRCodeAPI(projectCode, drawing, sheet, rev, weld, locate, filterType, code, isSpending, page)
       .then(res => {
-        console.log('=== GetQCSpendListQRCodeAPI response ===', JSON.stringify(res));
         if (!isMounted.current) return;
         if (res.success) {
           if (page === 1) {
