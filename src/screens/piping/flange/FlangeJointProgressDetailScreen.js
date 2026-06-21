@@ -333,14 +333,30 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+
         <View style={styles.row}>
           <View style={styles.cellTitle}>
-            <Text style={styles.titleBaseText}>FlangeJoint:</Text>
+            <Text style={styles.titleBaseText}>{'Flange\nJoint:'}</Text>
           </View>
-          <View style={styles.cellData}>
+          <View style={styles.cellTitle}>
             <Text style={styles.textBlue}>{Formater.formatEmptyData(item.FlangeJointNo)}</Text>
           </View>
+          <View style={styles.cellTitle}>
+            <Text style={styles.titleBaseText}>{'Torque:'}</Text>
+          </View>
+          <View style={styles.cellTitle}>
+            <Text style={styles.textBlue}>
+              {
+                !item.Torque
+                  ?
+                  Formater.formatEmptyData(item.Torque)
+                  :
+                  Formater.formatTwoDigits(item.Torque)
+              }
+            </Text>
+          </View>
         </View>
+
         <View style={styles.row}>
           <View style={styles.cellTitle}>
             <Text style={styles.titleRedText}>{'RequestToQC\nDate'}:</Text>
