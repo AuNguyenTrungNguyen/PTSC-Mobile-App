@@ -18,7 +18,7 @@ import { GetSpendListAPI, GetSpendListSubContractorAPI, UpdateSpendListAPI } fro
 
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
-import TotalLocationModal from '../../../components/Drawing/TotalLocationModal';
+import TotalLocationModal from '../../../components/drawing/TotalLocationModal';
 import SelectPopup from '../../../components/SelectPopup';
 
 const QCSpendListScreen = ({ route, navigation }) => {

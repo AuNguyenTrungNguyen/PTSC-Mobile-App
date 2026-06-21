@@ -23,7 +23,7 @@ import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
-import HelpModal from '../../../components/Drawing/HelpModal';
+import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
 import SelectPopupTwoColumns from '../../../components/SelectPopupTwoColumns';
 

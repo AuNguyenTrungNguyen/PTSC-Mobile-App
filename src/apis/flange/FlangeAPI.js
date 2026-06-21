@@ -51,4 +51,51 @@ export const UpdateFlangeJointProgresslDetailAPI = async (userUpdate, listItemUp
   ).then(res => res.json());
 }
 
-
+//-- NEW 
+export const GetFlangeJointListAPI = async (projectCode, facilityCode, lineNo) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetFlangeJointList'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&lineNo=' + lineNo,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }
+  ).then(res => res.json());
+};
+export const GetFlangeJointDetailAPI = async (projectCode, facilityCode, lineNo, sheet) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/GetFlangeJointDetail'
+    + '?projectCode=' + projectCode
+    + '&facilityCode=' + facilityCode
+    + '&lineNo=' + lineNo
+    + '&sheet=' + sheet,
+    {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+};
+export const UpdateFlangeJointDetailAPI = async (projectCode, facilityCode, userUpdate, listItemUpdate) => {
+  const token = await Helper.getData('TOKEN');
+  return fetch(
+    Port_Server
+    + '/api/piping/UpdateFlangeJointDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectCode, facilityCode, userUpdate, listItemUpdate }),
+    }
+  ).then(res => res.json());
+}

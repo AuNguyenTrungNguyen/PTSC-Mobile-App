@@ -4,19 +4,22 @@ import Moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-simple-toast';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import Dialog from "react-native-dialog";
 
 import Networker from '../../../utils/Networker';
 import Constant from '../../../utils/Constant';
 import Helper from '../../../utils/Helper';
 import Formater from '../../../utils/Formater';
 
-import { GetFlangeJointProgressDetailAPI, UpdateFlangeJointProgresslDetailAPI } from '../../../apis/flange/FlangeAPI';
+import { GetFlangeJointDetailAPI, UpdateFlangeJointDetailAPI } from '../../../apis/flange/FlangeAPI';
 
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
 import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
+import SelectPopup from '../../../components/SelectPopup';
 
 const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
 
@@ -69,7 +72,7 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
 
   //-- Get Data
   const getDetailList = () => {
-    GetFlangeJointProgressDetailAPI(projectCode, facilityCode, lineNo, sheet)
+    GetFlangeJointDetailAPI(projectCode, facilityCode, lineNo, sheet)
       .then(res => {
         if (res.Success) {
           setDetailList(res.Data);
@@ -120,7 +123,7 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
     //       messages.push('Heat02');
     //     }
     //     if ((column.indexOf('AdhesiveBatchNo') >= 0 && !batchNo) || (column.indexOf('AdhesiveBatchNo') < 0 && !oldItem['AdhesiveBatchNo'])) {
-    //       messages.push('BatchNo');
+    //       messages.push('Method');
     //     }
     //     if ((column.indexOf('ENVHumidity') >= 0 && !ENVHum) || (column.indexOf('ENVHumidity') < 0 && !oldItem['ENVHumidity'])) {
     //       messages.push('ENVHum');
@@ -139,10 +142,10 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
     //     const startTime = item['CuringStartTime'];
     //     const endTime = item['CuringEndTime'];
     //     const bonderID = item['BonderID'];
-    //     const CICO = item['CICO'];
+    //     const Lubricant = item['Lubricant'];
 
-    //     if ((startTime && endTime && bonderID && CICO)
-    //       || (!startTime && !endTime && !bonderID && !CICO)) {
+    //     if ((startTime && endTime && bonderID && Lubricant)
+    //       || (!startTime && !endTime && !bonderID && !Lubricant)) {
     //       return item;
     //     }
 
@@ -160,8 +163,8 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
     //     if ((column.indexOf('BonderID') >= 0 && !bonderID) || (column.indexOf('BonderID') < 0 && !oldItem['BonderID'])) {
     //       messages.push('BonderID');
     //     }
-    //     if ((column.indexOf('CICO') >= 0 && !CICO) || (column.indexOf('CICO') < 0 && !oldItem['CICO'])) {
-    //       messages.push('CICO');
+    //     if ((column.indexOf('Lubricant') >= 0 && !Lubricant) || (column.indexOf('Lubricant') < 0 && !oldItem['Lubricant'])) {
+    //       messages.push('Lubricant');
     //     }
     //     return item;
     //   });
@@ -171,7 +174,7 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
   const updateDetailList = async () => {
     const listUpdate = Helper.handleListUpdate(updateList);
     setIsUploading(true);
-    UpdateFlangeJointProgresslDetailAPI(userLogin, listUpdate)
+    UpdateFlangeJointDetailAPI(projectCode, facilityCode, userLogin, listUpdate)
       .then(res => {
         if (res.Success) {
           setUpdateList([]);
@@ -248,6 +251,10 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
     let array = [...detailList];
     array[index]['RequestToQCDate'] = valueClear;
     array[index]['TightenedDate'] = valueClear;
+
+    array[index]['Method'] = valueClear;
+    array[index]['Lubrication'] = valueClear;
+    array[index]['ToolSerialNo'] = valueClear;
     setDetailList(array);
 
     array = [...updateList];
@@ -258,10 +265,18 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
         RowIndex: rowIndex,
         ['RequestToQCDate']: valueClear,
         ['TightenedDate']: valueClear,
+
+        ['Method']: valueClear,
+        ['Lubrication']: valueClear,
+        ['ToolSerialNo']: valueClear,
       });
     } else {
       array[objIndex]['RequestToQCDate'] = valueClear;
       array[objIndex]['TightenedDate'] = valueClear;
+
+      array[objIndex]['Method'] = valueClear;
+      array[objIndex]['Lubrication'] = valueClear;
+      array[objIndex]['ToolSerialNo'] = valueClear;
     }
     setUpdateList(array);
   };
@@ -323,7 +338,7 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
             <Text style={styles.titleBaseText}>FlangeJoint:</Text>
           </View>
           <View style={styles.cellData}>
-            <Text style={styles.textBlue}>{Formater.formatEmptyData(item.FlangeJointNos)}</Text>
+            <Text style={styles.textBlue}>{Formater.formatEmptyData(item.FlangeJointNo)}</Text>
           </View>
         </View>
         <View style={styles.row}>
@@ -348,10 +363,97 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text style={styles.redText}>Method:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.Method)}</Text>
+            <TouchableOpacity onPress={() => { _onPressShowMethodPopup(index, 'Method') }}>
+              <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.cellPercent} />
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text style={styles.redText}>Lubricant:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.Lubrication)}</Text>
+            <TouchableOpacity onPress={() => { _onPressShowLubricantPopup(index, 'Lubrication') }}>
+              <Ionicons style={styles.iconAction} name='md-list' size={20} color={BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.cellPercent} />
+        </View>
+        <View style={styles.row}>
+          <View style={styles.cellTitle}>
+            <Text style={styles.redText}>ToolSerialNo:</Text>
+          </View>
+          <View style={styles.cellData}>
+            <Text style={styles.textData}>{Formater.formatEmptyData(item.ToolSerialNo)}</Text>
+            <TouchableOpacity onPress={() => _onPressSelectText(item.ToolSerialNo, index, 'ToolSerialNo')}>
+              <FontAwesomeIcon style={styles.iconAction} name='pencil' size={20} color={BASE_COLOR} />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     );
   };
 
+  //-- Method
+  const [isVisibleMethod, setIsVisibleMethod] = useState(false);
+  const _onPressShowMethodPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleMethod(true);
+  };
+  const _onPressClearMethod = () => {
+    onChangeMethod(null);
+    setIsVisibleMethod(false);
+  };
+  const onChangeMethod = data => {
+    onChangeData(data);
+    setIsVisibleMethod(false);
+  };
+
+  //-- Lubricant
+  const [isVisibleLubricant, setIsVisibleLubricant] = useState(false);
+  const _onPressShowLubricantPopup = (index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    setIsVisibleLubricant(true);
+  };
+  const _onPressClearLubricant = () => {
+    onChangeLubricant(null);
+    setIsVisibleLubricant(false);
+  };
+  const onChangeLubricant = data => {
+    onChangeData(data);
+    setIsVisibleLubricant(false);
+  };
+
+  //-- ToolSerialNo
+  const [isVisibleText, setIsVisibleText] = useState(false);
+  const [textDisplay, setTextDisplay] = useState('');
+  const _onPressSelectText = (value, index, key) => {
+    setIndexUpdate(index);
+    setKeyUpdate(key);
+    if (value) {
+      setTextDisplay(value.toString());
+    } else {
+      setTextDisplay('');
+    }
+    setIsVisibleText(true);
+  };
+  const _onChangeText = () => {
+    const text = textDisplay.trim();
+    setTextDisplay(text);
+    onChangeData(text);
+    setIsVisibleText(false);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -405,6 +507,32 @@ const FlangeJointProgressDetailScreen = ({ route, navigation }) => {
         onConfirm={_onChangeDate}
         onCancel={() => { setIsVisibleDate(false) }}
       />
+
+      <SelectPopup
+        visible={isVisibleMethod}
+        data={['Hand', 'Hydraulic', 'Tensional_2part', 'Tensional_4part']}
+        onChangeItem={onChangeMethod}
+        onCancel={() => setIsVisibleMethod(false)}
+        onClear={_onPressClearMethod}
+      />
+      <SelectPopup
+        visible={isVisibleLubricant}
+        data={['Molykote-P1000', 'N/A']}
+        onChangeItem={onChangeLubricant}
+        onCancel={() => setIsVisibleLubricant(false)}
+        onClear={_onPressClearLubricant} />
+
+      <Dialog.Container visible={isVisibleText}>
+        <Dialog.Title>{'Update ' + keyUpdate + ':'}</Dialog.Title>
+        <Dialog.Input
+          value={textDisplay}
+          placeholder={'Enter ' + keyUpdate}
+          onChangeText={(text) => setTextDisplay(text)}
+          underlineColorAndroid={BASE_COLOR}
+        />
+        <Dialog.Button label='Cancel' onPress={() => { setIsVisibleText(false) }} />
+        <Dialog.Button label='OK' onPress={_onChangeText} />
+      </Dialog.Container>
     </SafeAreaView>
   );
 };

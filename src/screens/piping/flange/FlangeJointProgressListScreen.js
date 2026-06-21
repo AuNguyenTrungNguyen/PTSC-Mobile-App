@@ -9,7 +9,7 @@ import Helper from '../../../utils/Helper';
 import CoreStyle from '../../../utils/CoreStyle';
 
 import { GetFacilityListAPI } from '../../../apis/app/AppAPI';
-import { GetFlangeJointProgressListAPI } from '../../../apis/flange/FlangeAPI';
+import { GetFlangeJointListAPI } from '../../../apis/flange/FlangeAPI';
 
 import { ListSelectData, ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import LoadingRefresh from '../../../components/LoadingRefresh';
@@ -69,7 +69,7 @@ const FlangeJointProgressListScreen = ({ route, navigation }) => {
   };
   async function getLineNoData({ facility = facilityCode } = {}) {
     facility = (!facility || facility === FACILITY_CODE_DEFAULT) ? '' : facility;
-    GetFlangeJointProgressListAPI(projectCode, facility, lineNo)
+    GetFlangeJointListAPI(projectCode, facility, lineNo)
       .then(res => {
         if (res.Success && res.Data) {
           setFlangeJointList(res.Data);

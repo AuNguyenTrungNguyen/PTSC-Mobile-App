@@ -23,7 +23,7 @@ import { ListLoadingData, ListEmptyData } from '../../../components/HelperUI';
 import MessageAlert from '../../../components/MessageAlert';
 import LoadingRefresh from '../../../components/LoadingRefresh';
 import Header from '../../../components/Header';
-import HelpModal from '../../../components/Drawing/HelpModal';
+import HelpModal from '../../../components/drawing/HelpModal';
 import SelectPopup from '../../../components/SelectPopup';
 
 const ConstructionMultiDetailScreen = ({ route, navigation }) => {
